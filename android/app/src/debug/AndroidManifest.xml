@@ -7,7 +7,9 @@
     <application
         tools:targetApi="28"
         tools:ignore="GoogleAppIndexingWarning"
-        android:extractNativeLibs="true">
+        android:extractNativeLibs="true"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:usesCleartextTraffic">
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false" />
     </application>
 </manifest>
