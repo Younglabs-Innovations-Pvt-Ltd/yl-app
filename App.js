@@ -53,7 +53,11 @@ function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          cardStyle: {backgroundColor: '#fff'},
+        }}>
         <Stack.Screen
           name="DemoClass"
           component={DemoClassScreen}
