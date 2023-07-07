@@ -4,6 +4,10 @@ import {StatusBar, Linking} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
+// Native mmodules
+import {initZoomSdk} from './src/natiive-modules/zoom-modules';
+
+// Screens
 import DemoClassScreen from './src/screens/demo-class.screen';
 
 const Stack = createStackNavigator();
@@ -12,11 +16,27 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [queryDataFromUrl, setQueryDataFromUrl] = useState(null);
 
+  // Style status bar
   useEffect(() => {
     StatusBar.setBarStyle('light-content');
     StatusBar.setBackgroundColor('#3CCF4E');
   }, []);
 
+  // Initialize Zoom
+  useEffect(() => {
+    const initializeZoom = async () => {
+      try {
+        const res = await initZoomSdk();
+        console.log(res);
+      } catch (error) {
+        console.log('Zoom initialize error', error);
+      }
+    };
+
+    initializeZoom();
+  }, []);
+
+  // Handle redirect url (Deep Link)
   useEffect(() => {
     const handleRedirectUrl = url => {
       if (!url) {

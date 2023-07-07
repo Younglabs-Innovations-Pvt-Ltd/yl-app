@@ -20,14 +20,14 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: '#fff',
   },
   logo: {
-    width: 36,
-    height: 36,
+    width: 48,
+    height: 48,
     resizeMode: 'contain',
   },
 });

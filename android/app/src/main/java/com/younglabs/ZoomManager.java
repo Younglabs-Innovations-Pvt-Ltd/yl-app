@@ -9,6 +9,9 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
+import us.zoom.sdk.JoinMeetingOptions;
+import us.zoom.sdk.JoinMeetingParams;
+import us.zoom.sdk.MeetingError;
 import us.zoom.sdk.MeetingParameter;
 import us.zoom.sdk.MeetingService;
 import us.zoom.sdk.MeetingServiceListener;
@@ -22,6 +25,8 @@ public class ZoomManager extends ReactContextBaseJavaModule implements ZoomSDKIn
     private ReactApplicationContext reactContext;
 
     private Promise initPromise;
+
+    private Promise meetingPromise;
 
     ZoomManager(ReactApplicationContext context) {
         super(context);
@@ -71,14 +76,54 @@ public class ZoomManager extends ReactContextBaseJavaModule implements ZoomSDKIn
         }
     }
 
+    @ReactMethod
+    public void joinClass(String meetingId, String password, String displayName, Promise promise) {
+        this.getReactApplicationContext().getCurrentActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ZoomSDK zoomSDK = ZoomSDK.getInstance();
+                MeetingService meetingService = zoomSDK.getMeetingService();
+                if (meetingService == null) {
+                    Log.d("ZoomManager", "Meeting service not available.");
+                }else {
+                    JoinMeetingOptions options = new JoinMeetingOptions();
+                    JoinMeetingParams params = new JoinMeetingParams();
+                    params.displayName = displayName;
+                    params.meetingNo = meetingId;
+                    params.password = password;
+
+                    int result = meetingService.joinMeetingWithParams(reactContext, params, options);
+                    if (result == MeetingError.MEETING_ERROR_SUCCESS) {
+                        meetingPromise = promise;
+                    }
+                }
+            }
+        });
+    }
+
     @Override
     public void onZoomAuthIdentityExpired() {
 
     }
 
     @Override
-    public void onMeetingStatusChanged(MeetingStatus meetingStatus, int i, int i1) {
+    public void onMeetingStatusChanged(MeetingStatus meetingStatus, int errorCode, int internalErrorCode) {
+        Log.i(this.getName(), "onMeetingStatusChanged, meetingStatus=" + meetingStatus + ", errorCode=" + errorCode
+                + ", internalErrorCode=" + internalErrorCode);
 
+        if(meetingStatus == MeetingStatus.MEETING_STATUS_FAILED && errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE) {
+            Log.d(this.getName(), "Version of ZoomSDK is too low!");
+        }
+
+        if (meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING) {
+            Log.d(this.getName(), "Class joined successfully.");
+            meetingPromise.resolve("class joined.");
+        }
+
+        if (meetingStatus == MeetingStatus.MEETING_STATUS_DISCONNECTING) {
+            Log.d(this.getName(), "Class leaving.");
+            meetingPromise.resolve("class leaved.");
+        }
     }
 
     @Override

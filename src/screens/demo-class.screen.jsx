@@ -5,9 +5,10 @@ import CountDown from '../components/countdown.component';
 import Seperator from '../components/seperator.component';
 import Button from '../components/Button.component';
 import {TextInput} from 'react-native-gesture-handler';
+import {joinClassOnZoom} from '../natiive-modules/zoom-modules';
 
 const getTimeRemaining = () => {
-  const countDownTime = new Date('2023-07-07T08:47:00.000Z').getTime();
+  const countDownTime = new Date('2023-07-07T11:30:00.000Z').getTime();
   const now = new Date().getTime();
 
   const remainingTime = countDownTime - now;
@@ -29,6 +30,7 @@ const DemoClassScreen = ({route}) => {
     params: {data},
   } = route;
 
+  const [childName, setChildName] = useState('');
   const [timeLeft, setTimeLeft] = useState(() => getTimeRemaining());
   const [isTimeover, setIsTimeover] = useState(false);
 
@@ -53,11 +55,24 @@ const DemoClassScreen = ({route}) => {
     };
   }, []);
 
-  const onClick = () => console.log('clicked!');
+  // Join Class
+  const handleJoinClass = async () => {
+    if (!data || !childName) {
+      console.log('No class data found');
+      return;
+    }
+
+    try {
+      const {meetingId, meetingPassword} = data;
+      const res = await joinClassOnZoom(meetingId, meetingPassword);
+      console.log('Join Class', res);
+    } catch (error) {
+      console.log('Join class error', error);
+    }
+  };
 
   return (
     <View>
-      <Header />
       <View style={styles.container}>
         {/* Logo */}
         <View style={{width: '100%', alignItems: 'center'}}>
@@ -79,9 +94,11 @@ const DemoClassScreen = ({route}) => {
                   placeholder="Child Name"
                   selectionColor="#000"
                   style={styles.input}
+                  value={childName}
+                  onChangeText={e => setChildName(e)}
                 />
                 <Seperator />
-                <Button onPress={onClick} bg="#3CCF4E">
+                <Button onPress={handleJoinClass} bg="#3CCF4E">
                   Join Class
                 </Button>
               </>
@@ -99,8 +116,8 @@ export default DemoClassScreen;
 
 const styles = StyleSheet.create({
   logo: {
-    width: 110,
-    height: 110,
+    width: 136,
+    height: 136,
   },
   heading: {
     fontSize: 24,
