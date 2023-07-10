@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import {useEffect, useState} from 'react';
-import {StatusBar, Linking} from 'react-native';
+import {StatusBar, Linking, ToastAndroid} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -27,6 +27,11 @@ function App() {
     const initializeZoom = async () => {
       try {
         const res = await initZoomSdk();
+        ToastAndroid.showWithGravity(
+          JSON.stringify(res),
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+        );
         console.log(res);
       } catch (error) {
         console.log('Zoom initialize error', error);
@@ -81,7 +86,9 @@ function App() {
         <Stack.Screen
           name="DemoClass"
           component={DemoClassScreen}
-          initialParams={{data: queryDataFromUrl}}
+          initialParams={{
+            data: {queryData: queryDataFromUrl, bookingId: '72625'},
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

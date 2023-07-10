@@ -85,6 +85,7 @@ public class ZoomManager extends ReactContextBaseJavaModule implements ZoomSDKIn
                 MeetingService meetingService = zoomSDK.getMeetingService();
                 if (meetingService == null) {
                     Log.d("ZoomManager", "Meeting service not available.");
+                    promise.resolve("Meeting service not available.");
                 }else {
                     JoinMeetingOptions options = new JoinMeetingOptions();
                     JoinMeetingParams params = new JoinMeetingParams();
