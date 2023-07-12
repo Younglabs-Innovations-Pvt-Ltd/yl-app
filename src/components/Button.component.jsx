@@ -6,7 +6,8 @@ const Button = ({children, bg, ...otherProps}) => {
   return (
     <TouchableOpacity
       {...otherProps}
-      style={{...styles.button, backgroundColor: bg}}>
+      activeOpacity={0.75}
+      style={[styles.button, {backgroundColor: bg}]}>
       <Text style={styles.buttonText}>{children}</Text>
     </TouchableOpacity>
   );

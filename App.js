@@ -2,13 +2,18 @@ import 'react-native-gesture-handler';
 import {useEffect, useState} from 'react';
 import {StatusBar, Linking, ToastAndroid} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+} from '@react-navigation/stack';
 
 // Native mmodules
 import {initZoomSdk} from './src/natiive-modules/zoom-modules';
 
 // Screens
 import DemoClassScreen from './src/screens/demo-class.screen';
+import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
+import OnBoardingScreen from './src/screens/on-boarding-screen';
 
 const Stack = createStackNavigator();
 
@@ -82,14 +87,19 @@ function App() {
         screenOptions={{
           headerShown: false,
           cardStyle: {backgroundColor: '#fff'},
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
         }}>
         <Stack.Screen
           name="DemoClass"
           component={DemoClassScreen}
           initialParams={{
-            data: {queryData: queryDataFromUrl, bookingId: '72625'},
+            data: {queryData: queryDataFromUrl},
           }}
         />
+        <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
+        <Stack.Screen name="Reschedule" component={ReScheduleScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

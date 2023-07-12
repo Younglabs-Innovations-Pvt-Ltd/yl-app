@@ -1,5 +1,7 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, Dimensions} from 'react-native';
+
+const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 
 const CountDown = ({timeLeft}) => {
   return (
@@ -15,11 +17,35 @@ const CountDown = ({timeLeft}) => {
 
             return (
               <View key={label} style={styles.timeContainer}>
-                <Text style={styles.timeText}>{value}</Text>
+                <Text style={styles.timeText}>{zeroPrefix(value)}</Text>
                 <Text style={styles.timeLabel}>{updatedLabel}</Text>
               </View>
             );
           })}
+        {/* {days > 0 && (
+          <View style={styles.timeBlock}>
+            <Text style={styles.timerText}>{zeroPrefix(days)}</Text>
+            <Text style={styles.timeText}>Days</Text>
+          </View>
+        )}
+        {hours > 0 && (
+          <View style={styles.timeBlock}>
+            <Text style={styles.timerText}>{zeroPrefix(hours)}</Text>
+            <Text style={styles.timeText}>Hours</Text>
+          </View>
+        )}
+        {hours <= 0 && (
+          <View style={styles.timeBlock}>
+            <Text style={styles.timerText}>{zeroPrefix(minutes)}</Text>
+            <Text style={styles.timeText}>Minutes</Text>
+          </View>
+        )}
+        {days <= 0 && hours <= 0 ? (
+          <View style={styles.timeBlock}>
+            <Text style={styles.timerText}>{zeroPrefix(seconds)}</Text>
+            <Text style={styles.timeText}>Seconds</Text>
+          </View>
+        ) : null} */}
       </View>
     </View>
   );
@@ -31,9 +57,8 @@ const styles = StyleSheet.create({
   countdown: {
     width: '100%',
     backgroundColor: '#eaeaea',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 16,
+    padding: 12,
+    borderRadius: 8,
   },
   timeContainer: {
     flex: 1,
@@ -52,13 +77,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   timeText: {
-    fontSize: 24,
+    fontSize: 36,
     fontWeight: '600',
     color: '#000',
+    marginLeft: 8,
   },
   containerList: {
     width: '100%',
     display: 'flex',
+    justifyContent: 'space-between',
     flexDirection: 'row',
     gap: 8,
   },

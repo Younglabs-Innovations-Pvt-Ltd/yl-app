@@ -1,10 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  KeyboardAvoidingView,
+  ScrollView,
+} from 'react-native';
 import CountDown from '../components/countdown.component';
 import Seperator from '../components/seperator.component';
-import Button from '../components/Button.component';
-import {TextInput} from 'react-native-gesture-handler';
+import Button from '../components/button.component';
 import {joinClassOnZoom} from '../natiive-modules/zoom-modules';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Input from '../components/input.component';
 
 const BOOKING_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/bookingstatus';
@@ -37,25 +45,42 @@ const INITIAL_TIME = {
   seconds: 0,
 };
 
-const checkDemoEnded = time => {
-  return new Date(time).getTime() + 1000 * 60 * 60 <= new Date().getTime();
-};
-
 // Main Component
-const DemoClassScreen = ({route}) => {
+const DemoClassScreen = ({route, navigation}) => {
   const {
     params: {
-      data: {bookingId},
+      data: {queryData},
     },
   } = route;
 
   const [childName, setChildName] = useState('');
-  const [bookingTime, setBookingTime] = useState('2023-07-08T09:30:00.000Z');
+  const [bookingTime, setBookingTime] = useState('2023-07-12T09:30:00.000Z');
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
   const [zoomData, setZoomData] = useState(null);
-  const [isAttended, setIsAttended] = useState(false);
+  const [demoBookingId, setDemoBookingId] = useState('');
   const [showJoinButton, setShowJoinButton] = useState(false);
+
+  // Set demo booking id
+  useEffect(() => {
+    const getDemoId = async () => {
+      try {
+        const demoIdFromAsyncStorage = await AsyncStorage.getItem('bookingid');
+
+        if (queryData && !demoIdFromAsyncStorage) {
+          await AsyncStorage.setItem('bookingid', queryData?.demoId);
+        }
+
+        const demoId = demoIdFromAsyncStorage || queryData?.demoId;
+
+        if (demoId) setDemoBookingId(demoId);
+      } catch (error) {
+        console.log('Async storage error', error);
+      }
+    };
+
+    getDemoId();
+  }, []);
 
   // Call api to get booking status
   useEffect(() => {
@@ -66,12 +91,11 @@ const DemoClassScreen = ({route}) => {
           headers: {
             'content-type': 'application/json',
           },
-          body: JSON.stringify({bId: bookingId}),
+          body: JSON.stringify({bId: JSON.parse(demoBookingId)}),
         });
 
         const {
           demoDate: {_seconds},
-          demoFlag,
           meetingId,
           pwd,
           attendedOrNot,
@@ -82,13 +106,16 @@ const DemoClassScreen = ({route}) => {
 
         // Mark attendence
         if (demodate === today) {
-          if (!demoFlag) {
+          if (!attendedOrNot) {
             const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({type: 'student', bId: bookingId}),
+              body: JSON.stringify({
+                type: 'student',
+                bId: JSON.parse(demoBookingId),
+              }),
             });
 
             if (markAttendenceResponse.status === 200) {
@@ -99,14 +126,10 @@ const DemoClassScreen = ({route}) => {
 
         // If marked attendence, set zoom data(meetingId, password)
         if (meetingId && pwd) {
-          console.log('Got zoom data successfully.');
+          console.log('Got zoom data successfully.', {meetingId, pwd});
           setZoomData({meetingId, pwd});
           setShowJoinButton(true);
         }
-
-        // Set attended or not a demo class
-        setIsAttended(attendedOrNot);
-        console.log('attended=', attendedOrNot);
 
         // Set booking time for timer
         if (_seconds) setBookingTime(_seconds * 1000);
@@ -115,10 +138,10 @@ const DemoClassScreen = ({route}) => {
       }
     };
 
-    if (bookingId) {
+    if (demoBookingId) {
       getBookingStatus();
     }
-  }, []);
+  }, [demoBookingId]);
 
   // Timer
   useEffect(() => {
@@ -157,10 +180,11 @@ const DemoClassScreen = ({route}) => {
     if (bookingTime) {
       const afterOneHourFromDemoDate =
         new Date(bookingTime).getTime() + 1000 * 60 * 60;
+
       if (afterOneHourFromDemoDate <= new Date().getTime()) {
-        console.log('Demo ended');
+        console.log('time over');
         // Hide class join button
-        // setShowJoinButton(false);
+        setShowJoinButton(false);
       }
     }
   }, [bookingTime]);
@@ -181,53 +205,60 @@ const DemoClassScreen = ({route}) => {
     }
   };
 
+  // const handleDemoId = async id => {
+  //   console.log('id', id);
+
+  //   try {
+  //     const data = await fetch(BOOKING_URL, {
+  //       method: 'POST',
+  //       headers: {
+  //         'content-type': 'application/json',
+  //       },
+  //       body: JSON.stringify({bId: id}),
+  //     }).then(response => response.json());
+
+  //     console.log(data);
+  //   } catch (error) {
+  //     console.log('Demo Class, booking status api error', error);
+  //   }
+  // };
+
   return (
-    <View>
-      <View style={styles.container}>
-        {/* Logo */}
-        <View style={{width: '100%', alignItems: 'center'}}>
-          <Image
-            source={require('../images/YoungLabsLogo.png')}
-            resizeMode="contain"
-            style={styles.logo}
-          />
+    <KeyboardAvoidingView behavior="padding">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+          <View style={styles.box}>
+            {/* <Text style={styles.heading}>Welcome to YoungLabs</Text> */}
+            {bookingTime
+              ? new Date(bookingTime).getTime() > new Date().getTime() && (
+                  <DateTime demoDate={bookingTime} />
+                )
+              : null}
+            <Seperator space={6} />
+            {<CountDown timeLeft={timeLeft} />}
+            <Seperator />
+            {isTimeover
+              ? showJoinButton && (
+                  <>
+                    <Input
+                      placeholder="Child Name"
+                      selectionColor="#000"
+                      style={styles.input}
+                      value={childName}
+                      onChangeText={e => setChildName(e)}
+                    />
+                    <Seperator />
+                    <Button onPress={handleJoinClass} bg="#3CCF4E">
+                      Join Class
+                    </Button>
+                  </>
+                )
+              : null}
+            <Seperator />
+          </View>
         </View>
-        <View style={styles.box}>
-          <Text style={styles.heading}>Welcome to YoungLabs</Text>
-          <Seperator space={6} />
-          {bookingTime && <DateTime demoDate={bookingTime} />}
-          <Seperator />
-          <CountDown timeLeft={timeLeft} />
-          <Seperator />
-          {isTimeover ? (
-            showJoinButton ? (
-              <>
-                <TextInput
-                  placeholder="Child Name"
-                  selectionColor="#000"
-                  style={styles.input}
-                  value={childName}
-                  onChangeText={e => setChildName(e)}
-                />
-                <Seperator />
-                <Button onPress={handleJoinClass} bg="#3CCF4E">
-                  Join Class
-                </Button>
-              </>
-            ) : (
-              <Text>Not coming through url</Text>
-            )
-          ) : null}
-          {isAttended && <Text>How was the demo class?</Text>}
-          {bookingTime
-            ? !isAttended &&
-              checkDemoEnded(bookingTime) && (
-                <Text>You missed demo class, please re-schedule one</Text>
-              )
-            : null}
-        </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -241,26 +272,27 @@ const DateTime = ({demoDate}) => {
         ...styles.textCenter,
         ...styles.demoDateText,
       }}>
-      Your free class is at{' '}
+      Your demo class is at{' '}
       <Text style={{color: '#000', fontWeight: '700'}}>{localDate}</Text>
     </Text>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    height: '100%',
+    paddingHorizontal: 12,
+    paddingTop: 36,
+  },
   logo: {
-    width: 136,
-    height: 136,
+    maxWidth: '100%',
+    height: 110,
   },
   heading: {
     fontSize: 24,
     fontWeight: '600',
     color: '#000',
     textAlign: 'center',
-  },
-  container: {
-    paddingTop: 48,
-    paddingHorizontal: 12,
   },
   box: {
     maxWidth: 540,
