@@ -1,5 +1,6 @@
 import React from 'react';
-import {StyleSheet, Text, View, Dimensions} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
+import {COLORS} from '../theme/theme';
 
 const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 
@@ -22,30 +23,6 @@ const CountDown = ({timeLeft}) => {
               </View>
             );
           })}
-        {/* {days > 0 && (
-          <View style={styles.timeBlock}>
-            <Text style={styles.timerText}>{zeroPrefix(days)}</Text>
-            <Text style={styles.timeText}>Days</Text>
-          </View>
-        )}
-        {hours > 0 && (
-          <View style={styles.timeBlock}>
-            <Text style={styles.timerText}>{zeroPrefix(hours)}</Text>
-            <Text style={styles.timeText}>Hours</Text>
-          </View>
-        )}
-        {hours <= 0 && (
-          <View style={styles.timeBlock}>
-            <Text style={styles.timerText}>{zeroPrefix(minutes)}</Text>
-            <Text style={styles.timeText}>Minutes</Text>
-          </View>
-        )}
-        {days <= 0 && hours <= 0 ? (
-          <View style={styles.timeBlock}>
-            <Text style={styles.timerText}>{zeroPrefix(seconds)}</Text>
-            <Text style={styles.timeText}>Seconds</Text>
-          </View>
-        ) : null} */}
       </View>
     </View>
   );
@@ -56,31 +33,27 @@ export default CountDown;
 const styles = StyleSheet.create({
   countdown: {
     width: '100%',
-    backgroundColor: '#eaeaea',
-    padding: 12,
-    borderRadius: 8,
+    padding: 8,
   },
   timeContainer: {
     flex: 1,
-    height: 75,
-    paddingHorizontal: 8,
-    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.pgreen,
     borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
   },
   timeLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: 'gray',
+    color: COLORS.white,
     marginTop: 2,
   },
   timeText: {
     fontSize: 36,
-    fontWeight: '600',
-    color: '#000',
-    marginLeft: 8,
+    fontWeight: 'bold',
+    color: COLORS.white,
   },
   containerList: {
     width: '100%',
