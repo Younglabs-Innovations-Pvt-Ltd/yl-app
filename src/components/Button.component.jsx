@@ -1,15 +1,16 @@
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {StyleSheet, Text, Pressable} from 'react-native';
 
 const Button = ({children, bg, ...otherProps}) => {
   return (
-    <TouchableOpacity
+    <Pressable
       {...otherProps}
-      activeOpacity={0.75}
-      style={[styles.button, {backgroundColor: bg}]}>
+      style={({pressed}) => [
+        styles.button,
+        {backgroundColor: bg, opacity: pressed ? 0.75 : 1},
+      ]}>
       <Text style={styles.buttonText}>{children}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

@@ -1,11 +1,15 @@
 import 'react-native-gesture-handler';
 import {useEffect, useState} from 'react';
-import {StatusBar, Linking, ToastAndroid} from 'react-native';
+import {StatusBar, Linking, ToastAndroid, Platform} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
   createStackNavigator,
 } from '@react-navigation/stack';
+import {Provider} from 'react-redux';
+import {store} from './src/store/store';
+
+// import SplashScreen from 'react-native-splash-screen';
 
 // Native mmodules
 import {initZoomSdk} from './src/natiive-modules/zoom-modules';
@@ -14,6 +18,8 @@ import {initZoomSdk} from './src/natiive-modules/zoom-modules';
 import DemoClassScreen from './src/screens/demo-class.screen';
 import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
+
+import {COLORS} from './src/theme/theme';
 
 const Stack = createStackNavigator();
 
@@ -24,8 +30,15 @@ function App() {
   // Style status bar
   useEffect(() => {
     StatusBar.setBarStyle('light-content');
-    StatusBar.setBackgroundColor('#3CCF4E');
+    StatusBar.setBackgroundColor(COLORS.pgreen);
   }, []);
+
+  // Splash Screen
+  // useEffect(() => {
+  //   if (Platform.OS === 'android') {
+  //     SplashScreen.hide();
+  //   }
+  // }, []);
 
   // Initialize Zoom
   useEffect(() => {
@@ -82,26 +95,28 @@ function App() {
   if (loading) return null;
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          cardStyle: {backgroundColor: '#fff'},
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-          gestureEnabled: true,
-          gestureDirection: 'horizontal',
-        }}>
-        <Stack.Screen
-          name="DemoClass"
-          component={DemoClassScreen}
-          initialParams={{
-            data: {queryData: queryDataFromUrl},
-          }}
-        />
-        <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
-        <Stack.Screen name="Reschedule" component={ReScheduleScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            cardStyle: {backgroundColor: '#fff'},
+            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+            gestureEnabled: true,
+            gestureDirection: 'horizontal',
+          }}>
+          <Stack.Screen
+            name="DemoClass"
+            component={DemoClassScreen}
+            initialParams={{
+              data: {queryData: queryDataFromUrl},
+            }}
+          />
+          <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
+          <Stack.Screen name="Reschedule" component={ReScheduleScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 

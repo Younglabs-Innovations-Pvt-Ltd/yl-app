@@ -7,12 +7,18 @@ import {
   ScrollView,
 } from 'react-native';
 import CountDown from '../components/countdown.component';
-import Seperator from '../components/seperator.component';
+import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
 import {joinClassOnZoom} from '../natiive-modules/zoom-modules';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Input from '../components/input.component';
+import JoinDemo from '../components/join-demo.component';
+import Seperator from '../components/seperator.component';
+
+import {COLORS} from '../theme/theme';
+
+import {useSelector} from 'react-redux';
 
 const BOOKING_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/bookingstatus';
@@ -53,12 +59,16 @@ const DemoClassScreen = ({route, navigation}) => {
     },
   } = route;
 
+  const demoState = useSelector(state => state.demo);
+  console.log(demoState);
+
   const [childName, setChildName] = useState('');
-  const [bookingTime, setBookingTime] = useState('2023-07-12T09:30:00.000Z');
+  const [bookingTime, setBookingTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
   const [zoomData, setZoomData] = useState(null);
   const [demoBookingId, setDemoBookingId] = useState('');
+  const [demoPhoneNumber, setDemoPhoneNumber] = useState('');
   const [showJoinButton, setShowJoinButton] = useState(false);
 
   // Set demo booking id
@@ -66,6 +76,7 @@ const DemoClassScreen = ({route, navigation}) => {
     const getDemoId = async () => {
       try {
         const demoIdFromAsyncStorage = await AsyncStorage.getItem('bookingid');
+        const phoneFromAsyncStorage = await AsyncStorage.getItem('phone');
 
         if (queryData && !demoIdFromAsyncStorage) {
           await AsyncStorage.setItem('bookingid', queryData?.demoId);
@@ -73,7 +84,11 @@ const DemoClassScreen = ({route, navigation}) => {
 
         const demoId = demoIdFromAsyncStorage || queryData?.demoId;
 
-        if (demoId) setDemoBookingId(demoId);
+        if (demoId) {
+          setDemoBookingId(demoId);
+        } else {
+          setDemoPhoneNumber(phoneFromAsyncStorage);
+        }
       } catch (error) {
         console.log('Async storage error', error);
       }
@@ -84,64 +99,19 @@ const DemoClassScreen = ({route, navigation}) => {
 
   // Call api to get booking status
   useEffect(() => {
-    const getBookingStatus = async () => {
-      try {
-        const response = await fetch(BOOKING_URL, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({bId: JSON.parse(demoBookingId)}),
-        });
-
-        const {
-          demoDate: {_seconds},
-          meetingId,
-          pwd,
-          attendedOrNot,
-        } = await response.json();
-
-        const demodate = new Date(_seconds * 1000).getDate();
-        const today = new Date().getDate();
-
-        // Mark attendence
-        if (demodate === today) {
-          if (!attendedOrNot) {
-            const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                type: 'student',
-                bId: JSON.parse(demoBookingId),
-              }),
-            });
-
-            if (markAttendenceResponse.status === 200) {
-              console.log(await markAttendenceResponse.json());
-            }
-          }
-        }
-
-        // If marked attendence, set zoom data(meetingId, password)
-        if (meetingId && pwd) {
-          console.log('Got zoom data successfully.', {meetingId, pwd});
-          setZoomData({meetingId, pwd});
-          setShowJoinButton(true);
-        }
-
-        // Set booking time for timer
-        if (_seconds) setBookingTime(_seconds * 1000);
-      } catch (error) {
-        console.log('Demo Class, booking status api error', error);
-      }
-    };
-
     if (demoBookingId) {
-      getBookingStatus();
+      // Booking status by booking id
+      getBookingStatus({bId: JSON.parse(demoBookingId)});
     }
   }, [demoBookingId]);
+
+  // Call api to get booking status
+  useEffect(() => {
+    if (demoPhoneNumber) {
+      // Booking status by booking id
+      getBookingStatus({phone: JSON.parse(demoPhoneNumber)});
+    }
+  }, [demoPhoneNumber]);
 
   // Timer
   useEffect(() => {
@@ -162,6 +132,9 @@ const DemoClassScreen = ({route, navigation}) => {
         if (remaining.remainingTime <= 120 * 1000) {
           if (apiCount === 1) {
             console.log('2 minutes is left to call api');
+            if (demoBookingId) {
+              getBookingStatus({bId: JSON.parse(demoBookingId)});
+            }
             apiCount++;
           }
         }
@@ -189,6 +162,68 @@ const DemoClassScreen = ({route, navigation}) => {
     }
   }, [bookingTime]);
 
+  // Booking status
+  const getBookingStatus = async data => {
+    try {
+      const asyncPhone = await AsyncStorage.getItem('phone');
+      if (data.phone) {
+        if (!asyncPhone) {
+          await AsyncStorage.setItem('phone', JSON.stringify(data.phone));
+        }
+      }
+
+      const response = await fetch(BOOKING_URL, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const {
+        demoDate: {_seconds},
+        meetingId,
+        pwd,
+        attendedOrNot,
+      } = await response.json();
+
+      const demodate = new Date(_seconds * 1000).getDate();
+      const today = new Date().getDate();
+
+      // Mark attendence
+      if (demodate === today) {
+        if (!attendedOrNot) {
+          const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'student',
+              bId: JSON.parse(demoBookingId),
+            }),
+          });
+
+          if (markAttendenceResponse.status === 200) {
+            console.log(await markAttendenceResponse.json());
+          }
+        }
+      }
+
+      // If marked attendence, set zoom data(meetingId, password)
+      if (meetingId && pwd) {
+        console.log('Got zoom data successfully.', {meetingId, pwd});
+        setZoomData({meetingId, pwd});
+        setShowJoinButton(true);
+      }
+
+      // Set booking time for timer
+      if (_seconds) setBookingTime(_seconds * 1000);
+    } catch (error) {
+      console.log('Demo Class, booking status api error', error);
+    }
+  };
+
   // Join Class
   const handleJoinClass = async () => {
     if (!zoomData || !childName) {
@@ -205,23 +240,10 @@ const DemoClassScreen = ({route, navigation}) => {
     }
   };
 
-  // const handleDemoId = async id => {
-  //   console.log('id', id);
-
-  //   try {
-  //     const data = await fetch(BOOKING_URL, {
-  //       method: 'POST',
-  //       headers: {
-  //         'content-type': 'application/json',
-  //       },
-  //       body: JSON.stringify({bId: id}),
-  //     }).then(response => response.json());
-
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.log('Demo Class, booking status api error', error);
-  //   }
-  // };
+  const handleBookingStatus = async phone => {
+    const d = {phone: parseInt(phone)};
+    getBookingStatus(d);
+  };
 
   return (
     <KeyboardAvoidingView behavior="padding">
@@ -234,9 +256,17 @@ const DemoClassScreen = ({route, navigation}) => {
                   <DateTime demoDate={bookingTime} />
                 )
               : null}
-            <Seperator space={6} />
-            {<CountDown timeLeft={timeLeft} />}
-            <Seperator />
+            <Spacer space={6} />
+            {bookingTime ? (
+              new Date(bookingTime).getTime() > new Date().getTime() ? (
+                <CountDown timeLeft={timeLeft} />
+              ) : (
+                <View>
+                  <Text>How was your demo?</Text>
+                </View>
+              )
+            ) : null}
+            <Spacer />
             {isTimeover
               ? showJoinButton && (
                   <>
@@ -247,14 +277,24 @@ const DemoClassScreen = ({route, navigation}) => {
                       value={childName}
                       onChangeText={e => setChildName(e)}
                     />
-                    <Seperator />
-                    <Button onPress={handleJoinClass} bg="#3CCF4E">
+                    <Spacer />
+                    <Button onPress={handleJoinClass} bg={COLORS.pgreen}>
                       Join Class
                     </Button>
                   </>
                 )
               : null}
-            <Seperator />
+            {!demoBookingId && !demoPhoneNumber ? (
+              <>
+                <JoinDemo handleBookingStatus={handleBookingStatus} />
+                <Spacer space={4} />
+                <Seperator text="or" />
+                <Spacer space={4} />
+                <Button bg={'#F86F03'} onPress={() => console.log('pressed!')}>
+                  Book A Free Demo
+                </Button>
+              </>
+            ) : null}
           </View>
         </View>
       </ScrollView>
@@ -282,7 +322,7 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     paddingHorizontal: 12,
-    paddingTop: 36,
+    paddingTop: 16,
   },
   logo: {
     maxWidth: '100%',

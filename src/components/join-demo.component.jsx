@@ -1,27 +1,31 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Input from './input.component';
 import Button from './button.component';
-import Seperator from './seperator.component';
+import Seperator from './spacer.component';
+import {COLORS} from '../theme/theme';
 
-const JoinDemo = ({handleDemoId}) => {
-  const [demoId, setDemoId] = useState('');
+const JoinDemo = ({handleBookingStatus}) => {
+  const [phone, setPhone] = useState('');
 
   const handleDemoBookingId = () => {
-    if (!demoId) return;
-    handleDemoId(demoId);
+    if (!phone) return;
+    handleBookingStatus(phone);
   };
 
   return (
     <View>
+      <Text style={styles.demoText}>
+        Enter your mobile number to get demo class details
+      </Text>
       <Input
-        placeholder="Enter your demo id"
-        value={demoId}
+        placeholder="Enter mobile number"
+        value={phone}
         inputMode="numeric"
-        onChangeText={id => setDemoId(id)}
+        onChangeText={phoneNumber => setPhone(phoneNumber)}
       />
       <Seperator />
-      <Button bg="green" onPress={handleDemoBookingId}>
+      <Button bg={COLORS.pgreen} onPress={handleDemoBookingId}>
         Submit
       </Button>
     </View>
@@ -30,4 +34,10 @@ const JoinDemo = ({handleDemoId}) => {
 
 export default JoinDemo;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  demoText: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: COLORS.black,
+  },
+});
