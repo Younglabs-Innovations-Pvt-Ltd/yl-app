@@ -8,17 +8,24 @@ import {
   setBookingDetailSuccess,
   startFetchBookingDetailsFromId,
   startFetchBookingDetailsFromPhone,
+  setDemoPhone,
 } from './demo.reducer';
 
 // Fetch booking details from phone number
 function* fetchDemoDetailsFromPhone({payload}) {
   try {
+    const response = yield call(fetchBookingDetailsFromPhone, payload);
+    const data = yield response.json();
+    // Check if phone number is not wrong
+    if (response.status === 400) {
+      yield put(setBookingDetailSuccess(data));
+      return;
+    }
+    // set phone to local storage
     const phoneFromAsync = yield AsyncStorage.getItem('phone');
     if (!phoneFromAsync) {
       yield AsyncStorage.setItem('phone', payload);
     }
-    const response = yield call(fetchBookingDetailsFromPhone, payload);
-    const data = yield response.json();
     yield put(setBookingDetailSuccess(data));
   } catch (error) {
     console.log('Demosaga_detail_phone', error);

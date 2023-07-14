@@ -17,12 +17,13 @@ import Input from '../components/input.component';
 import JoinDemo from '../components/join-demo.component';
 import Seperator from '../components/seperator.component';
 
-import {COLORS} from '../theme/theme';
+import {COLORS, FONTS} from '../assets/theme/theme';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {
   startFetchBookingDetailsFromId,
   startFetchBookingDetailsFromPhone,
+  setDemoPhone,
 } from '../store/demo/demo.reducer';
 
 const MARK_ATTENDENCE_URL =
@@ -62,7 +63,7 @@ const DemoClassScreen = ({route, navigation}) => {
   } = route;
 
   const dispatch = useDispatch();
-  const {demoData, loading} = useSelector(state => state.demo);
+  const {demoData, loading, demoPhoneNumber} = useSelector(state => state.demo);
 
   const [childName, setChildName] = useState('');
   const [bookingTime, setBookingTime] = useState(null);
@@ -70,7 +71,6 @@ const DemoClassScreen = ({route, navigation}) => {
   const [isTimeover, setIsTimeover] = useState(false);
   const [zoomData, setZoomData] = useState(null);
   const [demoBookingId, setDemoBookingId] = useState('');
-  const [demoPhoneNumber, setDemoPhoneNumber] = useState('');
   const [showJoinButton, setShowJoinButton] = useState(false);
 
   // Set demo booking id
@@ -87,7 +87,7 @@ const DemoClassScreen = ({route, navigation}) => {
         const demoId = demoIdFromAsyncStorage || queryData?.demoId;
 
         if (phoneFromAsyncStorage) {
-          setDemoPhoneNumber(phoneFromAsyncStorage);
+          dispatch(setDemoPhone(phoneFromAsyncStorage));
         } else {
           setDemoBookingId(demoId);
         }
@@ -162,6 +162,7 @@ const DemoClassScreen = ({route, navigation}) => {
           ToastAndroid.SHORT,
           ToastAndroid.BOTTOM,
         );
+        dispatch(setDemoPhone(''));
       }
     }
   }, [demoData]);
@@ -169,14 +170,14 @@ const DemoClassScreen = ({route, navigation}) => {
   // Call api to get booking status from booking id
   useEffect(() => {
     if (demoBookingId) {
-      dispatch(startFetchBookingDetailsFromId(demoBookingId));
+      !demoData && dispatch(startFetchBookingDetailsFromId(demoBookingId));
     }
   }, [demoBookingId]);
 
   // Call api to get booking status from phone number
   useEffect(() => {
     if (demoPhoneNumber) {
-      dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+      !demoData && dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
     }
   }, [demoPhoneNumber]);
 
@@ -247,7 +248,6 @@ const DemoClassScreen = ({route, navigation}) => {
 
   const handleBookingStatus = async phone => {
     dispatch(startFetchBookingDetailsFromPhone(phone));
-    setDemoPhoneNumber(phone);
   };
 
   return loading ? (
@@ -257,16 +257,12 @@ const DemoClassScreen = ({route, navigation}) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.box}>
-            {/* <Text style={styles.heading}>Welcome to YoungLabs</Text> */}
-            {bookingTime
-              ? new Date(bookingTime).getTime() > new Date().getTime() && (
-                  <DateTime demoDate={bookingTime} />
-                )
-              : null}
-            <Spacer space={6} />
             {bookingTime ? (
               new Date(bookingTime).getTime() > new Date().getTime() ? (
-                <CountDown timeLeft={timeLeft} />
+                <>
+                  <DateTime demoDate={bookingTime} />
+                  <CountDown timeLeft={timeLeft} />
+                </>
               ) : (
                 <View>
                   <Text>How was your demo?</Text>
@@ -314,11 +310,7 @@ export default DemoClassScreen;
 const DateTime = ({demoDate}) => {
   const localDate = new Date(demoDate).toDateString();
   return (
-    <Text
-      style={{
-        ...styles.textCenter,
-        ...styles.demoDateText,
-      }}>
+    <Text style={styles.demoDateText}>
       Your demo class is at{' '}
       <Text style={{color: '#000', fontWeight: '700'}}>{localDate}</Text>
     </Text>
@@ -335,14 +327,9 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
     height: 110,
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#000',
-    textAlign: 'center',
-  },
   box: {
     maxWidth: 540,
+    marginHorizontal: 'auto',
   },
   input: {
     width: '100%',
@@ -357,5 +344,6 @@ const styles = StyleSheet.create({
   demoDateText: {
     fontSize: 18,
     color: 'gray',
+    fontFamily: FONTS.roboto,
   },
 });

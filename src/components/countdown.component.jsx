@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {COLORS} from '../theme/theme';
+import {COLORS, FONTS} from '../assets/theme/theme';
 
 const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 
@@ -49,11 +49,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.white,
     marginTop: 2,
+    fontFamily: FONTS.roboto,
   },
   timeText: {
-    fontSize: 36,
-    fontWeight: 'bold',
+    fontSize: 52,
     color: COLORS.white,
+    fontFamily: FONTS.bigShoulders_semibold,
   },
   containerList: {
     width: '100%',

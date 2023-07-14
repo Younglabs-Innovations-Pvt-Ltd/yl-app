@@ -3,7 +3,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import Input from './input.component';
 import Button from './button.component';
 import Seperator from './spacer.component';
-import {COLORS} from '../theme/theme';
+import {COLORS, FONTS} from '../assets/theme/theme';
 
 const JoinDemo = ({handleBookingStatus}) => {
   const [phone, setPhone] = useState('');
@@ -39,5 +39,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: COLORS.black,
+    fontFamily: FONTS.roboto,
   },
 });

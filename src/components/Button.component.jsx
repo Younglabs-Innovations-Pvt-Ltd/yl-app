@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, Pressable} from 'react-native';
+import {FONTS} from '../assets/theme/theme';
 
 const Button = ({children, bg, ...otherProps}) => {
   return (
@@ -27,8 +28,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
     color: '#fff',
     textAlign: 'center',
+    letterSpacing: 1.5,
+    fontFamily: FONTS.roboto,
   },
 });

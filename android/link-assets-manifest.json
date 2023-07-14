@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Big Shoulders Display SemiBold.ttf",
+      "sha1": "ba87c28cfbea5b4da7f506550a9febff5b34223f"
+    },
+    {
+      "path": "src/assets/fonts/Roboto Condensed.ttf",
+      "sha1": "e0d7acf2ca3dd0ff68f533797bb94b0580397e95"
+    }
+  ]
+}

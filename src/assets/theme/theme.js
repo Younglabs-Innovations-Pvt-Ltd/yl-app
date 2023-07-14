@@ -6,3 +6,8 @@ export const COLORS = {
   black: '#000',
   white: '#fff',
 };
+
+export const FONTS = {
+  roboto: 'Roboto Condensed',
+  bigShoulders_semibold: 'Big Shoulders Display SemiBold',
+};

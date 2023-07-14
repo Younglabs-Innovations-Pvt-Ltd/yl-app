@@ -19,7 +19,7 @@ import DemoClassScreen from './src/screens/demo-class.screen';
 import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
 
-import {COLORS} from './src/theme/theme';
+import {COLORS} from './src/assets/theme/theme';
 
 const Stack = createStackNavigator();
 

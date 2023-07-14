@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, TextInput} from 'react-native';
+import {FONTS} from '../assets/theme/theme';
 
 const Input = props => {
   return <TextInput {...props} selectionColor="#000" style={styles.input} />;
@@ -15,6 +16,8 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     borderBottomWidth: 1,
     borderRadius: 4,
-    fontSize: 16,
+    fontSize: 18,
+    letterSpacing: 1.15,
+    fontFamily: FONTS.roboto,
   },
 });
