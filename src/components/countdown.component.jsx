@@ -33,7 +33,7 @@ export default CountDown;
 const styles = StyleSheet.create({
   countdown: {
     width: '100%',
-    padding: 8,
+    paddingVertical: 8,
   },
   timeContainer: {
     flex: 1,

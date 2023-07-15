@@ -25,6 +25,8 @@ import {
   startFetchBookingDetailsFromPhone,
   setDemoPhone,
 } from '../store/demo/demo.reducer';
+import TextWrapper from '../components/text-wrapper.component';
+import Spinner from '../components/spinner.component';
 
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
@@ -88,7 +90,7 @@ const DemoClassScreen = ({route, navigation}) => {
 
         if (phoneFromAsyncStorage) {
           dispatch(setDemoPhone(phoneFromAsyncStorage));
-        } else {
+        } else if (demoId) {
           setDemoBookingId(demoId);
         }
       } catch (error) {
@@ -102,7 +104,7 @@ const DemoClassScreen = ({route, navigation}) => {
   // set demo data
   useEffect(() => {
     const setDemoData = async () => {
-      // If data not found
+      // If user put wrong number
       if (demoData.hasOwnProperty('message')) return;
       try {
         const {
@@ -118,20 +120,19 @@ const DemoClassScreen = ({route, navigation}) => {
         // Mark attendence
         if (demodate === today) {
           if (!attendedOrNot) {
-            const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                type: 'student',
-                bId: JSON.parse(demoBookingId),
-              }),
-            });
-
-            if (markAttendenceResponse.status === 200) {
-              console.log(await markAttendenceResponse.json());
-            }
+            // const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
+            //   method: 'POST',
+            //   headers: {
+            //     'Content-Type': 'application/json',
+            //   },
+            //   body: JSON.stringify({
+            //     type: 'student',
+            //     bId: JSON.parse(demoBookingId),
+            //   }),
+            // });
+            // if (markAttendenceResponse.status === 200) {
+            //   console.log(await markAttendenceResponse.json());
+            // }
           }
         }
 
@@ -198,12 +199,14 @@ const DemoClassScreen = ({route, navigation}) => {
         if (apiCount < 1) apiCount++;
 
         if (remaining.remainingTime <= 120 * 1000) {
-          if (apiCount === 1) {
-            console.log('2 minutes is left to call api');
-            // if (demoBookingId) {
-            //   getBookingStatus({bId: JSON.parse(demoBookingId)});
-            // }
-            apiCount++;
+          console.log('2 minutes is left to call api');
+          if (new Date(bookingTime).getTime() - 1000 <= new Date().getTime()) {
+            console.log('Call the api immediataly');
+            if (demoPhoneNumber) {
+              dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+            } else {
+              dispatch(startFetchBookingDetailsFromId(demoBookingId));
+            }
           }
         }
 
@@ -217,13 +220,13 @@ const DemoClassScreen = ({route, navigation}) => {
     };
   }, [bookingTime]);
 
+  // Do not show join button after 1 hour of demo ended
   useEffect(() => {
     if (bookingTime) {
       const afterOneHourFromDemoDate =
         new Date(bookingTime).getTime() + 1000 * 60 * 60;
 
       if (afterOneHourFromDemoDate <= new Date().getTime()) {
-        console.log('time over');
         // Hide class join button
         setShowJoinButton(false);
       }
@@ -251,25 +254,23 @@ const DemoClassScreen = ({route, navigation}) => {
   };
 
   return loading ? (
-    <Text>Loading...</Text>
+    <Spinner />
   ) : (
     <KeyboardAvoidingView behavior="padding">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.box}>
-            {bookingTime ? (
-              new Date(bookingTime).getTime() > new Date().getTime() ? (
-                <>
-                  <DateTime demoDate={bookingTime} />
-                  <CountDown timeLeft={timeLeft} />
-                </>
-              ) : (
-                <View>
-                  <Text>How was your demo?</Text>
-                </View>
-              )
-            ) : null}
-            <Spacer />
+            {bookingTime
+              ? new Date(bookingTime).getTime() > new Date().getTime() && (
+                  <>
+                    <TextWrapper color="gray">
+                      Your demo class starts in
+                    </TextWrapper>
+                    <CountDown timeLeft={timeLeft} />
+                    <View></View>
+                  </>
+                )
+              : null}
             {isTimeover
               ? showJoinButton && (
                   <>
@@ -298,6 +299,16 @@ const DemoClassScreen = ({route, navigation}) => {
                 </Button>
               </>
             ) : null}
+
+            {
+              // If user attended demo class
+              // Demo has ended
+              // Show post action after demo class
+              bookingTime
+                ? new Date(bookingTime).getTime() + 1000 * 60 * 60 <=
+                    new Date().getTime() && <Text>How was your demo?</Text>
+                : null
+            }
           </View>
         </View>
       </ScrollView>

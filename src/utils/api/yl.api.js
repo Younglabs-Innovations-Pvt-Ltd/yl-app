@@ -23,3 +23,16 @@ export const fetchBookingDetailsFromBookingId = async bookingId => {
     body: JSON.stringify({bId: bookingId}),
   });
 };
+
+export const markattendence = async () => {
+  const response = await fetch(MARK_ATTENDENCE_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      type: 'student',
+      bId: JSON.parse(demoBookingId),
+    }),
+  });
+};

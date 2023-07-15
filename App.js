@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+import 'react-native-reanimated';
 import {useEffect, useState} from 'react';
 import {StatusBar, Linking, ToastAndroid, Platform} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';

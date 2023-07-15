@@ -26,8 +26,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 16,
   },
-  spinner: {
-    width: 48,
-    height: 48,
-  },
 });
