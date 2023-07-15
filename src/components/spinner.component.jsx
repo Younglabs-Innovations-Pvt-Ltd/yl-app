@@ -2,10 +2,11 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {MotiImage} from 'moti';
 import {Easing} from 'react-native-reanimated';
+import {COLORS} from '../assets/theme/theme';
 
-const Spinner = ({bg}) => {
+const Spinner = () => {
   return (
-    <View style={[styles.spinnerContainer, {backgroundColor: bg}]}>
+    <View style={[styles.spinnerContainer]}>
       <MotiImage
         source={require('../assets/images/spinner.png')}
         style={styles.spinner}
@@ -16,7 +17,7 @@ const Spinner = ({bg}) => {
           rotate: '360deg',
         }}
         transition={{
-          duration: 700,
+          duration: 350,
           type: 'timing',
           loop: true,
           repeatReverse: false,
@@ -41,6 +42,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: COLORS.white,
     zIndex: 1000,
   },
   spinner: {

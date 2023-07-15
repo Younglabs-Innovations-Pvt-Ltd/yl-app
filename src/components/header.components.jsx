@@ -1,15 +1,11 @@
 import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
+import TextWrapper from './text-wrapper.component';
 
-const Header = () => {
+const Header = ({text}) => {
   return (
     <View style={styles.header}>
-      <View>
-        <Image
-          style={styles.logo}
-          source={require('../images/YoungLabsLogo.png')}
-        />
-      </View>
+      <TextWrapper fs={18}>{text}</TextWrapper>
     </View>
   );
 };
@@ -19,8 +15,7 @@ export default Header;
 const styles = StyleSheet.create({
   header: {
     width: '100%',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: '#fff',

@@ -2,13 +2,17 @@ import React from 'react';
 import {StyleSheet, Text, Pressable} from 'react-native';
 import {FONTS} from '../assets/theme/theme';
 
-const Button = ({children, bg, ...otherProps}) => {
+const Button = ({children, bg, rounded, ...otherProps}) => {
   return (
     <Pressable
       {...otherProps}
       style={({pressed}) => [
         styles.button,
-        {backgroundColor: bg, opacity: pressed ? 0.75 : 1},
+        {
+          backgroundColor: bg,
+          opacity: pressed ? 0.75 : 1,
+          borderRadius: rounded ? rounded : 0,
+        },
       ]}>
       <Text style={styles.buttonText}>{children}</Text>
     </Pressable>
@@ -22,7 +26,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 48,
     paddingVertical: 6,
-    borderRadius: 4,
     display: 'flex',
     justifyContent: 'center',
   },

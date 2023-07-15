@@ -19,6 +19,7 @@ import {initZoomSdk} from './src/natiive-modules/zoom-modules';
 import DemoClassScreen from './src/screens/demo-class.screen';
 import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
+import BookDemoScreen from './src/screens/book-demo-class.screen';
 
 import {COLORS} from './src/assets/theme/theme';
 
@@ -97,7 +98,13 @@ function App() {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            headerShown: false,
+            // headerShown: false,
+            headerStyle: {
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: '#eaeaea',
+            },
             cardStyle: {backgroundColor: '#fff'},
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
             gestureEnabled: true,
@@ -109,9 +116,15 @@ function App() {
             initialParams={{
               data: {queryData: queryDataFromUrl},
             }}
+            options={{headerShown: false}}
           />
           <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
           <Stack.Screen name="Reschedule" component={ReScheduleScreen} />
+          <Stack.Screen
+            name="BookDemo"
+            component={BookDemoScreen}
+            options={{title: 'Book Class'}}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

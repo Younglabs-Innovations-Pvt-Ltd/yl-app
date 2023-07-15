@@ -265,7 +265,7 @@ const DemoClassScreen = ({route, navigation}) => {
               ? new Date(bookingTime).getTime() > new Date().getTime() && (
                   <>
                     <TextWrapper color="gray">
-                      Your demo class starts in
+                      Your free class starts in
                     </TextWrapper>
                     <CountDown timeLeft={timeLeft} />
                     <View></View>
@@ -283,7 +283,10 @@ const DemoClassScreen = ({route, navigation}) => {
                       onChangeText={e => setChildName(e)}
                     />
                     <Spacer />
-                    <Button onPress={handleJoinClass} bg={COLORS.pgreen}>
+                    <Button
+                      rounded={4}
+                      onPress={handleJoinClass}
+                      bg={COLORS.pgreen}>
                       Join Class
                     </Button>
                   </>
@@ -295,8 +298,11 @@ const DemoClassScreen = ({route, navigation}) => {
                 <Spacer space={4} />
                 <Seperator text="or" />
                 <Spacer space={4} />
-                <Button bg={'#F86F03'} onPress={() => console.log('pressed!')}>
-                  Book A Free Demo
+                <Button
+                  rounded={4}
+                  bg={COLORS.orange}
+                  onPress={() => navigation.navigate('BookDemo')}>
+                  Book A Free class
                 </Button>
               </>
             ) : null}
@@ -307,7 +313,7 @@ const DemoClassScreen = ({route, navigation}) => {
               // Show post action after demo class
               bookingTime
                 ? new Date(bookingTime).getTime() + 1000 * 60 * 60 <=
-                    new Date().getTime() && <Text>How was your demo?</Text>
+                    new Date().getTime() && <Text>How was your class?</Text>
                 : null
             }
           </View>

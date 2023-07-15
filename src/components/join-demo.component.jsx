@@ -16,7 +16,7 @@ const JoinDemo = ({handleBookingStatus}) => {
   return (
     <View>
       <Text style={styles.demoText}>
-        Enter your mobile number to get demo class details
+        Enter your mobile number to get free class details
       </Text>
       <Input
         placeholder="Enter mobile number"
@@ -25,7 +25,7 @@ const JoinDemo = ({handleBookingStatus}) => {
         onChangeText={phoneNumber => setPhone(phoneNumber)}
       />
       <Seperator />
-      <Button bg={COLORS.pgreen} onPress={handleDemoBookingId}>
+      <Button rounded={4} bg={COLORS.pgreen} onPress={handleDemoBookingId}>
         Submit
       </Button>
     </View>
