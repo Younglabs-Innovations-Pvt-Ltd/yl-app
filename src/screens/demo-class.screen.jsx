@@ -112,6 +112,7 @@ const DemoClassScreen = ({route, navigation}) => {
           meetingId,
           pwd,
           attendedOrNot,
+          bookingId: bookingIdFromDemoData,
         } = demoData;
 
         const demodate = new Date(_seconds * 1000).getDate();
@@ -120,19 +121,19 @@ const DemoClassScreen = ({route, navigation}) => {
         // Mark attendence
         if (demodate === today) {
           if (!attendedOrNot) {
-            // const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
-            //   method: 'POST',
-            //   headers: {
-            //     'Content-Type': 'application/json',
-            //   },
-            //   body: JSON.stringify({
-            //     type: 'student',
-            //     bId: JSON.parse(demoBookingId),
-            //   }),
-            // });
-            // if (markAttendenceResponse.status === 200) {
-            //   console.log(await markAttendenceResponse.json());
-            // }
+            const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                type: 'student',
+                bId: bookingIdFromDemoData,
+              }),
+            });
+            if (markAttendenceResponse.status === 200) {
+              console.log(await markAttendenceResponse.json());
+            }
           }
         }
 

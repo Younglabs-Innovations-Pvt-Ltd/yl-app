@@ -77,12 +77,9 @@ function App() {
       let urlParams = {};
 
       const parseUrl = url.split('?')[1];
-      parseUrl.split('&').forEach(queryData => {
-        const params = queryData.split('=');
-        const queryName = params[0];
-        const queryValue = params[1];
-        urlParams[queryName] = queryValue;
-      });
+      const parseBookingId = parseUrl.split('=')[1];
+      const bookingId = parseBookingId.replace(/#/g, '');
+      urlParams.demoId = bookingId;
 
       setQueryDataFromUrl(urlParams);
       setLoading(false);
