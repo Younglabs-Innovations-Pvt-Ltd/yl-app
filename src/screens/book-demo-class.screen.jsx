@@ -1,27 +1,38 @@
-import React, {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  KeyboardAvoidingView,
-  ScrollView,
-  Dimensions,
-} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import Input from '../components/input.component';
 import Spacer from '../components/spacer.component';
 import {Dropdown, DropdownList} from '../components/dropdown.component';
 import TextWrapper from '../components/text-wrapper.component';
 import Button from '../components/button.component';
-import Header from '../components/header.components';
 import {COLORS} from '../assets/theme/theme';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
-const {height} = Dimensions.get('window');
+const GEO_LOCATION_API =
+  'https://api.ipgeolocation.io/ipgeo?apiKey=db02b89808894a7a9ddef353d01805dd';
 
 const BookDemoScreen = () => {
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
+
+  useEffect(() => {
+    const getTimeZone = async () => {
+      try {
+        const response = await fetch(GEO_LOCATION_API, {
+          method: 'GET',
+        });
+
+        const data = await response.json();
+        console.log('timezone data', data);
+      } catch (error) {
+        console.log('Timezone error', error);
+      }
+    };
+
+    getTimeZone();
+  }, []);
 
   const handleChangeValue = item => {
     setValue(item);

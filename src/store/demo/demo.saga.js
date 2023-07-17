@@ -8,7 +8,6 @@ import {
   setBookingDetailSuccess,
   startFetchBookingDetailsFromId,
   startFetchBookingDetailsFromPhone,
-  setDemoPhone,
 } from './demo.reducer';
 
 // Fetch booking details from phone number

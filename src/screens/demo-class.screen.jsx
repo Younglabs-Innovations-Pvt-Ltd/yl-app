@@ -1,13 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   KeyboardAvoidingView,
   ScrollView,
   ToastAndroid,
 } from 'react-native';
-import CountDown from '../components/countdown.component';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
 import {joinClassOnZoom} from '../natiive-modules/zoom-modules';
@@ -24,9 +22,11 @@ import {
   startFetchBookingDetailsFromId,
   startFetchBookingDetailsFromPhone,
   setDemoPhone,
+  setDemoBookingId,
 } from '../store/demo/demo.reducer';
-import TextWrapper from '../components/text-wrapper.component';
 import Spinner from '../components/spinner.component';
+import PostDemoAction from '../components/demo_class/post-demo-actions.component';
+import DemoWaiting from '../components/demo_class/demo-waiting.component';
 
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
@@ -65,15 +65,18 @@ const DemoClassScreen = ({route, navigation}) => {
   } = route;
 
   const dispatch = useDispatch();
-  const {demoData, loading, demoPhoneNumber} = useSelector(state => state.demo);
+  const {demoData, loading, demoPhoneNumber, demoBookingId} = useSelector(
+    state => state.demo,
+  );
 
   const [childName, setChildName] = useState('');
   const [bookingTime, setBookingTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
   const [zoomData, setZoomData] = useState(null);
-  const [demoBookingId, setDemoBookingId] = useState('');
   const [showJoinButton, setShowJoinButton] = useState(false);
+  const [shouldShowJoin, setShouldShowJoin] = useState(false);
+  const [isAttended, setIsAttended] = useState(false);
 
   // Set demo booking id
   useEffect(() => {
@@ -91,7 +94,7 @@ const DemoClassScreen = ({route, navigation}) => {
         if (phoneFromAsyncStorage) {
           dispatch(setDemoPhone(phoneFromAsyncStorage));
         } else if (demoId) {
-          setDemoBookingId(demoId);
+          dispatch(setDemoBookingId(demoId));
         }
       } catch (error) {
         console.log('Async storage error', error);
@@ -99,13 +102,15 @@ const DemoClassScreen = ({route, navigation}) => {
     };
 
     getDemoId();
-  }, []);
+  }, [dispatch, queryData]);
 
   // set demo data
   useEffect(() => {
     const setDemoData = async () => {
       // If user put wrong number
-      if (demoData.hasOwnProperty('message')) return;
+      if (demoData.hasOwnProperty('message')) {
+        return;
+      }
       try {
         const {
           demoDate: {_seconds},
@@ -142,6 +147,7 @@ const DemoClassScreen = ({route, navigation}) => {
           console.log('Got zoom data successfully.', {meetingId, pwd});
           setZoomData({meetingId, pwd});
           setShowJoinButton(true);
+          setIsAttended(attendedOrNot);
         }
 
         // Set booking time for timer
@@ -167,25 +173,24 @@ const DemoClassScreen = ({route, navigation}) => {
         dispatch(setDemoPhone(''));
       }
     }
-  }, [demoData]);
+  }, [demoData, dispatch]);
 
   // Call api to get booking status from booking id
   useEffect(() => {
     if (demoBookingId) {
       !demoData && dispatch(startFetchBookingDetailsFromId(demoBookingId));
     }
-  }, [demoBookingId]);
+  }, [demoBookingId, dispatch, demoData]);
 
   // Call api to get booking status from phone number
   useEffect(() => {
     if (demoPhoneNumber) {
       !demoData && dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
     }
-  }, [demoPhoneNumber]);
+  }, [demoPhoneNumber, dispatch, demoData]);
 
   // Timer
   useEffect(() => {
-    let apiCount = 0;
     let timer;
 
     if (bookingTime) {
@@ -197,17 +202,9 @@ const DemoClassScreen = ({route, navigation}) => {
           return;
         }
 
-        if (apiCount < 1) apiCount++;
-
         if (remaining.remainingTime <= 120 * 1000) {
-          console.log('2 minutes is left to call api');
           if (new Date(bookingTime).getTime() - 1000 <= new Date().getTime()) {
-            console.log('Call the api immediataly');
-            if (demoPhoneNumber) {
-              dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-            } else {
-              dispatch(startFetchBookingDetailsFromId(demoBookingId));
-            }
+            dispatch(startFetchBookingDetailsFromId(demoData.bookingId));
           }
         }
 
@@ -219,7 +216,7 @@ const DemoClassScreen = ({route, navigation}) => {
     return () => {
       clearInterval(timer);
     };
-  }, [bookingTime]);
+  }, [bookingTime, demoBookingId, demoPhoneNumber, dispatch]);
 
   // Do not show join button after 1 hour of demo ended
   useEffect(() => {
@@ -233,6 +230,21 @@ const DemoClassScreen = ({route, navigation}) => {
       }
     }
   }, [bookingTime]);
+
+  useEffect(() => {
+    const checkForIdOrPhone = async () => {
+      try {
+        const id = await AsyncStorage.getItem('bookingid');
+        const phone = await AsyncStorage.getItem('phone');
+        const shouldShowJoinComponent = !id && !phone;
+        setShouldShowJoin(shouldShowJoinComponent);
+      } catch (error) {
+        console.log('error from async storage', error);
+      }
+    };
+
+    checkForIdOrPhone();
+  }, [demoBookingId, demoPhoneNumber, demoData]);
 
   // Join Class
   const handleJoinClass = async () => {
@@ -250,7 +262,7 @@ const DemoClassScreen = ({route, navigation}) => {
     }
   };
 
-  const handleBookingStatus = async phone => {
+  const handleBookingStatus = phone => {
     dispatch(startFetchBookingDetailsFromPhone(phone));
   };
 
@@ -263,13 +275,7 @@ const DemoClassScreen = ({route, navigation}) => {
           <View style={styles.box}>
             {bookingTime
               ? new Date(bookingTime).getTime() > new Date().getTime() && (
-                  <>
-                    <TextWrapper color="gray">
-                      Your free class starts in
-                    </TextWrapper>
-                    <CountDown timeLeft={timeLeft} />
-                    <View></View>
-                  </>
+                  <DemoWaiting timeLeft={timeLeft} />
                 )
               : null}
             {isTimeover
@@ -277,8 +283,6 @@ const DemoClassScreen = ({route, navigation}) => {
                   <>
                     <Input
                       placeholder="Child Name"
-                      selectionColor="#000"
-                      style={styles.input}
                       value={childName}
                       onChangeText={e => setChildName(e)}
                     />
@@ -292,7 +296,7 @@ const DemoClassScreen = ({route, navigation}) => {
                   </>
                 )
               : null}
-            {!demoBookingId && !demoPhoneNumber ? (
+            {shouldShowJoin && (
               <>
                 <JoinDemo handleBookingStatus={handleBookingStatus} />
                 <Spacer space={4} />
@@ -300,12 +304,15 @@ const DemoClassScreen = ({route, navigation}) => {
                 <Spacer space={4} />
                 <Button
                   rounded={4}
-                  bg={COLORS.orange}
+                  bg="transparent"
+                  outlined={true}
+                  outlineColor={COLORS.black}
+                  textColor={COLORS.black}
                   onPress={() => navigation.navigate('BookDemo')}>
                   Book A Free class
                 </Button>
               </>
-            ) : null}
+            )}
 
             {
               // If user attended demo class
@@ -313,7 +320,7 @@ const DemoClassScreen = ({route, navigation}) => {
               // Show post action after demo class
               bookingTime
                 ? new Date(bookingTime).getTime() + 1000 * 60 * 60 <=
-                    new Date().getTime() && <Text>How was your class?</Text>
+                    new Date().getTime() && <PostDemoAction />
                 : null
             }
           </View>
@@ -324,16 +331,6 @@ const DemoClassScreen = ({route, navigation}) => {
 };
 
 export default DemoClassScreen;
-
-const DateTime = ({demoDate}) => {
-  const localDate = new Date(demoDate).toDateString();
-  return (
-    <Text style={styles.demoDateText}>
-      Your demo class is at{' '}
-      <Text style={{color: '#000', fontWeight: '700'}}>{localDate}</Text>
-    </Text>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {

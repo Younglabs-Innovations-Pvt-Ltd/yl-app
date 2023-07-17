@@ -9,12 +9,13 @@ const INITIAL_STATE = {
 
 // reducer
 const reducer = {
-  startFetchBookingDetailsFromPhone(state, action) {
+  startFetchBookingDetailsFromPhone(state) {
     state.loading = true;
-    state.demoPhoneNumber = action.payload;
+    // state.demoPhoneNumber = action.payload;
   },
   startFetchBookingDetailsFromId(state) {
     state.loading = true;
+    // state.demoBookingId = action.payload;
   },
   setBookingDetailSuccess(state, action) {
     state.demoData = action.payload;
@@ -22,6 +23,9 @@ const reducer = {
   },
   setDemoPhone(state, action) {
     state.demoPhoneNumber = action.payload;
+  },
+  setDemoBookingId(state, action) {
+    state.demoBookingId = action.payload;
   },
 };
 
@@ -38,6 +42,7 @@ export const {
   startFetchBookingDetailsFromPhone,
   startFetchBookingDetailsFromId,
   setDemoPhone,
+  setDemoBookingId,
 } = demoSlice.actions;
 
 export const demoReducer = demoSlice.reducer;

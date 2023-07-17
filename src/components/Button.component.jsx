@@ -1,20 +1,45 @@
 import React from 'react';
 import {StyleSheet, Text, Pressable} from 'react-native';
-import {FONTS} from '../assets/theme/theme';
+import {COLORS, FONTS} from '../assets/theme/theme';
 
-const Button = ({children, bg, rounded, ...otherProps}) => {
+const button_styles = {
+  styles(bg, outlined, outlineColor) {
+    if (outlined) {
+      return {
+        borderWidth: 1,
+        borderColor: outlineColor,
+      };
+    }
+
+    return {
+      backgroundColor: bg,
+    };
+  },
+};
+
+const Button = ({
+  children,
+  bg,
+  rounded,
+  outlined,
+  outlineColor,
+  textColor,
+  ...otherProps
+}) => {
   return (
     <Pressable
       {...otherProps}
       style={({pressed}) => [
         styles.button,
         {
-          backgroundColor: bg,
           opacity: pressed ? 0.75 : 1,
-          borderRadius: rounded ? rounded : 0,
+          borderRadius: rounded || 0,
         },
+        button_styles.styles(bg, outlined, outlineColor),
       ]}>
-      <Text style={styles.buttonText}>{children}</Text>
+      <Text style={[styles.buttonText, {color: textColor || COLORS.white}]}>
+        {children}
+      </Text>
     </Pressable>
   );
 };
@@ -32,7 +57,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#fff',
     textAlign: 'center',
     letterSpacing: 1.5,
     fontFamily: FONTS.roboto,

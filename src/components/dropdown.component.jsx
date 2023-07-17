@@ -25,10 +25,10 @@ export const DropdownList = ({
       onPress={onClose}>
       <View style={styles.listWrapper}>
         <ScrollView bounces={false}>
-          {data.map(item => (
+          {data.map(age => (
             <DropdownItem
-              key={item}
-              item={item}
+              key={age}
+              age={age}
               onClose={onClose}
               onChangeValue={onChange}
               currentValue={currentValue}
@@ -40,9 +40,9 @@ export const DropdownList = ({
   );
 };
 
-const DropdownItem = ({item, onChangeValue, onClose, currentValue}) => {
+const DropdownItem = ({age, onChangeValue, onClose, currentValue}) => {
   const handleChange = () => {
-    onChangeValue(item);
+    onChangeValue(age);
     onClose();
   };
 
@@ -53,8 +53,8 @@ const DropdownItem = ({item, onChangeValue, onClose, currentValue}) => {
         {backgroundColor: e.pressed ? '#eaeaea' : 'transparent'},
       ]}
       onPress={handleChange}>
-      <TextWrapper>{item}</TextWrapper>
-      {currentValue === item && (
+      <TextWrapper>{age}</TextWrapper>
+      {currentValue === age && (
         <Icon name="checkmark-outline" size={24} color={COLORS.pgreen} />
       )}
     </Pressable>
@@ -74,7 +74,13 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 12,
     backgroundColor: COLORS.white,
-    height: 320,
+    height: 240,
+    shadowColor: '#171717',
+    shadowOffset: {width: -2, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+    borderRadius: 4,
   },
   optionList: {
     position: 'absolute',
@@ -83,6 +89,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     zIndex: 1000,
+    paddingHorizontal: 8,
   },
   item: {
     width: '100%',

@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
-import {useEffect, useState} from 'react';
-import {StatusBar, Linking, ToastAndroid, Platform} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StatusBar, Linking, ToastAndroid} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -10,7 +10,7 @@ import {
 import {Provider} from 'react-redux';
 import {store} from './src/store/store';
 
-// import SplashScreen from 'react-native-splash-screen';
+import SplashScreen from 'react-native-splash-screen';
 
 // Native mmodules
 import {initZoomSdk} from './src/natiive-modules/zoom-modules';
@@ -36,11 +36,9 @@ function App() {
   }, []);
 
   // Splash Screen
-  // useEffect(() => {
-  //   if (Platform.OS === 'android') {
-  //     SplashScreen.hide();
-  //   }
-  // }, []);
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
 
   // Initialize Zoom
   useEffect(() => {
