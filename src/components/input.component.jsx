@@ -1,9 +1,16 @@
 import React from 'react';
 import {StyleSheet, TextInput} from 'react-native';
-import {FONTS} from '../assets/theme/theme';
+import {COLORS, FONTS} from '../assets/theme/theme';
 
 const Input = props => {
-  return <TextInput {...props} selectionColor="#000" style={styles.input} />;
+  return (
+    <TextInput
+      {...props}
+      selectionColor={COLORS.black}
+      style={styles.input}
+      placeholderTextColor={'gray'}
+    />
+  );
 };
 
 export default Input;
@@ -19,5 +26,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     letterSpacing: 1.15,
     fontFamily: FONTS.roboto,
+    color: COLORS.black,
   },
 });

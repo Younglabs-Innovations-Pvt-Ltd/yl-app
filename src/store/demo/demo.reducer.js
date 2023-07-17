@@ -27,6 +27,9 @@ const reducer = {
   setDemoBookingId(state, action) {
     state.demoBookingId = action.payload;
   },
+  setDemoData(state, action) {
+    state.demoData = action.payload;
+  },
 };
 
 // slice
@@ -43,6 +46,7 @@ export const {
   startFetchBookingDetailsFromId,
   setDemoPhone,
   setDemoBookingId,
+  setDemoData,
 } = demoSlice.actions;
 
 export const demoReducer = demoSlice.reducer;

@@ -137,7 +137,12 @@ const DemoClassScreen = ({route, navigation}) => {
               }),
             });
             if (markAttendenceResponse.status === 200) {
-              console.log(await markAttendenceResponse.json());
+              const message = await markAttendenceResponse.json();
+              ToastAndroid.showWithGravity(
+                message,
+                ToastAndroid.SHORT,
+                ToastAndroid.BOTTOM,
+              );
             }
           }
         }
@@ -151,7 +156,7 @@ const DemoClassScreen = ({route, navigation}) => {
         }
 
         // Set booking time for timer
-        if (_seconds) setBookingTime(_seconds * 1000);
+        if (_seconds) setBookingTime(_seconds * 1000 + 1000 * 60);
       } catch (error) {
         console.log('setDemoData_error', error);
       }
@@ -202,10 +207,8 @@ const DemoClassScreen = ({route, navigation}) => {
           return;
         }
 
-        if (remaining.remainingTime <= 120 * 1000) {
-          if (new Date(bookingTime).getTime() - 1000 <= new Date().getTime()) {
-            dispatch(startFetchBookingDetailsFromId(demoData.bookingId));
-          }
+        if (new Date(bookingTime).getTime() - 1000 <= new Date().getTime()) {
+          dispatch(startFetchBookingDetailsFromId(demoData.bookingId));
         }
 
         // set time to show
@@ -257,6 +260,11 @@ const DemoClassScreen = ({route, navigation}) => {
       const {meetingId, pwd} = zoomData;
       const res = await joinClassOnZoom(JSON.stringify(meetingId), pwd);
       console.log('Join Class', res);
+      // if (res === 'class joined.') {
+      //   if (new Date(bookingTime).getTime() <= new Date().getTime()) {
+      //     demoData.attendedOrNot && setIsAttended(true);
+      //   }
+      // }
     } catch (error) {
       console.log('Join class error', error);
     }
@@ -319,8 +327,9 @@ const DemoClassScreen = ({route, navigation}) => {
               // Demo has ended
               // Show post action after demo class
               bookingTime
-                ? new Date(bookingTime).getTime() + 1000 * 60 * 60 <=
-                    new Date().getTime() && <PostDemoAction />
+                ? new Date(bookingTime).getTime() + 1000 * 60 <=
+                    new Date().getTime() &&
+                  isAttended && <PostDemoAction />
                 : null
             }
           </View>

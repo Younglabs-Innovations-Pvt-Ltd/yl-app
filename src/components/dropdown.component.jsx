@@ -42,7 +42,7 @@ export const DropdownList = ({
 
 const DropdownItem = ({age, onChangeValue, onClose, currentValue}) => {
   const handleChange = () => {
-    onChangeValue(age);
+    onChangeValue({childAge: age});
     onClose();
   };
 
@@ -50,13 +50,15 @@ const DropdownItem = ({age, onChangeValue, onClose, currentValue}) => {
     <Pressable
       style={e => [
         styles.item,
-        {backgroundColor: e.pressed ? '#eaeaea' : 'transparent'},
+        {opacity: e.pressed ? 0.25 : 1},
+        {
+          backgroundColor: currentValue === age ? '#3AA6B9' : 'transparent',
+        },
       ]}
       onPress={handleChange}>
-      <TextWrapper>{age}</TextWrapper>
-      {currentValue === age && (
-        <Icon name="checkmark-outline" size={24} color={COLORS.pgreen} />
-      )}
+      <TextWrapper color={currentValue === age ? COLORS.white : COLORS.black}>
+        {age}
+      </TextWrapper>
     </Pressable>
   );
 };
