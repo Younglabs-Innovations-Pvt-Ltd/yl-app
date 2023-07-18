@@ -43,4 +43,4 @@ export const {
   setDemoBookingId,
 } = demoSlice.actions;
 
-export const demoReducer = demoSlice.reducer;
+export const joinDemoReducer = demoSlice.reducer;

@@ -8,7 +8,7 @@ import {
   setBookingDetailSuccess,
   startFetchBookingDetailsFromId,
   startFetchBookingDetailsFromPhone,
-} from './demo.reducer';
+} from './join-demo.reducer';
 
 // Fetch booking details from phone number
 function* fetchDemoDetailsFromPhone({payload}) {
@@ -59,7 +59,7 @@ function* demoBookingDetailsFromId() {
   );
 }
 
-export function* demoSaga() {
+export function* joinDemoSaga() {
   yield all([
     call(demoBookingDetailsFromPhone),
     call(demoBookingDetailsFromId),

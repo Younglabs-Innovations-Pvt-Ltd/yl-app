@@ -1,7 +1,7 @@
 import {all, call} from 'redux-saga/effects';
 
-import {demoSaga} from './demo/demo.saga';
+import {joinDemoSaga} from './join-demo/join-demo.saga';
 
 export function* rootSaga() {
-  yield all([call(demoSaga)]);
+  yield all([call(joinDemoSaga)]);
 }

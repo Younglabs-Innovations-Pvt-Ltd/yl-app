@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import {COLORS, FONTS} from '../assets/theme/theme';
+import Spinner from './spinner.component';
 
 const COUNTRIES_URL = 'https://restcountries.com/v3.1/all';
 
@@ -17,10 +18,12 @@ const CountryList = ({visible, onChangeVisible, onSelect}) => {
   const [countryData, setCountryData] = useState([]);
   const [updatedData, setUpdatedData] = useState(countryData);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const countriesData = async () => {
       try {
+        setLoading(true);
         const response = await fetch(COUNTRIES_URL, {
           method: 'GET',
         });
@@ -39,6 +42,7 @@ const CountryList = ({visible, onChangeVisible, onSelect}) => {
         });
 
         setCountryData(countries);
+        setLoading(false);
       } catch (error) {
         console.log('countries data error', error);
       }
@@ -73,6 +77,8 @@ const CountryList = ({visible, onChangeVisible, onSelect}) => {
           </TextWrapper>
         </Pressable>
       </View>
+
+      {loading && <Spinner style={{alignSelf: 'center'}} />}
 
       <FlatList
         data={updatedData}

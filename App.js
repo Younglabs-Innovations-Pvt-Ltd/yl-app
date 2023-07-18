@@ -16,7 +16,7 @@ import SplashScreen from 'react-native-splash-screen';
 import {initZoomSdk} from './src/natiive-modules/zoom-modules';
 
 // Screens
-import DemoClassScreen from './src/screens/demo-class.screen';
+import JoinDemoScreen from './src/screens/join-demo-class.screen';
 import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
 import BookDemoScreen from './src/screens/book-demo-class.screen';
@@ -109,8 +109,8 @@ function App() {
             gestureDirection: 'horizontal',
           }}>
           <Stack.Screen
-            name="DemoClass"
-            component={DemoClassScreen}
+            name="joinDemo"
+            component={JoinDemoScreen}
             initialParams={{
               data: {queryData: queryDataFromUrl},
             }}

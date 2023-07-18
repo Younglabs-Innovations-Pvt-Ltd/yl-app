@@ -1,7 +1,7 @@
 import {combineReducers} from '@reduxjs/toolkit';
 
-import {demoReducer} from './demo/demo.reducer';
+import {joinDemoReducer} from './join-demo/join-demo.reducer';
 
 export const rootReducer = combineReducers({
-  demo: demoReducer,
+  joinDemo: joinDemoReducer,
 });

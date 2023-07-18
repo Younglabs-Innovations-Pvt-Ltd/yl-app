@@ -23,10 +23,11 @@ import {
   startFetchBookingDetailsFromPhone,
   setDemoPhone,
   setDemoBookingId,
-} from '../store/demo/demo.reducer';
+} from '../store/join-demo/join-demo.reducer';
 import Spinner from '../components/spinner.component';
-import PostDemoAction from '../components/demo_class/post-demo-actions.component';
-import DemoWaiting from '../components/demo_class/demo-waiting.component';
+import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
+import DemoWaiting from '../components/join-demo-class-screen/demo-waiting.component';
+import Modal from '../components/modal.component';
 
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
@@ -66,7 +67,7 @@ const DemoClassScreen = ({route, navigation}) => {
 
   const dispatch = useDispatch();
   const {demoData, loading, demoPhoneNumber, demoBookingId} = useSelector(
-    state => state.demo,
+    state => state.joinDemo,
   );
 
   const [childName, setChildName] = useState('');
@@ -275,7 +276,9 @@ const DemoClassScreen = ({route, navigation}) => {
   };
 
   return loading ? (
-    <Spinner />
+    <Modal>
+      <Spinner />
+    </Modal>
   ) : (
     <KeyboardAvoidingView behavior="padding">
       <ScrollView showsVerticalScrollIndicator={false}>

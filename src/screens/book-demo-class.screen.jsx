@@ -14,11 +14,12 @@ import Button from '../components/button.component';
 import {COLORS} from '../assets/theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {startFetchBookingDetailsFromId} from '../store/demo/demo.reducer';
+import {startFetchBookingDetailsFromId} from '../store/join-demo/join-demo.reducer';
 import {useDispatch} from 'react-redux';
 import CountryList from '../components/country-list.component';
 import {isValidNumber} from '../utils/isValidNumber';
 import Spinner from '../components/spinner.component';
+import Modal from '../components/modal.component';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -212,8 +213,6 @@ const BookDemoScreen = ({navigation}) => {
     setVisible(false);
   };
 
-  console.log(loading);
-
   return (
     <KeyboardAvoidingView>
       <ScrollView
@@ -320,7 +319,11 @@ const BookDemoScreen = ({navigation}) => {
           onChange={handleChangeValue}
         />
       )}
-      {loading && <Spinner bg="rgba(0,0,0,0.25)" />}
+      {loading && (
+        <Modal bg="rgba(0,0,0,0.25)">
+          <Spinner />
+        </Modal>
+      )}
     </KeyboardAvoidingView>
   );
 };
@@ -332,6 +335,7 @@ const DemoSlots = ({
   handleCurrentSlotTime,
   handleCurrentSlotDate,
 }) => {
+  // Arrange slot time by show date
   const slotsTime = useMemo(() => {
     let updatedSlots = {};
     slots.forEach(slot => {
