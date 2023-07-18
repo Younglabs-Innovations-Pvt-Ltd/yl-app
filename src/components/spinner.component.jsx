@@ -4,9 +4,9 @@ import {MotiImage} from 'moti';
 import {Easing} from 'react-native-reanimated';
 import {COLORS} from '../assets/theme/theme';
 
-const Spinner = () => {
+const Spinner = ({bg = COLORS.white}) => {
   return (
-    <View style={[styles.spinnerContainer]}>
+    <View style={[styles.spinnerContainer, {backgroundColor: bg}]}>
       <MotiImage
         source={require('../assets/images/spinner.png')}
         style={styles.spinner}
@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
     zIndex: 1000,
   },
   spinner: {

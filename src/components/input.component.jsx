@@ -2,12 +2,12 @@ import React from 'react';
 import {StyleSheet, TextInput} from 'react-native';
 import {COLORS, FONTS} from '../assets/theme/theme';
 
-const Input = props => {
+const Input = ({noBorder, ...props}) => {
   return (
     <TextInput
       {...props}
       selectionColor={COLORS.black}
-      style={styles.input}
+      style={[styles.input, {borderBottomWidth: noBorder ? 0 : 1}]}
       placeholderTextColor={'gray'}
     />
   );
@@ -17,11 +17,10 @@ export default Input;
 
 const styles = StyleSheet.create({
   input: {
-    width: '100%',
+    flex: 1,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderColor: '#000',
-    borderBottomWidth: 1,
     borderRadius: 4,
     fontSize: 18,
     letterSpacing: 1.15,

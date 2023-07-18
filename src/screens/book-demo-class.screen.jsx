@@ -16,6 +16,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {startFetchBookingDetailsFromId} from '../store/demo/demo.reducer';
 import {useDispatch} from 'react-redux';
+import CountryList from '../components/country-list.component';
+import {isValidNumber} from '../utils/isValidNumber';
+import Spinner from '../components/spinner.component';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -43,19 +46,32 @@ const BookDemoScreen = ({navigation}) => {
   const [demoSlots, setDemoSlots] = useState([]);
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState({
+    phone: '',
+    name: '',
+    childAge: '',
+  });
+  const [visible, setVisible] = useState(false);
+  const [country, setCountry] = useState({callingCode: ''});
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     const getTimeZone = async () => {
       try {
+        setLoading(true);
         const response = await fetch(GEO_LOCATION_API, {
           method: 'GET',
         });
 
         const data = await response.json();
+        setCountry({
+          callingCode: data.calling_code,
+          countryCode: {cca2: data.country_code2},
+        });
         setIpData(data);
+        setLoading(false);
       } catch (error) {
         console.log('Timezone error', error);
       }
@@ -93,8 +109,31 @@ const BookDemoScreen = ({navigation}) => {
 
   const handleDemoSlots = async () => {
     const {childAge, name, phone} = formFields;
-    if (!childAge || !timezone || !name || !phone) {
-      setErrorMessage("Fields can't be empty");
+
+    if (!childAge || !name || !phone) {
+      setErrorMessage({
+        ...errorMessage,
+        name: 'Fields are required.',
+        childAge: 'Fields are required.',
+        phone: 'Fields are required.',
+      });
+      return;
+    }
+
+    if (!childAge) {
+      setErrorMessage({...errorMessage, childAge: 'Select child age'});
+      return;
+    } else if (!name) {
+      setErrorMessage({...errorMessage, name: 'Please enter your name'});
+      return;
+    } else if (!phone) {
+      setErrorMessage({...errorMessage, phone: 'Please enter phone number'});
+      return;
+    }
+
+    const isValidPhone = await isValidNumber(phone, country.countryCode.cca2);
+    if (!isValidPhone) {
+      setErrorMessage({...errorMessage, phone: 'Please enter a valid number'});
       return;
     }
 
@@ -163,6 +202,18 @@ const BookDemoScreen = ({navigation}) => {
     }
   };
 
+  const handleSelectCountry = country => {
+    let code = '';
+    if (country.callingCode.hasOwnProperty('root')) {
+      code = country.callingCode.root.concat(country.callingCode.suffixes[0]);
+      country.callingCode = code;
+    }
+    setCountry(country);
+    setVisible(false);
+  };
+
+  console.log(loading);
+
   return (
     <KeyboardAvoidingView>
       <ScrollView
@@ -178,21 +229,34 @@ const BookDemoScreen = ({navigation}) => {
                 value={formFields.name}
                 onChangeText={name => handleChangeValue({name})}
               />
-              {errorMessage && (
+              {errorMessage.name && (
                 <TextWrapper fs={14} color={COLORS.pred}>
-                  {errorMessage}
+                  {errorMessage.name}
                 </TextWrapper>
               )}
               <Spacer />
-              <Input
-                inputMode="numeric"
-                placeholder="Enter your phone number"
-                value={formFields.phone}
-                onChangeText={phone => handleChangeValue({phone})}
-              />
-              {errorMessage && (
+              <View style={styles.row}>
+                <Pressable
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    paddingHorizontal: 8,
+                    borderBottomWidth: 1,
+                    borderBottomColor: COLORS.black,
+                  }}
+                  onPress={() => setVisible(p => !p)}>
+                  <TextWrapper>{country.callingCode}</TextWrapper>
+                </Pressable>
+                <Input
+                  inputMode="numeric"
+                  placeholder="Enter your phone number"
+                  value={formFields.phone}
+                  onChangeText={phone => handleChangeValue({phone})}
+                />
+              </View>
+              {errorMessage.phone && (
                 <TextWrapper fs={14} color={COLORS.pred}>
-                  {errorMessage}
+                  {errorMessage.phone}
                 </TextWrapper>
               )}
               <TextWrapper fs={14} color="gray">
@@ -211,9 +275,9 @@ const BookDemoScreen = ({navigation}) => {
                   )
                 }
               />
-              {errorMessage && (
+              {errorMessage.childAge && (
                 <TextWrapper fs={14} color={COLORS.pred}>
-                  {errorMessage}
+                  {errorMessage.childAge}
                 </TextWrapper>
               )}
             </View>
@@ -242,6 +306,11 @@ const BookDemoScreen = ({navigation}) => {
           </Button>
         )}
       </View>
+      <CountryList
+        visible={visible}
+        onChangeVisible={v => setVisible(v)}
+        onSelect={handleSelectCountry}
+      />
       {open && (
         <DropdownList
           data={ageList}
@@ -251,6 +320,7 @@ const BookDemoScreen = ({navigation}) => {
           onChange={handleChangeValue}
         />
       )}
+      {loading && <Spinner bg="rgba(0,0,0,0.25)" />}
     </KeyboardAvoidingView>
   );
 };
@@ -363,5 +433,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 4,
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    gap: 8,
   },
 });
