@@ -124,6 +124,8 @@ const DemoClassScreen = ({route, navigation}) => {
         const demodate = new Date(_seconds * 1000).getDate();
         const today = new Date().getDate();
 
+        console.log('attended', attendedOrNot);
+
         // Mark attendence
         if (demodate === today) {
           if (!attendedOrNot) {
@@ -319,7 +321,7 @@ const DemoClassScreen = ({route, navigation}) => {
                   outlined={true}
                   outlineColor={COLORS.black}
                   textColor={COLORS.black}
-                  onPress={() => navigation.navigate('BookDemo')}>
+                  onPress={() => navigation.navigate('BookDemoForm')}>
                   Book A Free class
                 </Button>
               </>

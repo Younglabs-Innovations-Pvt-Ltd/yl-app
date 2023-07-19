@@ -16,10 +16,11 @@ import SplashScreen from 'react-native-splash-screen';
 import {initZoomSdk} from './src/natiive-modules/zoom-modules';
 
 // Screens
-import JoinDemoScreen from './src/screens/join-demo-class.screen';
+import JoinDemoScreen from './src/screens/join-demo.screen';
 import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
-import BookDemoScreen from './src/screens/book-demo-class.screen';
+import BookDemoFormScreen from './src/screens/book-demo-form.screen';
+import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 
 import {COLORS} from './src/assets/theme/theme';
 
@@ -119,8 +120,13 @@ function App() {
           <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
           <Stack.Screen name="Reschedule" component={ReScheduleScreen} />
           <Stack.Screen
-            name="BookDemo"
-            component={BookDemoScreen}
+            name="BookDemoForm"
+            component={BookDemoFormScreen}
+            options={{title: 'Book Class'}}
+          />
+          <Stack.Screen
+            name="BookDemoSlots"
+            component={BookDemoSlotsScreen}
             options={{title: 'Book Class'}}
           />
         </Stack.Navigator>

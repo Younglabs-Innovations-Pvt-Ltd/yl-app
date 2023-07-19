@@ -62,7 +62,7 @@ const CountryList = ({visible, onChangeVisible, onSelect}) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TextInput
-          placeholder="Search"
+          placeholder="Search..."
           style={styles.search}
           selectionColor={COLORS.black}
           placeholderTextColor={COLORS.black}
@@ -93,7 +93,7 @@ const CountryList = ({visible, onChangeVisible, onSelect}) => {
               ]}
               onPress={() => onSelect(item)}>
               <Image source={{uri: item.flags.png}} style={styles.flag} />
-              <TextWrapper>{item.name.official}</TextWrapper>
+              <TextWrapper>{item.name.common}</TextWrapper>
             </Pressable>
           );
         }}
