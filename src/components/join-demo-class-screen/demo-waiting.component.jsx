@@ -7,7 +7,7 @@ import {COLORS} from '../../assets/theme/theme';
 
 const DemoWaiting = ({timeLeft}) => {
   return (
-    <View>
+    <>
       <TextWrapper color="gray">Your free class starts in</TextWrapper>
       <CountDown timeLeft={timeLeft} />
       <Spacer />
@@ -30,7 +30,7 @@ const DemoWaiting = ({timeLeft}) => {
           </View>
         </View>
       </View>
-    </View>
+    </>
   );
 };
 

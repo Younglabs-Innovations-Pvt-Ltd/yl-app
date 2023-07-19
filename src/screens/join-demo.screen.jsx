@@ -124,8 +124,6 @@ const DemoClassScreen = ({route, navigation}) => {
         const demodate = new Date(_seconds * 1000).getDate();
         const today = new Date().getDate();
 
-        console.log('attended', attendedOrNot);
-
         // Mark attendence
         if (demodate === today) {
           if (!attendedOrNot) {
@@ -332,7 +330,7 @@ const DemoClassScreen = ({route, navigation}) => {
               // Demo has ended
               // Show post action after demo class
               bookingTime
-                ? new Date(bookingTime).getTime() + 1000 * 60 <=
+                ? new Date(bookingTime).getTime() + 1000 * 60 * 30 <=
                     new Date().getTime() &&
                   isAttended && <PostDemoAction />
                 : null

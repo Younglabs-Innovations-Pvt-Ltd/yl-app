@@ -64,7 +64,6 @@ function App() {
   useEffect(() => {
     const handleRedirectUrl = url => {
       if (!url) {
-        console.log('Not from url.');
         setLoading(false);
         return;
       }

@@ -1,6 +1,6 @@
 import React from 'react';
-import {StyleSheet, Text, Pressable} from 'react-native';
-import {COLORS, FONTS} from '../assets/theme/theme';
+import {StyleSheet, Pressable} from 'react-native';
+import TextWrapper from './text-wrapper.component';
 
 const button_styles = {
   styles(bg, outlined, outlineColor) {
@@ -24,6 +24,7 @@ const Button = ({
   outlined,
   outlineColor,
   textColor,
+  shadow,
   ...otherProps
 }) => {
   return (
@@ -34,12 +35,16 @@ const Button = ({
         {
           opacity: pressed ? 0.75 : 1,
           borderRadius: rounded || 0,
+          elevation: shadow ? 2 : 0,
         },
         button_styles.styles(bg, outlined, outlineColor),
       ]}>
-      <Text style={[styles.buttonText, {color: textColor || COLORS.white}]}>
+      <TextWrapper
+        fs={16}
+        fw="500"
+        styles={{textAlign: 'center', letterSpacing: 1.5}}>
         {children}
-      </Text>
+      </TextWrapper>
     </Pressable>
   );
 };
@@ -53,12 +58,5 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     display: 'flex',
     justifyContent: 'center',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    textAlign: 'center',
-    letterSpacing: 1.5,
-    fontFamily: FONTS.roboto,
   },
 });

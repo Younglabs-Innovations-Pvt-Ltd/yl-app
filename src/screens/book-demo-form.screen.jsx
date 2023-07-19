@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import Button from '../components/button.component';
 import {COLORS} from '../assets/theme/theme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {useDispatch, useSelector} from 'react-redux';
 import CountryList from '../components/country-list.component';
@@ -109,48 +108,6 @@ const BookDemoScreen = ({navigation}) => {
     }
 
     navigation.navigate('BookDemoSlots', {formFields, country});
-  };
-
-  const handleBookNow = async () => {
-    const bodyData = {
-      ...formFields,
-      timeZone: timezone,
-      demoDate: currentSlotTime.demoDate,
-      bookingType: 'direct',
-      source: 'Website',
-      course: 'Eng_Hw',
-      digits: 'na',
-      slotId: currentSlotTime.slotId,
-      country: ipData.country_name.toUpperCase(),
-      countryCode: country.callingCode,
-      websiteSrc: 'website',
-    };
-
-    try {
-      const response = await fetch(ADD_BOOKINGS_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bodyData),
-      });
-
-      const bookingData = await response.json();
-      if (response.status === 200) {
-        console.log('bookingData', bookingData);
-
-        await AsyncStorage.setItem(
-          'bookingid',
-          JSON.stringify(bookingData.bookingId),
-        );
-        dispatch(startFetchBookingDetailsFromId(bookingData.bookingId));
-        navigation.goBack();
-      } else if (response.status === 400) {
-        console.log('bookingData', bookingData);
-      }
-    } catch (error) {
-      console.log('booking error', error);
-    }
   };
 
   const handleSelectCountry = country => {
