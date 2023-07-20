@@ -8,7 +8,10 @@ import {
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
-import {joinClassOnZoom} from '../natiive-modules/zoom-modules';
+import {
+  joinClassOnZoom,
+  classStatusChangeListener,
+} from '../natiive-modules/zoom-modules';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Input from '../components/input.component';
@@ -28,6 +31,8 @@ import Spinner from '../components/spinner.component';
 import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
 import DemoWaiting from '../components/join-demo-class-screen/demo-waiting.component';
 import Modal from '../components/modal.component';
+
+import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
@@ -78,6 +83,25 @@ const DemoClassScreen = ({route, navigation}) => {
   const [showJoinButton, setShowJoinButton] = useState(false);
   const [shouldShowJoin, setShouldShowJoin] = useState(false);
   const [isAttended, setIsAttended] = useState(false);
+
+  // class status callback
+  const handleClassStatusCallback = async () => {
+    try {
+      const phone = await AsyncStorage.getItem('phone');
+      const reponse = await fetchBookingDetailsFromPhone(phone);
+      const {
+        demoDate: {_seconds},
+      } = await reponse.json();
+      setBookingTime(_seconds * 1000);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Class status callback listener
+  useEffect(() => {
+    classStatusChangeListener(handleClassStatusCallback);
+  }, []);
 
   // Set demo booking id
   useEffect(() => {
@@ -137,14 +161,10 @@ const DemoClassScreen = ({route, navigation}) => {
                 bId: bookingIdFromDemoData,
               }),
             });
-            if (markAttendenceResponse.status === 200) {
-              const message = await markAttendenceResponse.json();
-              ToastAndroid.showWithGravity(
-                message,
-                ToastAndroid.SHORT,
-                ToastAndroid.BOTTOM,
-              );
-            }
+
+            const markAttendenceData = await markAttendenceResponse.json();
+
+            console.log(markAttendenceData);
           }
         }
 
@@ -225,10 +245,12 @@ const DemoClassScreen = ({route, navigation}) => {
   // Do not show join button after 1 hour of demo ended
   useEffect(() => {
     if (bookingTime) {
-      const afterOneHourFromDemoDate =
-        new Date(bookingTime).getTime() + 1000 * 60 * 60;
+      console.log('hit');
 
-      if (afterOneHourFromDemoDate <= new Date().getTime()) {
+      const afterHalfHourFromDemoDate =
+        new Date(bookingTime).getTime() + 1000 * 60 * 30;
+
+      if (afterHalfHourFromDemoDate <= new Date().getTime()) {
         // Hide class join button
         setShowJoinButton(false);
       }

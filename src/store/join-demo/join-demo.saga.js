@@ -22,9 +22,11 @@ function* fetchDemoDetailsFromPhone({payload}) {
     }
     // set phone to local storage
     const phoneFromAsync = yield AsyncStorage.getItem('phone');
+
     if (!phoneFromAsync) {
       yield AsyncStorage.setItem('phone', payload);
     }
+
     yield put(setBookingDetailSuccess(data));
   } catch (error) {
     console.log('Demosaga_detail_phone', error);

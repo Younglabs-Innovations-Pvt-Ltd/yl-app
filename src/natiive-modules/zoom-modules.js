@@ -6,3 +6,6 @@ export const initZoomSdk = () => ZoomManager.initZoomSdk();
 
 export const joinClassOnZoom = (meetingId, meetingPassword, displayName) =>
   ZoomManager.joinClass(meetingId, meetingPassword, displayName);
+
+export const classStatusChangeListener = callback =>
+  ZoomManager.registerClassStatusCallback(callback);

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -28,6 +29,8 @@ public class ZoomManager extends ReactContextBaseJavaModule implements ZoomSDKIn
 
     private Promise meetingPromise;
 
+    private Callback meetingStatusCallback;
+
     ZoomManager(ReactApplicationContext context) {
         super(context);
         this.reactContext = context;
@@ -37,6 +40,11 @@ public class ZoomManager extends ReactContextBaseJavaModule implements ZoomSDKIn
     @Override
     public String getName() {
         return "ZoomManager";
+    }
+
+    @ReactMethod
+    public void registerClassStatusCallback(Callback callback) {
+        this.meetingStatusCallback = callback;
     }
 
     @ReactMethod
@@ -123,7 +131,7 @@ public class ZoomManager extends ReactContextBaseJavaModule implements ZoomSDKIn
 
         if (meetingStatus == MeetingStatus.MEETING_STATUS_DISCONNECTING) {
             Log.d(this.getName(), "Class leaving.");
-            meetingPromise.resolve("class leaved.");
+            meetingStatusCallback.invoke("leave");
         }
     }
 

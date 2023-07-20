@@ -42,7 +42,8 @@ const Button = ({
       <TextWrapper
         fs={16}
         fw="500"
-        styles={{textAlign: 'center', letterSpacing: 1.5}}>
+        styles={{textAlign: 'center', letterSpacing: 1.5}}
+        color={textColor}>
         {children}
       </TextWrapper>
     </Pressable>

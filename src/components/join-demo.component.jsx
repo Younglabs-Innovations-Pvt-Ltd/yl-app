@@ -31,7 +31,12 @@ const JoinDemo = ({handleBookingStatus}) => {
           onChangeText={phoneNumber => setPhone(phoneNumber)}
         />
         <Seperator />
-        <Button rounded={4} bg={COLORS.pgreen} onPress={handleDemoBookingId}>
+        <Button
+          rounded={4}
+          bg={COLORS.pgreen}
+          onPress={handleDemoBookingId}
+          textColor={COLORS.white}
+          shadow={true}>
           Submit
         </Button>
       </View>
@@ -66,5 +71,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.black,
     fontFamily: FONTS.roboto,
+  },
+  animatedLogo: {
+    width: 180,
+    height: 180,
+    objectFit: 'contain',
   },
 });

@@ -1,18 +1,114 @@
-import React, {useState} from 'react';
-import {StyleSheet, View, Pressable} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, View, Pressable, Linking} from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../assets/theme/theme';
 import Icon from '../icon.component';
 import Button from '../button.component';
 
+import {useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const RATING_API =
+  'https://younglabsapis-33heck6yza-el.a.run.app/admin/postdemo/saveRating';
+
+const MARK_MORE_INFO_API =
+  'https://younglabsapis-33heck6yza-el.a.run.app/admin/postdemo/markNeedMoreInfo';
+
+const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
+
 const PostDemoAction = () => {
   const [rating, setRating] = useState(0);
   const [isRated, setIsRated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const {demoData} = useSelector(state => state.joinDemo);
+
+  useEffect(() => {
+    const checkForRating = async () => {
+      try {
+        const rating = await AsyncStorage.getItem('isRated');
+        if (rating === 'true') {
+          setIsRated(true);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.log('async rated error', error);
+      }
+    };
+
+    checkForRating();
+  }, []);
+
+  const handleSaveRating = async rate => {
+    const rated = rate * 2;
+    console.log('rating', rated);
+
+    try {
+      const response = await fetch(RATING_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookingId: demoData.bookingId,
+          rating: rated,
+        }),
+      });
+
+      if (response.status === 200) {
+        await AsyncStorage.setItem('isRated', 'true');
+        setIsRated(true);
+      }
+    } catch (error) {
+      console.log('Demo rating error', error);
+    }
+  };
 
   const onChangeRating = rate => {
     setRating(rate);
-    setIsRated(true);
+    handleSaveRating(rate);
   };
+
+  const redirectToWebsiteToBuyCourse = () => Linking.openURL(COURSE_URL);
+
+  const markNeedMoreInfo = async () => {
+    try {
+      const response = await fetch(MARK_MORE_INFO_API, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({bookingId: demoData.bookingId}),
+      });
+
+      const data = await response.text();
+      console.log('nmi', data);
+      if (response.status === 200) {
+        openWhatsApp();
+      }
+    } catch (error) {
+      console.log('nmi error', error);
+    }
+  };
+
+  const openWhatsApp = async () => {
+    const phoneNumber = '+919289029696';
+    let url = '';
+
+    if (Platform.OS === 'android') {
+      url = `whatsapp://send?phone=${phoneNumber}`;
+    } else if (Platform.OS === 'ios') {
+      url = `whatsapp://wa.me/${phoneNumber}`;
+    }
+
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error('Error opening WhatsApp:', error);
+    }
+  };
+
+  if (loading) return null;
 
   return (
     <View style={styles.container}>
@@ -61,14 +157,16 @@ const PostDemoAction = () => {
               textColor={COLORS.black}
               bg={COLORS.white}
               rounded={4}
-              shadow={true}>
+              shadow={true}
+              onPress={markNeedMoreInfo}>
               Yes, need more info
             </Button>
             <Button
               textColor={COLORS.black}
               bg={COLORS.white}
               rounded={4}
-              shadow={true}>
+              shadow={true}
+              onPress={redirectToWebsiteToBuyCourse}>
               Buy on website
             </Button>
             <Button
