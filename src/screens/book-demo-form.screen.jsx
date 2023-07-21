@@ -188,7 +188,10 @@ const BookDemoScreen = ({navigation}) => {
         </View>
       </ScrollView>
       <View style={styles.footer}>
-        <Button bg={COLORS.pgreen} onPress={handleDemoSlots}>
+        <Button
+          bg={COLORS.pgreen}
+          onPress={handleDemoSlots}
+          textColor={COLORS.white}>
           Select date and book
         </Button>
       </View>

@@ -189,7 +189,10 @@ const BookDemoSlots = ({route, navigation}) => {
         )}
       </View>
       <View style={styles.footer}>
-        <Button bg={COLORS.pgreen} onPress={handleBookNow}>
+        <Button
+          bg={COLORS.pgreen}
+          onPress={handleBookNow}
+          textColor={COLORS.white}>
           Book now
         </Button>
       </View>

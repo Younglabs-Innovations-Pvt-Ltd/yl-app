@@ -33,6 +33,7 @@ import DemoWaiting from '../components/join-demo-class-screen/demo-waiting.compo
 import Modal from '../components/modal.component';
 
 import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
+import {setCountdownTriggerNotification} from '../utils/notifications';
 
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
@@ -145,11 +146,11 @@ const DemoClassScreen = ({route, navigation}) => {
           bookingId: bookingIdFromDemoData,
         } = demoData;
 
-        const demodate = new Date(_seconds * 1000).getDate();
+        const demodate = new Date(_seconds * 1000);
         const today = new Date().getDate();
 
         // Mark attendence
-        if (demodate === today) {
+        if (demodate.getDate() === today) {
           if (!attendedOrNot) {
             const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
               method: 'POST',
@@ -188,6 +189,7 @@ const DemoClassScreen = ({route, navigation}) => {
     }
   }, [demoData]);
 
+  // Show wrong number
   useEffect(() => {
     if (demoData) {
       if (demoData.hasOwnProperty('message')) {
@@ -245,8 +247,6 @@ const DemoClassScreen = ({route, navigation}) => {
   // Do not show join button after 1 hour of demo ended
   useEffect(() => {
     if (bookingTime) {
-      console.log('hit');
-
       const afterHalfHourFromDemoDate =
         new Date(bookingTime).getTime() + 1000 * 60 * 30;
 
@@ -271,6 +271,53 @@ const DemoClassScreen = ({route, navigation}) => {
 
     checkForIdOrPhone();
   }, [demoBookingId, demoPhoneNumber, demoData]);
+
+  // Notification
+  useEffect(() => {
+    const setNotification = async () => {
+      try {
+        const isNotification = await AsyncStorage.getItem(
+          'countdown_notification',
+        );
+
+        if (!isNotification) {
+          // before 1 hour from demo class
+          const notificationTime =
+            new Date(bookingTime).getTime() - 1000 * 60 * 60;
+
+          // for 11 am
+          const time = new Date(bookingTime);
+          time.setHours(11);
+
+          const hours = new Date(bookingTime).getHours();
+          const body = `Your free class will be started at ${
+            hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
+          } : 00 ${hours >= 12 ? 'pm' : 'am'}.`;
+
+          await setCountdownTriggerNotification(
+            'countdown',
+            'countdown',
+            time.getTime(),
+            body,
+          );
+          await setCountdownTriggerNotification(
+            'countdown',
+            'countdown',
+            notificationTime,
+            body,
+          );
+
+          await AsyncStorage.setItem('countdown_notification', 'saved');
+        }
+      } catch (error) {
+        console.log('notification error', error);
+      }
+    };
+
+    if (bookingTime) {
+      setNotification();
+    }
+  }, [bookingTime]);
 
   // Join Class
   const handleJoinClass = async () => {
@@ -323,7 +370,8 @@ const DemoClassScreen = ({route, navigation}) => {
                     <Button
                       rounded={4}
                       onPress={handleJoinClass}
-                      bg={COLORS.pgreen}>
+                      bg={COLORS.pgreen}
+                      textColor={COLORS.white}>
                       Join Class
                     </Button>
                   </>
