@@ -379,19 +379,10 @@ const DemoClassScreen = ({route, navigation}) => {
               : null}
             {shouldShowJoin && (
               <>
-                <JoinDemo handleBookingStatus={handleBookingStatus} />
-                <Spacer space={4} />
-                <Seperator text="or" />
-                <Spacer space={4} />
-                <Button
-                  rounded={4}
-                  bg="transparent"
-                  outlined={true}
-                  outlineColor={COLORS.black}
-                  textColor={COLORS.black}
-                  onPress={() => navigation.navigate('BookDemoForm')}>
-                  Book A Free class
-                </Button>
+                <JoinDemo
+                  handleBookingStatus={handleBookingStatus}
+                  navigation={navigation}
+                />
               </>
             )}
 

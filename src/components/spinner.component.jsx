@@ -1,26 +1,38 @@
-import React from 'react';
-import {StyleSheet} from 'react-native';
-import {MotiImage} from 'moti';
+import React, {useEffect, useRef} from 'react';
+import {StyleSheet, Animated} from 'react-native';
 import {Easing} from 'react-native-reanimated';
 
 const Spinner = ({style}) => {
-  return (
-    <MotiImage
-      source={require('../assets/images/spinner.png')}
-      style={[styles.spinner, {...style}]}
-      from={{
-        rotate: '0deg',
-      }}
-      animate={{
-        rotate: '360deg',
-      }}
-      transition={{
-        duration: 350,
-        type: 'timing',
-        loop: true,
-        repeatReverse: false,
+  const rotation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(rotation, {
+        toValue: 1,
+        duration: 300,
         easing: Easing.linear,
-      }}
+        useNativeDriver: true,
+      }),
+    ).start();
+  }, []);
+
+  return (
+    <Animated.Image
+      source={require('../assets/images/spinner.png')}
+      style={[
+        styles.spinner,
+        {
+          transform: [
+            {
+              rotate: rotation.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0deg', '360deg'],
+              }),
+            },
+          ],
+          ...style,
+        },
+      ]}
     />
   );
 };
