@@ -16,7 +16,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Input from '../components/input.component';
 import JoinDemo from '../components/join-demo.component';
-import Seperator from '../components/seperator.component';
 
 import {COLORS, FONTS} from '../assets/theme/theme';
 

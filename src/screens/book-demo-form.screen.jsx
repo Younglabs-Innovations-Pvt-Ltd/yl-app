@@ -47,7 +47,7 @@ const BookDemoScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  const {timezone, ipData, loading} = useSelector(bookDemoSelector);
+  const {ipData, loading} = useSelector(bookDemoSelector);
 
   useEffect(() => {
     if (!ipData) {

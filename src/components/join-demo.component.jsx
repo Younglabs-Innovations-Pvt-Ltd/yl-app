@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View, Animated} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import Input from './input.component';
 import Button from './button.component';
 import Seperator from './seperator.component';
@@ -16,7 +16,7 @@ const JoinDemo = ({navigation, handleBookingStatus}) => {
 
   return (
     <View>
-      {/* <View style={styles.headingWrapper}>
+      <View style={styles.headingWrapper}>
         <Text style={styles.heading}>
           Welcome to <Text style={styles.ylText}>YoungLabs</Text>
         </Text>
@@ -52,11 +52,7 @@ const JoinDemo = ({navigation, handleBookingStatus}) => {
         textColor={COLORS.black}
         onPress={() => navigation.navigate('BookDemoForm')}>
         Book A Free class
-      </Button> */}
-      <Animated.Image
-        source={require('../assets/images/spinner.png')}
-        style={styles.animatedLogo}
-      />
+      </Button>
     </View>
   );
 };
@@ -93,5 +89,7 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     objectFit: 'contain',
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
 });

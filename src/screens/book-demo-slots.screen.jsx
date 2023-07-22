@@ -12,6 +12,8 @@ import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {startFetchingBookingSlots} from '../store/book-demo/book-demo.reducer';
 import {startFetchBookingDetailsFromId} from '../store/join-demo/join-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Modal from '../components/modal.component';
+import Icon from '../components/icon.component';
 
 const ADD_BOOKINGS_API =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/bookings/addBookings';
@@ -21,6 +23,8 @@ const BookDemoSlots = ({route, navigation}) => {
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [popup, setPopup] = useState(false);
+  const [bookingData, setBookingData] = useState(null);
 
   const {
     formFields: {childAge, name, phone},
@@ -63,7 +67,7 @@ const BookDemoSlots = ({route, navigation}) => {
   // Set current slots date
   const handleCurrentSlotDate = date => {
     setCurrentSlotDate(date);
-    setCurrentSlotTime(bookingSlots[0].data[0]);
+    setCurrentSlotTime(slotsTime[date][0]);
   };
 
   // set current slots time
@@ -96,17 +100,17 @@ const BookDemoSlots = ({route, navigation}) => {
         body: JSON.stringify(bodyData),
       });
 
-      const bookingData = await response.json();
+      const bookingDetails = await response.json();
       if (response.status === 200) {
-        console.log('bookingData', bookingData);
-
         await AsyncStorage.setItem(
           'bookingid',
-          JSON.stringify(bookingData.bookingId),
+          JSON.stringify(bookingDetails.bookingId),
         );
-        dispatch(startFetchBookingDetailsFromId(bookingData.bookingId));
-        if (errorMessage) setErrorMessage('');
-        navigation.replace('joinDemo');
+
+        // set booking Data
+        setBookingData(bookingDetails);
+        // show popup
+        setPopup(true);
       } else if (response.status === 400) {
         console.log('booking data', bookingData);
 
@@ -115,6 +119,12 @@ const BookDemoSlots = ({route, navigation}) => {
     } catch (error) {
       console.log('booking error', error);
     }
+  };
+
+  const handlePopup = () => {
+    dispatch(startFetchBookingDetailsFromId(bookingData.bookingId));
+    if (errorMessage) setErrorMessage('');
+    navigation.replace('joinDemo');
   };
 
   return bookingSlots.length === 0 ? (
@@ -196,11 +206,41 @@ const BookDemoSlots = ({route, navigation}) => {
           Book now
         </Button>
       </View>
+      {/* show popup */}
+      {popup && <Popup onHandlePopup={handlePopup} />}
     </>
   );
 };
 
 export default BookDemoSlots;
+
+const Popup = ({onHandlePopup}) => {
+  return (
+    <Modal bg="rgba(0,0,0,0.25)">
+      <View style={styles.popup}>
+        <Icon
+          name="checkmark"
+          size={54}
+          color={COLORS.pgreen}
+          style={{alignSelf: 'center'}}
+        />
+        <TextWrapper styles={{textAlign: 'center'}}>
+          Congratulation your free class booking successful
+        </TextWrapper>
+        <Spacer />
+        <View>
+          <Button
+            bg={COLORS.orange}
+            textColor={COLORS.white}
+            rounded={4}
+            onPress={onHandlePopup}>
+            Continue
+          </Button>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -227,5 +267,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  popup: {
+    maxWidth: 324,
+    backgroundColor: COLORS.white,
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    elevation: 4,
   },
 });

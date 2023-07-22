@@ -96,10 +96,14 @@ const PostDemoAction = () => {
     let url = '';
 
     if (Platform.OS === 'android') {
-      url = `whatsapp://send?phone=${phoneNumber}`;
+      url = `whatsapp://send?phone=${phoneNumber}&text=interested`;
     } else if (Platform.OS === 'ios') {
-      url = `whatsapp://wa.me/${phoneNumber}`;
+      url = `whatsapp://wa.me/${phoneNumber}&text=interested`;
     }
+
+    const canOpen = await Linking.canOpenURL(url);
+
+    if (!canOpen) return;
 
     try {
       await Linking.openURL(url);
