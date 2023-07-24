@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   ToastAndroid,
-  Modal,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
@@ -31,11 +30,9 @@ import {
 import Spinner from '../components/spinner.component';
 import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
 import DemoWaiting from '../components/join-demo-class-screen/demo-waiting.component';
-// import Modal from '../components/modal.component';
 
 import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 import {setCountdownTriggerNotification} from '../utils/notifications';
-import CustomerSupportActions from '../components/customer-support-actions';
 
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
@@ -436,8 +433,6 @@ const DemoClassScreen = ({route, navigation}) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <CustomerSupportActions />
-      {/* {(!demoData || showPostActions) && <CustomerSupportActions />} */}
     </>
   );
 };
@@ -464,5 +459,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'gray',
     fontFamily: FONTS.roboto,
+  },
+  footer: {
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
+    width: '100%',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    backgroundColor: COLORS.white,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 1000,
   },
 });

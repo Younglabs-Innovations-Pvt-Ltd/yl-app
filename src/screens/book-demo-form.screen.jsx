@@ -67,6 +67,7 @@ const BookDemoScreen = ({navigation}) => {
   useEffect(() => {
     if (ipData) {
       const tz = ipData.time_zone.offset + ipData.time_zone.dst_savings;
+      console.log(tz);
       dispatch(setTimezone(tz));
     }
   }, [ipData]);

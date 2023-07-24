@@ -33,8 +33,8 @@ const COUNTRIES_URL = 'https://restcountries.com/v3.1/all';
 const ADD_INQUIRY_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/courses/addEnquiry';
 
-const CustomerSupportActions = () => {
-  const [actions, setActions] = useState(false);
+const CustomerSupportActions = ({visible, onClose}) => {
+  // const [actions, setActions] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [bottomModalVisible, setBottomModalVisible] = useState(false);
   const [country, setCountry] = useState({callingCode: ''});
@@ -207,13 +207,13 @@ const CustomerSupportActions = () => {
   return (
     <>
       <View style={styles.customerSupportActions}>
-        <Modal animationType="none" transparent={true} visible={actions}>
-          <Pressable style={{flex: 1}} onPress={() => setActions(false)}>
+        <Modal animationType="none" transparent={true} visible={visible}>
+          <Pressable style={{flex: 1}} onPress={onClose}>
             <View
               style={{
                 position: 'absolute',
-                right: 20,
-                bottom: 75,
+                right: 12,
+                bottom: 68,
               }}>
               <Pressable style={styles.btnCta} onPress={handleShowFormVisible}>
                 <View
@@ -252,11 +252,11 @@ const CustomerSupportActions = () => {
             </View>
           </Pressable>
         </Modal>
-        <Pressable
+        {/* <Pressable
           style={styles.btnCustomerSupport}
           onPress={() => setActions(true)}>
           <MIcon name="headset" size={24} color={COLORS.black} />
-        </Pressable>
+        </Pressable> */}
       </View>
       <Modal visible={formVisible} animationType="none" transparent={true}>
         <View

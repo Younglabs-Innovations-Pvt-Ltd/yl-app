@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View, Modal} from 'react-native';
 
-export default ({visible, bg = 'transparent'}) => {
+export default ({children, visible, bg = 'transparent'}) => {
   return (
     <Modal transparent={true} animationType="none" visible={visible}>
       <View style={[styles.modal, {backgroundColor: bg}]}>{children}</View>
@@ -14,5 +14,6 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });

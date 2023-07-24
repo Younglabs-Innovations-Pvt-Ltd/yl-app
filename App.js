@@ -7,6 +7,7 @@ import {
   CardStyleInterpolators,
   createStackNavigator,
 } from '@react-navigation/stack';
+
 import {Provider} from 'react-redux';
 import {store} from './src/store/store';
 
@@ -16,11 +17,12 @@ import SplashScreen from 'react-native-splash-screen';
 import {initZoomSdk} from './src/natiive-modules/zoom-modules';
 
 // Screens
-import JoinDemoScreen from './src/screens/join-demo.screen';
+import WelcomeScreen from './src/screens/welcome-screen';
 import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
 import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
+import MainScreen from './src/screens/main-screen';
 
 import {COLORS} from './src/assets/theme/theme';
 
@@ -109,8 +111,8 @@ function App() {
             gestureDirection: 'horizontal',
           }}>
           <Stack.Screen
-            name="joinDemo"
-            component={JoinDemoScreen}
+            name="Welcome"
+            component={WelcomeScreen}
             initialParams={{
               data: {queryData: queryDataFromUrl},
             }}
@@ -127,6 +129,11 @@ function App() {
             name="BookDemoSlots"
             component={BookDemoSlotsScreen}
             options={{title: 'Book Class'}}
+          />
+          <Stack.Screen
+            name="Main"
+            component={MainScreen}
+            options={{headerShown: false}}
           />
         </Stack.Navigator>
       </NavigationContainer>
