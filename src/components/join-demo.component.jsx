@@ -18,7 +18,7 @@ const JoinDemo = ({navigation, handleBookingStatus}) => {
     <View>
       <View style={styles.headingWrapper}>
         <Text style={styles.heading}>
-          Welcome to <Text style={styles.ylText}>YoungLabs</Text>
+          Welcome to <Text style={styles.ylText}>Younglabs</Text>
         </Text>
       </View>
       <View style={styles.contentWrapper}>

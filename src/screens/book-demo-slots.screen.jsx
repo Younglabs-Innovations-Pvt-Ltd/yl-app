@@ -112,9 +112,9 @@ const BookDemoSlots = ({route, navigation}) => {
         // show popup
         setPopup(true);
       } else if (response.status === 400) {
-        console.log('booking data', bookingData);
+        console.log('booking data', bookingDetails);
 
-        setErrorMessage(bookingData.message);
+        setErrorMessage(bookingDetails.message);
       }
     } catch (error) {
       console.log('booking error', error);

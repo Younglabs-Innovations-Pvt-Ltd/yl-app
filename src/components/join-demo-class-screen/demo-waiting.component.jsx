@@ -5,6 +5,7 @@ import CountDown from '../countdown.component';
 import Spacer from '../spacer.component';
 import {COLORS} from '../../assets/theme/theme';
 import {useSelector} from 'react-redux';
+import BackButton from '../back-button.component';
 
 const months = [
   'Jan',
@@ -36,15 +37,19 @@ const getClassDate = seconds => {
   return `${classDate} ${months[month]} ${year} at ${classTime}`;
 };
 
-const DemoWaiting = ({timeLeft}) => {
-  const {
-    demoData: {demoDate},
-  } = useSelector(state => state.joinDemo);
+const DemoWaiting = ({timeLeft, handleBackButton}) => {
+  const {demoData} = useSelector(state => state.joinDemo);
 
+  if (!demoData) return;
+
+  const {demoDate} = demoData;
   const seconds = demoDate._seconds;
 
   return (
-    <>
+    <View>
+      <View style={styles.header}>
+        <BackButton onPress={handleBackButton} />
+      </View>
       <TextWrapper color="gray">Your free class starts in</TextWrapper>
       <CountDown timeLeft={timeLeft} />
       <Spacer />
@@ -70,7 +75,7 @@ const DemoWaiting = ({timeLeft}) => {
           </View>
         </View>
       </View>
-    </>
+    </View>
   );
 };
 
@@ -89,11 +94,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.black,
   },
   listItem: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     padding: 4,
     position: 'relative',
+  },
+  header: {
+    alignItems: 'flex-start',
+    paddingVertical: 12,
   },
 });

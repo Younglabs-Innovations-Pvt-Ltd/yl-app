@@ -18,6 +18,7 @@ const button_styles = {
 };
 
 const Button = ({
+  loading,
   children,
   bg,
   rounded,
@@ -38,7 +39,8 @@ const Button = ({
           elevation: shadow ? 2 : 0,
         },
         button_styles.styles(bg, outlined, outlineColor),
-      ]}>
+      ]}
+      disabled={loading ? true : false}>
       <TextWrapper
         fs={16}
         fw="500"

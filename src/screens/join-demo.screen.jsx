@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   ToastAndroid,
+  Modal,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
@@ -25,14 +26,16 @@ import {
   startFetchBookingDetailsFromPhone,
   setDemoPhone,
   setDemoBookingId,
+  setToInitialState,
 } from '../store/join-demo/join-demo.reducer';
 import Spinner from '../components/spinner.component';
 import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
 import DemoWaiting from '../components/join-demo-class-screen/demo-waiting.component';
-import Modal from '../components/modal.component';
+// import Modal from '../components/modal.component';
 
 import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 import {setCountdownTriggerNotification} from '../utils/notifications';
+import CustomerSupportActions from '../components/customer-support-actions';
 
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
@@ -83,6 +86,7 @@ const DemoClassScreen = ({route, navigation}) => {
   const [showJoinButton, setShowJoinButton] = useState(false);
   const [shouldShowJoin, setShouldShowJoin] = useState(false);
   const [isAttended, setIsAttended] = useState(false);
+  const [showPostActions, setShowPostActions] = useState(false);
 
   // class status callback
   const handleClassStatusCallback = async () => {
@@ -103,7 +107,7 @@ const DemoClassScreen = ({route, navigation}) => {
     classStatusChangeListener(handleClassStatusCallback);
   }, []);
 
-  // Set demo booking id
+  // Set demo booking id or phone number
   useEffect(() => {
     const getDemoId = async () => {
       try {
@@ -279,6 +283,10 @@ const DemoClassScreen = ({route, navigation}) => {
           'countdown_notification',
         );
 
+        const checkDate =
+          new Date().getDate() <= new Date(bookingTime).getDate();
+        if (!checkDate) return;
+
         if (!isNotification) {
           // before 1 hour from demo class
           const notificationTime =
@@ -318,6 +326,18 @@ const DemoClassScreen = ({route, navigation}) => {
     }
   }, [bookingTime]);
 
+  // Post Actions
+  useEffect(() => {
+    if (!bookingTime) return;
+
+    const isDemoOver =
+      new Date(bookingTime).getTime() + 1000 * 60 * 30 <= new Date().getTime();
+
+    if (isDemoOver && isAttended) {
+      setShowPostActions(true);
+    }
+  }, [bookingTime, isAttended]);
+
   // Join Class
   const handleJoinClass = async () => {
     if (!zoomData || !childName) {
@@ -343,62 +363,82 @@ const DemoClassScreen = ({route, navigation}) => {
     dispatch(startFetchBookingDetailsFromPhone(phone));
   };
 
-  return loading ? (
-    <Modal>
-      <Spinner />
-    </Modal>
-  ) : (
-    <KeyboardAvoidingView behavior="padding">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.box}>
-            {bookingTime
-              ? new Date(bookingTime).getTime() > new Date().getTime() && (
-                  <DemoWaiting timeLeft={timeLeft} />
-                )
-              : null}
-            {isTimeover
-              ? showJoinButton && (
-                  <>
-                    <Input
-                      placeholder="Child Name"
-                      value={childName}
-                      onChangeText={e => setChildName(e)}
-                    />
-                    <Spacer />
-                    <Button
-                      rounded={4}
-                      onPress={handleJoinClass}
-                      bg={COLORS.pgreen}
-                      textColor={COLORS.white}>
-                      Join Class
-                    </Button>
-                  </>
-                )
-              : null}
-            {shouldShowJoin && (
-              <>
-                <JoinDemo
-                  handleBookingStatus={handleBookingStatus}
-                  navigation={navigation}
-                />
-              </>
-            )}
+  const handleBackButton = async () => {
+    try {
+      await AsyncStorage.removeItem('phone');
+      await AsyncStorage.removeItem('bookingid');
+      await AsyncStorage.removeItem('countdown_notification');
+      dispatch(setToInitialState());
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-            {
-              // If user attended demo class
-              // Demo has ended
-              // Show post action after demo class
-              bookingTime
-                ? new Date(bookingTime).getTime() + 1000 * 60 * 30 <=
-                    new Date().getTime() &&
-                  isAttended && <PostDemoAction />
-                : null
-            }
+  return loading ? (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: COLORS.white,
+      }}>
+      <Spinner />
+    </View>
+  ) : (
+    <>
+      <KeyboardAvoidingView behavior="padding">
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.box}>
+              {bookingTime
+                ? new Date(bookingTime).getTime() > new Date().getTime() && (
+                    <DemoWaiting
+                      timeLeft={timeLeft}
+                      handleBackButton={handleBackButton}
+                    />
+                  )
+                : null}
+              {isTimeover
+                ? showJoinButton && (
+                    <>
+                      <Input
+                        placeholder="Child Name"
+                        value={childName}
+                        onChangeText={e => setChildName(e)}
+                      />
+                      <Spacer />
+                      <Button
+                        rounded={4}
+                        onPress={handleJoinClass}
+                        bg={COLORS.pgreen}
+                        textColor={COLORS.white}>
+                        Join Class
+                      </Button>
+                    </>
+                  )
+                : null}
+              {shouldShowJoin && (
+                <>
+                  <JoinDemo
+                    handleBookingStatus={handleBookingStatus}
+                    navigation={navigation}
+                  />
+                </>
+              )}
+
+              {
+                // If user attended demo class
+                // Demo has ended
+                // Show post action after demo class
+                showPostActions && <PostDemoAction />
+              }
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+      <CustomerSupportActions />
+      {/* {(!demoData || showPostActions) && <CustomerSupportActions />} */}
+    </>
   );
 };
 
@@ -406,7 +446,6 @@ export default DemoClassScreen;
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
     paddingHorizontal: 12,
     paddingTop: 16,
   },
@@ -417,13 +456,6 @@ const styles = StyleSheet.create({
   box: {
     maxWidth: 540,
     marginHorizontal: 'auto',
-  },
-  input: {
-    width: '100%',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 4,
   },
   textCenter: {
     textAlign: 'center',
