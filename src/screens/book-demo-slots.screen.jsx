@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Pressable, View} from 'react-native';
+import {CommonActions} from '@react-navigation/native';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
@@ -10,10 +11,9 @@ import {COLORS} from '../assets/theme/theme';
 import {useDispatch, useSelector} from 'react-redux';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {startFetchingBookingSlots} from '../store/book-demo/book-demo.reducer';
-import {startFetchBookingDetailsFromId} from '../store/join-demo/join-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Modal from '../components/modal.component';
 import Icon from '../components/icon.component';
+import Center from '../components/center.component';
 
 const ADD_BOOKINGS_API =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/bookings/addBookings';
@@ -31,7 +31,8 @@ const BookDemoSlots = ({route, navigation}) => {
   } = route.params;
 
   const dispatch = useDispatch();
-  const {bookingSlots, timezone, ipData} = useSelector(bookDemoSelector);
+  const {bookingSlots, timezone, ipData, loading} =
+    useSelector(bookDemoSelector);
 
   // Fetch booking slots
   useEffect(() => {
@@ -102,10 +103,7 @@ const BookDemoSlots = ({route, navigation}) => {
 
       const bookingDetails = await response.json();
       if (response.status === 200) {
-        await AsyncStorage.setItem(
-          'bookingid',
-          JSON.stringify(bookingDetails.bookingId),
-        );
+        await AsyncStorage.setItem('phone', phone);
 
         // set booking Data
         setBookingData(bookingDetails);
@@ -122,12 +120,16 @@ const BookDemoSlots = ({route, navigation}) => {
   };
 
   const handlePopup = () => {
-    dispatch(startFetchBookingDetailsFromId(bookingData.bookingId));
     if (errorMessage) setErrorMessage('');
-    navigation.replace('joinDemo');
+    const resetAction = CommonActions.reset({
+      index: 0,
+      routes: [{name: 'Main'}],
+    });
+
+    navigation.dispatch(resetAction);
   };
 
-  return bookingSlots.length === 0 ? (
+  return loading ? (
     <Spinner style={{alignSelf: 'center'}} />
   ) : (
     <>
@@ -214,31 +216,33 @@ const BookDemoSlots = ({route, navigation}) => {
 
 export default BookDemoSlots;
 
-const Popup = ({onHandlePopup}) => {
+const Popup = ({onHandlePopup, popup}) => {
   return (
-    <Modal bg="rgba(0,0,0,0.25)">
-      <View style={styles.popup}>
-        <Icon
-          name="checkmark"
-          size={54}
-          color={COLORS.pgreen}
-          style={{alignSelf: 'center'}}
-        />
-        <TextWrapper styles={{textAlign: 'center'}}>
-          Congratulation your free class booking successful
-        </TextWrapper>
-        <Spacer />
-        <View>
-          <Button
-            bg={COLORS.orange}
-            textColor={COLORS.white}
-            rounded={4}
-            onPress={onHandlePopup}>
-            Continue
-          </Button>
+    <View style={styles.modal} visible={popup}>
+      <Center>
+        <View style={styles.popup}>
+          <Icon
+            name="checkmark"
+            size={54}
+            color={COLORS.pgreen}
+            style={{alignSelf: 'center'}}
+          />
+          <TextWrapper styles={{textAlign: 'center'}}>
+            Congratulation your free class booking successful
+          </TextWrapper>
+          <Spacer />
+          <View>
+            <Button
+              bg={COLORS.orange}
+              textColor={COLORS.white}
+              rounded={4}
+              onPress={onHandlePopup}>
+              Continue
+            </Button>
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Center>
+    </View>
   );
 };
 
@@ -275,5 +279,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 16,
     elevation: 4,
+  },
+  modal: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

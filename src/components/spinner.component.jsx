@@ -9,7 +9,7 @@ const Spinner = ({style}) => {
     Animated.loop(
       Animated.timing(rotation, {
         toValue: 1,
-        duration: 300,
+        duration: 400,
         easing: Easing.linear,
         useNativeDriver: true,
       }),

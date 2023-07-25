@@ -14,10 +14,10 @@
     "@react-native-async-storage/async-storage": "^1.19.0",
     "@react-native-community/netinfo": "^9.4.1",
     "@react-navigation/bottom-tabs": "^6.5.8",
+    "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
     "@reduxjs/toolkit": "^1.9.5",
-    "country-data": "^0.0.31",
     "google-libphonenumber": "^3.2.32",
     "moti": "^0.25.3",
     "react": "18.2.0",
@@ -30,7 +30,6 @@
     "react-native-splash-screen": "^3.3.0",
     "react-native-vector-icons": "^10.0.0",
     "react-redux": "^8.1.1",
-    "redux": "^4.2.1",
     "redux-saga": "^1.2.3"
   },
   "devDependencies": {

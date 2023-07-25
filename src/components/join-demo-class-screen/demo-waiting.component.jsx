@@ -46,10 +46,10 @@ const DemoWaiting = ({timeLeft, handleBackButton}) => {
   const seconds = demoDate._seconds;
 
   return (
-    <View>
-      <View style={styles.header}>
+    <View style={{paddingVertical: 12}}>
+      {/* <View style={styles.header}>
         <BackButton onPress={handleBackButton} />
-      </View>
+      </View> */}
       <TextWrapper color="gray">Your free class starts in</TextWrapper>
       <CountDown timeLeft={timeLeft} />
       <Spacer />

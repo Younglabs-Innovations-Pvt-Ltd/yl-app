@@ -24,6 +24,7 @@ import {
   startFetchingIpData,
 } from '../store/book-demo/book-demo.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import Center from '../components/center.component';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -209,11 +210,6 @@ const BookDemoScreen = ({navigation}) => {
           onClose={handleOnClose}
           onChange={handleChangeValue}
         />
-      )}
-      {loading && (
-        <Modal bg="rgba(0,0,0,0.25)">
-          <Spinner />
-        </Modal>
       )}
     </KeyboardAvoidingView>
   );

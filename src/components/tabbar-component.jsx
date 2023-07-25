@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
 import {StyleSheet, View, Pressable, Image} from 'react-native';
 import TextWrapper from './text-wrapper.component';
-import Icon from './icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../assets/theme/theme';
 import CustomerSupportActions from './customer-support-actions';
 
 const Icons = (name, focused) => {
   switch (name) {
-    case 'Home':
+    case 'Drawer':
       return (
         <Image
           source={require('../assets/images/spinner.png')}
@@ -29,7 +28,7 @@ const Icons = (name, focused) => {
 };
 
 function Tabbar({state, descriptors, navigation}) {
-  const [currentTab, setCurrentTab] = useState('home');
+  const [currentTab, setCurrentTab] = useState('drawer');
   const [actions, setActions] = useState(false);
 
   const ScreenIcon = ({name, focused}) => {
@@ -44,12 +43,7 @@ function Tabbar({state, descriptors, navigation}) {
 
   return (
     <>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingVertical: 4,
-        }}>
+      <View style={styles.tabbar}>
         {state.routes.map(route => {
           const {options} = descriptors[route.key];
           const label =
@@ -70,6 +64,7 @@ function Tabbar({state, descriptors, navigation}) {
           if (route.name === 'Contact') {
             return (
               <Pressable
+                key={route.key}
                 accessibilityRole="button"
                 accessibilityState={isFocused ? {selected: true} : {}}
                 accessibilityLabel={options.tabBarAccessibilityLabel}
@@ -93,6 +88,7 @@ function Tabbar({state, descriptors, navigation}) {
 
           return (
             <Pressable
+              key={route.key}
               accessibilityRole="button"
               accessibilityState={isFocused ? {selected: true} : {}}
               accessibilityLabel={options.tabBarAccessibilityLabel}
@@ -120,4 +116,13 @@ function Tabbar({state, descriptors, navigation}) {
 
 export default Tabbar;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  tabbar: {
+    backgroundColor: COLORS.white,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+});

@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import React, {useEffect, useState} from 'react';
-import {StatusBar, Linking, ToastAndroid} from 'react-native';
+import {Linking, ToastAndroid} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -23,20 +23,14 @@ import OnBoardingScreen from './src/screens/on-boarding-screen';
 import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
-
-import {COLORS} from './src/assets/theme/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 
 function App() {
   const [loading, setLoading] = useState(true);
   const [queryDataFromUrl, setQueryDataFromUrl] = useState(null);
-
-  // Style status bar
-  useEffect(() => {
-    StatusBar.setBarStyle('light-content');
-    StatusBar.setBackgroundColor(COLORS.pgreen);
-  }, []);
+  const [isPhone, setIsPhone] = useState(false);
 
   // Splash Screen
   useEffect(() => {
@@ -63,32 +57,50 @@ function App() {
   }, []);
 
   // Handle redirect url (Deep Link)
+  // useEffect(() => {
+  //   const handleRedirectUrl = url => {
+  //     if (!url) {
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     const appPackage = 'com.younglabs';
+  //     if (url.includes('openStore=true')) {
+  //       Linking.openURL(`market://details?id=${appPackage}`);
+  //     }
+
+  //     let urlParams = {};
+
+  //     const parseUrl = url.split('?')[1];
+  //     const parseBookingId = parseUrl.split('=')[1];
+  //     const bookingId = parseBookingId.replace(/#/g, '');
+  //     urlParams.demoId = bookingId;
+
+  //     setQueryDataFromUrl(urlParams);
+  //     setLoading(false);
+  //   };
+
+  //   Linking.getInitialURL()
+  //     .then(handleRedirectUrl)
+  //     .catch(err => console.log(err));
+  // }, []);
+
   useEffect(() => {
-    const handleRedirectUrl = url => {
-      if (!url) {
+    const checkPhone = async () => {
+      try {
+        setLoading(true);
+        const phone = await AsyncStorage.getItem('phone');
+
+        if (phone) {
+          setIsPhone(true);
+        }
         setLoading(false);
-        return;
+      } catch (error) {
+        console.log('CHECK_PHONE_ASYNC_STORAGE_ERROR_APP', error);
       }
-
-      const appPackage = 'com.younglabs';
-      if (url.includes('openStore=true')) {
-        Linking.openURL(`market://details?id=${appPackage}`);
-      }
-
-      let urlParams = {};
-
-      const parseUrl = url.split('?')[1];
-      const parseBookingId = parseUrl.split('=')[1];
-      const bookingId = parseBookingId.replace(/#/g, '');
-      urlParams.demoId = bookingId;
-
-      setQueryDataFromUrl(urlParams);
-      setLoading(false);
     };
 
-    Linking.getInitialURL()
-      .then(handleRedirectUrl)
-      .catch(err => console.log(err));
+    checkPhone();
   }, []);
 
   if (loading) return null;
@@ -107,15 +119,21 @@ function App() {
             },
             cardStyle: {backgroundColor: '#fff'},
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-            gestureEnabled: true,
-            gestureDirection: 'horizontal',
-          }}>
+            // gestureEnabled: true,
+            // gestureDirection: 'horizontal',
+          }}
+          initialRouteName={isPhone ? 'Main' : 'Welcome'}>
           <Stack.Screen
             name="Welcome"
             component={WelcomeScreen}
             initialParams={{
               data: {queryData: queryDataFromUrl},
             }}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Main"
+            component={MainScreen}
             options={{headerShown: false}}
           />
           <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
@@ -129,11 +147,6 @@ function App() {
             name="BookDemoSlots"
             component={BookDemoSlotsScreen}
             options={{title: 'Book Class'}}
-          />
-          <Stack.Screen
-            name="Main"
-            component={MainScreen}
-            options={{headerShown: false}}
           />
         </Stack.Navigator>
       </NavigationContainer>

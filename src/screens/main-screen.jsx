@@ -1,9 +1,11 @@
-import React from 'react';
-import {Text, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {Text, View, StatusBar} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import Tabbar from '../components/tabbar-component';
-import HomeScreen from './home-screen';
+import DrawerScreen from './drawer-screen';
+
+import {COLORS} from '../assets/theme/theme';
 
 const Tab = createBottomTabNavigator();
 
@@ -20,13 +22,20 @@ function AccountScreen() {
 }
 
 const MainScreen = () => {
+  useEffect(() => {
+    StatusBar.setHidden(false);
+    StatusBar.setBackgroundColor(COLORS.pgreen);
+    StatusBar.setBarStyle('light-content');
+  }, []);
+
   return (
     <Tab.Navigator tabBar={props => <Tabbar {...props} />}>
       <Tab.Screen
-        name="Home"
-        component={HomeScreen}
+        name="Drawer"
+        component={DrawerScreen}
         options={{
           headerShown: false,
+          tabBarLabel: 'Home',
         }}
       />
       <Tab.Screen

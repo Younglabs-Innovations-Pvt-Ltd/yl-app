@@ -195,9 +195,9 @@ const styles = StyleSheet.create({
   },
   ratingContainer: {
     marginTop: 16,
+    height: 200,
   },
   ratingWrapper: {
-    flex: 1,
     height: 146,
     alignItems: 'center',
     justifyContent: 'center',
