@@ -27,9 +27,7 @@ const reducer = {
   },
   setToInitialState(state) {
     state.demoData = null;
-    state.demoBookingId = '';
     state.demoPhoneNumber = '';
-    state.loading = false;
   },
 };
 

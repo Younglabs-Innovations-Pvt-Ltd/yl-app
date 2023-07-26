@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Text, View, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import Tabbar from '../components/tabbar-component';

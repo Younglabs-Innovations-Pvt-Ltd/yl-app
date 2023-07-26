@@ -25,8 +25,6 @@ import ModalComponent from '../components/modal.component';
 import Center from '../components/center.component';
 import Spinner from '../components/spinner.component';
 
-import notifee from '@notifee/react-native';
-
 // Main Component
 const DemoClassScreen = ({navigation}) => {
   const [popup, setPopup] = useState(false);

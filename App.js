@@ -119,8 +119,8 @@ function App() {
             },
             cardStyle: {backgroundColor: '#fff'},
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-            // gestureEnabled: true,
-            // gestureDirection: 'horizontal',
+            gestureEnabled: true,
+            gestureDirection: 'horizontal',
           }}
           initialRouteName={isPhone ? 'Main' : 'Welcome'}>
           <Stack.Screen
