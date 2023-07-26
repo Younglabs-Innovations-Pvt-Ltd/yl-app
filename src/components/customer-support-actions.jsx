@@ -34,7 +34,6 @@ const ADD_INQUIRY_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/courses/addEnquiry';
 
 const CustomerSupportActions = ({visible, onClose}) => {
-  // const [actions, setActions] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [bottomModalVisible, setBottomModalVisible] = useState(false);
   const [country, setCountry] = useState({callingCode: ''});
@@ -107,6 +106,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
     getCountriesData();
   }, [bottomModalVisible]);
 
+  // search
   useEffect(() => {
     const filteredCountry = countriesData.filter(counrty =>
       counrty.name.official.toLowerCase().includes(search.toLowerCase()),

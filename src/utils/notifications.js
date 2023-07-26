@@ -1,4 +1,8 @@
-import notifee, {TimestampTrigger, TriggerType} from '@notifee/react-native';
+import notifee, {
+  TimestampTrigger,
+  TriggerType,
+  AndroidImportance,
+} from '@notifee/react-native';
 
 const createChannelIdForAndroid = async (name, id) => {
   return await notifee.createChannel({
@@ -27,6 +31,8 @@ export const setCountdownTriggerNotification = async (
       android: {
         channelId,
         autoCancel: false,
+        smallIcon: 'ic_small_icon',
+        importance: AndroidImportance.HIGH,
         pressAction: {
           id: 'countdown',
           launchActivity: 'default',

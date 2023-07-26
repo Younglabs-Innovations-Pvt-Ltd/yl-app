@@ -220,9 +220,9 @@ const HomeScreen = ({navigation}) => {
           'countdown_notification',
         );
 
-        const checkDate =
-          new Date().getDate() <= new Date(bookingTime).getDate();
-        if (!checkDate) return;
+        const classDate = new Date(bookingTime);
+
+        if (new Date().getDate() > classDate.getDate()) return;
 
         if (!isNotification) {
           // before 1 hour from demo class

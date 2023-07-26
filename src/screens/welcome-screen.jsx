@@ -1,19 +1,18 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
   Pressable,
   StatusBar,
-  Animated,
-  Easing,
   ToastAndroid,
+  Image,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
 
 import Input from '../components/input.component';
 
-import {COLORS, FONTS} from '../assets/theme/theme';
+import {COLORS} from '../assets/theme/theme';
 
 import {useSelector, useDispatch} from 'react-redux';
 
@@ -25,6 +24,8 @@ import Icon from '../components/icon.component';
 import ModalComponent from '../components/modal.component';
 import Center from '../components/center.component';
 import Spinner from '../components/spinner.component';
+
+import notifee from '@notifee/react-native';
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
@@ -59,18 +60,7 @@ const DemoClassScreen = ({navigation}) => {
     }
   }, [demoData]);
 
-  const rotatedLogo = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(rotatedLogo, {
-        toValue: 1,
-        duration: 5000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ).start();
-  }, []);
+  const onRequestClose = () => setPopup(false);
 
   return (
     <View style={styles.wrapper}>
@@ -78,36 +68,18 @@ const DemoClassScreen = ({navigation}) => {
         <View style={{flex: 1, justifyContent: 'center'}}>
           <View style={{paddingHorizontal: 16, alignItems: 'center'}}>
             <View style={{position: 'relative'}}>
-              <TextWrapper
-                color={COLORS.white}
-                styles={{letterSpacing: 2, textAlign: 'center'}}
-                fs={76}
-                ff={FONTS.bigShoulders_semibold}>
-                Younglabs
-              </TextWrapper>
-              <Animated.Image
-                source={require('../assets/images/spinner.png')}
+              <Image
+                source={require('../assets/images/YoungLabsLogo.png')}
                 style={{
-                  width: 48,
-                  height: 48,
+                  alignSelf: 'center',
+                  width: 200,
+                  height: 200,
                   objectFit: 'contain',
-                  position: 'absolute',
-                  left: -10,
-                  top: -24,
-                  transform: [
-                    {
-                      rotate: rotatedLogo.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ['0deg', '360deg'],
-                      }),
-                    },
-                  ],
                 }}
               />
             </View>
-            <Spacer space={4} />
             <TextWrapper
-              color={COLORS.white}
+              color={COLORS.black}
               fs={18}
               styles={{textAlign: 'center', textTransform: 'capitalize'}}>
               Helping parents raise capable, skillful & happy children
@@ -117,13 +89,16 @@ const DemoClassScreen = ({navigation}) => {
       </View>
       <View style={styles.bottomContainer}>
         <Pressable
-          style={[styles.btnCtas, {backgroundColor: COLORS.white}]}
+          style={[styles.btnCtas, {backgroundColor: COLORS.pgreen}]}
           onPress={() => setPopup(true)}>
-          <TextWrapper color={COLORS.black} fw="600">
+          <TextWrapper color={COLORS.white} fw="600">
             Join free booked class
           </TextWrapper>
         </Pressable>
-        <ModalComponent animationType="slide" visible={popup}>
+        <ModalComponent
+          animationType="slide"
+          visible={popup}
+          onRequestClose={onRequestClose}>
           <View
             style={{
               flex: 1,
@@ -196,7 +171,7 @@ export default DemoClassScreen;
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#12452C',
+    backgroundColor: '#fff',
   },
   topContainer: {
     flex: 2,

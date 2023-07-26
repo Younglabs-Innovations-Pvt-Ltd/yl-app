@@ -13,14 +13,6 @@ function ContactScreen() {
   return <></>;
 }
 
-function AccountScreen() {
-  return (
-    <View>
-      <Text>Account Screen</Text>
-    </View>
-  );
-}
-
 const MainScreen = () => {
   useEffect(() => {
     StatusBar.setHidden(false);
@@ -37,11 +29,6 @@ const MainScreen = () => {
           headerShown: false,
           tabBarLabel: 'Home',
         }}
-      />
-      <Tab.Screen
-        name="Account"
-        component={AccountScreen}
-        options={{headerShown: false}}
       />
       <Tab.Screen name="Contact" component={ContactScreen} />
     </Tab.Navigator>
