@@ -65,7 +65,6 @@ const HomeScreen = ({navigation}) => {
   const [isTimeover, setIsTimeover] = useState(false);
   const [zoomData, setZoomData] = useState(null);
   const [showJoinButton, setShowJoinButton] = useState(false);
-  // const [shouldShowJoin, setShouldShowJoin] = useState(false);
   const [isAttended, setIsAttended] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
 
@@ -91,12 +90,11 @@ const HomeScreen = ({navigation}) => {
     classStatusChangeListener(handleClassStatusCallback);
   }, []);
 
-  // Set demo booking id or phone number
+  // Set demo phone number
   useEffect(() => {
     const getDemoId = async () => {
       try {
         const phoneFromAsyncStorage = await AsyncStorage.getItem('phone');
-
         if (phoneFromAsyncStorage) {
           dispatch(setDemoPhone(phoneFromAsyncStorage));
         }
@@ -302,7 +300,7 @@ const HomeScreen = ({navigation}) => {
   const handleShowDrawer = () => navigation.openDrawer();
 
   return loading ? (
-    <Center>
+    <Center bg={COLORS.white}>
       <Spinner />
     </Center>
   ) : (

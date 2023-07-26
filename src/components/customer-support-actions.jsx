@@ -4,7 +4,6 @@ import {
   Pressable,
   View,
   TextInput,
-  Modal,
   FlatList,
   Image,
   Linking,
@@ -16,6 +15,7 @@ import Input from './input.component';
 import Icon from './icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Spinner from './spinner.component';
+import Modal from './modal.component';
 
 import {Select, SelectContent, SelectItem} from './selelct.component';
 
@@ -207,7 +207,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
   return (
     <>
       <View style={styles.customerSupportActions}>
-        <Modal animationType="none" transparent={true} visible={visible}>
+        <Modal visible={visible}>
           <Pressable style={{flex: 1}} onPress={onClose}>
             <View
               style={{
@@ -252,13 +252,8 @@ const CustomerSupportActions = ({visible, onClose}) => {
             </View>
           </Pressable>
         </Modal>
-        {/* <Pressable
-          style={styles.btnCustomerSupport}
-          onPress={() => setActions(true)}>
-          <MIcon name="headset" size={24} color={COLORS.black} />
-        </Pressable> */}
       </View>
-      <Modal visible={formVisible} animationType="none" transparent={true}>
+      <Modal visible={formVisible}>
         <View
           style={{
             flex: 1,
@@ -403,7 +398,6 @@ const CustomerSupportActions = ({visible, onClose}) => {
       <Modal
         visible={bottomModalVisible}
         animationType="slide"
-        transparent={true}
         onRequestClose={setBottomModalVisible}>
         <Pressable
           style={{
@@ -451,7 +445,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
         msg="We will call you soon"
         onContinue={handleOnContinue}
       />
-      <Modal transparent={true} visible={inquiryLoading} animationType="none">
+      <Modal visible={inquiryLoading}>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Spinner />
         </View>

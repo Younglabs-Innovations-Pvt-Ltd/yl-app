@@ -1,16 +1,15 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {Modal} from 'react-native';
 
-const Modal = ({children, bg = 'transparent'}) => {
-  return <View style={[styles.modal, {backgroundColor: bg}]}>{children}</View>;
+export default ({
+  children,
+  transparent = true,
+  animationType = 'none',
+  ...props
+}) => {
+  return (
+    <Modal transparent={transparent} animationType={animationType} {...props}>
+      {children}
+    </Modal>
+  );
 };
-
-export default Modal;
-
-const styles = StyleSheet.create({
-  modal: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

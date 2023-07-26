@@ -6,7 +6,7 @@ import {
   StatusBar,
   Animated,
   Easing,
-  Modal,
+  ToastAndroid,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
@@ -22,6 +22,9 @@ import {startFetchBookingDetailsFromPhone} from '../store/join-demo/join-demo.re
 
 import TextWrapper from '../components/text-wrapper.component';
 import Icon from '../components/icon.component';
+import ModalComponent from '../components/modal.component';
+import Center from '../components/center.component';
+import Spinner from '../components/spinner.component';
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
@@ -36,7 +39,6 @@ const DemoClassScreen = ({navigation}) => {
   }, []);
 
   const handleBookingStatus = () => {
-    console.log('hit');
     if (!phone) return;
     dispatch(startFetchBookingDetailsFromPhone(phone));
   };
@@ -44,6 +46,15 @@ const DemoClassScreen = ({navigation}) => {
   useEffect(() => {
     if (demoData) {
       setPopup(false);
+      if (demoData?.message === 'Booking not found') {
+        ToastAndroid.showWithGravity(
+          'Wrong Number',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+        );
+        return;
+      }
+
       navigation.replace('Main');
     }
   }, [demoData]);
@@ -112,7 +123,7 @@ const DemoClassScreen = ({navigation}) => {
             Join free booked class
           </TextWrapper>
         </Pressable>
-        <Modal transparent={true} animationType="slide" visible={popup}>
+        <ModalComponent animationType="slide" visible={popup}>
           <View
             style={{
               flex: 1,
@@ -161,7 +172,7 @@ const DemoClassScreen = ({navigation}) => {
               </View>
             </View>
           </View>
-        </Modal>
+        </ModalComponent>
         <Spacer space={6} />
         <Pressable
           style={[styles.btnCtas, {backgroundColor: COLORS.orange}]}
@@ -171,6 +182,11 @@ const DemoClassScreen = ({navigation}) => {
           </TextWrapper>
         </Pressable>
       </View>
+      <ModalComponent visible={loading}>
+        <Center>
+          <Spinner />
+        </Center>
+      </ModalComponent>
     </View>
   );
 };

@@ -24,15 +24,18 @@ const BookDemoSlots = ({route, navigation}) => {
   const [slotsTime, setSlotsTime] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [popup, setPopup] = useState(false);
-  const [bookingData, setBookingData] = useState(null);
 
   const {
     formFields: {childAge, name, phone},
   } = route.params;
 
   const dispatch = useDispatch();
-  const {bookingSlots, timezone, ipData, loading} =
-    useSelector(bookDemoSelector);
+  const {
+    bookingSlots,
+    timezone,
+    ipData,
+    loading: {bookingSlotsLoading},
+  } = useSelector(bookDemoSelector);
 
   // Fetch booking slots
   useEffect(() => {
@@ -42,6 +45,7 @@ const BookDemoSlots = ({route, navigation}) => {
       timeZone: timezone.toString(),
       type: 'website',
     };
+
     dispatch(startFetchingBookingSlots(body));
   }, []);
 
@@ -106,7 +110,7 @@ const BookDemoSlots = ({route, navigation}) => {
         await AsyncStorage.setItem('phone', phone);
 
         // set booking Data
-        setBookingData(bookingDetails);
+        // setBookingData(bookingDetails);
         // show popup
         setPopup(true);
       } else if (response.status === 400) {
@@ -129,7 +133,7 @@ const BookDemoSlots = ({route, navigation}) => {
     navigation.dispatch(resetAction);
   };
 
-  return loading ? (
+  return bookingSlotsLoading ? (
     <Spinner style={{alignSelf: 'center'}} />
   ) : (
     <>

@@ -5,7 +5,10 @@ const INITIAL_STATE = {
   ipData: null,
   country: {callingCode: ''},
   bookingSlots: [],
-  loading: false,
+  loading: {
+    ipDataLoading: false,
+    bookingSlotsLoading: false,
+  },
 };
 
 // reducer
@@ -14,17 +17,17 @@ const reducer = {
     state.timezone = action.payload;
   },
   startFetchingIpData(state) {
-    state.loading = true;
+    state.loading.ipDataLoading = true;
   },
   fetchIpDataSuccess(state, action) {
-    state.loading = false;
+    state.loading.ipDataLoading = false;
     state.ipData = action.payload;
   },
   startFetchingBookingSlots(state) {
-    state.loading = true;
+    state.loading.bookingSlotsLoading = true;
   },
   fetchBookingSlotsSuccess(state, action) {
-    state.loading = false;
+    state.loading.bookingSlotsLoading = false;
     state.bookingSlots = action.payload;
   },
 };

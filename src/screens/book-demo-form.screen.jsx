@@ -13,11 +13,11 @@ import {useDispatch, useSelector} from 'react-redux';
 import CountryList from '../components/country-list.component';
 import {isValidNumber} from '../utils/isValidNumber';
 import Spinner from '../components/spinner.component';
-import Modal from '../components/modal.component';
 import {DropdownList, Dropdown} from '../components/dropdown.component';
 import Input from '../components/input.component';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
+import Modal from '../components/modal.component';
 
 import {
   setTimezone,
@@ -48,7 +48,10 @@ const BookDemoScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  const {ipData, loading} = useSelector(bookDemoSelector);
+  const {
+    ipData,
+    loading: {ipDataLoading},
+  } = useSelector(bookDemoSelector);
 
   useEffect(() => {
     if (!ipData) {
@@ -68,7 +71,6 @@ const BookDemoScreen = ({navigation}) => {
   useEffect(() => {
     if (ipData) {
       const tz = ipData.time_zone.offset + ipData.time_zone.dst_savings;
-      console.log(tz);
       dispatch(setTimezone(tz));
     }
   }, [ipData]);
@@ -211,6 +213,11 @@ const BookDemoScreen = ({navigation}) => {
           onChange={handleChangeValue}
         />
       )}
+      <Modal visible={ipDataLoading}>
+        <Center>
+          <Spinner />
+        </Center>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
