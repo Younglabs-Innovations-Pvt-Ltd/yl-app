@@ -1,6 +1,12 @@
 import React from 'react';
 import {CommonActions} from '@react-navigation/native';
-import {View, StyleSheet, useWindowDimensions, Pressable} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  useWindowDimensions,
+  Pressable,
+  Linking,
+} from 'react-native';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -22,7 +28,7 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = ({navigation, ...props}) => {
   const dispatch = useDispatch();
-  const {demoPhoneNumber, demoData} = useSelector(joinDemoSelector);
+  const {demoPhoneNumber} = useSelector(joinDemoSelector);
   const windowDimensions = useWindowDimensions();
 
   const handleChangeNumber = async () => {
@@ -40,6 +46,45 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       console.log('CHANGE_NUMBER_ERROR', error);
     }
   };
+
+  const openInstagram = async () => {
+    try {
+      const instagram_url = 'https://www.instagram.com/younglabs.in/';
+      await Linking.openURL(instagram_url);
+    } catch (error) {
+      console.log('OPEN_INSTAGRAM_URL_ERROR', error);
+    }
+  };
+
+  const openFacebook = async () => {
+    try {
+      const facebook_url = 'https://www.facebook.com/Younglabs/';
+      await Linking.openURL(facebook_url);
+    } catch (error) {
+      console.log('OPEN_INSTAGRAM_URL_ERROR', error);
+    }
+  };
+
+  const openWhatsapp = async () => {
+    let whatappUrl = '';
+    const phoneNumber = '+919289029696';
+
+    if (Platform.OS === 'android') {
+      whatappUrl = `whatsapp://send?phone=${phoneNumber}`;
+    } else if (Platform.OS === 'ios') {
+      whatappUrl = `whatsapp://wa.me/${phoneNumber}`;
+    }
+    try {
+      const canOpen = await Linking.canOpenURL(whatappUrl);
+
+      if (canOpen) {
+        await Linking.openURL(whatappUrl);
+      }
+    } catch (error) {
+      console.log('join demo screen whatsapp redirect error', error);
+    }
+  };
+
   return (
     <DrawerContentScrollView {...props}>
       <View
@@ -54,6 +99,17 @@ const CustomDrawerContent = ({navigation, ...props}) => {
           </View>
         </View>
         <View style={{flex: 0.5, justifyContent: 'flex-end'}}>
+          <View style={styles.socialMediaIconsWrapper}>
+            <Pressable style={styles.btnSocialMedia} onPress={openFacebook}>
+              <Icon name="logo-facebook" size={30} color="blue" />
+            </Pressable>
+            <Pressable style={styles.btnSocialMedia} onPress={openInstagram}>
+              <Icon name="logo-instagram" size={30} color={COLORS.orange} />
+            </Pressable>
+            <Pressable style={styles.btnSocialMedia} onPress={openWhatsapp}>
+              <Icon name="logo-whatsapp" size={30} color={COLORS.pgreen} />
+            </Pressable>
+          </View>
           <Pressable
             style={({pressed}) => [
               styles.btnChangeNumber,
@@ -97,5 +153,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 12,
     borderRadius: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#eaeaea',
+  },
+  btnSocialMedia: {
+    width: 36,
+    height: 36,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  socialMediaIconsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 8,
   },
 });
