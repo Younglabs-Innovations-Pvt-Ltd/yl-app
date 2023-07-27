@@ -344,7 +344,13 @@ const HomeScreen = ({navigation}) => {
             // If user attended demo class
             // Demo has ended
             // Show post action after demo class
-            showPostActions && <PostDemoAction />
+            showPostActions ? (
+              <PostDemoAction />
+            ) : (
+              <TextWrapper>
+                Looks like you missed the class, please reschedule one
+              </TextWrapper>
+            )
           }
         </View>
       </View>

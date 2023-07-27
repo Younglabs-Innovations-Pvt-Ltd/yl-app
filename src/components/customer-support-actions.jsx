@@ -208,7 +208,9 @@ const CustomerSupportActions = ({visible, onClose}) => {
     <>
       <View style={styles.customerSupportActions}>
         <Modal visible={visible}>
-          <Pressable style={{flex: 1}} onPress={onClose}>
+          <Pressable
+            style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.3)'}}
+            onPress={onClose}>
             <View
               style={{
                 position: 'absolute',
@@ -218,36 +220,31 @@ const CustomerSupportActions = ({visible, onClose}) => {
               <Pressable style={styles.btnCta} onPress={handleShowFormVisible}>
                 <View
                   style={{
-                    minWidth: 95,
+                    // minWidth: 95,
                     paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    backgroundColor: COLORS.black,
+                    // paddingHorizontal: 12,
+                    // backgroundColor: COLORS.black,
                     borderRadius: 4,
                   }}>
-                  <TextWrapper
-                    color={COLORS.white}
-                    styles={{textAlign: 'center'}}>
-                    Call me
+                  <TextWrapper color={COLORS.black}>
+                    Request callback
                   </TextWrapper>
                 </View>
-                <MIcon name="phone-in-talk" size={36} color={COLORS.pblue} />
+                <MIcon name="phone-in-talk" size={32} color={COLORS.pblue} />
               </Pressable>
+              <Spacer space={4} />
               <Pressable style={styles.btnCta} onPress={openWhatsapp}>
                 <View
                   style={{
-                    minWidth: 95,
+                    // minWidth: 95,
                     paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    backgroundColor: COLORS.black,
+                    // paddingHorizontal: 12,
+                    // backgroundColor: COLORS.white,
                     borderRadius: 4,
                   }}>
-                  <TextWrapper
-                    color={COLORS.white}
-                    styles={{textAlign: 'center'}}>
-                    Chat with us
-                  </TextWrapper>
+                  <TextWrapper color={COLORS.black}>Chat with us</TextWrapper>
                 </View>
-                <Icon name="logo-whatsapp" size={36} color={COLORS.pgreen} />
+                <Icon name="logo-whatsapp" size={32} color={COLORS.pgreen} />
               </Pressable>
             </View>
           </Pressable>
@@ -475,9 +472,14 @@ const styles = StyleSheet.create({
   },
   btnCta: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 8,
-    paddingBottom: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: COLORS.white,
+    borderRadius: 6,
+    elevation: 1,
   },
   flag: {
     width: 24,
