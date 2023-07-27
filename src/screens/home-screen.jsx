@@ -106,6 +106,13 @@ const HomeScreen = ({navigation}) => {
     getDemoId();
   }, [dispatch]);
 
+  // Call api to get booking status from phone number
+  useEffect(() => {
+    if (demoPhoneNumber) {
+      !demoData && dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+    }
+  }, [demoPhoneNumber, dispatch, demoData]);
+
   // set demo data
   useEffect(() => {
     const setDemoData = async () => {
@@ -164,13 +171,6 @@ const HomeScreen = ({navigation}) => {
       setDemoData();
     }
   }, [demoData]);
-
-  // Call api to get booking status from phone number
-  useEffect(() => {
-    if (demoPhoneNumber) {
-      !demoData && dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-    }
-  }, [demoPhoneNumber, dispatch, demoData]);
 
   // Timer
   useEffect(() => {

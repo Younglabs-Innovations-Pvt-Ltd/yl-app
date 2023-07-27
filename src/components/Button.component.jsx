@@ -26,6 +26,7 @@ const Button = ({
   outlineColor,
   textColor,
   shadow,
+  textSize = 16,
   ...otherProps
 }) => {
   return (
@@ -42,7 +43,7 @@ const Button = ({
       ]}
       disabled={loading ? true : false}>
       <TextWrapper
-        fs={16}
+        fs={textSize}
         fw="500"
         styles={{textAlign: 'center', letterSpacing: 1.5}}
         color={textColor}>

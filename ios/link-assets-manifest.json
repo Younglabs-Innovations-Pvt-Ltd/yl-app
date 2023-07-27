@@ -6,6 +6,14 @@
       "sha1": "ba87c28cfbea5b4da7f506550a9febff5b34223f"
     },
     {
+      "path": "src/assets/fonts/Gelasio-Regular.ttf",
+      "sha1": "9fbbe91882df3ce403acadefe7d9be8637361da4"
+    },
+    {
+      "path": "src/assets/fonts/Gelasio-SemiBold.ttf",
+      "sha1": "b2812e4e45593e9635cb9b46b1b94e38f2295b69"
+    },
+    {
       "path": "src/assets/fonts/Roboto Condensed.ttf",
       "sha1": "e0d7acf2ca3dd0ff68f533797bb94b0580397e95"
     }

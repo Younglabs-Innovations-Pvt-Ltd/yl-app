@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {CommonActions} from '@react-navigation/native';
 import {View, StyleSheet, useWindowDimensions, Pressable} from 'react-native';
 import {
@@ -25,23 +25,17 @@ const CustomDrawerContent = ({navigation, ...props}) => {
   const {demoPhoneNumber, demoData} = useSelector(joinDemoSelector);
   const windowDimensions = useWindowDimensions();
 
-  useEffect(() => {
-    if (!demoData && !demoPhoneNumber) {
-      const resetAction = CommonActions.reset({
-        index: 0,
-        routes: [{name: 'Welcome'}],
-      });
-
-      console.log('hit');
-      navigation.dispatch(resetAction);
-    }
-  }, [demoData, demoPhoneNumber]);
-
   const handleChangeNumber = async () => {
     try {
       await AsyncStorage.removeItem('phone');
       await AsyncStorage.removeItem('countdown_notification');
       dispatch(setToInitialState());
+      const resetAction = CommonActions.reset({
+        index: 0,
+        routes: [{name: 'Welcome'}],
+      });
+
+      navigation.dispatch(resetAction);
     } catch (error) {
       console.log('CHANGE_NUMBER_ERROR', error);
     }
