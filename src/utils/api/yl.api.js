@@ -4,6 +4,19 @@ const BOOKING_URL =
 const MARK_ATTENDENCE_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
 
+const BOOKING_DETAILS =
+  'https://younglabsapis-33heck6yza-el.a.run.app/admin/bookings/getBooking';
+
+export const fetchBookingDetils = async phone => {
+  return await fetch(BOOKING_DETAILS, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({phone}),
+  });
+};
+
 export const fetchBookingDetailsFromPhone = async phone => {
   return await fetch(BOOKING_URL, {
     method: 'POST',

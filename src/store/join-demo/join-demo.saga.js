@@ -2,6 +2,7 @@ import {all, call, put, takeLatest} from 'redux-saga/effects';
 import {
   fetchBookingDetailsFromBookingId,
   fetchBookingDetailsFromPhone,
+  fetchBookingDetils,
 } from '../../utils/api/yl.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -20,6 +21,9 @@ function* fetchDemoDetailsFromPhone({payload}) {
       yield put(setBookingDetailSuccess(data));
       return;
     }
+
+    const detailsResponse = yield call(fetchBookingDetils, payload);
+    const bookingDetails = yield detailsResponse.json();
     // set phone to local storage
     const phoneFromAsync = yield AsyncStorage.getItem('phone');
 
@@ -27,7 +31,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
       yield AsyncStorage.setItem('phone', payload);
     }
 
-    yield put(setBookingDetailSuccess(data));
+    yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
     console.log('Demosaga_detail_phone', error);
   }

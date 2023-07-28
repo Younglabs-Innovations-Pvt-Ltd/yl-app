@@ -69,7 +69,8 @@ const HomeScreen = ({navigation}) => {
   const [showPostActions, setShowPostActions] = useState(false);
 
   const dispatch = useDispatch();
-  const {demoData, loading, demoPhoneNumber} = useSelector(joinDemoSelector);
+  const {demoData, loading, demoPhoneNumber, bookingDetails} =
+    useSelector(joinDemoSelector);
 
   // class status callback
   const handleClassStatusCallback = async () => {
@@ -299,6 +300,13 @@ const HomeScreen = ({navigation}) => {
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
 
+  const rescheduleFreeClass = () => {
+    const {childAge, parentName} = bookingDetails;
+    const formFields = {childAge, name: parentName, phone: demoPhoneNumber};
+
+    navigation.navigate('BookDemoSlots', {formFields});
+  };
+
   return loading ? (
     <Center bg={COLORS.white}>
       <Spinner />
@@ -344,14 +352,31 @@ const HomeScreen = ({navigation}) => {
             // If user attended demo class
             // Demo has ended
             // Show post action after demo class
-            showPostActions ? (
-              <PostDemoAction />
-            ) : (
-              <TextWrapper>
-                Looks like you missed the class, please reschedule one
-              </TextWrapper>
-            )
+            showPostActions && <PostDemoAction />
           }
+
+          {bookingTime
+            ? new Date(bookingTime).getTime() + 1000 * 60 * 60 <=
+                new Date().getTime() &&
+              !isAttended && (
+                <View
+                  style={{
+                    paddingVertical: 16,
+                  }}>
+                  <TextWrapper fs={20}>
+                    Looks like you missed the class, please reschedule one
+                  </TextWrapper>
+                  <Spacer />
+                  <Button
+                    textColor={COLORS.white}
+                    bg={COLORS.pgreen}
+                    rounded={6}
+                    onPress={rescheduleFreeClass}>
+                    Reschedule
+                  </Button>
+                </View>
+              )
+            : null}
         </View>
       </View>
     </>

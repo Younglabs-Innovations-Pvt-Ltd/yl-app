@@ -149,7 +149,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
   return (
     <>
       <View style={styles.customerSupportActions}>
-        <Modal visible={visible}>
+        <Modal visible={visible} onRequestClose={onClose}>
           <Pressable
             style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.3)'}}
             onPress={onClose}>

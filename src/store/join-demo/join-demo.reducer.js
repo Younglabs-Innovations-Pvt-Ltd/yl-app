@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const INITIAL_STATE = {
   demoData: null,
+  bookingDetails: null,
   demoBookingId: '',
   demoPhoneNumber: '',
   loading: false,
@@ -16,7 +17,11 @@ const reducer = {
     state.loading = true;
   },
   setBookingDetailSuccess(state, action) {
-    state.demoData = action.payload;
+    const {
+      payload: {demoData, bookingDetails},
+    } = action;
+    state.demoData = demoData;
+    state.bookingDetails = bookingDetails;
     state.loading = false;
   },
   setDemoPhone(state, action) {

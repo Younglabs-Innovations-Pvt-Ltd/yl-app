@@ -10,7 +10,11 @@ import {COLORS} from '../assets/theme/theme';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {startFetchingBookingSlots} from '../store/book-demo/book-demo.reducer';
+import {
+  startFetchingBookingSlots,
+  startFetchingIpData,
+  setTimezone,
+} from '../store/book-demo/book-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
@@ -37,8 +41,22 @@ const BookDemoSlots = ({route, navigation}) => {
     loading: {bookingSlotsLoading},
   } = useSelector(bookDemoSelector);
 
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData]);
+
+  useEffect(() => {
+    if (ipData) {
+      const tz = ipData.time_zone.offset + ipData.time_zone.dst_savings;
+      dispatch(setTimezone(tz));
+    }
+  }, [ipData]);
+
   // Fetch booking slots
   useEffect(() => {
+    if (!timezone) return;
     const body = {
       courseId: 'Eng_Hw',
       childAge: childAge,
@@ -47,7 +65,7 @@ const BookDemoSlots = ({route, navigation}) => {
     };
 
     dispatch(startFetchingBookingSlots(body));
-  }, []);
+  }, [timezone]);
 
   // set booking slot date and time
   useEffect(() => {
@@ -106,6 +124,8 @@ const BookDemoSlots = ({route, navigation}) => {
       });
 
       const bookingDetails = await response.json();
+      console.log('details', bookingDetails);
+
       if (response.status === 200) {
         await AsyncStorage.setItem('phone', phone);
 

@@ -21,6 +21,8 @@ import {setToInitialState} from '../store/join-demo/join-demo.reducer';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Icon from '../components/icon.component';
+import Spacer from '../components/spacer.component';
+
 import {COLORS} from '../assets/theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -28,8 +30,10 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = ({navigation, ...props}) => {
   const dispatch = useDispatch();
-  const {demoPhoneNumber} = useSelector(joinDemoSelector);
+  const {bookingDetails} = useSelector(joinDemoSelector);
   const windowDimensions = useWindowDimensions();
+
+  const {phone, parentName} = bookingDetails;
 
   const handleChangeNumber = async () => {
     try {
@@ -94,8 +98,20 @@ const CustomDrawerContent = ({navigation, ...props}) => {
         ]}>
         <View style={{flex: 2}}>
           <View style={{padding: 12}}>
-            <TextWrapper fs={28}>Welcome guest</TextWrapper>
-            <TextWrapper>{demoPhoneNumber}</TextWrapper>
+            <TextWrapper fs={28}>Welcome {parentName || 'guest'}</TextWrapper>
+            <TextWrapper>{phone}</TextWrapper>
+            <Spacer space={4} />
+            <Pressable
+              style={({pressed}) => [
+                styles.btnChangeNumber,
+                {opacity: pressed ? 0.75 : 1},
+              ]}
+              onPress={handleChangeNumber}>
+              <TextWrapper color={COLORS.white} fs={16.5}>
+                Logout
+              </TextWrapper>
+              <Icon name="log-out-outline" size={24} color={COLORS.white} />
+            </Pressable>
           </View>
         </View>
         <View style={{flex: 0.5, justifyContent: 'flex-end'}}>
@@ -110,15 +126,6 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               <Icon name="logo-whatsapp" size={30} color={COLORS.pgreen} />
             </Pressable>
           </View>
-          <Pressable
-            style={({pressed}) => [
-              styles.btnChangeNumber,
-              {backgroundColor: pressed ? '#eee' : 'transparent'},
-            ]}
-            onPress={handleChangeNumber}>
-            <TextWrapper>Change number</TextWrapper>
-            <Icon name="log-out-outline" size={24} color={COLORS.black} />
-          </Pressable>
         </View>
       </View>
     </DrawerContentScrollView>
@@ -153,8 +160,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 12,
     borderRadius: 4,
-    borderTopWidth: 1,
-    borderTopColor: '#eaeaea',
+    backgroundColor: COLORS.orange,
   },
   btnSocialMedia: {
     width: 36,
@@ -167,7 +173,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 8,
   },
