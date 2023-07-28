@@ -33,6 +33,8 @@ const CustomDrawerContent = ({navigation, ...props}) => {
   const {bookingDetails} = useSelector(joinDemoSelector);
   const windowDimensions = useWindowDimensions();
 
+  if (!bookingDetails) return null;
+
   const {phone, parentName} = bookingDetails;
 
   const handleChangeNumber = async () => {
