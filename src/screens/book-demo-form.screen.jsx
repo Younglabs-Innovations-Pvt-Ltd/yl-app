@@ -116,13 +116,17 @@ const BookDemoScreen = ({navigation}) => {
 
   const handleSelectCountry = country => {
     let code = '';
-    if (country.callingCode.hasOwnProperty('root')) {
+    if (country.callingCode?.root && country.callingCode?.suffixes.length) {
       code = country.callingCode.root.concat(country.callingCode.suffixes[0]);
     }
-    country.callingCode = code;
-    setCountry(country);
+    setCountry({
+      callingCode: code,
+      countryCode: {cca2: country.countryCode.cca2},
+    });
     setVisible(false);
   };
+
+  const onCloseBottomSheet = () => setVisible(false);
 
   return (
     <KeyboardAvoidingView>
@@ -201,7 +205,7 @@ const BookDemoScreen = ({navigation}) => {
       </View>
       <CountryList
         visible={visible}
-        onChangeVisible={v => setVisible(v)}
+        onClose={onCloseBottomSheet}
         onSelect={handleSelectCountry}
       />
       {open && (

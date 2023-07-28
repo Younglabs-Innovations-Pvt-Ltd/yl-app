@@ -1,13 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  Pressable,
-  View,
-  TextInput,
-  FlatList,
-  Image,
-  Linking,
-} from 'react-native';
+import {StyleSheet, Pressable, View, TextInput, Linking} from 'react-native';
 
 import TextWrapper from './text-wrapper.component';
 import Spacer from './spacer.component';
@@ -27,8 +19,7 @@ import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import Button from './button.component';
 import SuccessPopup from './success-popup.component';
 import {isValidNumber} from '../utils/isValidNumber';
-
-const COUNTRIES_URL = 'https://restcountries.com/v3.1/all';
+import CountryList from './country-list.component';
 
 const ADD_INQUIRY_URL =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/courses/addEnquiry';
@@ -37,11 +28,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const [formVisible, setFormVisible] = useState(false);
   const [bottomModalVisible, setBottomModalVisible] = useState(false);
   const [country, setCountry] = useState({callingCode: ''});
-  const [loading, setLoading] = useState(false);
   const [inquiryLoading, setInquiryLoading] = useState(false);
-  const [countriesData, setCountriesData] = useState([]);
-  const [updatedData, setUpdatedData] = useState(countriesData);
-  const [search, setSearch] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [validPhone, setValidPhone] = useState(false);
@@ -72,54 +59,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
     }
   }, [ipData]);
 
-  useEffect(() => {
-    if (!bottomModalVisible) return;
-    const getCountriesData = async () => {
-      if (countriesData.length > 0) return;
-
-      try {
-        setLoading(true);
-        const response = await fetch(COUNTRIES_URL, {
-          method: 'GET',
-        });
-        const data = await response.json();
-
-        const countries = data.map(country => {
-          return {
-            name: country.name,
-            flags: country.flags,
-            callingCode: country.idd,
-            countryCode: {
-              cca2: country.cca2,
-              cca3: country.cca3,
-            },
-          };
-        });
-
-        setCountriesData(countries);
-        setLoading(false);
-      } catch (error) {
-        console.log('countries data error', error);
-      }
-    };
-
-    getCountriesData();
-  }, [bottomModalVisible]);
-
-  // search
-  useEffect(() => {
-    const filteredCountry = countriesData.filter(counrty =>
-      counrty.name.official.toLowerCase().includes(search.toLowerCase()),
-    );
-    setUpdatedData(filteredCountry);
-  }, [search, countriesData]);
-
   const handleShowFormVisible = () => setFormVisible(true);
-
-  const handleModalContentPress = e => {
-    // Prevent the Modal from closing when clicking on modal content
-    e.stopPropagation();
-  };
 
   const openWhatsapp = async () => {
     let whatappUrl = '';
@@ -143,11 +83,13 @@ const CustomerSupportActions = ({visible, onClose}) => {
 
   const handleSelectCountry = country => {
     let code = '';
-    if (country.callingCode.hasOwnProperty('root')) {
+    if (country.callingCode?.root && country.callingCode?.suffixes.length) {
       code = country.callingCode.root.concat(country.callingCode.suffixes[0]);
     }
-    country.callingCode = code;
-    setCountry(country);
+    setCountry({
+      callingCode: code,
+      countryCode: {cca2: country.countryCode.cca2},
+    });
     setBottomModalVisible(false);
   };
 
@@ -220,10 +162,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
               <Pressable style={styles.btnCta} onPress={handleShowFormVisible}>
                 <View
                   style={{
-                    // minWidth: 95,
                     paddingVertical: 8,
-                    // paddingHorizontal: 12,
-                    // backgroundColor: COLORS.black,
                     borderRadius: 4,
                   }}>
                   <TextWrapper color={COLORS.black}>
@@ -236,10 +175,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
               <Pressable style={styles.btnCta} onPress={openWhatsapp}>
                 <View
                   style={{
-                    // minWidth: 95,
                     paddingVertical: 8,
-                    // paddingHorizontal: 12,
-                    // backgroundColor: COLORS.white,
                     borderRadius: 4,
                   }}>
                   <TextWrapper color={COLORS.black}>Chat with us</TextWrapper>
@@ -327,6 +263,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
               )}
               <Spacer space={4} />
             </View>
+            <TextWrapper>Choose course</TextWrapper>
             <Select
               defaultValue={courseId || 'Choose course'}
               onSelect={onSelectCourseId}>
@@ -346,6 +283,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
               </SelectContent>
             </Select>
             <Spacer space={4} />
+            <TextWrapper>Choose an option</TextWrapper>
             <Select
               defaultValue={comment || 'choose an option'}
               onSelect={onSelectComment}>
@@ -392,51 +330,11 @@ const CustomerSupportActions = ({visible, onClose}) => {
           </View>
         </View>
       </Modal>
-      <Modal
+      <CountryList
         visible={bottomModalVisible}
-        animationType="slide"
-        onRequestClose={setBottomModalVisible}>
-        <Pressable
-          style={{
-            flex: 1,
-            backgroundColor: 'transparent',
-            paddingTop: 180,
-          }}
-          onPress={() => setBottomModalVisible(false)}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: COLORS.white,
-            }}
-            onTouchStart={handleModalContentPress}>
-            <Input
-              placeholder="Search..."
-              noBorder={true}
-              value={search}
-              onChangeText={e => setSearch(e)}
-            />
-            {loading && <Spinner style={{alignSelf: 'center'}} />}
-            <FlatList
-              data={updatedData}
-              keyExtractor={country => country.name.official}
-              renderItem={({item}) => {
-                return (
-                  <Pressable
-                    key={item.name.official}
-                    style={({pressed}) => [
-                      styles.listItem,
-                      pressed && {backgroundColor: '#eee'},
-                    ]}
-                    onPress={() => handleSelectCountry(item)}>
-                    <Image source={{uri: item.flags.png}} style={styles.flag} />
-                    <TextWrapper>{item.name.common}</TextWrapper>
-                  </Pressable>
-                );
-              }}
-            />
-          </View>
-        </Pressable>
-      </Modal>
+        onClose={() => setBottomModalVisible(false)}
+        onSelect={val => handleSelectCountry(val)}
+      />
       <SuccessPopup
         open={success}
         msg="We will call you soon"
