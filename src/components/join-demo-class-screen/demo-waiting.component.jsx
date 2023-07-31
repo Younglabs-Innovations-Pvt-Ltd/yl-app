@@ -5,7 +5,6 @@ import CountDown from '../countdown.component';
 import Spacer from '../spacer.component';
 import {COLORS} from '../../assets/theme/theme';
 import {useSelector} from 'react-redux';
-import BackButton from '../back-button.component';
 
 const months = [
   'Jan',
@@ -30,14 +29,12 @@ const getClassDate = seconds => {
   const month = date.getMonth();
 
   const classTime =
-    time >= 12
-      ? `${time === 12 ? time : time - 12} : 00 PM`
-      : `${time} : 00 AM`;
+    time >= 12 ? `${time === 12 ? time : time - 12}:00 PM` : `${time}:00 AM`;
 
   return `${classDate} ${months[month]} ${year} at ${classTime}`;
 };
 
-const DemoWaiting = ({timeLeft, handleBackButton}) => {
+const DemoWaiting = ({timeLeft}) => {
   const {demoData} = useSelector(state => state.joinDemo);
 
   if (!demoData) return;
@@ -47,16 +44,14 @@ const DemoWaiting = ({timeLeft, handleBackButton}) => {
 
   return (
     <View style={{paddingVertical: 12}}>
-      {/* <View style={styles.header}>
-        <BackButton onPress={handleBackButton} />
-      </View> */}
       <TextWrapper color="gray">Your free class starts in</TextWrapper>
       <CountDown timeLeft={timeLeft} />
       <Spacer />
       <View>
-        <TextWrapper color="gray" fw="bold">{`Your class is on ${getClassDate(
+        <TextWrapper color="gray" fw="600">{`Your class is on ${getClassDate(
           seconds,
         )}`}</TextWrapper>
+        <Spacer space={6} />
         <TextWrapper fs={20}>Instructions:</TextWrapper>
         <View style={styles.listStyle}>
           <View style={styles.listItem}>

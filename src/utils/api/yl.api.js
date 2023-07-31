@@ -7,13 +7,17 @@ const MARK_ATTENDENCE_URL =
 const BOOKING_DETAILS =
   'https://younglabsapis-33heck6yza-el.a.run.app/admin/bookings/getBooking';
 
-export const fetchBookingDetils = async phone => {
+export const fetchBookingDetils = async data => {
+  const body = data.phone
+    ? JSON.stringify({phone: data.phone})
+    : JSON.stringify({bookingId: data.bookingId});
+
   return await fetch(BOOKING_DETAILS, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({phone}),
+    body: body,
   });
 };
 

@@ -9,6 +9,7 @@ import {
 } from '@react-navigation/stack';
 
 import {Provider} from 'react-redux';
+
 import {store} from './src/store/store';
 
 import SplashScreen from 'react-native-splash-screen';
@@ -29,8 +30,8 @@ const Stack = createStackNavigator();
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [queryDataFromUrl, setQueryDataFromUrl] = useState(null);
   const [isPhone, setIsPhone] = useState(false);
+  const [bookingId, setBookingId] = useState('');
 
   // Splash Screen
   useEffect(() => {
@@ -57,42 +58,42 @@ function App() {
   }, []);
 
   // Handle redirect url (Deep Link)
-  // useEffect(() => {
-  //   const handleRedirectUrl = url => {
-  //     if (!url) {
-  //       setLoading(false);
-  //       return;
-  //     }
+  useEffect(() => {
+    const handleRedirectUrl = url => {
+      if (!url) {
+        return;
+      }
 
-  //     const appPackage = 'com.younglabs';
-  //     if (url.includes('openStore=true')) {
-  //       Linking.openURL(`market://details?id=${appPackage}`);
-  //     }
+      const appPackage = 'com.younglabs';
+      if (url.includes('openStore=true')) {
+        Linking.openURL(`market://details?id=${appPackage}`);
+      }
 
-  //     let urlParams = {};
+      const parseUrl = url.split('?')[1];
+      const parseBookingId = parseUrl.split('=')[1];
+      const bookingId = parseBookingId.replace(/#/g, '');
 
-  //     const parseUrl = url.split('?')[1];
-  //     const parseBookingId = parseUrl.split('=')[1];
-  //     const bookingId = parseBookingId.replace(/#/g, '');
-  //     urlParams.demoId = bookingId;
+      setBookingId(bookingId);
+    };
 
-  //     setQueryDataFromUrl(urlParams);
-  //     setLoading(false);
-  //   };
-
-  //   Linking.getInitialURL()
-  //     .then(handleRedirectUrl)
-  //     .catch(err => console.log(err));
-  // }, []);
+    Linking.getInitialURL()
+      .then(handleRedirectUrl)
+      .catch(err => console.log(err));
+  }, []);
 
   useEffect(() => {
     const checkPhone = async () => {
       try {
         setLoading(true);
         const phone = await AsyncStorage.getItem('phone');
+        const bookingId = await AsyncStorage.getItem('bookingid');
 
         if (phone) {
           setIsPhone(true);
+        }
+
+        if (bookingId) {
+          setBookingId(bookingId);
         }
         setLoading(false);
       } catch (error) {
@@ -122,19 +123,17 @@ function App() {
             gestureEnabled: true,
             gestureDirection: 'horizontal',
           }}
-          initialRouteName={isPhone ? 'Main' : 'Welcome'}>
+          initialRouteName={isPhone || bookingId ? 'Main' : 'Welcome'}>
           <Stack.Screen
             name="Welcome"
             component={WelcomeScreen}
-            initialParams={{
-              data: {queryData: queryDataFromUrl},
-            }}
             options={{headerShown: false}}
           />
           <Stack.Screen
             name="Main"
             component={MainScreen}
             options={{headerShown: false}}
+            initialParams={{bookingId}}
           />
           <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
           <Stack.Screen name="Reschedule" component={ReScheduleScreen} />

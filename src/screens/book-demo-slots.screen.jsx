@@ -10,11 +10,13 @@ import {COLORS} from '../assets/theme/theme';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {
   startFetchingBookingSlots,
   startFetchingIpData,
   setTimezone,
 } from '../store/book-demo/book-demo.reducer';
+import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
@@ -40,6 +42,8 @@ const BookDemoSlots = ({route, navigation}) => {
     ipData,
     loading: {bookingSlotsLoading},
   } = useSelector(bookDemoSelector);
+
+  const {demoBookingId} = useSelector(joinDemoSelector);
 
   useEffect(() => {
     if (!ipData) {
@@ -124,14 +128,10 @@ const BookDemoSlots = ({route, navigation}) => {
       });
 
       const bookingDetails = await response.json();
-      console.log('details', bookingDetails);
 
       if (response.status === 200) {
         await AsyncStorage.setItem('phone', phone);
 
-        // set booking Data
-        // setBookingData(bookingDetails);
-        // show popup
         setPopup(true);
       } else if (response.status === 400) {
         console.log('booking data', bookingDetails);
@@ -143,13 +143,17 @@ const BookDemoSlots = ({route, navigation}) => {
     }
   };
 
-  const handlePopup = () => {
+  const handlePopup = async () => {
     if (errorMessage) setErrorMessage('');
     const resetAction = CommonActions.reset({
       index: 0,
       routes: [{name: 'Main'}],
     });
 
+    if (demoBookingId) {
+      await AsyncStorage.removeItem('bookingid');
+      dispatch(setDemoBookingId(''));
+    }
     navigation.dispatch(resetAction);
   };
 

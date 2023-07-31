@@ -23,7 +23,6 @@ import {useSelector} from 'react-redux';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import Button from './button.component';
 import SuccessPopup from './success-popup.component';
-import CountryList from './country-list.component';
 import Input from './input.component';
 
 const ADD_INQUIRY_URL =
@@ -31,7 +30,6 @@ const ADD_INQUIRY_URL =
 
 const CustomerSupportActions = ({visible, onClose}) => {
   const [formVisible, setFormVisible] = useState(false);
-  const [bottomModalVisible, setBottomModalVisible] = useState(false);
   const [inquiryLoading, setInquiryLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
@@ -63,18 +61,6 @@ const CustomerSupportActions = ({visible, onClose}) => {
     } catch (error) {
       console.log('join demo screen whatsapp redirect error', error);
     }
-  };
-
-  const handleSelectCountry = country => {
-    let code = '';
-    if (country.callingCode?.root && country.callingCode?.suffixes.length) {
-      code = country.callingCode.root.concat(country.callingCode.suffixes[0]);
-    }
-    setCountry({
-      callingCode: code,
-      countryCode: {cca2: country.countryCode.cca2},
-    });
-    setBottomModalVisible(false);
   };
 
   const onSelectComment = val => setComment(val);
@@ -289,11 +275,6 @@ const CustomerSupportActions = ({visible, onClose}) => {
           </KeyboardAvoidingView>
         </View>
       </Modal>
-      <CountryList
-        visible={bottomModalVisible}
-        onClose={() => setBottomModalVisible(false)}
-        onSelect={val => handleSelectCountry(val)}
-      />
       <SuccessPopup
         open={success}
         msg="We will call you soon"

@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   setDemoPhone,
   startFetchBookingDetailsFromPhone,
+  startFetchBookingDetailsFromId,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {
@@ -69,7 +70,7 @@ const HomeScreen = ({navigation}) => {
   const [showPostActions, setShowPostActions] = useState(false);
 
   const dispatch = useDispatch();
-  const {demoData, loading, demoPhoneNumber, bookingDetails} =
+  const {demoData, loading, demoPhoneNumber, bookingDetails, demoBookingId} =
     useSelector(joinDemoSelector);
 
   // class status callback
@@ -93,9 +94,10 @@ const HomeScreen = ({navigation}) => {
 
   // Set demo phone number
   useEffect(() => {
-    const getDemoId = async () => {
+    const getPhone = async () => {
       try {
         const phoneFromAsyncStorage = await AsyncStorage.getItem('phone');
+
         if (phoneFromAsyncStorage) {
           dispatch(setDemoPhone(phoneFromAsyncStorage));
         }
@@ -104,15 +106,8 @@ const HomeScreen = ({navigation}) => {
       }
     };
 
-    getDemoId();
-  }, [dispatch]);
-
-  // Call api to get booking status from phone number
-  useEffect(() => {
-    if (demoPhoneNumber) {
-      !demoData && dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-    }
-  }, [demoPhoneNumber, dispatch, demoData]);
+    getPhone();
+  }, []);
 
   // set demo data
   useEffect(() => {
@@ -173,6 +168,20 @@ const HomeScreen = ({navigation}) => {
     }
   }, [demoData]);
 
+  // Call api to get booking status from phone number
+  useEffect(() => {
+    if (demoPhoneNumber) {
+      dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+    }
+  }, [demoPhoneNumber, dispatch]);
+
+  // Call api to get booking status from booking id
+  useEffect(() => {
+    if (demoBookingId) {
+      dispatch(startFetchBookingDetailsFromId(demoBookingId));
+    }
+  }, [demoBookingId, dispatch]);
+
   // Timer
   useEffect(() => {
     let timer;
@@ -211,7 +220,7 @@ const HomeScreen = ({navigation}) => {
         setShowJoinButton(false);
       }
     }
-  }, [bookingTime]);
+  }, [bookingTime, demoData]);
 
   // Notification
   useEffect(() => {
@@ -304,7 +313,11 @@ const HomeScreen = ({navigation}) => {
     const {childAge, parentName} = bookingDetails;
     const formFields = {childAge, name: parentName, phone: demoPhoneNumber};
 
-    navigation.navigate('BookDemoSlots', {formFields});
+    if (!demoPhoneNumber) {
+      navigation.navigate('BookDemoForm');
+    } else {
+      navigation.navigate('BookDemoSlots', {formFields});
+    }
   };
 
   return loading ? (
@@ -315,7 +328,7 @@ const HomeScreen = ({navigation}) => {
     <>
       <View>
         <View style={styles.header}>
-          <TextWrapper color={COLORS.black}>Welcome</TextWrapper>
+          <TextWrapper color={COLORS.black}>Younglabs</TextWrapper>
           <Pressable onPress={handleShowDrawer}>
             <MIcon name="account-circle" size={28} color={COLORS.black} />
           </Pressable>
@@ -323,10 +336,7 @@ const HomeScreen = ({navigation}) => {
         <View style={styles.container}>
           {bookingTime
             ? new Date(bookingTime).getTime() > new Date().getTime() && (
-                <DemoWaiting
-                  timeLeft={timeLeft}
-                  // handleBackButton={handleBackButton}
-                />
+                <DemoWaiting timeLeft={timeLeft} />
               )
             : null}
           {isTimeover
@@ -395,6 +405,7 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: COLORS.white,

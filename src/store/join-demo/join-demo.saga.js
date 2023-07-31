@@ -22,7 +22,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
       return;
     }
 
-    const detailsResponse = yield call(fetchBookingDetils, payload);
+    const detailsResponse = yield call(fetchBookingDetils, {phone: payload});
     const bookingDetails = yield detailsResponse.json();
     // set phone to local storage
     const phoneFromAsync = yield AsyncStorage.getItem('phone');
@@ -40,10 +40,25 @@ function* fetchDemoDetailsFromPhone({payload}) {
 // Fetch booking details from booking id
 function* fetchDemoDetailsFromBookingId({payload}) {
   try {
-    const response = yield call(fetchBookingDetailsFromBookingId, payload);
+    const response = yield call(fetchBookingDetailsFromBookingId, {
+      bookingId: payload,
+    });
     const data = yield response.json();
 
-    yield put(setBookingDetailSuccess(data));
+    const detailsResponse = yield call(fetchBookingDetils, {
+      bookingId: payload,
+    });
+    const bookingDetails = yield detailsResponse.json();
+
+    // set id to local storage
+    const bookingIdFromAsync = yield AsyncStorage.getItem('bookingid');
+
+    if (!bookingIdFromAsync) {
+      console.log('save bookingid');
+      yield AsyncStorage.setItem('bookingid', payload);
+    }
+
+    yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
     console.log('Demosaga_detail_booking_id', error);
   }

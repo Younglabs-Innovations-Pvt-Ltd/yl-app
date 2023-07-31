@@ -6,23 +6,25 @@ const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 
 const CountDown = ({timeLeft}) => {
   return (
-    <View style={styles.countdown}>
-      <View style={styles.containerList}>
-        {Object.entries(timeLeft)
-          .filter(entry => entry[0] !== 'remainingTime')
-          .map(time => {
-            const label = time[0];
-            const value = time[1];
-            const updatedLabel =
-              label.slice(0, 1).toUpperCase() + label.slice(1);
+    <View style={{alignItems: 'center'}}>
+      <View style={styles.countdown}>
+        <View style={styles.containerList}>
+          {Object.entries(timeLeft)
+            .filter(entry => entry[0] !== 'remainingTime')
+            .map(time => {
+              const label = time[0];
+              const value = time[1];
+              const updatedLabel =
+                label.slice(0, 1).toUpperCase() + label.slice(1);
 
-            return (
-              <View key={label} style={styles.timeContainer}>
-                <Text style={styles.timeText}>{zeroPrefix(value)}</Text>
-                <Text style={styles.timeLabel}>{updatedLabel}</Text>
-              </View>
-            );
-          })}
+              return (
+                <View key={label} style={styles.timeContainer}>
+                  <Text style={styles.timeText}>{zeroPrefix(value)}</Text>
+                  <Text style={styles.timeLabel}>{updatedLabel}</Text>
+                </View>
+              );
+            })}
+        </View>
       </View>
     </View>
   );
@@ -33,7 +35,8 @@ export default CountDown;
 const styles = StyleSheet.create({
   countdown: {
     width: '100%',
-    paddingVertical: 8,
+    maxWidth: 448,
+    paddingTop: 8,
   },
   timeContainer: {
     flex: 1,

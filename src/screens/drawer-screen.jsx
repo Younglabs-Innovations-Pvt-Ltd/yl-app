@@ -21,7 +21,6 @@ import {setToInitialState} from '../store/join-demo/join-demo.reducer';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Icon from '../components/icon.component';
-import Spacer from '../components/spacer.component';
 
 import {COLORS} from '../assets/theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -41,6 +40,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
     try {
       await AsyncStorage.removeItem('phone');
       await AsyncStorage.removeItem('countdown_notification');
+      await AsyncStorage.removeItem('bookingid');
       dispatch(setToInitialState());
       const resetAction = CommonActions.reset({
         index: 0,
@@ -91,6 +91,8 @@ const CustomDrawerContent = ({navigation, ...props}) => {
     }
   };
 
+  const fullName = parentName.slice(0, 1).toUpperCase() + parentName.slice(1);
+
   return (
     <DrawerContentScrollView {...props}>
       <View
@@ -100,32 +102,40 @@ const CustomDrawerContent = ({navigation, ...props}) => {
         ]}>
         <View style={{flex: 2}}>
           <View style={{padding: 12}}>
-            <TextWrapper fs={28}>Welcome {parentName || 'guest'}</TextWrapper>
-            <TextWrapper>{phone}</TextWrapper>
-            <Spacer space={4} />
-            <Pressable
-              style={({pressed}) => [
-                styles.btnChangeNumber,
-                {opacity: pressed ? 0.75 : 1},
-              ]}
-              onPress={handleChangeNumber}>
-              <TextWrapper color={COLORS.white} fs={16.5}>
-                Logout
-              </TextWrapper>
-              <Icon name="log-out-outline" size={24} color={COLORS.white} />
-            </Pressable>
+            <TextWrapper fs={28}>Welcome {fullName || 'Guest'}</TextWrapper>
+            <TextWrapper fs={18}>{phone}</TextWrapper>
           </View>
         </View>
         <View style={{flex: 0.5, justifyContent: 'flex-end'}}>
-          <View style={styles.socialMediaIconsWrapper}>
-            <Pressable style={styles.btnSocialMedia} onPress={openFacebook}>
-              <Icon name="logo-facebook" size={30} color="blue" />
-            </Pressable>
-            <Pressable style={styles.btnSocialMedia} onPress={openInstagram}>
-              <Icon name="logo-instagram" size={30} color={COLORS.orange} />
-            </Pressable>
-            <Pressable style={styles.btnSocialMedia} onPress={openWhatsapp}>
-              <Icon name="logo-whatsapp" size={30} color={COLORS.pgreen} />
+          <View>
+            <View style={styles.socialMediaIconsWrapper}>
+              <Pressable style={styles.btnSocialMedia} onPress={openFacebook}>
+                <Icon name="logo-facebook" size={30} color="blue" />
+              </Pressable>
+              <Pressable style={styles.btnSocialMedia} onPress={openInstagram}>
+                <Icon name="logo-instagram" size={30} color={COLORS.orange} />
+              </Pressable>
+              <Pressable style={styles.btnSocialMedia} onPress={openWhatsapp}>
+                <Icon name="logo-whatsapp" size={30} color={COLORS.pgreen} />
+              </Pressable>
+            </View>
+          </View>
+          <View
+            style={{
+              borderTopWidth: 1,
+              borderTopColor: '#eee',
+              paddingVertical: 2,
+            }}>
+            <Pressable
+              style={({pressed}) => [
+                styles.btnChangeNumber,
+                {backgroundColor: pressed ? '#eaeaea' : 'transparent'},
+              ]}
+              onPress={handleChangeNumber}>
+              <TextWrapper color={COLORS.black} fs={16.5}>
+                Logout
+              </TextWrapper>
+              <Icon name="log-out-outline" size={24} color={COLORS.black} />
             </Pressable>
           </View>
         </View>
@@ -162,7 +172,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 12,
     borderRadius: 4,
-    backgroundColor: COLORS.orange,
   },
   btnSocialMedia: {
     width: 36,
@@ -174,8 +183,11 @@ const styles = StyleSheet.create({
   socialMediaIconsWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingVertical: 8,
-    gap: 8,
+    justifyContent: 'flex-end',
+    paddingVertical: 12,
+    paddingRight: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    gap: 16,
   },
 });

@@ -7,17 +7,43 @@ import DrawerScreen from './drawer-screen';
 
 import {COLORS} from '../assets/theme/theme';
 
+import {useDispatch} from 'react-redux';
+import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Tab = createBottomTabNavigator();
 
 function ContactScreen() {
   return <></>;
 }
 
-const MainScreen = () => {
+const MainScreen = ({route}) => {
+  const data = route.params;
+  const dispatch = useDispatch();
+
   useEffect(() => {
     StatusBar.setHidden(false);
     StatusBar.setBackgroundColor(COLORS.pgreen);
     StatusBar.setBarStyle('light-content');
+  }, []);
+
+  useEffect(() => {
+    if (!data) return;
+
+    // If not phone exists already
+    // only then set booking id
+    const checkForPhone = async () => {
+      try {
+        const isPhoneExists = await AsyncStorage.getItem('phone');
+        if (!isPhoneExists) {
+          dispatch(setDemoBookingId(data.bookingId));
+        }
+      } catch (error) {
+        console.log('CHECK_FOR_PHONE', error);
+      }
+    };
+
+    checkForPhone();
   }, []);
 
   return (

@@ -81,8 +81,6 @@ const PostDemoAction = () => {
         body: JSON.stringify({bookingId: demoData.bookingId}),
       });
 
-      const data = await response.text();
-      console.log('nmi', data);
       if (response.status === 200) {
         openWhatsApp();
       }
@@ -172,13 +170,6 @@ const PostDemoAction = () => {
               shadow={true}
               onPress={redirectToWebsiteToBuyCourse}>
               Buy on website
-            </Button>
-            <Button
-              textColor={COLORS.black}
-              bg={COLORS.white}
-              shadow={true}
-              rounded={4}>
-              No, I don't want
             </Button>
           </View>
         </View>

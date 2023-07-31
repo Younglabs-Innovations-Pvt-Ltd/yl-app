@@ -15,16 +15,13 @@ import Input from '../components/input.component';
 
 import {COLORS, FONTS} from '../assets/theme/theme';
 
-import {useSelector, useDispatch} from 'react-redux';
-
-import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import {startFetchBookingDetailsFromPhone} from '../store/join-demo/join-demo.reducer';
-
 import TextWrapper from '../components/text-wrapper.component';
 import Icon from '../components/icon.component';
 import ModalComponent from '../components/modal.component';
 import Center from '../components/center.component';
 import Spinner from '../components/spinner.component';
+import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 const IMAGE_WIDTH = width * 0.7;
@@ -34,24 +31,21 @@ const IMAGE_HEIGHT = width * 0.7;
 const DemoClassScreen = ({navigation}) => {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [phone, setPhone] = useState('');
-
-  const dispatch = useDispatch();
-  const {demoData, loading} = useSelector(joinDemoSelector);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     StatusBar.setHidden(true);
     StatusBar.setBarStyle('light-content');
   }, []);
 
-  const handleBookingStatus = () => {
+  const handleBookingStatus = async () => {
     if (!phone) return;
-    dispatch(startFetchBookingDetailsFromPhone(phone));
-  };
 
-  useEffect(() => {
-    if (demoData) {
-      setShowBottomSheet(false);
-      if (demoData?.message === 'Booking not found') {
+    try {
+      setLoading(true);
+      const response = await fetchBookingDetailsFromPhone(phone);
+      setLoading(false);
+      if (response.status === 400) {
         ToastAndroid.showWithGravity(
           'Wrong Number',
           ToastAndroid.SHORT,
@@ -60,9 +54,14 @@ const DemoClassScreen = ({navigation}) => {
         return;
       }
 
-      navigation.replace('Main');
+      if (response.status === 200) {
+        await AsyncStorage.setItem('phone', phone);
+        navigation.replace('Main');
+      }
+    } catch (error) {
+      console.log(error);
     }
-  }, [demoData]);
+  };
 
   const closeBottomSheet = () => setShowBottomSheet(false);
   const openBottomSheet = () => setShowBottomSheet(true);
@@ -220,8 +219,6 @@ const DemoClassScreen = ({navigation}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    // borderBottomWidth: 1,
-                    // borderBottomColor: '#eaeaea',
                     paddingHorizontal: 16,
                   }}>
                   <TextWrapper fs={18} fw="600">
