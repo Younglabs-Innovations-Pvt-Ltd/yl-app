@@ -25,8 +25,7 @@ import Button from './button.component';
 import SuccessPopup from './success-popup.component';
 import Input from './input.component';
 
-const ADD_INQUIRY_URL =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/courses/addEnquiry';
+import {ADD_INQUIRY_URL} from '@env';
 
 const CustomerSupportActions = ({visible, onClose}) => {
   const [formVisible, setFormVisible] = useState(false);

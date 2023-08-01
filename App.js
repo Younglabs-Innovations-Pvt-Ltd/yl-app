@@ -19,7 +19,6 @@ import {initZoomSdk} from './src/natiive-modules/zoom-modules';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
-import ReScheduleScreen from './src/screens/Re-schedule-class.screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
 import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
@@ -136,7 +135,6 @@ function App() {
             initialParams={{bookingId}}
           />
           <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
-          <Stack.Screen name="Reschedule" component={ReScheduleScreen} />
           <Stack.Screen
             name="BookDemoForm"
             component={BookDemoFormScreen}

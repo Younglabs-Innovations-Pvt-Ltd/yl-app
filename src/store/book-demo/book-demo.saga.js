@@ -6,11 +6,7 @@ import {
   fetchBookingSlotsSuccess,
 } from './book-demo.reducer';
 
-const GEO_LOCATION_API =
-  'https://api.ipgeolocation.io/ipgeo?apiKey=db02b89808894a7a9ddef353d01805dd';
-
-const GET_SLOTS_API =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/getDemoSlots';
+import {GEO_LOCATION_API, GET_SLOTS_API} from '@env';
 
 // Fetch ip address data
 function* fetchIpData() {

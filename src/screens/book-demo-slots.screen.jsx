@@ -21,8 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
 
-const ADD_BOOKINGS_API =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/bookings/addBookings';
+import {ADD_BOOKINGS_API} from '@env';
 
 const BookDemoSlots = ({route, navigation}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');

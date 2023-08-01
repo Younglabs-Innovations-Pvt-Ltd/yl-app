@@ -1,11 +1,4 @@
-const BOOKING_URL =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/bookingstatus';
-
-const MARK_ATTENDENCE_URL =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
-
-const BOOKING_DETAILS =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/bookings/getBooking';
+import {BOOKING_URL, MARK_ATTENDENCE_URL, BOOKING_DETAILS} from '@env';
 
 export const fetchBookingDetils = async data => {
   const body = data.phone

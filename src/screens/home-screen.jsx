@@ -29,8 +29,7 @@ import {COLORS} from '../assets/theme/theme';
 import TextWrapper from '../components/text-wrapper.component';
 import Center from '../components/center.component';
 
-const MARK_ATTENDENCE_URL =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/demobook/markattendance';
+import {MARK_ATTENDENCE_URL} from '@env';
 
 const INITIAL_TIME = {
   days: 0,
