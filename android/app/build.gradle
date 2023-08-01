@@ -115,8 +115,8 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation project(':react-native-splash-screen')
 
-    implementation project(':commonlib');
-    implementation project(':mobilertc');
+    implementation project(':mobilertc')
+    implementation project(':commonlib')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

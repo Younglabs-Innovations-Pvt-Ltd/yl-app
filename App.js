@@ -42,12 +42,13 @@ function App() {
     const initializeZoom = async () => {
       try {
         const res = await initZoomSdk();
-        ToastAndroid.showWithGravity(
-          JSON.stringify(res),
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM,
-        );
-        console.log(res);
+        if (process.env.NODE_ENV !== 'production') {
+          ToastAndroid.showWithGravity(
+            res,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+          );
+        }
       } catch (error) {
         console.log('Zoom initialize error', error);
       }
