@@ -29,6 +29,7 @@ const BookDemoSlots = ({route, navigation}) => {
   const [slotsTime, setSlotsTime] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [popup, setPopup] = useState(false);
+  const [disableButton, setDisableButton] = useState(false);
 
   const {
     formFields: {childAge, name, phone},
@@ -118,6 +119,7 @@ const BookDemoSlots = ({route, navigation}) => {
     };
 
     try {
+      setDisableButton(true);
       const response = await fetch(ADD_BOOKINGS_API, {
         method: 'POST',
         headers: {
@@ -132,13 +134,16 @@ const BookDemoSlots = ({route, navigation}) => {
         await AsyncStorage.setItem('phone', phone);
 
         setPopup(true);
+        setDisableButton(false);
       } else if (response.status === 400) {
         console.log('booking data', bookingDetails);
 
         setErrorMessage(bookingDetails.message);
+        setDisableButton(false);
       }
     } catch (error) {
       console.log('booking error', error);
+      setDisableButton(false);
     }
   };
 
@@ -229,6 +234,7 @@ const BookDemoSlots = ({route, navigation}) => {
       </View>
       <View style={styles.footer}>
         <Button
+          loading={disableButton}
           bg={COLORS.pgreen}
           onPress={handleBookNow}
           textColor={COLORS.white}>

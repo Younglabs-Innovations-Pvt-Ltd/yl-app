@@ -41,7 +41,7 @@ const Button = ({
         },
         button_styles.styles(bg, outlined, outlineColor),
       ]}
-      disabled={loading ? true : false}>
+      disabled={loading}>
       <TextWrapper
         fs={textSize}
         fw="500"

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View, Pressable, Dimensions} from 'react-native';
+import {StyleSheet, View, Pressable, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
@@ -55,8 +55,6 @@ const getTimeRemaining = bookingDate => {
 
   return {days, hours, minutes, seconds, remainingTime};
 };
-
-const {height: windowHeight} = Dimensions.get('window');
 
 const HomeScreen = ({navigation}) => {
   const [childName, setChildName] = useState('');
@@ -231,34 +229,53 @@ const HomeScreen = ({navigation}) => {
 
         const classDate = new Date(bookingTime);
 
+        // before 1 hour from demo class
+        const secondNotificationTime = classDate.getTime() - 1000 * 60 * 60;
+
         if (new Date().getDate() > classDate.getDate()) return;
 
+        const hours = classDate.getHours();
+        const body = `Your free class will be started at ${
+          hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
+        }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
+
         if (!isNotification) {
-          // before 1 hour from demo class
-          const notificationTime =
-            new Date(bookingTime).getTime() - 1000 * 60 * 60;
-
-          // for 11 am
-          const time = new Date(bookingTime);
-          time.setHours(11);
-
-          const hours = new Date(bookingTime).getHours();
-          const body = `Your free class will be started at ${
-            hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
-          } : 00 ${hours >= 12 ? 'pm' : 'am'}.`;
-
-          await setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            time.getTime(),
-            body,
-          );
-          await setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            notificationTime,
-            body,
-          );
+          // If demo is today
+          if (classDate.getDate() === new Date().getDate()) {
+            // Set notificatioin for 11am
+            if (new Date().getHours() <= 10) {
+              classDate.setHours(11);
+              await setCountdownTriggerNotification(
+                'countdown',
+                'countdown',
+                classDate.getTime(),
+                body,
+              );
+              // Set notification for one hour before from free class
+            } else if (secondNotificationTime > new Date().getTime()) {
+              await setCountdownTriggerNotification(
+                'countdown',
+                'countdown',
+                secondNotificationTime,
+                body,
+              );
+            }
+            // If today date less than class date
+            // then set both notification at once
+          } else if (new Date().getDate() < classDate.getDate()) {
+            await setCountdownTriggerNotification(
+              'countdown',
+              'countdown',
+              classDate.getTime(),
+              body,
+            );
+            await setCountdownTriggerNotification(
+              'countdown',
+              'countdown',
+              secondNotificationTime,
+              body,
+            );
+          }
 
           await AsyncStorage.setItem('countdown_notification', 'saved');
         }
@@ -324,14 +341,14 @@ const HomeScreen = ({navigation}) => {
       <Spinner />
     </Center>
   ) : (
-    <>
-      <View>
-        <View style={styles.header}>
-          <TextWrapper color={COLORS.black}>Younglabs</TextWrapper>
-          <Pressable onPress={handleShowDrawer}>
-            <MIcon name="account-circle" size={28} color={COLORS.black} />
-          </Pressable>
-        </View>
+    <View style={{flex: 1}}>
+      <View style={styles.header}>
+        <TextWrapper color={COLORS.black}>Younglabs</TextWrapper>
+        <Pressable onPress={handleShowDrawer}>
+          <MIcon name="account-circle" size={28} color={COLORS.black} />
+        </Pressable>
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         <View style={styles.container}>
           {bookingTime
             ? new Date(bookingTime).getTime() > new Date().getTime() && (
@@ -352,7 +369,7 @@ const HomeScreen = ({navigation}) => {
                     onPress={handleJoinClass}
                     bg={COLORS.pgreen}
                     textColor={COLORS.white}>
-                    Join Class
+                    Enter Class
                   </Button>
                 </>
               )
@@ -387,8 +404,8 @@ const HomeScreen = ({navigation}) => {
               )
             : null}
         </View>
-      </View>
-    </>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -396,9 +413,7 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    height: windowHeight,
-    backgroundColor: COLORS.white,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   header: {
     padding: 16,

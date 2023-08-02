@@ -10,7 +10,6 @@ import {
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
-  DrawerItem,
 } from '@react-navigation/drawer';
 
 // Screens
@@ -21,16 +20,16 @@ import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {setToInitialState} from '../store/join-demo/join-demo.reducer';
 
 import TextWrapper from '../components/text-wrapper.component';
-import Icon from '../components/icon.component';
 import Spacer from '../components/spacer.component';
+import Icon from '../components/icon.component';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {COLORS} from '../assets/theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Drawer = createDrawerNavigator();
 
-const ABOUT_US_URL = 'https://www.younglabs.in/about';
-const POLICY_URL = 'https://www.younglabs.in/privacy_Policy';
+const WEBSITE_URL = 'https://www.younglabs.in/';
 
 const CustomDrawerContent = ({navigation, ...props}) => {
   const dispatch = useDispatch();
@@ -114,36 +113,34 @@ const CustomDrawerContent = ({navigation, ...props}) => {
           {height: windowDimensions.height - 94},
         ]}>
         <View style={{flex: 2}}>
-          <View style={{padding: 12}}>
+          <View style={styles.drawerHeader}>
             <TextWrapper fs={28}>Welcome {fullName || 'Guest'}</TextWrapper>
             <TextWrapper fs={18}>{phone}</TextWrapper>
           </View>
-          <Spacer />
-          <DrawerItem
-            label="About us"
-            style={styles.drawerItem}
-            onPress={() => openUrl(ABOUT_US_URL)}
-          />
-          <DrawerItem
-            label="Policy"
-            style={styles.drawerItem}
-            onPress={() => openUrl(POLICY_URL)}
-          />
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <TextWrapper fs={20} styles={{textAlign: 'center'}}>
+              Checkout our website for other courses
+            </TextWrapper>
+            <Spacer space={4} />
+            <Pressable
+              style={({pressed}) => [
+                styles.drawerButton,
+                {backgroundColor: pressed ? '#eee' : 'transparent'},
+              ]}
+              onPress={() => openUrl(WEBSITE_URL)}>
+              <MIcon name="web" size={24} color={COLORS.black} />
+              <TextWrapper fs={18} styles={{letterSpacing: 1.02}}>
+                Visit website
+              </TextWrapper>
+            </Pressable>
+          </View>
         </View>
         <View
           style={{
             flex: 0.5,
             justifyContent: 'flex-end',
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 12,
-              borderTopWidth: 1,
-              borderTopColor: '#eee',
-            }}>
+          <View style={styles.socialContainer}>
             <TextWrapper>Get in touch</TextWrapper>
             <View style={styles.socialMediaIconsWrapper}>
               <Pressable style={styles.btnSocialMedia} onPress={openFacebook}>
@@ -165,7 +162,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             }}>
             <Pressable
               style={({pressed}) => [
-                styles.btnChangeNumber,
+                styles.btnLogout,
                 {backgroundColor: pressed ? '#eaeaea' : 'transparent'},
               ]}
               onPress={handleChangeNumber}>
@@ -190,7 +187,11 @@ const DrawerScreen = () => {
         drawerType: 'front',
       }}
       drawerContent={props => <CustomDrawerContent {...props} />}>
-      <Drawer.Screen name="Home" component={HomeScreen} />
+      <Drawer.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{sceneContainerStyle: {backgroundColor: COLORS.white}}}
+      />
     </Drawer.Navigator>
   );
 };
@@ -202,7 +203,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 4,
   },
-  btnChangeNumber: {
+  drawerHeader: {
+    paddingHorizontal: 12,
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  btnLogout: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -217,14 +224,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  socialContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
   socialMediaIconsWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     gap: 16,
   },
-  drawerItem: {
-    borderWidth: 1,
-    borderColor: '#eee',
+  drawerButton: {
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderRadius: 4,
   },
 });

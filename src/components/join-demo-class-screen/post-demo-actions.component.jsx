@@ -7,12 +7,7 @@ import Button from '../button.component';
 
 import {useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const RATING_API =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/postdemo/saveRating';
-
-const MARK_MORE_INFO_API =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/postdemo/markNeedMoreInfo';
+import {RATING_API, MARK_MORE_INFO_API} from '@env';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
@@ -20,6 +15,7 @@ const PostDemoAction = () => {
   const [rating, setRating] = useState(0);
   const [isRated, setIsRated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [disableButton, setDisableButton] = useState(false);
 
   const {demoData} = useSelector(state => state.joinDemo);
 
@@ -41,7 +37,6 @@ const PostDemoAction = () => {
 
   const handleSaveRating = async rate => {
     const rated = rate * 2;
-    console.log('rating', rated);
 
     try {
       const response = await fetch(RATING_API, {
@@ -73,6 +68,7 @@ const PostDemoAction = () => {
 
   const markNeedMoreInfo = async () => {
     try {
+      setDisableButton(true);
       const response = await fetch(MARK_MORE_INFO_API, {
         method: 'POST',
         headers: {
@@ -84,8 +80,10 @@ const PostDemoAction = () => {
       if (response.status === 200) {
         openWhatsApp();
       }
+      setDisableButton(false);
     } catch (error) {
       console.log('nmi error', error);
+      setDisableButton(false);
     }
   };
 
@@ -156,6 +154,7 @@ const PostDemoAction = () => {
           </TextWrapper>
           <View style={styles.ctas}>
             <Button
+              loading={disableButton}
               textColor={COLORS.black}
               bg={COLORS.white}
               rounded={4}
