@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Pressable,
+  TextInput,
 } from 'react-native';
 import Button from '../components/button.component';
 import {COLORS} from '../assets/theme/theme';
@@ -160,11 +161,13 @@ const BookDemoScreen = ({navigation}) => {
                 onPress={() => setVisible(p => !p)}>
                 <TextWrapper>{country.callingCode}</TextWrapper>
               </Pressable>
-              <Input
-                inputMode="numeric"
+              <TextInput
                 placeholder="Enter your phone number"
+                style={styles.input}
+                selectionColor={COLORS.black}
                 value={formFields.phone}
                 onChangeText={phone => handleChangeValue({phone})}
+                inputMode="numeric"
               />
             </View>
             {errorMessage.phone && (
@@ -243,5 +246,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     gap: 8,
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderColor: '#000',
+    fontSize: 18,
+    letterSpacing: 1.15,
+    borderBottomWidth: 1,
   },
 });

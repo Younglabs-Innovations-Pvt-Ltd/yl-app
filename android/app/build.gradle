@@ -80,6 +80,11 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        Properties properties = new Properties();
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField "String", "jwt_token", "\"${properties.getProperty("JWT_TOKEN")}\""
     }
     signingConfigs {
         debug {

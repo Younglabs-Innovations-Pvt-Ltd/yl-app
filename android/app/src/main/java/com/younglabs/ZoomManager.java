@@ -57,7 +57,7 @@ public class ZoomManager extends ReactContextBaseJavaModule implements ZoomSDKIn
 
                 if (!zoomSDK.isInitialized()) {
                     ZoomSDKInitParams params = new ZoomSDKInitParams();
-                    params.jwtToken = AuthConstant.JWT_TOKEN;
+                    params.jwtToken = BuildConfig.jwt_token;
                     params.domain = AuthConstant.WEB_DOMAIN;
                     params.enableLog = true;
                     params.enableGenerateDump = true;

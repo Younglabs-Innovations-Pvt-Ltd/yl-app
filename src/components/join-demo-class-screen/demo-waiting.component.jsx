@@ -44,7 +44,7 @@ const DemoWaiting = ({timeLeft}) => {
 
   return (
     <View style={{paddingVertical: 12}}>
-      <TextWrapper color="gray">Your free class starts in</TextWrapper>
+      <TextWrapper color="gray">Please wait class will start</TextWrapper>
       <CountDown timeLeft={timeLeft} />
       <Spacer />
       <View>

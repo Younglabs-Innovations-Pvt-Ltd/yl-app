@@ -10,6 +10,7 @@ import {
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
+  DrawerItem,
 } from '@react-navigation/drawer';
 
 // Screens
@@ -21,11 +22,15 @@ import {setToInitialState} from '../store/join-demo/join-demo.reducer';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Icon from '../components/icon.component';
+import Spacer from '../components/spacer.component';
 
 import {COLORS} from '../assets/theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Drawer = createDrawerNavigator();
+
+const ABOUT_US_URL = 'https://www.younglabs.in/about';
+const POLICY_URL = 'https://www.younglabs.in/privacy_Policy';
 
 const CustomDrawerContent = ({navigation, ...props}) => {
   const dispatch = useDispatch();
@@ -34,7 +39,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
 
   if (!bookingDetails) return null;
 
-  const {phone, parentName, bookingId} = bookingDetails;
+  const {phone, parentName} = bookingDetails;
 
   const handleChangeNumber = async () => {
     try {
@@ -91,6 +96,14 @@ const CustomDrawerContent = ({navigation, ...props}) => {
     }
   };
 
+  const openUrl = async url => {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.log('OPEN_ABOUT_US_URL_ERROR', error);
+    }
+  };
+
   const fullName = parentName.slice(0, 1).toUpperCase() + parentName.slice(1);
 
   return (
@@ -105,9 +118,33 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             <TextWrapper fs={28}>Welcome {fullName || 'Guest'}</TextWrapper>
             <TextWrapper fs={18}>{phone}</TextWrapper>
           </View>
+          <Spacer />
+          <DrawerItem
+            label="About us"
+            style={styles.drawerItem}
+            onPress={() => openUrl(ABOUT_US_URL)}
+          />
+          <DrawerItem
+            label="Policy"
+            style={styles.drawerItem}
+            onPress={() => openUrl(POLICY_URL)}
+          />
         </View>
-        <View style={{flex: 0.5, justifyContent: 'flex-end'}}>
-          <View>
+        <View
+          style={{
+            flex: 0.5,
+            justifyContent: 'flex-end',
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingHorizontal: 12,
+              borderTopWidth: 1,
+              borderTopColor: '#eee',
+            }}>
+            <TextWrapper>Get in touch</TextWrapper>
             <View style={styles.socialMediaIconsWrapper}>
               <Pressable style={styles.btnSocialMedia} onPress={openFacebook}>
                 <Icon name="logo-facebook" size={30} color="blue" />
@@ -183,11 +220,11 @@ const styles = StyleSheet.create({
   socialMediaIconsWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
     paddingVertical: 12,
-    paddingRight: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
     gap: 16,
+  },
+  drawerItem: {
+    borderWidth: 1,
+    borderColor: '#eee',
   },
 });

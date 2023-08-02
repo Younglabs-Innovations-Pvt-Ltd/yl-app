@@ -365,7 +365,7 @@ const HomeScreen = ({navigation}) => {
           }
 
           {bookingTime
-            ? new Date(bookingTime).getTime() + 1000 * 60 * 60 <=
+            ? new Date(bookingTime).getTime() + 1000 * 60 * 30 <=
                 new Date().getTime() &&
               !isAttended && (
                 <View
