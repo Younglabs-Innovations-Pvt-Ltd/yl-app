@@ -36,13 +36,14 @@ const getClassDate = seconds => {
 
 const requirement_1 =
   '1. Please make sure that your child is ready with a pencil/pen and a notebook (4 Line Notebook or 2 line Notebook for 11+ ages) before the session';
-const requirement_2 =
-  '2. Laptop/Desktop/Smart phone is preferable for the session';
 
 const {width: windowWidth} = Dimensions.get('window');
 
 const DemoWaiting = ({timeLeft}) => {
   const {demoData} = useSelector(state => state.joinDemo);
+
+  const isTablet = windowWidth > 540;
+  const columns = isTablet ? 2 : 1;
 
   if (!demoData) return;
 
@@ -51,7 +52,6 @@ const DemoWaiting = ({timeLeft}) => {
 
   return (
     <View style={{paddingVertical: 12}}>
-      {/* <TextWrapper color="gray">Please wait class will start</TextWrapper> */}
       <TextWrapper color="gray" fw="600">{`Your class is on ${getClassDate(
         seconds,
       )}`}</TextWrapper>
@@ -69,17 +69,17 @@ const DemoWaiting = ({timeLeft}) => {
           <View style={styles.listItem}>
             <TextWrapper fs={18}>{requirement_1}</TextWrapper>
           </View>
-          <View style={styles.listItem}>
-            <TextWrapper fs={18}>{requirement_2}</TextWrapper>
-          </View>
         </View>
       </View>
       <View
         style={[
           styles.features,
-          {flexDirection: windowWidth > 540 ? 'row' : 'column'},
+          // {
+          //   flexDirection: isTablet ? 'row' : 'column',
+          //   columnGap: isTablet ? 16 : 0,
+          // },
         ]}>
-        <TextWrapper fs={32} fw="700" styles={{textAlign: 'center'}}>
+        <TextWrapper fs={28} styles={{textAlign: 'center'}}>
           Course Features
         </TextWrapper>
         <View style={styles.feature}>
@@ -88,9 +88,10 @@ const DemoWaiting = ({timeLeft}) => {
             style={styles.featureIcon}
           />
           <View style={styles.featureContent}>
-            <TextWrapper fs={24} fw="700">
+            <TextWrapper fs={18} fw="700">
               Submit Homework
             </TextWrapper>
+            <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
               Submit homework and get feedback from your teacher.
             </TextWrapper>
@@ -98,13 +99,16 @@ const DemoWaiting = ({timeLeft}) => {
         </View>
         <View style={styles.feature}>
           <Image
-            source={{uri: 'https://www.younglabs.in/icons/download-pdf.png'}}
+            source={{
+              uri: 'https://www.younglabs.in/icons/download-pdf.png',
+            }}
             style={styles.featureIcon}
           />
           <View style={styles.featureContent}>
-            <TextWrapper fs={24} fw="700">
+            <TextWrapper fs={18} fw="700">
               Download Worksheets
             </TextWrapper>
+            <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
               Get access to worksheets of the course and practice.
             </TextWrapper>
@@ -112,13 +116,16 @@ const DemoWaiting = ({timeLeft}) => {
         </View>
         <View style={styles.feature}>
           <Image
-            source={{uri: 'https://www.younglabs.in/icons/play-recording.png'}}
+            source={{
+              uri: 'https://www.younglabs.in/icons/play-recording.png',
+            }}
             style={styles.featureIcon}
           />
           <View style={styles.featureContent}>
-            <TextWrapper fs={24} fw="700">
+            <TextWrapper fs={18} fw="700">
               View Recordings
             </TextWrapper>
+            <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
               Watch the recordings of the classes you missed.
             </TextWrapper>
@@ -130,9 +137,10 @@ const DemoWaiting = ({timeLeft}) => {
             style={styles.featureIcon}
           />
           <View style={styles.featureContent}>
-            <TextWrapper fs={24} fw="700">
+            <TextWrapper fs={18} fw="700">
               Reschedule Classes
             </TextWrapper>
+            <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
               Won't be able to attend a class? Reschedule it.
             </TextWrapper>
@@ -146,9 +154,10 @@ const DemoWaiting = ({timeLeft}) => {
             style={styles.featureIcon}
           />
           <View style={styles.featureContent}>
-            <TextWrapper fs={24} fw="700">
+            <TextWrapper fs={18} fw="700">
               Customer Support
             </TextWrapper>
+            <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
               Facing any issues? Our customer support team is always there to
               help you.
@@ -161,9 +170,10 @@ const DemoWaiting = ({timeLeft}) => {
             style={styles.featureIcon}
           />
           <View style={styles.featureContent}>
-            <TextWrapper fs={24} fw="700">
+            <TextWrapper fs={18} fw="700">
               Certificate of Completion
             </TextWrapper>
+            <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
               Get a certificate of completion after completing the course
             </TextWrapper>
@@ -201,13 +211,12 @@ const styles = StyleSheet.create({
   },
   features: {
     paddingVertical: 20,
-    display: 'flex',
-    flexWrap: 'wrap',
-    columnGap: 16,
   },
   feature: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 28,
+    alignSelf: 'center',
+    maxWidth: 300,
   },
   featureIcon: {
     width: 64,
@@ -216,6 +225,6 @@ const styles = StyleSheet.create({
   },
   featureContent: {
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 16,
   },
 });

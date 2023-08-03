@@ -241,9 +241,10 @@ const HomeScreen = ({navigation}) => {
 
         if (!isNotification) {
           // If demo is today
-          if (classDate.getDate() === new Date().getDate()) {
+          if (new Date().getDate() === classDate.getDate()) {
             // Set notificatioin for 11am
             if (new Date().getHours() <= 10) {
+              console.log('first');
               classDate.setHours(11);
               await setCountdownTriggerNotification(
                 'countdown',
@@ -251,8 +252,11 @@ const HomeScreen = ({navigation}) => {
                 classDate.getTime(),
                 body,
               );
-              // Set notification for one hour before from free class
-            } else if (secondNotificationTime > new Date().getTime()) {
+            }
+
+            // Set notification for one hour before from free class
+            if (secondNotificationTime > new Date().getTime()) {
+              console.log('second');
               await setCountdownTriggerNotification(
                 'countdown',
                 'countdown',
@@ -262,7 +266,8 @@ const HomeScreen = ({navigation}) => {
             }
             // If today date less than class date
             // then set both notification at once
-          } else if (new Date().getDate() < classDate.getDate()) {
+          } else if (new Date().getTime() < classDate.getTime()) {
+            console.log('both');
             await setCountdownTriggerNotification(
               'countdown',
               'countdown',

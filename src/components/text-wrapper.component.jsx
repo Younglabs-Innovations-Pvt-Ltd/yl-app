@@ -9,6 +9,7 @@ const TextWrapper = ({
   fw = '400',
   children,
   styles,
+  ...otherProps
 }) => {
   return (
     <Text
@@ -18,7 +19,8 @@ const TextWrapper = ({
         color: color,
         fontWeight: fw,
         ...styles,
-      }}>
+      }}
+      {...otherProps}>
       {children}
     </Text>
   );

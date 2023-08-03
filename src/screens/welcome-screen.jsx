@@ -125,7 +125,7 @@ const DemoClassScreen = ({navigation}) => {
             justifyContent: 'center',
             paddingTop: 20,
           }}>
-          <View style={{}}>
+          <View>
             <Animated.Image
               source={require('../assets/images/YoungLabsLogo.png')}
               style={{
@@ -145,40 +145,39 @@ const DemoClassScreen = ({navigation}) => {
                 ],
               }}
             />
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              paddingBottom: 12,
-            }}>
-            {animatedValues.length > 0 &&
-              SLOGN_TEXT.split(' ').map((word, index) => {
-                return (
-                  <Animated.Text
-                    key={word}
-                    style={[
-                      styles.animatedText,
-                      {
-                        opacity: animatedValues[index],
-                        transform: [
-                          {
-                            translateY: Animated.multiply(
-                              animatedValues[index],
-                              new Animated.Value(-5),
-                            ),
-                          },
-                        ],
-                      },
-                    ]}>
-                    {word}
-                    {index <= SLOGN_TEXT.split(' ').length ? ' ' : ''}
-                  </Animated.Text>
-                );
-              })}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                paddingBottom: 12,
+              }}>
+              {animatedValues.length > 0 &&
+                SLOGN_TEXT.split(' ').map((word, index) => {
+                  return (
+                    <Animated.Text
+                      key={word}
+                      style={[
+                        styles.animatedText,
+                        {
+                          opacity: animatedValues[index],
+                          transform: [
+                            {
+                              translateY: Animated.multiply(
+                                animatedValues[index],
+                                new Animated.Value(-5),
+                              ),
+                            },
+                          ],
+                        },
+                      ]}>
+                      {word}
+                      {index <= SLOGN_TEXT.split(' ').length ? ' ' : ''}
+                    </Animated.Text>
+                  );
+                })}
+            </View>
           </View>
         </View>
       </View>

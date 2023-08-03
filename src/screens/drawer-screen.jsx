@@ -114,8 +114,10 @@ const CustomDrawerContent = ({navigation, ...props}) => {
         ]}>
         <View style={{flex: 2}}>
           <View style={styles.drawerHeader}>
-            <TextWrapper fs={28}>Welcome {fullName || 'Guest'}</TextWrapper>
-            <TextWrapper fs={18}>{phone}</TextWrapper>
+            <TextWrapper fs={28} numberOfLines={1}>
+              {fullName || 'Guest'}
+            </TextWrapper>
+            <TextWrapper>{phone}</TextWrapper>
           </View>
           <View style={{flex: 1, justifyContent: 'center'}}>
             <TextWrapper fs={20} styles={{textAlign: 'center'}}>

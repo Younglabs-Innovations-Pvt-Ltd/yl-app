@@ -21,7 +21,6 @@ import {COLORS, FONTS} from '../assets/theme/theme';
 
 import {useSelector} from 'react-redux';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import Button from './button.component';
 import SuccessPopup from './success-popup.component';
 import Input from './input.component';
 
@@ -30,12 +29,12 @@ import {ADD_INQUIRY_URL} from '@env';
 const CustomerSupportActions = ({visible, onClose}) => {
   const [formVisible, setFormVisible] = useState(false);
   const [inquiryLoading, setInquiryLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // entries
-  const [courseId, setCourseId] = useState('English handwriting');
-  const [comment, setComment] = useState('Need expert guiedence in enrolling');
+  const [courseId, setCourseId] = useState('');
+  const [comment, setComment] = useState('');
   const [otherOption, setOtherOption] = useState('');
 
   const {bookingDetails} = useSelector(joinDemoSelector);
@@ -62,19 +61,28 @@ const CustomerSupportActions = ({visible, onClose}) => {
     }
   };
 
-  const onSelectComment = val => setComment(val);
+  const onSelectComment = val => {
+    setComment(val);
+    if (errorMessage) setErrorMessage('');
+  };
   const onSelectCourseId = id => setCourseId(id);
 
   const onCloseForm = () => {
     setOtherOption('');
-    setComment('Need expert guiedence in enrolling');
+    setComment('');
+    setCourseId('');
     setFormVisible(false);
+    if (errorMessage) setErrorMessage('');
   };
 
   const handleAddInquiry = async () => {
     try {
       if (!courseId || !comment) {
-        setErrorMessage('Fields are required.');
+        return;
+      }
+
+      if (comment === 'Other' && !otherOption) {
+        setErrorMessage('Field is required.');
         return;
       }
 
@@ -110,8 +118,8 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const handleOnContinue = () => {
     setSuccess(false);
     setOtherOption('');
-    setComment('Need expert guiedence in enrolling');
-    setCourseId('English handwriting');
+    setComment('');
+    setCourseId('');
     if (errorMessage) setErrorMessage('');
   };
 
@@ -256,19 +264,22 @@ const CustomerSupportActions = ({visible, onClose}) => {
                   />
                 )}
                 {errorMessage && (
-                  <TextWrapper color={COLORS.pred} fs={14}>
+                  <TextWrapper fs={14} color={COLORS.pred}>
                     {errorMessage}
                   </TextWrapper>
                 )}
                 <Spacer />
-                <Button
-                  loading={inquiryLoading}
-                  bg={COLORS.pgreen}
-                  textColor={COLORS.white}
-                  rounded={4}
-                  onPress={handleAddInquiry}>
-                  Submit
-                </Button>
+                <Pressable
+                  style={[
+                    styles.btnSubmit,
+                    {opacity: !courseId || !comment ? 0.5 : 1},
+                  ]}
+                  onPress={handleAddInquiry}
+                  disabled={!courseId || !comment ? true : false}>
+                  <TextWrapper fs={18} color={COLORS.white}>
+                    Submit
+                  </TextWrapper>
+                </Pressable>
               </View>
             </ScrollView>
           </KeyboardAvoidingView>
@@ -340,5 +351,15 @@ const styles = StyleSheet.create({
     letterSpacing: 1.15,
     fontFamily: FONTS.roboto,
     color: COLORS.black,
+  },
+  btnSubmit: {
+    width: '100%',
+    height: 48,
+    paddingVertical: 6,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.pgreen,
+    borderRadius: 4,
   },
 });
