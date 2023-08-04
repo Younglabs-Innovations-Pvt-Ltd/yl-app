@@ -38,7 +38,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
 
   if (!bookingDetails) return null;
 
-  const {phone, parentName} = bookingDetails;
+  const {phone, parentName, bookingId} = bookingDetails;
 
   const handleChangeNumber = async () => {
     try {
@@ -118,6 +118,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               {fullName || 'Guest'}
             </TextWrapper>
             <TextWrapper>{phone}</TextWrapper>
+            <TextWrapper>{bookingId}</TextWrapper>
           </View>
           <View style={{flex: 1, justifyContent: 'center'}}>
             <TextWrapper fs={20} styles={{textAlign: 'center'}}>

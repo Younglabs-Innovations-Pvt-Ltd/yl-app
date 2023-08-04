@@ -30,6 +30,10 @@ const reducer = {
     state.loading.bookingSlotsLoading = false;
     state.bookingSlots = action.payload;
   },
+  setIpDataLoadingState(state, action) {
+    console.log(payload);
+    state.ipDataLoading = action.payload;
+  },
 };
 
 // slice
@@ -46,6 +50,7 @@ export const {
   fetchIpDataSuccess,
   startFetchingBookingSlots,
   fetchBookingSlotsSuccess,
+  setIpDataLoadingState,
 } = bookDemoSlice.actions;
 
 // reducer

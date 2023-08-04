@@ -27,6 +27,8 @@ import Input from './input.component';
 import {ADD_INQUIRY_URL} from '@env';
 
 const CustomerSupportActions = ({visible, onClose}) => {
+  if (!visible) return null;
+
   const [formVisible, setFormVisible] = useState(false);
   const [inquiryLoading, setInquiryLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -40,6 +42,8 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const {bookingDetails} = useSelector(joinDemoSelector);
 
   const handleShowFormVisible = () => setFormVisible(true);
+
+  console.log(bookingDetails);
 
   const openWhatsapp = async () => {
     let whatappUrl = '';

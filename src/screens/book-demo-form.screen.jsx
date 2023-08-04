@@ -23,6 +23,7 @@ import Modal from '../components/modal.component';
 import {
   setTimezone,
   startFetchingIpData,
+  setIpDataLoadingState,
 } from '../store/book-demo/book-demo.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import Center from '../components/center.component';
@@ -168,6 +169,7 @@ const BookDemoScreen = ({navigation}) => {
                 value={formFields.phone}
                 onChangeText={phone => handleChangeValue({phone})}
                 inputMode="numeric"
+                placeholderTextColor={'gray'}
               />
             </View>
             {errorMessage.phone && (
@@ -220,7 +222,9 @@ const BookDemoScreen = ({navigation}) => {
           onChange={handleChangeValue}
         />
       )}
-      <Modal visible={ipDataLoading}>
+      <Modal
+        visible={ipDataLoading}
+        onRequestClose={() => setIpDataLoadingState(false)}>
         <Center>
           <Spinner />
         </Center>
@@ -255,5 +259,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     letterSpacing: 1.15,
     borderBottomWidth: 1,
+    color: COLORS.black,
   },
 });

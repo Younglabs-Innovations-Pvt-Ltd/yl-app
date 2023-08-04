@@ -8,7 +8,10 @@ const useSelectContext = () => useContext(SelectContext);
 
 export const Select = ({children, defaultValue, onSelect}) => {
   const [visible, setVisible] = useState(false);
-  const [selectPosition, setSelectPosition] = useState({top: 0, left: 0});
+  const [selectPosition, setSelectPosition] = useState({
+    top: 0,
+    left: 0,
+  });
   const selectRef = useRef(null);
 
   const onLayout = () => {
@@ -19,6 +22,10 @@ export const Select = ({children, defaultValue, onSelect}) => {
 
   const onClose = () => setVisible(false);
 
+  const handleVisible = () => {
+    setVisible(true);
+  };
+
   const value = {
     selectPosition,
     onClose,
@@ -28,7 +35,7 @@ export const Select = ({children, defaultValue, onSelect}) => {
     <SelectContext.Provider value={value}>
       <Pressable
         ref={selectRef}
-        onPress={() => setVisible(true)}
+        onPress={handleVisible}
         style={styles.select}
         onLayout={onLayout}>
         <TextWrapper>{defaultValue}</TextWrapper>
