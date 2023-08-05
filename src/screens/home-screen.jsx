@@ -191,7 +191,7 @@ const HomeScreen = ({navigation}) => {
       }
 
       if (demoBookingId) {
-        dispatch(startFetchBookingDetailsFromId(demoBookingId));
+        dispatch(startFetchBookingDetailsFromId(JSON.parse(demoBookingId)));
       }
     }
   }, [isAttendenceMarked]);
@@ -223,11 +223,11 @@ const HomeScreen = ({navigation}) => {
     };
   }, [bookingTime, demoPhoneNumber, dispatch]);
 
-  // Do not show join button after 1 hour of demo ended
+  // Do not show join button after 30 minutes of demo ended
   useEffect(() => {
     if (bookingTime) {
       const afterHalfHourFromDemoDate =
-        new Date(bookingTime).getTime() + 1000 * 60 * 30;
+        new Date(bookingTime).getTime() + 1000 * 60 * 50;
 
       if (afterHalfHourFromDemoDate <= new Date().getTime()) {
         // Hide class join button
@@ -239,111 +239,97 @@ const HomeScreen = ({navigation}) => {
   // Notification
   useEffect(() => {
     const setNotification = async () => {
+      const classDate = new Date(bookingTime);
+      const currentTime = Date.now();
+
+      // If class passed
+      if (currentTime > classDate) {
+        return;
+      }
+
+      const ONE_HOUR = 60 * 60 * 1000;
+      const TEN_MINUTES = 10 * 60 * 1000;
+      const FIVE_MINUTES = 5 * 60 * 1000;
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+
+      const beforeOneHour = classDate.getTime() - ONE_HOUR;
+      const beforeTenMinutes = classDate.getTime() - TEN_MINUTES;
+      const afterFiveMinutes = classDate.getTime() + FIVE_MINUTES;
+
+      const hours = classDate.getHours();
+      const body = `Your free class will be started on ${classDate.toDateString()} at ${
+        hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
+      }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
+
       try {
         const isNotification = await AsyncStorage.getItem(
           'countdown_notification',
         );
 
-        const classDate = new Date(bookingTime);
+        // If already set notifications
+        if (isNotification) return;
 
-        // before 1 hour from demo class
-        const beforeOneHour = classDate.getTime() - 1000 * 60 * 60;
-        // before 10 minutes from class
-        const beforeTenMinutes = classDate.getTime() - 1000 * 60 * 10;
-        // after 5 minutes from class
-        const afterFiveMinutes = classDate.getTime() + 1000 * 60 * 5;
-
-        if (new Date().getDate() > classDate.getDate()) return;
-
-        const hours = classDate.getHours();
-        const body = `Your free class will be started at ${
-          hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
-        }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
-
-        if (!isNotification) {
-          // If demo is today
-          if (new Date().getDate() === classDate.getDate()) {
-            // Set notificatioin for 11am
-            // if (new Date().getHours() <= 10) {
-            //   console.log('first');
-            //   classDate.setHours(11);
-            //   await setCountdownTriggerNotification(
-            //     'countdown',
-            //     'countdown',
-            //     classDate.getTime(),
-            //     body,
-            //   );
-            // }
-
-            // Set notification for one hour before from free class
-            if (new Date().getTime() < classDate) {
-              console.log('set for before 10 minutes');
-              if (beforeTenMinutes > new Date().getTime()) {
-                await setCountdownTriggerNotification(
-                  'countdown',
-                  'countdown',
-                  beforeTenMinutes,
-                  'Your class will be started in 10 minutes.',
-                );
-              }
-              if (beforeOneHour > new Date().getTime()) {
-                console.log('set for before 1 hour');
-                await setCountdownTriggerNotification(
-                  'countdown',
-                  'countdown',
-                  beforeOneHour,
-                  '1 hour left to start class.',
-                );
-              }
-
+        // Check for today
+        if (new Date().getDate() === classDate.getDate()) {
+          console.log('all notification for today');
+          if (currentTime < classDate) {
+            if (currentTime < beforeTenMinutes) {
               await setCountdownTriggerNotification(
                 'countdown',
                 'countdown',
-                afterFiveMinutes,
-                'Your class has started, join now.',
+                beforeTenMinutes,
+                'Your class is about to being in 10 minutes.',
               );
             }
-            // If today date less than class date
-            // then set both notification at once
-          } else if (new Date().getTime() < classDate.getTime()) {
-            console.log('all');
-            await setCountdownTriggerNotification(
-              'countdown',
-              'countdown',
-              beforeTenMinutes,
-              'Your class will be started in 10 minutes.',
-            );
-
-            await setCountdownTriggerNotification(
-              'countdown',
-              'countdown',
-              beforeOneHour,
-              '1 hour left to start class.',
-            );
-
+            if (currentTime < beforeOneHour) {
+              await setCountdownTriggerNotification(
+                'countdown',
+                'countdown',
+                beforeOneHour,
+                'Your class will be started in 1 hour. Please get ready.',
+              );
+            }
             await setCountdownTriggerNotification(
               'countdown',
               'countdown',
               afterFiveMinutes,
-              'Your class has started, join now.',
+              'Hurry! your class has already started, join now.',
             );
-
-            if (classDate.getHours() < 13) {
-              const beforeOneDay = new Date(
-                classDate.getTime() - 1000 * 60 * 60 * 24,
-              );
-              beforeOneDay.setHours(20);
-              await setCountdownTriggerNotification(
-                'countdown',
-                'countdown',
-                beforeOneDay.getTime(),
-                body,
-              );
-            }
           }
+        } else {
+          // Set notifications for future class
+          await setCountdownTriggerNotification(
+            'countdown',
+            'countdown',
+            beforeTenMinutes,
+            'Your class will be started in 10 minutes.',
+          );
+          await setCountdownTriggerNotification(
+            'countdown',
+            'countdown',
+            beforeOneHour,
+            '1 hour left to start class.',
+          );
+          await setCountdownTriggerNotification(
+            'countdown',
+            'countdown',
+            afterFiveMinutes,
+            'Your class has started, join now.',
+          );
 
-          await AsyncStorage.setItem('countdown_notification', 'saved');
+          if (new Date().getHours() < 20) {
+            const beforeOneDay = new Date(classDate.getTime() - ONE_DAY);
+            beforeOneDay.setHours(20);
+            await setCountdownTriggerNotification(
+              'countdown',
+              'countdown',
+              beforeOneDay.getTime(),
+              body,
+            );
+          }
         }
+
+        await AsyncStorage.setItem('countdown_notification', 'saved');
       } catch (error) {
         console.log('notification error', error);
       }
@@ -359,7 +345,7 @@ const HomeScreen = ({navigation}) => {
     if (!bookingTime) return;
 
     const isDemoOver =
-      new Date(bookingTime).getTime() + 1000 * 60 * 30 <= new Date().getTime();
+      new Date(bookingTime).getTime() + 1000 * 60 * 50 <= new Date().getTime();
 
     if (isDemoOver && isAttended) {
       setShowPostActions(true);
@@ -415,57 +401,59 @@ const HomeScreen = ({navigation}) => {
       </View>
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         <View style={styles.container}>
-          {bookingTime
-            ? new Date(bookingTime).getTime() > new Date().getTime() && (
-                <DemoWaiting timeLeft={timeLeft} />
-              )
-            : null}
-          {isTimeover
-            ? showJoinButton && (
-                <>
-                  <Input
-                    placeholder="Child Name"
-                    value={childName}
-                    onChangeText={e => setChildName(e)}
-                  />
+          <View style={{width: '100%', maxWidth: 428, alignSelf: 'center'}}>
+            {bookingTime
+              ? new Date(bookingTime).getTime() > new Date().getTime() && (
+                  <DemoWaiting timeLeft={timeLeft} />
+                )
+              : null}
+            {isTimeover
+              ? showJoinButton && (
+                  <>
+                    <Input
+                      placeholder="Child Name"
+                      value={childName}
+                      onChangeText={e => setChildName(e)}
+                    />
+                    <Spacer />
+                    <Button
+                      rounded={4}
+                      onPress={handleJoinClass}
+                      bg={COLORS.pgreen}
+                      textColor={COLORS.white}>
+                      Enter Class
+                    </Button>
+                  </>
+                )
+              : null}
+            {
+              // If user attended demo class
+              // Demo has ended
+              // Show post action after demo class
+              showPostActions && <PostDemoAction />
+            }
+
+            {bookingTime &&
+              new Date(bookingTime).getTime() <= new Date().getTime() &&
+              !zoomData && (
+                <View
+                  style={{
+                    paddingVertical: 16,
+                  }}>
+                  <TextWrapper fs={20}>
+                    Looks like you missed the class, please reschedule one
+                  </TextWrapper>
                   <Spacer />
                   <Button
-                    rounded={4}
-                    onPress={handleJoinClass}
+                    textColor={COLORS.white}
                     bg={COLORS.pgreen}
-                    textColor={COLORS.white}>
-                    Enter Class
+                    rounded={6}
+                    onPress={rescheduleFreeClass}>
+                    Reschedule
                   </Button>
-                </>
-              )
-            : null}
-          {
-            // If user attended demo class
-            // Demo has ended
-            // Show post action after demo class
-            showPostActions && <PostDemoAction />
-          }
-
-          {bookingTime &&
-            new Date(bookingTime).getTime() <= new Date().getTime() &&
-            !zoomData && (
-              <View
-                style={{
-                  paddingVertical: 16,
-                }}>
-                <TextWrapper fs={20}>
-                  Looks like you missed the class, please reschedule one
-                </TextWrapper>
-                <Spacer />
-                <Button
-                  textColor={COLORS.white}
-                  bg={COLORS.pgreen}
-                  rounded={6}
-                  onPress={rescheduleFreeClass}>
-                  Reschedule
-                </Button>
-              </View>
-            )}
+                </View>
+              )}
+          </View>
         </View>
       </ScrollView>
     </View>

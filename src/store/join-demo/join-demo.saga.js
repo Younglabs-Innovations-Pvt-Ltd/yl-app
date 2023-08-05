@@ -40,9 +40,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
 // Fetch booking details from booking id
 function* fetchDemoDetailsFromBookingId({payload}) {
   try {
-    const response = yield call(fetchBookingDetailsFromBookingId, {
-      bookingId: payload,
-    });
+    const response = yield call(fetchBookingDetailsFromBookingId, payload);
     const data = yield response.json();
 
     const detailsResponse = yield call(fetchBookingDetils, {
@@ -54,7 +52,6 @@ function* fetchDemoDetailsFromBookingId({payload}) {
     const bookingIdFromAsync = yield AsyncStorage.getItem('bookingid');
 
     if (!bookingIdFromAsync) {
-      console.log('save bookingid');
       yield AsyncStorage.setItem('bookingid', payload);
     }
 

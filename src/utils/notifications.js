@@ -42,3 +42,11 @@ export const setCountdownTriggerNotification = async (
     trigger,
   );
 };
+
+export const getAllTriggerNotificationIds = async () => {
+  return await notifee.getTriggerNotificationIds();
+};
+
+export const cancleNotifications = async () => {
+  return await notifee.cancelAllNotifications();
+};

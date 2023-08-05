@@ -23,15 +23,17 @@ import Spinner from '../components/spinner.component';
 import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const {width} = Dimensions.get('window');
-const IMAGE_WIDTH = width * 0.7;
-const IMAGE_HEIGHT = width * 0.7;
+const {width: deviceWidth} = Dimensions.get('window');
+const IMAGE_WIDTH = deviceWidth * 0.7;
+const IMAGE_HEIGHT = deviceWidth * 0.7;
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const isTablet = deviceWidth > 540;
 
   useEffect(() => {
     StatusBar.setHidden(true);
@@ -116,13 +118,14 @@ const DemoClassScreen = ({navigation}) => {
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.topContainer}>
+      <View style={{flex: isTablet ? 1 : 2}}>
         <View
           style={{
             flex: 1,
             paddingHorizontal: 16,
             position: 'relative',
-            justifyContent: 'center',
+            alignItems: isTablet ? 'flex-end' : 'center',
+            justifyContent: isTablet ? 'flex-end' : 'center',
             paddingTop: 20,
           }}>
           <View>
@@ -182,7 +185,15 @@ const DemoClassScreen = ({navigation}) => {
         </View>
       </View>
       <Animated.View
-        style={[styles.bottomContainer, {opacity: animatedButtons}]}>
+        style={[
+          styles.bottomContainer,
+          {
+            opacity: animatedButtons,
+            flex: isTablet ? 0.8 : 0.5,
+            justifyContent: isTablet ? 'flex-start' : 'center',
+            paddingTop: isTablet ? 20 : 0,
+          },
+        ]}>
         <Pressable
           style={[styles.btnCtas, {backgroundColor: COLORS.pgreen}]}
           onPress={openBottomSheet}>
@@ -275,21 +286,22 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingHorizontal: 16,
   },
   topContainer: {
     flex: 2,
   },
   bottomContainer: {
-    flex: 0.5,
-    paddingHorizontal: 16,
     paddingBottom: 16,
-    justifyContent: 'center',
   },
   btnCtas: {
+    width: '100%',
+    maxWidth: 348,
     height: 54,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
+    alignSelf: 'center',
   },
   animatedText: {
     fontSize: 20,

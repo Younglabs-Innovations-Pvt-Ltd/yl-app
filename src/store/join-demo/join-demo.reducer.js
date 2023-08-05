@@ -33,6 +33,7 @@ const reducer = {
   setToInitialState(state) {
     state.demoData = null;
     state.demoPhoneNumber = '';
+    state.demoBookingId = '';
   },
 };
 

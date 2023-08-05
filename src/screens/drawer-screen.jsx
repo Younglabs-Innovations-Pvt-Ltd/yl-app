@@ -27,6 +27,8 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../assets/theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import {cancleNotifications} from '../utils/notifications';
+
 const Drawer = createDrawerNavigator();
 
 const WEBSITE_URL = 'https://www.younglabs.in/';
@@ -38,13 +40,15 @@ const CustomDrawerContent = ({navigation, ...props}) => {
 
   if (!bookingDetails) return null;
 
-  const {phone, parentName, bookingId} = bookingDetails;
+  const {phone, parentName} = bookingDetails;
 
-  const handleChangeNumber = async () => {
+  const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('phone');
       await AsyncStorage.removeItem('countdown_notification');
       await AsyncStorage.removeItem('bookingid');
+      await cancleNotifications();
+
       dispatch(setToInitialState());
       const resetAction = CommonActions.reset({
         index: 0,
@@ -118,7 +122,6 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               {fullName || 'Guest'}
             </TextWrapper>
             <TextWrapper>{phone}</TextWrapper>
-            <TextWrapper>{bookingId}</TextWrapper>
           </View>
           <View style={{flex: 1, justifyContent: 'center'}}>
             <TextWrapper fs={20} styles={{textAlign: 'center'}}>
@@ -168,7 +171,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
                 styles.btnLogout,
                 {backgroundColor: pressed ? '#eaeaea' : 'transparent'},
               ]}
-              onPress={handleChangeNumber}>
+              onPress={handleLogout}>
               <TextWrapper color={COLORS.black} fs={16.5}>
                 Logout
               </TextWrapper>

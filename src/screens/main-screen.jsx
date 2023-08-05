@@ -39,7 +39,7 @@ const MainScreen = ({route}) => {
           dispatch(setDemoBookingId(data.bookingId));
         }
       } catch (error) {
-        console.log('CHECK_FOR_PHONE', error);
+        console.log('CHECK_FOR_PHONE_MAIN_SCREEN', error);
       }
     };
 

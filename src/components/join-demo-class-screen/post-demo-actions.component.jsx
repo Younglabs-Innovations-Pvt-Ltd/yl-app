@@ -11,6 +11,8 @@ import {RATING_API, MARK_MORE_INFO_API} from '@env';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
+const NMI_SOURCE = 'app';
+
 const PostDemoAction = () => {
   const [rating, setRating] = useState(0);
   const [isRated, setIsRated] = useState(false);
@@ -74,7 +76,10 @@ const PostDemoAction = () => {
         headers: {
           'content-type': 'application/json',
         },
-        body: JSON.stringify({bookingId: demoData.bookingId}),
+        body: JSON.stringify({
+          bookingId: demoData.bookingId,
+          source: NMI_SOURCE,
+        }),
       });
 
       if (response.status === 200) {

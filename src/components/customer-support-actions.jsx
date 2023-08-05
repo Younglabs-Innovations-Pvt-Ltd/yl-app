@@ -6,6 +6,7 @@ import {
   Linking,
   KeyboardAvoidingView,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 
 import TextWrapper from './text-wrapper.component';
@@ -26,6 +27,8 @@ import Input from './input.component';
 
 import {ADD_INQUIRY_URL} from '@env';
 
+const {width: deviceWidth} = Dimensions.get('window');
+
 const CustomerSupportActions = ({visible, onClose}) => {
   if (!visible) return null;
 
@@ -33,6 +36,8 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const [inquiryLoading, setInquiryLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const isTablet = deviceWidth > 540;
 
   // entries
   const [courseId, setCourseId] = useState('');
@@ -42,8 +47,6 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const {bookingDetails} = useSelector(joinDemoSelector);
 
   const handleShowFormVisible = () => setFormVisible(true);
-
-  console.log(bookingDetails);
 
   const openWhatsapp = async () => {
     let whatappUrl = '';
@@ -171,7 +174,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
         <View
           style={{
             flex: 1,
-            paddingTop: 120,
+            paddingTop: isTablet ? 200 : 120,
             paddingHorizontal: 16,
             backgroundColor: 'rgba(0,0,0,0.25)',
           }}>
@@ -181,9 +184,9 @@ const CustomerSupportActions = ({visible, onClose}) => {
                 style={{
                   backgroundColor: COLORS.white,
                   borderRadius: 6,
-                  paddingHorizontal: 12,
-                  paddingVertical: 20,
-                  maxWidth: 346,
+                  paddingHorizontal: isTablet ? 20 : 12,
+                  paddingVertical: isTablet ? 40 : 20,
+                  maxWidth: 380,
                   width: '100%',
                   alignSelf: 'center',
                   elevation: 2,
