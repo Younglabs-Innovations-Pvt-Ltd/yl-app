@@ -4,7 +4,6 @@ import {
   View,
   Pressable,
   StatusBar,
-  ToastAndroid,
   Dimensions,
   Animated,
 } from 'react-native';
@@ -32,6 +31,7 @@ const DemoClassScreen = ({navigation}) => {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const isTablet = deviceWidth > 540;
 
@@ -41,23 +41,23 @@ const DemoClassScreen = ({navigation}) => {
   }, []);
 
   const handleBookingStatus = async () => {
-    if (!phone) return;
+    if (!phone) {
+      setErrorMsg('Enter phone number');
+      return;
+    }
 
     try {
       setLoading(true);
       const response = await fetchBookingDetailsFromPhone(phone);
       setLoading(false);
       if (response.status === 400) {
-        ToastAndroid.showWithGravity(
-          'Wrong Number',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM,
-        );
+        setErrorMsg('Details not found. Please check your phone number');
         return;
       }
 
       if (response.status === 200) {
         await AsyncStorage.setItem('phone', phone);
+        if (errorMsg) setErrorMsg('');
         navigation.replace('Main');
       }
     } catch (error) {
@@ -65,7 +65,11 @@ const DemoClassScreen = ({navigation}) => {
     }
   };
 
-  const closeBottomSheet = () => setShowBottomSheet(false);
+  const closeBottomSheet = () => {
+    setShowBottomSheet(false);
+    setPhone('');
+    if (errorMsg) setErrorMsg('');
+  };
   const openBottomSheet = () => setShowBottomSheet(true);
 
   // Animation stuff
@@ -247,6 +251,11 @@ const DemoClassScreen = ({navigation}) => {
                     value={phone}
                     onChangeText={e => setPhone(e)}
                   />
+                  {errorMsg && (
+                    <TextWrapper fs={14} color={COLORS.pred}>
+                      {errorMsg}
+                    </TextWrapper>
+                  )}
                   <Spacer space={12} />
                   <Button
                     textSize={18}
