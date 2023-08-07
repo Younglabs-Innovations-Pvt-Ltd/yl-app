@@ -21,6 +21,7 @@ import Center from '../components/center.component';
 import Spinner from '../components/spinner.component';
 import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Seperator from '../components/seperator.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -94,7 +95,7 @@ const DemoClassScreen = ({navigation}) => {
       return Animated.timing(animatedValues[i], {
         useNativeDriver: true,
         toValue: 1,
-        duration: 800,
+        duration: 500,
         delay: 800,
       });
     });
@@ -107,7 +108,7 @@ const DemoClassScreen = ({navigation}) => {
       useNativeDriver: true,
       toValue: 1,
       duration: 500,
-      delay: 3500,
+      delay: 2800,
     }).start();
   }, []);
 
@@ -188,21 +189,36 @@ const DemoClassScreen = ({navigation}) => {
           </View>
         </View>
       </View>
+      {/* Footer */}
       <Animated.View
         style={[
           styles.bottomContainer,
           {
             opacity: animatedButtons,
-            flex: isTablet ? 0.8 : 0.5,
-            justifyContent: isTablet ? 'flex-start' : 'center',
+            flex: isTablet ? 0.8 : 0.7,
+            justifyContent: 'flex-start',
             paddingTop: isTablet ? 20 : 0,
           },
         ]}>
+        <TextWrapper
+          fs={14}
+          style={{
+            marginBottom: 4,
+            marginLeft: 4,
+            color: COLORS.black,
+            textAlign: 'center',
+          }}>
+          Already have a booking?
+        </TextWrapper>
         <Pressable
           style={[styles.btnCtas, {backgroundColor: COLORS.pgreen}]}
           onPress={openBottomSheet}>
-          <TextWrapper fs={18} color={COLORS.white} fw="600">
-            Join free booked class
+          <TextWrapper
+            fs={18}
+            color={COLORS.white}
+            fw="600"
+            styles={{textTransform: 'capitalize'}}>
+            Enter phone to continue
           </TextWrapper>
         </Pressable>
         {/* Bottom sheet modal */}
@@ -271,11 +287,15 @@ const DemoClassScreen = ({navigation}) => {
             </View>
           </View>
         </ModalComponent>
-        <Spacer space={6} />
+        <Seperator text="or" />
         <Pressable
           style={[styles.btnCtas, {backgroundColor: COLORS.orange}]}
           onPress={() => navigation.navigate('BookDemoForm')}>
-          <TextWrapper fs={18} color={COLORS.white} fw="600">
+          <TextWrapper
+            fs={18}
+            color={COLORS.white}
+            fw="600"
+            styles={{textTransform: 'capitalize'}}>
             Book a free handwriting class
           </TextWrapper>
         </Pressable>
@@ -301,7 +321,7 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   bottomContainer: {
-    paddingBottom: 16,
+    paddingBottom: 24,
   },
   btnCtas: {
     width: '100%',

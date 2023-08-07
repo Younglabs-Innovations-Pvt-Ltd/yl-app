@@ -3,6 +3,7 @@ import {StyleSheet, View, Pressable, Linking} from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../assets/theme/theme';
 import Icon from '../icon.component';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '../button.component';
 
 import {useSelector} from 'react-redux';
@@ -97,9 +98,9 @@ const PostDemoAction = () => {
     let url = '';
 
     if (Platform.OS === 'android') {
-      url = `whatsapp://send?phone=${phoneNumber}&text=interested`;
+      url = `whatsapp://send?phone=${phoneNumber}&text=Hello, I need more info about the full course`;
     } else if (Platform.OS === 'ios') {
-      url = `whatsapp://wa.me/${phoneNumber}&text=interested`;
+      url = `whatsapp://wa.me/${phoneNumber}&text=Hello, I need more info about the full course`;
     }
 
     const canOpen = await Linking.canOpenURL(url);
@@ -158,7 +159,20 @@ const PostDemoAction = () => {
             handwriting?
           </TextWrapper>
           <View style={styles.ctas}>
-            <Button
+            <Pressable
+              style={styles.ctaButton}
+              disabled={loading}
+              onPress={markNeedMoreInfo}>
+              <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
+              <TextWrapper>Yes, need more info</TextWrapper>
+            </Pressable>
+            <Pressable
+              style={styles.ctaButton}
+              onPress={redirectToWebsiteToBuyCourse}>
+              <MIcon name="web" size={22} color={COLORS.black} />
+              <TextWrapper>Buy on website</TextWrapper>
+            </Pressable>
+            {/* <Button
               loading={disableButton}
               textColor={COLORS.black}
               bg={COLORS.white}
@@ -174,7 +188,7 @@ const PostDemoAction = () => {
               shadow={true}
               onPress={redirectToWebsiteToBuyCourse}>
               Buy on website
-            </Button>
+            </Button> */}
           </View>
         </View>
       )}
@@ -207,7 +221,19 @@ const styles = StyleSheet.create({
   },
   ctas: {
     flex: 1,
+    gap: 10,
+    marginTop: 20,
+  },
+  ctaButton: {
+    height: 48,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 1.85,
+    borderRadius: 4,
+    // paddingLeft: 30,
     gap: 8,
-    marginTop: 16,
+    backgroundColor: COLORS.white,
   },
 });

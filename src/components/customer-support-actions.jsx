@@ -72,6 +72,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
     setComment(val);
     if (errorMessage) setErrorMessage('');
   };
+
   const onSelectCourseId = id => setCourseId(id);
 
   const onCloseForm = () => {

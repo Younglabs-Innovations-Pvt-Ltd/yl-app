@@ -15,7 +15,7 @@ export default Seperator;
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '100%',
+    // width: '100%',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',

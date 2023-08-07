@@ -139,12 +139,12 @@ function App() {
           <Stack.Screen
             name="BookDemoForm"
             component={BookDemoFormScreen}
-            options={{title: 'Book Class'}}
+            options={{title: 'Book Free Handwriting Class'}}
           />
           <Stack.Screen
             name="BookDemoSlots"
             component={BookDemoSlotsScreen}
-            options={{title: 'Book Class'}}
+            options={{title: 'Book Free Handwriting Class'}}
           />
         </Stack.Navigator>
       </NavigationContainer>
