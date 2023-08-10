@@ -255,9 +255,16 @@ const HomeScreen = ({navigation}) => {
       const beforeOneHour = classDate.getTime() - ONE_HOUR;
       const beforeTenMinutes = classDate.getTime() - TEN_MINUTES;
       const afterFiveMinutes = classDate.getTime() + FIVE_MINUTES;
+      // Set for 11am notification
+      const morningNotification = new Date(bookingTime);
+      morningNotification.setHours(11);
 
       const hours = classDate.getHours();
       const body = `Your free class will be started on ${classDate.toDateString()} at ${
+        hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
+      }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
+
+      const morningNotificationBody = `Your free class will be started at ${
         hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
       }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
 
@@ -289,6 +296,16 @@ const HomeScreen = ({navigation}) => {
                 'Your class will be started in 1 hour. Please get ready.',
               );
             }
+
+            if (new Date().getHours() < 11) {
+              await setCountdownTriggerNotification(
+                'countdown',
+                'countdown',
+                morningNotification.getTime(),
+                morningNotificationBody,
+              );
+            }
+
             await setCountdownTriggerNotification(
               'countdown',
               'countdown',
@@ -297,6 +314,7 @@ const HomeScreen = ({navigation}) => {
             );
           }
         } else {
+          console.log('set future notifications');
           // Set notifications for future class
           await setCountdownTriggerNotification(
             'countdown',
@@ -315,6 +333,13 @@ const HomeScreen = ({navigation}) => {
             'countdown',
             afterFiveMinutes,
             'Your class has started, join now.',
+          );
+
+          await setCountdownTriggerNotification(
+            'countdown',
+            'countdown',
+            morningNotification.getTime(),
+            morningNotificationBody,
           );
 
           if (new Date().getHours() < 20) {

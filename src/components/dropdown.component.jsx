@@ -2,7 +2,6 @@ import React from 'react';
 import {StyleSheet, Pressable, ScrollView, View} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import {COLORS} from '../assets/theme/theme';
-import Icon from './icon.component';
 
 export const Dropdown = ({defaultValue, value, ...otherProps}) => {
   return (

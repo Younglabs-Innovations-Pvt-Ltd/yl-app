@@ -160,35 +160,24 @@ const PostDemoAction = () => {
           </TextWrapper>
           <View style={styles.ctas}>
             <Pressable
-              style={styles.ctaButton}
-              disabled={loading}
+              style={({pressed}) => [
+                styles.ctaButton,
+                {opacity: pressed ? 0.8 : 1},
+              ]}
+              disabled={disableButton}
               onPress={markNeedMoreInfo}>
               <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
               <TextWrapper>Yes, need more info</TextWrapper>
             </Pressable>
             <Pressable
-              style={styles.ctaButton}
+              style={({pressed}) => [
+                styles.ctaButton,
+                {opacity: pressed ? 0.8 : 1},
+              ]}
               onPress={redirectToWebsiteToBuyCourse}>
               <MIcon name="web" size={22} color={COLORS.black} />
               <TextWrapper>Buy on website</TextWrapper>
             </Pressable>
-            {/* <Button
-              loading={disableButton}
-              textColor={COLORS.black}
-              bg={COLORS.white}
-              rounded={4}
-              shadow={true}
-              onPress={markNeedMoreInfo}>
-              Yes, need more info
-            </Button>
-            <Button
-              textColor={COLORS.black}
-              bg={COLORS.white}
-              rounded={4}
-              shadow={true}
-              onPress={redirectToWebsiteToBuyCourse}>
-              Buy on website
-            </Button> */}
           </View>
         </View>
       )}

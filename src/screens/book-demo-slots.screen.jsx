@@ -109,7 +109,7 @@ const BookDemoSlots = ({route, navigation}) => {
       timeZone: timezone,
       demoDate: currentSlotTime.demoDate,
       bookingType: 'direct',
-      source: 'Website',
+      source: 'app',
       course: 'Eng_Hw',
       digits: 'na',
       slotId: currentSlotTime.slotId,
