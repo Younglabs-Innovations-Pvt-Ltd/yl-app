@@ -22,9 +22,17 @@ function* fetchDemoDetailsFromPhone({payload}) {
       return;
     }
 
-    const detailsResponse = yield call(fetchBookingDetils, {phone: payload});
+    let callingCode = yield AsyncStorage.getItem('calling_code');
+
+    callingCode = callingCode?.replace('+', '') || '91';
+
+    console.log('calling_code', callingCode);
+
+    const detailsResponse = yield call(fetchBookingDetils, {
+      phone: JSON.parse(callingCode.concat(payload)),
+    });
     const bookingDetails = yield detailsResponse.json();
-    // set phone to local storage
+    // // set phone to local storage
     const phoneFromAsync = yield AsyncStorage.getItem('phone');
 
     if (!phoneFromAsync) {
@@ -33,6 +41,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
 
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
+    console.log(error);
     console.log('Demosaga_detail_phone', error);
   }
 }

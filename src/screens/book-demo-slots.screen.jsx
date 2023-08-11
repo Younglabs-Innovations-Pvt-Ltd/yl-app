@@ -32,7 +32,7 @@ const BookDemoSlots = ({route, navigation}) => {
   const [disableButton, setDisableButton] = useState(false);
 
   const {
-    formFields: {childAge, name, phone},
+    formFields: {childAge, name, phone, childName},
   } = route.params;
 
   const dispatch = useDispatch();
@@ -106,6 +106,7 @@ const BookDemoSlots = ({route, navigation}) => {
       name,
       childAge,
       phone,
+      childName,
       timeZone: timezone,
       demoDate: currentSlotTime.demoDate,
       bookingType: 'direct',
@@ -132,6 +133,7 @@ const BookDemoSlots = ({route, navigation}) => {
 
       if (response.status === 200) {
         await AsyncStorage.setItem('phone', phone);
+        await AsyncStorage.setItem('calling_code', ipData.calling_code);
 
         setPopup(true);
         setDisableButton(false);
@@ -167,7 +169,7 @@ const BookDemoSlots = ({route, navigation}) => {
     <>
       <View style={styles.container}>
         <View style={styles.slotsWrapper}>
-          <TextWrapper fs={20} color="gray" fw="bold">
+          <TextWrapper fs={20} color={COLORS.black} fw="bold">
             Select date:
           </TextWrapper>
           <View style={styles.slotDateList}>
@@ -199,7 +201,7 @@ const BookDemoSlots = ({route, navigation}) => {
         <Spacer />
 
         <View style={styles.slotsWrapper}>
-          <TextWrapper fs={20} color="gray" fw="bold">
+          <TextWrapper fs={20} color={COLORS.black} fw="bold">
             Select time:
           </TextWrapper>
           <View style={styles.slotDateList}>

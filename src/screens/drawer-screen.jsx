@@ -47,6 +47,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       await AsyncStorage.removeItem('phone');
       await AsyncStorage.removeItem('countdown_notification');
       await AsyncStorage.removeItem('bookingid');
+      await AsyncStorage.removeItem('calling_code');
       await cancleNotifications();
 
       dispatch(setToInitialState());

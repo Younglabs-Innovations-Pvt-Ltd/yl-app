@@ -44,8 +44,8 @@ const Button = ({
       disabled={loading}>
       <TextWrapper
         fs={textSize}
-        fw="500"
-        styles={{textAlign: 'center', letterSpacing: 1.5}}
+        fw="700"
+        styles={{textAlign: 'center', letterSpacing: 1.1}}
         color={textColor}>
         {children}
       </TextWrapper>

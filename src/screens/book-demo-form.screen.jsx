@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   StyleSheet,
   View,
@@ -7,7 +7,6 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
-import Button from '../components/button.component';
 import {COLORS} from '../assets/theme/theme';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -34,6 +33,7 @@ const INITIAL_sTATE = {
   name: '',
   childAge: null,
   phone: '',
+  childName: '',
 };
 
 const BookDemoScreen = ({navigation}) => {
@@ -44,11 +44,30 @@ const BookDemoScreen = ({navigation}) => {
     phone: '',
     name: '',
     childAge: '',
+    childName: '',
   });
   const [visible, setVisible] = useState(false);
   const [country, setCountry] = useState({callingCode: ''});
 
   const dispatch = useDispatch();
+
+  const isActive = useMemo(() => {
+    if (
+      !formFields.childAge ||
+      !formFields.name ||
+      !formFields.phone ||
+      !formFields.childName
+    ) {
+      return false;
+    }
+
+    return true;
+  }, [
+    formFields.childAge,
+    formFields.name,
+    formFields.phone,
+    formFields.childName,
+  ]);
 
   const {
     ipData,
@@ -140,9 +159,21 @@ const BookDemoScreen = ({navigation}) => {
           <View>
             <Input
               inputMode="text"
-              placeholder="Enter your name"
+              placeholder="Enter parent name"
               value={formFields.name}
               onChangeText={name => handleChangeValue({name})}
+            />
+            {errorMessage.name && (
+              <TextWrapper fs={14} color={COLORS.pred}>
+                {errorMessage.name}
+              </TextWrapper>
+            )}
+            <Spacer />
+            <Input
+              inputMode="text"
+              placeholder="Enter child name"
+              value={formFields.childName}
+              onChangeText={childName => handleChangeValue({childName})}
             />
             {errorMessage.name && (
               <TextWrapper fs={14} color={COLORS.pred}>
@@ -186,6 +217,7 @@ const BookDemoScreen = ({navigation}) => {
               defaultValue="Select child age"
               value={formFields.childAge}
               onPress={() => setOpen(true)}
+              open={open}
               onLayout={event =>
                 setGutter(
                   event.nativeEvent.layout.y + event.nativeEvent.layout.height,
@@ -201,12 +233,23 @@ const BookDemoScreen = ({navigation}) => {
         </View>
       </ScrollView>
       <View style={styles.footer}>
-        <Button
-          bg={COLORS.pgreen}
-          onPress={handleDemoSlots}
-          textColor={COLORS.white}>
-          Select date and book
-        </Button>
+        <Pressable
+          style={({pressed}) => [
+            styles.btnNext,
+            {
+              opacity: pressed ? 0.8 : 1,
+              backgroundColor: !isActive ? '#eaeaea' : COLORS.pgreen,
+            },
+          ]}
+          disabled={!isActive}
+          onPress={handleDemoSlots}>
+          <TextWrapper
+            color={COLORS.white}
+            fw="700"
+            styles={{letterSpacing: 1.1}}>
+            Next
+          </TextWrapper>
+        </Pressable>
       </View>
       <CountryList
         visible={visible}
@@ -260,5 +303,13 @@ const styles = StyleSheet.create({
     letterSpacing: 1.15,
     borderBottomWidth: 1,
     color: COLORS.black,
+  },
+  btnNext: {
+    width: '100%',
+    height: 48,
+    paddingVertical: 6,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

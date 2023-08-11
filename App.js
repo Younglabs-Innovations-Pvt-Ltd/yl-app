@@ -1,5 +1,3 @@
-import 'react-native-gesture-handler';
-import 'react-native-reanimated';
 import React, {useEffect, useState} from 'react';
 import {Linking, ToastAndroid} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -24,6 +22,7 @@ import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {FONTS} from './src/assets/theme/theme';
 
 const Stack = createStackNavigator();
 
@@ -118,6 +117,11 @@ function App() {
               borderBottomWidth: 1,
               borderBottomColor: '#eaeaea',
             },
+            headerTitleStyle: {
+              fontSize: 18,
+              fontFamily: FONTS.gelasio_semibold,
+              fontWeight: '700',
+            },
             cardStyle: {backgroundColor: '#fff'},
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
             gestureEnabled: true,
@@ -139,7 +143,9 @@ function App() {
           <Stack.Screen
             name="BookDemoForm"
             component={BookDemoFormScreen}
-            options={{title: 'Book Free Handwriting Class'}}
+            options={{
+              title: 'Book Free Handwriting Class',
+            }}
           />
           <Stack.Screen
             name="BookDemoSlots"

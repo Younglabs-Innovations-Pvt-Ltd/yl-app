@@ -6,11 +6,10 @@ import {
   StatusBar,
   Dimensions,
   Animated,
+  TextInput,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
-
-import Input from '../components/input.component';
 
 import {COLORS, FONTS} from '../assets/theme/theme';
 
@@ -22,6 +21,14 @@ import Spinner from '../components/spinner.component';
 import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Seperator from '../components/seperator.component';
+import CountryList from '../components/country-list.component';
+
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  startFetchingIpData,
+  setIpDataLoadingState,
+} from '../store/book-demo/book-demo.reducer';
+import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -33,13 +40,37 @@ const DemoClassScreen = ({navigation}) => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [visible, setVisible] = useState(false);
+  const [country, setCountry] = useState({callingCode: ''});
 
   const isTablet = deviceWidth > 540;
+
+  const dispatch = useDispatch();
+
+  const {
+    ipData,
+    loading: {ipDataLoading},
+  } = useSelector(bookDemoSelector);
 
   useEffect(() => {
     StatusBar.setHidden(true);
     StatusBar.setBarStyle('light-content');
   }, []);
+
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData]);
+
+  useEffect(() => {
+    if (ipData) {
+      setCountry({
+        callingCode: ipData.calling_code,
+        countryCode: {cca2: ipData.country_code2},
+      });
+    }
+  }, [ipData]);
 
   const handleBookingStatus = async () => {
     if (!phone) {
@@ -58,6 +89,7 @@ const DemoClassScreen = ({navigation}) => {
 
       if (response.status === 200) {
         await AsyncStorage.setItem('phone', phone);
+        await AsyncStorage.setItem('calling_code', country.callingCode);
         if (errorMsg) setErrorMsg('');
         navigation.replace('Main');
       }
@@ -66,12 +98,26 @@ const DemoClassScreen = ({navigation}) => {
     }
   };
 
+  const handleSelectCountry = country => {
+    let code = '';
+    if (country.callingCode?.root && country.callingCode?.suffixes.length) {
+      code = country.callingCode.root.concat(country.callingCode.suffixes[0]);
+    }
+    setCountry({
+      callingCode: code,
+      countryCode: {cca2: country.countryCode.cca2},
+    });
+    setVisible(false);
+  };
+
   const closeBottomSheet = () => {
     setShowBottomSheet(false);
     setPhone('');
     if (errorMsg) setErrorMsg('');
   };
   const openBottomSheet = () => setShowBottomSheet(true);
+
+  const onCloseBottomSheet = () => setVisible(false);
 
   // Animation stuff
   const SLOGN_TEXT = 'Helping parents raise capable, skillful & happy children';
@@ -261,12 +307,34 @@ const DemoClassScreen = ({navigation}) => {
                   </Pressable>
                 </View>
                 <View style={{paddingHorizontal: 16}}>
-                  <Input
+                  <View style={styles.row}>
+                    <Pressable
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        paddingHorizontal: 8,
+                        borderBottomWidth: 1,
+                        borderBottomColor: COLORS.black,
+                      }}
+                      onPress={() => setVisible(p => !p)}>
+                      <TextWrapper>{country.callingCode}</TextWrapper>
+                    </Pressable>
+                    <TextInput
+                      placeholder="Enter your phone number"
+                      style={styles.input}
+                      selectionColor={COLORS.black}
+                      value={phone}
+                      onChangeText={e => setPhone(e)}
+                      inputMode="numeric"
+                      placeholderTextColor={'gray'}
+                    />
+                  </View>
+                  {/* <Input
                     placeholder="Enter phone"
                     inputMode="numeric"
                     value={phone}
                     onChangeText={e => setPhone(e)}
-                  />
+                  /> */}
                   {errorMsg && (
                     <TextWrapper fs={14} color={COLORS.pred}>
                       {errorMsg}
@@ -305,6 +373,18 @@ const DemoClassScreen = ({navigation}) => {
           <Spinner />
         </Center>
       </ModalComponent>
+      <CountryList
+        visible={visible}
+        onClose={onCloseBottomSheet}
+        onSelect={handleSelectCountry}
+      />
+      {/* <ModalComponent
+        visible={ipDataLoading}
+        onRequestClose={() => setIpDataLoadingState(false)}>
+        <Center>
+          <Spinner />
+        </Center>
+      </ModalComponent> */}
     </View>
   );
 };
@@ -348,5 +428,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#eee',
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    gap: 8,
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderColor: '#000',
+    fontSize: 18,
+    letterSpacing: 1.15,
+    borderBottomWidth: 1,
+    color: COLORS.black,
   },
 });

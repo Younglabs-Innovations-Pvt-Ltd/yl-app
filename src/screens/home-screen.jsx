@@ -29,7 +29,7 @@ import {COLORS} from '../assets/theme/theme';
 import TextWrapper from '../components/text-wrapper.component';
 import Center from '../components/center.component';
 
-import {MARK_ATTENDENCE_URL} from '@env';
+import {MARK_ATTENDENCE_URL, UPDATE_CHILD_NAME} from '@env';
 
 const INITIAL_TIME = {
   days: 0,
@@ -137,6 +137,7 @@ const HomeScreen = ({navigation}) => {
               body: JSON.stringify({
                 type: 'student',
                 bId: bookingIdFromDemoData,
+                source: 'app',
               }),
             });
 
@@ -223,7 +224,7 @@ const HomeScreen = ({navigation}) => {
     };
   }, [bookingTime, demoPhoneNumber, dispatch]);
 
-  // Do not show join button after 30 minutes of demo ended
+  // Do not show join button after 50 minutes of demo ended
   useEffect(() => {
     if (bookingTime) {
       const afterHalfHourFromDemoDate =
@@ -385,6 +386,20 @@ const HomeScreen = ({navigation}) => {
     }
 
     try {
+      if (bookingDetails) {
+        if (bookingDetails.childName.includes('your child')) {
+          await fetch(UPDATE_CHILD_NAME, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              bId: bookingDetails.bookingId,
+              cN: childName,
+            }),
+          });
+        }
+      }
       const {meetingId, pwd} = zoomData;
       const res = await joinClassOnZoom(JSON.stringify(meetingId), pwd);
       console.log('Join Class', res);
@@ -397,6 +412,8 @@ const HomeScreen = ({navigation}) => {
       console.log('Join class error', error);
     }
   };
+
+  // console.log(bookingDetails);
 
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
@@ -419,7 +436,12 @@ const HomeScreen = ({navigation}) => {
   ) : (
     <View style={{flex: 1}}>
       <View style={styles.header}>
-        <TextWrapper color={COLORS.black}>Younglabs</TextWrapper>
+        <TextWrapper
+          fs={18}
+          color={COLORS.black}
+          styles={{textTransform: 'capitalize'}}>
+          English handwriting
+        </TextWrapper>
         <Pressable onPress={handleShowDrawer}>
           <MIcon name="account-circle" size={28} color={COLORS.black} />
         </Pressable>

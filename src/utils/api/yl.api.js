@@ -20,7 +20,7 @@ export const fetchBookingDetailsFromPhone = async phone => {
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({phone: parseInt(phone)}),
+    body: JSON.stringify({phone: parseInt(phone), source: 'app'}),
   });
 };
 
@@ -30,7 +30,7 @@ export const fetchBookingDetailsFromBookingId = async bookingId => {
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({bId: bookingId}),
+    body: JSON.stringify({bId: bookingId, source: 'app'}),
   });
 };
 

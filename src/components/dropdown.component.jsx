@@ -2,11 +2,17 @@ import React from 'react';
 import {StyleSheet, Pressable, ScrollView, View} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import {COLORS} from '../assets/theme/theme';
+import Icon from './icon.component';
 
-export const Dropdown = ({defaultValue, value, ...otherProps}) => {
+export const Dropdown = ({defaultValue, value, open, ...otherProps}) => {
   return (
     <Pressable style={styles.dropdown} {...otherProps}>
-      <TextWrapper color="gray">{value || defaultValue}</TextWrapper>
+      <TextWrapper color={COLORS.black}>{value || defaultValue}</TextWrapper>
+      <Icon
+        name={!open ? 'chevron-down-outline' : 'chevron-up-outline'}
+        size={20}
+        color={COLORS.black}
+      />
     </Pressable>
   );
 };
@@ -23,7 +29,7 @@ export const DropdownList = ({
       style={[styles.optionList, {paddingTop: gutter + 20}]}
       onPress={onClose}>
       <View style={styles.listWrapper}>
-        <ScrollView bounces={false}>
+        <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
           {data.map(age => (
             <DropdownItem
               key={age}
@@ -51,7 +57,7 @@ const DropdownItem = ({age, onChangeValue, onClose, currentValue}) => {
         styles.item,
         {opacity: e.pressed ? 0.25 : 1},
         {
-          backgroundColor: currentValue === age ? '#3AA6B9' : 'transparent',
+          backgroundColor: currentValue === age ? 'gray' : 'transparent',
         },
       ]}
       onPress={handleChange}>
@@ -70,6 +76,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   listWrapper: {
     width: '100%',

@@ -125,10 +125,10 @@ const PostDemoAction = () => {
             color={COLORS.pgreen}
             fw="600"
             styles={{textAlign: 'center'}}>
-            Congratulations for completing your free class.
+            Congratulations for attending your free class.
           </TextWrapper>
           <View style={styles.ratingWrapper}>
-            <TextWrapper fs={20}>Did you like it?</TextWrapper>
+            <TextWrapper fs={20}>Please rate your class experience</TextWrapper>
             <View style={styles.starsContainer}>
               {Array.from({length: 5}, (_, i) => {
                 return (
