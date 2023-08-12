@@ -78,8 +78,8 @@ android {
         applicationId "com.younglabs"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.01"
 
         Properties properties = new Properties();
         properties.load(project.rootProject.file("local.properties").newDataInputStream())

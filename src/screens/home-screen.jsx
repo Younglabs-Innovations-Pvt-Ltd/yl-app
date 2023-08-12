@@ -261,11 +261,11 @@ const HomeScreen = ({navigation}) => {
       morningNotification.setHours(11);
 
       const hours = classDate.getHours();
-      const body = `Your free class will be started on ${classDate.toDateString()} at ${
+      const body = `Your have a class on ${classDate.toDateString()} at ${
         hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
       }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
 
-      const morningNotificationBody = `Your free class will be started at ${
+      const morningNotificationBody = `Your have a class at ${
         hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
       }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
 
@@ -286,7 +286,7 @@ const HomeScreen = ({navigation}) => {
                 'countdown',
                 'countdown',
                 beforeTenMinutes,
-                'Your class is about to being in 10 minutes.',
+                'Your class is about to start in 10 minutes.',
               );
             }
             if (currentTime < beforeOneHour) {
@@ -294,7 +294,7 @@ const HomeScreen = ({navigation}) => {
                 'countdown',
                 'countdown',
                 beforeOneHour,
-                'Your class will be started in 1 hour. Please get ready.',
+                'Your class starts in 1 hour. Kindly, join on time.',
               );
             }
 
@@ -321,19 +321,19 @@ const HomeScreen = ({navigation}) => {
             'countdown',
             'countdown',
             beforeTenMinutes,
-            'Your class will be started in 10 minutes.',
+            'Your class is about to start in 10 minutes.',
           );
           await setCountdownTriggerNotification(
             'countdown',
             'countdown',
             beforeOneHour,
-            '1 hour left to start class.',
+            'Your class starts in 1 hour. Kindly, join on time.',
           );
           await setCountdownTriggerNotification(
             'countdown',
             'countdown',
             afterFiveMinutes,
-            'Your class has started, join now.',
+            'Hurry! your class has already started, join now.',
           );
 
           await setCountdownTriggerNotification(
@@ -413,8 +413,6 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
-  // console.log(bookingDetails);
-
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
 
@@ -479,7 +477,6 @@ const HomeScreen = ({navigation}) => {
               // Show post action after demo class
               showPostActions && <PostDemoAction />
             }
-
             {bookingTime &&
               new Date(bookingTime).getTime() <= new Date().getTime() &&
               !zoomData && (

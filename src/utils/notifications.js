@@ -26,7 +26,7 @@ export const setCountdownTriggerNotification = async (
 
   await notifee.createTriggerNotification(
     {
-      title: 'Younglabs',
+      title: 'Class Reminder',
       body,
       android: {
         channelId,

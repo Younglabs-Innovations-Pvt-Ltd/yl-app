@@ -208,9 +208,11 @@ const BookDemoScreen = ({navigation}) => {
                 {errorMessage.phone}
               </TextWrapper>
             )}
+
             <TextWrapper fs={14} color="gray">
               Please enter valid whatsapp number to receive further class
               details
+              {/* <Icon name="logo-whatsapp" size={18} color={COLORS.pgreen} /> */}
             </TextWrapper>
             <Spacer />
             <Dropdown
