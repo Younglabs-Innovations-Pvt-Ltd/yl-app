@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   Pressable,
-  StatusBar,
   Dimensions,
   Animated,
   TextInput,
@@ -29,6 +28,7 @@ import {
   setIpDataLoadingState,
 } from '../store/book-demo/book-demo.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import {isValidNumber} from '../utils/isValidNumber';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -53,11 +53,6 @@ const DemoClassScreen = ({navigation}) => {
   } = useSelector(bookDemoSelector);
 
   useEffect(() => {
-    StatusBar.setHidden(true);
-    StatusBar.setBarStyle('light-content');
-  }, []);
-
-  useEffect(() => {
     if (!ipData) {
       dispatch(startFetchingIpData());
     }
@@ -80,10 +75,17 @@ const DemoClassScreen = ({navigation}) => {
 
     try {
       setLoading(true);
+      const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
+      if (!isValidPhone) {
+        setErrorMsg('Please enter a valid number');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetchBookingDetailsFromPhone(phone);
-      setLoading(false);
       if (response.status === 400) {
         setErrorMsg('Details not found. Please check your phone number');
+        setLoading(false);
         return;
       }
 
@@ -93,6 +95,7 @@ const DemoClassScreen = ({navigation}) => {
         if (errorMsg) setErrorMsg('');
         navigation.replace('Main');
       }
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }

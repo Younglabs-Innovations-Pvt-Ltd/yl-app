@@ -1,10 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, FlatList, Pressable, Image} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Pressable,
+  Image,
+  StatusBar,
+} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import {COLORS, FONTS} from '../assets/theme/theme';
 import Spinner from './spinner.component';
 import Modal from './modal.component';
 import Input from './input.component';
+import Icon from './icon.component';
 
 const COUNTRIES_URL = 'https://restcountries.com/v3.1/all';
 
@@ -55,41 +63,55 @@ const CountryList = ({visible, onClose, onSelect}) => {
   }, [search, countryData]);
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.container} onPress={onClose}>
-        <View style={styles.bottomSheet}>
-          <View style={styles.header}>
-            <Input
-              placeholder="Search..."
-              style={styles.search}
-              value={search}
-              onChangeText={e => setSearch(e)}
-              noBorder={true}
-            />
-          </View>
-
-          {loading && <Spinner style={{alignSelf: 'center'}} />}
-
-          <FlatList
-            data={updatedData}
-            keyExtractor={country => country.name.official}
-            renderItem={({item}) => {
-              return (
-                <Pressable
-                  key={item.name.official}
-                  style={({pressed}) => [
-                    styles.listItem,
-                    pressed && {backgroundColor: '#eee'},
-                  ]}
-                  onPress={() => onSelect(item)}>
-                  <Image source={{uri: item.flags.png}} style={styles.flag} />
-                  <TextWrapper>{item.name.common}</TextWrapper>
-                </Pressable>
-              );
+    <Modal
+      visible={visible}
+      animationType="slide"
+      onRequestClose={onClose}
+      transparent={false}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TextWrapper fs={18}>Select country</TextWrapper>
+          <Pressable
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 48,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#eee',
             }}
-          />
+            onPress={onClose}>
+            <Icon name="close-outline" color={COLORS.black} size={24} />
+          </Pressable>
         </View>
-      </Pressable>
+        <Input
+          placeholder="Search..."
+          style={styles.search}
+          value={search}
+          onChangeText={e => setSearch(e)}
+          noBorder={true}
+        />
+        {loading && <Spinner style={{alignSelf: 'center'}} />}
+
+        <FlatList
+          data={updatedData}
+          keyExtractor={country => country.name.official}
+          renderItem={({item}) => {
+            return (
+              <Pressable
+                key={item.name.official}
+                style={({pressed}) => [
+                  styles.listItem,
+                  pressed && {backgroundColor: '#eee'},
+                ]}
+                onPress={() => onSelect(item)}>
+                <Image source={{uri: item.flags.png}} style={styles.flag} />
+                <TextWrapper>{item.name.common}</TextWrapper>
+              </Pressable>
+            );
+          }}
+        />
+      </View>
     </Modal>
   );
 };
@@ -98,10 +120,6 @@ export default CountryList;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: 180,
-  },
-  bottomSheet: {
     flex: 1,
     backgroundColor: COLORS.white,
     paddingHorizontal: 12,
@@ -122,9 +140,10 @@ const styles = StyleSheet.create({
     width: '100%',
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: 6,
-    justifyContent: 'center',
-    borderColor: 'red',
+    // padding: 8,
   },
   btnClose: {
     padding: 4,

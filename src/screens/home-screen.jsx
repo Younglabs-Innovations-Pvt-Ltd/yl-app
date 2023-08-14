@@ -30,6 +30,7 @@ import TextWrapper from '../components/text-wrapper.component';
 import Center from '../components/center.component';
 
 import {MARK_ATTENDENCE_URL, UPDATE_CHILD_NAME} from '@env';
+import Features from '../components/features.component';
 
 const INITIAL_TIME = {
   days: 0,
@@ -66,6 +67,7 @@ const HomeScreen = ({navigation}) => {
   const [isAttended, setIsAttended] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
   const [isAttendenceMarked, setIsAttendenceMarked] = useState(false);
+  const [isChildName, setIsChildName] = useState(false);
 
   const dispatch = useDispatch();
   const {demoData, loading, demoPhoneNumber, bookingDetails, demoBookingId} =
@@ -378,6 +380,19 @@ const HomeScreen = ({navigation}) => {
     }
   }, [bookingTime, isAttended]);
 
+  useEffect(() => {
+    if (demoData && bookingDetails) {
+      const isCN = !bookingDetails.childName
+        .toLowerCase()
+        .includes('your child');
+      if (isCN) {
+        console.log('isCN', isCN);
+        setChildName(bookingDetails.childName);
+      }
+      setIsChildName(demoData.cN);
+    }
+  }, [demoData, bookingDetails]);
+
   // Join Class
   const handleJoinClass = async () => {
     if (!zoomData || !childName) {
@@ -386,22 +401,31 @@ const HomeScreen = ({navigation}) => {
     }
 
     try {
-      if (bookingDetails) {
-        if (bookingDetails.childName.includes('your child')) {
-          await fetch(UPDATE_CHILD_NAME, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              bId: bookingDetails.bookingId,
-              cN: childName,
-            }),
-          });
-        }
+      const notChildName = bookingDetails.childName
+        .toLowerCase()
+        .includes('your child');
+      if (notChildName) {
+        console.log('not child name');
+        const res = await fetch(UPDATE_CHILD_NAME, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            bId: bookingDetails.bookingId,
+            cN: childName,
+          }),
+        });
+
+        console.log(await res.json());
       }
       const {meetingId, pwd} = zoomData;
-      const res = await joinClassOnZoom(JSON.stringify(meetingId), pwd);
+
+      const res = await joinClassOnZoom(
+        JSON.stringify(meetingId),
+        pwd,
+        childName,
+      );
       console.log('Join Class', res);
       // if (res === 'class joined.') {
       //   if (new Date(bookingTime).getTime() <= new Date().getTime()) {
@@ -455,11 +479,20 @@ const HomeScreen = ({navigation}) => {
             {isTimeover
               ? showJoinButton && (
                   <>
-                    <Input
-                      placeholder="Child Name"
-                      value={childName}
-                      onChangeText={e => setChildName(e)}
-                    />
+                    {!isChildName ? (
+                      <Input
+                        placeholder="Child Name"
+                        value={childName}
+                        onChangeText={e => setChildName(e)}
+                      />
+                    ) : (
+                      <TextWrapper
+                        color={COLORS.black}
+                        fs={18}
+                        styles={{textAlign: 'left'}}>
+                        Class is on going, Join now.
+                      </TextWrapper>
+                    )}
                     <Spacer />
                     <Button
                       rounded={4}
@@ -471,12 +504,6 @@ const HomeScreen = ({navigation}) => {
                   </>
                 )
               : null}
-            {
-              // If user attended demo class
-              // Demo has ended
-              // Show post action after demo class
-              showPostActions && <PostDemoAction />
-            }
             {bookingTime &&
               new Date(bookingTime).getTime() <= new Date().getTime() &&
               !zoomData && (
@@ -497,6 +524,16 @@ const HomeScreen = ({navigation}) => {
                   </Button>
                 </View>
               )}
+            {
+              // If user attended demo class
+              // Demo has ended
+              // Show post action after demo class
+              showPostActions ? (
+                <PostDemoAction />
+              ) : (
+                <Features demoData={demoData} />
+              )
+            }
           </View>
         </View>
       </ScrollView>

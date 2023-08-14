@@ -1,57 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
-import TextWrapper from '../text-wrapper.component';
-import CountDown from '../countdown.component';
-import Spacer from '../spacer.component';
-import {COLORS} from '../../assets/theme/theme';
-import {useSelector} from 'react-redux';
-import Button from '../button.component';
-import Input from '../input.component';
+import React, {useState} from 'react';
+import {StyleSheet, Image, View} from 'react-native';
+import TextWrapper from './text-wrapper.component';
+import Spacer from './spacer.component';
+import Input from './input.component';
+import Icon from './icon.component';
+import Button from './button.component';
+import {COLORS} from '../assets/theme/theme';
 
 import {SEND_CLASS_LINK_URL} from '@env';
-import Icon from '../icon.component';
 
-const months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'April',
-  'May',
-  'June',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-const getClassDate = seconds => {
-  const date = new Date(seconds * 1000);
-  const classDate = date.getDate();
-  const year = date.getFullYear();
-  const time = date.getHours();
-  const month = date.getMonth();
-
-  const classTime =
-    time >= 12 ? `${time === 12 ? time : time - 12}:00 PM` : `${time}:00 AM`;
-
-  return `${classDate} ${months[month]} ${year} at ${classTime}`;
-};
-
-const requirement_1 =
-  'Please make sure that your child is ready with a pencil/pen and a notebook (4 Line Notebook or 2 line Notebook for 11+ ages) before the session';
-
-const DemoWaiting = ({timeLeft}) => {
-  const {demoData} = useSelector(state => state.joinDemo);
+const Features = ({demoData}) => {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(demoData?.emailSent || false);
-
-  if (!demoData) return;
-
-  const {demoDate} = demoData;
-  const seconds = demoDate._seconds;
 
   const sendLinkOnEmail = async () => {
     try {
@@ -81,30 +42,8 @@ const DemoWaiting = ({timeLeft}) => {
   };
 
   return (
-    <View style={{paddingVertical: 12}}>
-      <TextWrapper color="gray" fw="600">
-        Your class is on{' '}
-        <TextWrapper color={COLORS.black} fw="bold">
-          {getClassDate(seconds)}
-        </TextWrapper>
-      </TextWrapper>
-      <CountDown timeLeft={timeLeft} />
-      <Spacer space={4} />
-      <TextWrapper
-        color={'gray'}
-        fs={
-          15
-        }>{`Once this timer ends Click on ENTER CLASS button (shown after timer ends)`}</TextWrapper>
-      <View>
-        <Spacer space={6} />
-        <TextWrapper fs={20}>Requirements for class:</TextWrapper>
-        <View style={styles.listStyle}>
-          <View style={styles.listItem}>
-            <TextWrapper fs={18}>{requirement_1}</TextWrapper>
-          </View>
-        </View>
-      </View>
-      {/* <View
+    <>
+      <View
         style={{
           paddingVertical: 20,
           maxWidth: 380,
@@ -124,6 +63,7 @@ const DemoWaiting = ({timeLeft}) => {
               inputMode="email"
               value={email}
               onChangeText={e => setEmail(e)}
+              autoCapitalize="none"
             />
             <Spacer />
           </>
@@ -258,36 +198,14 @@ const DemoWaiting = ({timeLeft}) => {
             </TextWrapper>
           </View>
         </View>
-      </View> */}
-    </View>
+      </View>
+    </>
   );
 };
 
-export default DemoWaiting;
+export default Features;
 
 const styles = StyleSheet.create({
-  listStyle: {
-    width: '100%',
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-  },
-  marker: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.black,
-  },
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: 4,
-    position: 'relative',
-  },
-  header: {
-    alignItems: 'flex-start',
-    paddingVertical: 12,
-  },
   features: {
     paddingVertical: 20,
   },

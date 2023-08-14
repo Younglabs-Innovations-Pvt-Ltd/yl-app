@@ -126,7 +126,7 @@ const BookDemoScreen = ({navigation}) => {
       return;
     }
 
-    const isValidPhone = await isValidNumber(phone, country.countryCode.cca2);
+    const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
     if (!isValidPhone) {
       setErrorMessage({...errorMessage, phone: 'Please enter a valid number'});
       return;
