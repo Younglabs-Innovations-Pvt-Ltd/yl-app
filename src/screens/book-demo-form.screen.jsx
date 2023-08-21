@@ -36,10 +36,16 @@ const INITIAL_sTATE = {
   childName: '',
 };
 
-const BookDemoScreen = ({navigation}) => {
+const BookDemoScreen = ({route, navigation}) => {
+  const {phone} = route.params;
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
-  const [formFields, setFormFields] = useState(INITIAL_sTATE);
+  const [formFields, setFormFields] = useState({
+    name: '',
+    childAge: null,
+    phone: phone || '',
+    childName: '',
+  });
   const [errorMessage, setErrorMessage] = useState({
     phone: '',
     name: '',

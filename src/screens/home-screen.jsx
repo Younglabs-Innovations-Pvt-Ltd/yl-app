@@ -31,6 +31,7 @@ import Center from '../components/center.component';
 
 import {MARK_ATTENDENCE_URL, UPDATE_CHILD_NAME} from '@env';
 import Features from '../components/features.component';
+import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 
 const INITIAL_TIME = {
   days: 0,
@@ -392,6 +393,16 @@ const HomeScreen = ({navigation}) => {
       setIsChildName(demoData.cN);
     }
   }, [demoData, bookingDetails]);
+
+  // show notification timer
+  useEffect(() => {
+    if (bookingTime) {
+      const currentTime = Date.now();
+      if (bookingTime > currentTime) {
+        registerNotificationTimer(bookingTime);
+      }
+    }
+  }, [bookingTime]);
 
   // Join Class
   const handleJoinClass = async () => {

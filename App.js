@@ -14,6 +14,10 @@ import SplashScreen from 'react-native-splash-screen';
 
 // Native mmodules
 import {initZoomSdk} from './src/natiive-modules/zoom-modules';
+import {
+  checkForUpdate,
+  addUpdateStatusListener,
+} from './src/natiive-modules/inapp-update';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
@@ -35,6 +39,24 @@ function App() {
   useEffect(() => {
     SplashScreen.hide();
   }, []);
+
+  // Check for update
+  useEffect(() => {
+    // const update = async () => {
+    //   try {
+    //     const res = await checkForUpdate();
+    //     console.log('app update', res);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
+    // update();
+    // checkForUpdate();
+  }, []);
+
+  // useEffect(() => {
+  //   addUpdateStatusListener(status => console.log(status));
+  // }, []);
 
   // Initialize Zoom
   useEffect(() => {
@@ -62,11 +84,10 @@ function App() {
       if (!url) {
         return;
       }
-
-      const appPackage = 'com.younglabs';
-      if (url.includes('openStore=true')) {
-        Linking.openURL(`market://details?id=${appPackage}`);
-      }
+      // const appPackage = 'com.younglabs';
+      // if (url.includes('openStore=true')) {
+      //   Linking.openURL(`market://details?id=${appPackage}`);
+      // }
 
       const parseUrl = url.split('?')[1];
       const parseBookingId = parseUrl.split('=')[1];
@@ -81,7 +102,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const checkPhone = async () => {
+    const isUserAlreadyLoggedIn = async () => {
       try {
         setLoading(true);
         const phone = await AsyncStorage.getItem('phone');
@@ -100,7 +121,7 @@ function App() {
       }
     };
 
-    checkPhone();
+    isUserAlreadyLoggedIn();
   }, []);
 
   if (loading) return null;

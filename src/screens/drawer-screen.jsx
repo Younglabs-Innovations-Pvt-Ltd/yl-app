@@ -29,6 +29,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {cancleNotifications} from '../utils/notifications';
 
+import Share from 'react-native-share';
+
 const Drawer = createDrawerNavigator();
 
 const WEBSITE_URL = 'https://www.younglabs.in/';
@@ -110,6 +112,20 @@ const CustomDrawerContent = ({navigation, ...props}) => {
 
   const fullName = parentName.slice(0, 1).toUpperCase() + parentName.slice(1);
 
+  const shareApp = async () => {
+    const message =
+      'Book a free english handwriting class for your child conducted by experts.';
+    const url = 'https://play.google.com/store/apps/details?id=com.younglabs';
+    try {
+      await Share.open({
+        title: 'Younglabs',
+        message: `${message} \n Download now: ${url}`,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <DrawerContentScrollView {...props}>
       <View
@@ -147,6 +163,23 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             flex: 0.5,
             justifyContent: 'flex-end',
           }}>
+          <Pressable
+            style={({pressed}) => [
+              styles.btnDrawer,
+              {
+                backgroundColor: pressed ? '#eaeaea' : 'transparent',
+                justifyContent: 'flex-start',
+              },
+            ]}
+            onPress={shareApp}>
+            <Icon name="share-social-outline" size={20} color={COLORS.black} />
+            <TextWrapper
+              color={COLORS.black}
+              fs={16.5}
+              styles={{marginLeft: 8}}>
+              Share with friends
+            </TextWrapper>
+          </Pressable>
           <View style={styles.socialContainer}>
             <TextWrapper>Get in touch</TextWrapper>
             <View style={styles.socialMediaIconsWrapper}>
@@ -169,7 +202,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             }}>
             <Pressable
               style={({pressed}) => [
-                styles.btnLogout,
+                styles.btnDrawer,
                 {backgroundColor: pressed ? '#eaeaea' : 'transparent'},
               ]}
               onPress={handleLogout}>
@@ -216,7 +249,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#eee',
   },
-  btnLogout: {
+  btnDrawer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

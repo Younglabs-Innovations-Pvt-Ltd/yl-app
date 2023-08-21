@@ -26,8 +26,6 @@ function* fetchDemoDetailsFromPhone({payload}) {
 
     callingCode = callingCode?.replace('+', '') || '91';
 
-    console.log('calling_code', callingCode);
-
     const detailsResponse = yield call(fetchBookingDetils, {
       phone: JSON.parse(callingCode.concat(payload)),
     });

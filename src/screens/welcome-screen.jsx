@@ -6,6 +6,7 @@ import {
   Dimensions,
   Animated,
   TextInput,
+  StatusBar,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 import Button from '../components/button.component';
@@ -13,20 +14,15 @@ import Button from '../components/button.component';
 import {COLORS, FONTS} from '../assets/theme/theme';
 
 import TextWrapper from '../components/text-wrapper.component';
-import Icon from '../components/icon.component';
 import ModalComponent from '../components/modal.component';
 import Center from '../components/center.component';
 import Spinner from '../components/spinner.component';
 import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Seperator from '../components/seperator.component';
 import CountryList from '../components/country-list.component';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  startFetchingIpData,
-  setIpDataLoadingState,
-} from '../store/book-demo/book-demo.reducer';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {isValidNumber} from '../utils/isValidNumber';
 
@@ -36,7 +32,6 @@ const IMAGE_HEIGHT = deviceWidth * 0.7;
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
-  const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -47,10 +42,12 @@ const DemoClassScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  const {
-    ipData,
-    loading: {ipDataLoading},
-  } = useSelector(bookDemoSelector);
+  const {ipData} = useSelector(bookDemoSelector);
+
+  useEffect(() => {
+    StatusBar.setBackgroundColor(COLORS.pgreen);
+    StatusBar.setBarStyle('light-content');
+  }, []);
 
   useEffect(() => {
     if (!ipData) {
@@ -83,9 +80,12 @@ const DemoClassScreen = ({navigation}) => {
       }
 
       const response = await fetchBookingDetailsFromPhone(phone);
+      console.log(response.status);
       if (response.status === 400) {
-        setErrorMsg('Details not found. Please check your phone number');
         setLoading(false);
+        // Booking not found
+        navigation.navigate('BookDemoForm', {phone});
+        if (errorMsg) setErrorMsg('');
         return;
       }
 
@@ -112,13 +112,6 @@ const DemoClassScreen = ({navigation}) => {
     });
     setVisible(false);
   };
-
-  const closeBottomSheet = () => {
-    setShowBottomSheet(false);
-    setPhone('');
-    if (errorMsg) setErrorMsg('');
-  };
-  const openBottomSheet = () => setShowBottomSheet(true);
 
   const onCloseBottomSheet = () => setVisible(false);
 
@@ -241,138 +234,61 @@ const DemoClassScreen = ({navigation}) => {
       {/* Footer */}
       <Animated.View
         style={[
-          styles.bottomContainer,
           {
             opacity: animatedButtons,
             flex: isTablet ? 0.8 : 0.7,
-            justifyContent: 'flex-start',
+            justifyContent: 'flex-end',
             paddingTop: isTablet ? 20 : 0,
           },
         ]}>
-        <TextWrapper
-          fs={14}
+        <View
           style={{
-            marginBottom: 4,
-            marginLeft: 4,
-            color: COLORS.black,
-            textAlign: 'center',
+            backgroundColor: '#eee',
+            padding: 16,
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
           }}>
-          Already have a booking?
-        </TextWrapper>
-        <Pressable
-          style={[styles.btnCtas, {backgroundColor: COLORS.pgreen}]}
-          onPress={openBottomSheet}>
-          <TextWrapper
-            fs={18}
-            color={COLORS.white}
-            fw="600"
-            styles={{textTransform: 'capitalize'}}>
-            Enter phone to continue
-          </TextWrapper>
-        </Pressable>
-        {/* Bottom sheet modal */}
-        <ModalComponent
-          animationType="slide"
-          visible={showBottomSheet}
-          onRequestClose={closeBottomSheet}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: 'transparent',
-            }}>
-            <View
+          <View style={styles.row}>
+            <Pressable
               style={{
-                flex: 1,
-                justifyContent: 'flex-end',
-              }}>
-              <View
-                style={{
-                  backgroundColor: COLORS.white,
-                  paddingBottom: 20,
-                  borderTopWidth: 1,
-                  borderTopColor: '#eaeaea',
-                }}>
-                <View
-                  style={{
-                    paddingVertical: 12,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 16,
-                  }}>
-                  <TextWrapper fs={18} fw="600">
-                    Join class
-                  </TextWrapper>
-                  <Pressable
-                    style={styles.btnRoundedClose}
-                    onPress={closeBottomSheet}>
-                    <Icon name="close-outline" size={22} color={COLORS.black} />
-                  </Pressable>
-                </View>
-                <View style={{paddingHorizontal: 16}}>
-                  <View style={styles.row}>
-                    <Pressable
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        paddingHorizontal: 8,
-                        borderBottomWidth: 1,
-                        borderBottomColor: COLORS.black,
-                      }}
-                      onPress={() => setVisible(p => !p)}>
-                      <TextWrapper>{country.callingCode}</TextWrapper>
-                    </Pressable>
-                    <TextInput
-                      placeholder="Enter your phone number"
-                      style={styles.input}
-                      selectionColor={COLORS.black}
-                      value={phone}
-                      onChangeText={e => setPhone(e)}
-                      inputMode="numeric"
-                      placeholderTextColor={'gray'}
-                    />
-                  </View>
-                  {/* <Input
-                    placeholder="Enter phone"
-                    inputMode="numeric"
-                    value={phone}
-                    onChangeText={e => setPhone(e)}
-                  /> */}
-                  {errorMsg && (
-                    <TextWrapper fs={14} color={COLORS.pred}>
-                      {errorMsg}
-                    </TextWrapper>
-                  )}
-                  <Spacer space={12} />
-                  <Button
-                    textSize={18}
-                    bg={COLORS.pgreen}
-                    textColor={COLORS.white}
-                    rounded={4}
-                    onPress={handleBookingStatus}
-                    loading={loading}>
-                    Submit
-                  </Button>
-                </View>
-              </View>
-            </View>
+                display: 'flex',
+                justifyContent: 'center',
+                paddingHorizontal: 8,
+                borderBottomWidth: 1,
+                borderBottomColor: COLORS.black,
+              }}
+              onPress={() => setVisible(p => !p)}>
+              <TextWrapper>{country.callingCode}</TextWrapper>
+            </Pressable>
+            <TextInput
+              placeholder="Enter your phone number"
+              style={styles.input}
+              selectionColor={COLORS.black}
+              value={phone}
+              onChangeText={e => setPhone(e)}
+              inputMode="numeric"
+              placeholderTextColor={'gray'}
+            />
           </View>
-        </ModalComponent>
-        <Seperator text="or" />
-        <Pressable
-          style={[styles.btnCtas, {backgroundColor: COLORS.orange}]}
-          onPress={() => navigation.navigate('BookDemoForm')}>
-          <TextWrapper
-            fs={18}
-            color={COLORS.white}
-            fw="600"
-            styles={{textTransform: 'capitalize'}}>
-            Book a free handwriting class
-          </TextWrapper>
-        </Pressable>
+          {errorMsg && (
+            <TextWrapper fs={14} color={COLORS.pred}>
+              {errorMsg}
+            </TextWrapper>
+          )}
+          <Spacer space={12} />
+          <Button
+            textSize={18}
+            bg={COLORS.pgreen}
+            textColor={COLORS.white}
+            rounded={4}
+            onPress={handleBookingStatus}
+            loading={loading}>
+            Continue
+          </Button>
+        </View>
       </Animated.View>
       <ModalComponent visible={loading}>
-        <Center>
+        <Center bg="rgba(0,0,0,0.25)">
           <Spinner />
         </Center>
       </ModalComponent>
@@ -381,13 +297,6 @@ const DemoClassScreen = ({navigation}) => {
         onClose={onCloseBottomSheet}
         onSelect={handleSelectCountry}
       />
-      {/* <ModalComponent
-        visible={ipDataLoading}
-        onRequestClose={() => setIpDataLoadingState(false)}>
-        <Center>
-          <Spinner />
-        </Center>
-      </ModalComponent> */}
     </View>
   );
 };
@@ -398,13 +307,9 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
   },
   topContainer: {
     flex: 2,
-  },
-  bottomContainer: {
-    paddingBottom: 24,
   },
   btnCtas: {
     width: '100%',
@@ -442,7 +347,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    borderColor: '#000',
+    borderColor: COLORS.black,
     fontSize: 18,
     letterSpacing: 1.15,
     borderBottomWidth: 1,

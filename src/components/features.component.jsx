@@ -8,14 +8,23 @@ import Button from './button.component';
 import {COLORS} from '../assets/theme/theme';
 
 import {SEND_CLASS_LINK_URL} from '@env';
+import Spinner from './spinner.component';
 
 const Features = ({demoData}) => {
+  if (!demoData) return null;
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState('');
+  const [emailLoading, setEmailLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(demoData?.emailSent || false);
+
+  const demoTime = demoData.demoDate._seconds * 1000;
+  const currentTime = Date.now();
+
+  const isDemoOver = currentTime > demoTime;
 
   const sendLinkOnEmail = async () => {
     try {
+      setEmailLoading(true);
       const res = await fetch(SEND_CLASS_LINK_URL, {
         method: 'POST',
         headers: {
@@ -27,9 +36,11 @@ const Features = ({demoData}) => {
       if (res.status === 200) {
         setShow(false);
         setEmailSent(true);
+        setEmailLoading(false);
       }
     } catch (error) {
       console.log('SEND_LINK_ON_EMAIL_ERROR_DEMO_WAITING', error);
+      setEmailLoading(false);
     }
   };
 
@@ -45,57 +56,60 @@ const Features = ({demoData}) => {
     <>
       <View
         style={{
-          paddingVertical: 20,
           maxWidth: 380,
           width: '100%',
           alignItems: 'center',
         }}>
-        {!emailSent && (
-          <TextWrapper color={COLORS.black} fs={18}>
-            Want to join class on other device?
-          </TextWrapper>
-        )}
-        <Spacer space={4} />
-        {show && (
+        {emailLoading ? (
+          <Spinner style={{alignSelf: 'center'}} />
+        ) : !isDemoOver ? (
           <>
-            <Input
-              placeholder="Enter your email"
-              inputMode="email"
-              value={email}
-              onChangeText={e => setEmail(e)}
-              autoCapitalize="none"
-            />
-            <Spacer />
+            {!emailSent ? (
+              <View
+                style={{marginTop: 20, width: '100%', alignItems: 'center'}}>
+                <TextWrapper color={COLORS.black} fs={18}>
+                  Want to join class on other device?
+                </TextWrapper>
+                {show && (
+                  <Input
+                    placeholder="Enter your email"
+                    inputMode="email"
+                    value={email}
+                    onChangeText={e => setEmail(e)}
+                    autoCapitalize="none"
+                  />
+                )}
+                <Spacer />
+                <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
+                  <TextWrapper fs={17} fw="700" color={COLORS.white}>
+                    {'Get class link on email'}
+                  </TextWrapper>
+                </Button>
+              </View>
+            ) : (
+              <View
+                style={{
+                  width: '100%',
+                  height: 48,
+                  paddingVertical: 6,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: COLORS.pgreen,
+                  borderRadius: 4,
+                }}>
+                <TextWrapper
+                  fs={16}
+                  fw="700"
+                  color={COLORS.white}
+                  styles={{marginRight: 4}}>
+                  Class link shared on your email
+                </TextWrapper>
+                <Icon name="mail-outline" size={24} color={COLORS.white} />
+              </View>
+            )}
           </>
-        )}
-        {!emailSent ? (
-          <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
-            <TextWrapper fs={17} fw="700" color={COLORS.white}>
-              {'Get class link on email'}
-            </TextWrapper>
-          </Button>
-        ) : (
-          <View
-            style={{
-              width: '100%',
-              height: 48,
-              paddingVertical: 6,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: COLORS.pgreen,
-              borderRadius: 4,
-            }}>
-            <TextWrapper
-              fs={16}
-              fw="700"
-              color={COLORS.white}
-              styles={{marginRight: 4}}>
-              Class link shared on your email
-            </TextWrapper>
-            <Icon name="mail-outline" size={24} color={COLORS.white} />
-          </View>
-        )}
+        ) : null}
       </View>
       <View style={[styles.features]}>
         <TextWrapper fs={28} styles={{textAlign: 'center'}}>

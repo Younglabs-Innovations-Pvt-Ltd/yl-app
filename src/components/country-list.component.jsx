@@ -73,9 +73,9 @@ const CountryList = ({visible, onClose, onSelect}) => {
           <TextWrapper fs={18}>Select country</TextWrapper>
           <Pressable
             style={{
-              width: 48,
-              height: 48,
-              borderRadius: 48,
+              width: 36,
+              height: 36,
+              borderRadius: 36,
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: '#eee',
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 6,
-    // padding: 8,
+    paddingVertical: 8,
   },
   btnClose: {
     padding: 4,

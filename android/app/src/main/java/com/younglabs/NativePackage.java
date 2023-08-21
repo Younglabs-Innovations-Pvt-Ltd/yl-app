@@ -11,18 +11,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ZoomPackage implements ReactPackage {
+public class NativePackage implements ReactPackage {
     @NonNull
     @Override
-    public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
+    public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactApplicationContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new ZoomManager(reactContext));
+        modules.add(new NotificationModule(reactApplicationContext));
+        modules.add(new ZoomManager(reactApplicationContext));
+        modules.add(new InAppUpdateModule(reactApplicationContext));
         return modules;
     }
 
     @NonNull
     @Override
-    public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
+    public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactApplicationContext) {
         return Collections.emptyList();
     }
 }
