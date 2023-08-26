@@ -116,7 +116,6 @@ const BookDemoSlots = ({route, navigation}) => {
       slotId: currentSlotTime.slotId,
       country: ipData.country_name.toUpperCase(),
       countryCode: ipData.calling_code,
-      websiteSrc: 'website',
     };
 
     try {

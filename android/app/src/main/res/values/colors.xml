@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Define your custom colors here -->
+    <color name="timerText">#3CCF4E</color>
+</resources>

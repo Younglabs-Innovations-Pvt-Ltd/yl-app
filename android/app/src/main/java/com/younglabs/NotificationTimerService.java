@@ -35,7 +35,7 @@ public class NotificationTimerService extends Service {
         super.onCreate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Service";
-            int importance = android.app.NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
@@ -66,6 +66,21 @@ public class NotificationTimerService extends Service {
             public void onFinish() {
                 Log.d(TAG, "Countdown finished");
                 stopSelf(); // Stop the service when the countdown finishes
+                Intent activityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, activityIntent, PendingIntent.FLAG_IMMUTABLE);
+
+                notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_small_icon)
+                        .setContentTitle("Class reminder")
+                        .setContentText("You class has started. join now")
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true);
+
+                notificationManager = NotificationManagerCompat.from(getApplicationContext());
+
+                notificationManager.notify(1002, notification.build());
             }
         };
 
@@ -96,7 +111,7 @@ public class NotificationTimerService extends Service {
         notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_small_icon)
                 .setContentTitle("Class timer")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
@@ -117,22 +132,6 @@ public class NotificationTimerService extends Service {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-
-        Intent activityIntent = new Intent(getApplicationContext(), MainActivity.class);
-        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, activityIntent, PendingIntent.FLAG_IMMUTABLE);
-
-        notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_small_icon)
-                .setContentTitle("Timer stopped")
-                .setContentText("You class has started.")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        notificationManager = NotificationManagerCompat.from(getApplicationContext());
-
-        notificationManager.notify(1002, notification.build());
     }
 
     @Nullable

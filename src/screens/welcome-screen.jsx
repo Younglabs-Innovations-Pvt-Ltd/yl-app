@@ -80,11 +80,11 @@ const DemoClassScreen = ({navigation}) => {
       }
 
       const response = await fetchBookingDetailsFromPhone(phone);
-      console.log(response.status);
+
       if (response.status === 400) {
         setLoading(false);
         // Booking not found
-        navigation.navigate('BookDemoForm', {phone});
+        navigation.navigate('CourseDetails', {phone});
         if (errorMsg) setErrorMsg('');
         return;
       }
@@ -97,7 +97,7 @@ const DemoClassScreen = ({navigation}) => {
       }
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR', error);
     }
   };
 
@@ -236,17 +236,19 @@ const DemoClassScreen = ({navigation}) => {
         style={[
           {
             opacity: animatedButtons,
-            flex: isTablet ? 0.8 : 0.7,
-            justifyContent: 'flex-end',
-            paddingTop: isTablet ? 20 : 0,
+            flex: 1,
+            justifyContent: 'flex-start',
           },
         ]}>
         <View
           style={{
-            backgroundColor: '#eee',
+            backgroundColor: COLORS.white,
             padding: 16,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            height: '100%',
+            justifyContent: 'center',
+            elevation: 8,
           }}>
           <View style={styles.row}>
             <Pressable
@@ -254,14 +256,12 @@ const DemoClassScreen = ({navigation}) => {
                 display: 'flex',
                 justifyContent: 'center',
                 paddingHorizontal: 8,
-                borderBottomWidth: 1,
-                borderBottomColor: COLORS.black,
               }}
               onPress={() => setVisible(p => !p)}>
               <TextWrapper>{country.callingCode}</TextWrapper>
             </Pressable>
             <TextInput
-              placeholder="Enter your phone number"
+              placeholder="Enter phone number"
               style={styles.input}
               selectionColor={COLORS.black}
               value={phone}
@@ -276,7 +276,7 @@ const DemoClassScreen = ({navigation}) => {
             </TextWrapper>
           )}
           <Spacer space={12} />
-          <Button
+          {/* <Button
             textSize={18}
             bg={COLORS.pgreen}
             textColor={COLORS.white}
@@ -284,7 +284,18 @@ const DemoClassScreen = ({navigation}) => {
             onPress={handleBookingStatus}
             loading={loading}>
             Continue
-          </Button>
+          </Button> */}
+          <Pressable
+            style={({pressed}) => [
+              styles.btnContinue,
+              {opacity: pressed ? 0.8 : 1},
+            ]}
+            disabled={loading}
+            onPress={handleBookingStatus}>
+            <TextWrapper fs={18} fw="800" color={COLORS.white}>
+              Continue
+            </TextWrapper>
+          </Pressable>
         </View>
       </Animated.View>
       <ModalComponent visible={loading}>
@@ -306,7 +317,7 @@ export default DemoClassScreen;
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
   },
   topContainer: {
     flex: 2,
@@ -341,16 +352,23 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    gap: 8,
+    backgroundColor: '#eee',
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 50,
   },
   input: {
     flex: 1,
-    paddingHorizontal: 12,
     paddingVertical: 10,
-    borderColor: COLORS.black,
     fontSize: 18,
     letterSpacing: 1.15,
-    borderBottomWidth: 1,
     color: COLORS.black,
+  },
+  btnContinue: {
+    height: 54,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.pgreen,
+    borderRadius: 54,
   },
 });

@@ -18,6 +18,8 @@ import {
   checkForUpdate,
   addUpdateStatusListener,
 } from './src/natiive-modules/inapp-update';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {FONTS} from './src/assets/theme/theme';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
@@ -25,8 +27,7 @@ import OnBoardingScreen from './src/screens/on-boarding-screen';
 import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {FONTS} from './src/assets/theme/theme';
+import CourseDetails from './src/screens/course-details.screen';
 
 const Stack = createStackNavigator();
 
@@ -42,16 +43,16 @@ function App() {
 
   // Check for update
   useEffect(() => {
-    // const update = async () => {
-    //   try {
-    //     const res = await checkForUpdate();
-    //     console.log('app update', res);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // };
-    // update();
-    // checkForUpdate();
+    const update = async () => {
+      try {
+        const res = await checkForUpdate();
+        console.log('app update', res);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    update();
+    checkForUpdate();
   }, []);
 
   // useEffect(() => {
@@ -145,8 +146,6 @@ function App() {
             },
             cardStyle: {backgroundColor: '#fff'},
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-            gestureEnabled: true,
-            gestureDirection: 'horizontal',
           }}
           initialRouteName={isPhone || bookingId ? 'Main' : 'Welcome'}>
           <Stack.Screen
@@ -172,6 +171,14 @@ function App() {
             name="BookDemoSlots"
             component={BookDemoSlotsScreen}
             options={{title: 'Book Free Handwriting Class'}}
+          />
+          <Stack.Screen
+            name="CourseDetails"
+            component={CourseDetails}
+            options={{
+              // headerStyle: {elevation: 0},
+              headerTitle: 'Course Detail',
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>

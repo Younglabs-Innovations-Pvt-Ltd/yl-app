@@ -268,7 +268,7 @@ const HomeScreen = ({navigation}) => {
         hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
       }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
 
-      const morningNotificationBody = `Your have a class at ${
+      const morningNotificationBody = `You have a class at ${
         hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
       }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
 
@@ -282,7 +282,7 @@ const HomeScreen = ({navigation}) => {
 
         // Check for today
         if (new Date().getDate() === classDate.getDate()) {
-          console.log('all notification for today');
+          console.log('all notifications for today');
           if (currentTime < classDate) {
             if (currentTime < beforeTenMinutes) {
               await setCountdownTriggerNotification(

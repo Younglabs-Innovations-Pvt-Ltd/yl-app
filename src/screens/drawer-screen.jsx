@@ -26,6 +26,7 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {COLORS} from '../assets/theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
 
 import {cancleNotifications} from '../utils/notifications';
 
@@ -51,6 +52,8 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       await AsyncStorage.removeItem('bookingid');
       await AsyncStorage.removeItem('calling_code');
       await cancleNotifications();
+
+      removeRegisterNotificationTimer();
 
       dispatch(setToInitialState());
       const resetAction = CommonActions.reset({

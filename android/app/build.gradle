@@ -125,6 +125,7 @@ android {
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
+    implementation 'com.azure.android:azure-communication-ui-calling:+'
     implementation("com.facebook.react:react-android")
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation project(':react-native-splash-screen')

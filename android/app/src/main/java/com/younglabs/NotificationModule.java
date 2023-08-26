@@ -45,6 +45,14 @@ public class NotificationModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void stopForegroundService() {
+        if (foregroundServiceRunning()) {
+            Intent serviceIntent = new Intent(this.reactContext, NotificationTimerService.class);
+            this.reactContext.stopService(serviceIntent);
+        }
+    }
+
     public boolean foregroundServiceRunning() {
         ActivityManager activityManager = (ActivityManager) this.reactContext.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service: activityManager.getRunningServices(Integer.MAX_VALUE)) {
