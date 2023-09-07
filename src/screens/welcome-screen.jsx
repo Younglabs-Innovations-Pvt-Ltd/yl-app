@@ -26,8 +26,6 @@ import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {isValidNumber} from '../utils/isValidNumber';
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 
-import auth from '@react-native-firebase/auth';
-
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
 const IMAGE_HEIGHT = deviceWidth * 0.7;
@@ -73,40 +71,8 @@ const DemoClassScreen = ({navigation}) => {
     }
   };
 
-  async function verifyPhoneNumber(phoneNumber) {
-    const confirm = await auth().verifyPhoneNumber(
-      `${country.callingCode}${phoneNumber}`,
-    );
-    console.log(
-      '-------------------------------------------------------------------',
-    );
-    console.log(confirm);
-    if (confirm) {
-      confirmCode(confirm);
-    }
-  }
-
-  // Handle confirm code button press
-  async function confirmCode(confirm) {
-    try {
-      const credential = auth.PhoneAuthProvider.credential(
-        confirm.verificationId,
-        code,
-      );
-      let userData = await auth().currentUser.linkWithCredential(credential);
-      console.log(userData.user);
-    } catch (error) {
-      if (error.code == 'auth/invalid-verification-code') {
-        console.log('Invalid code.');
-      } else {
-        console.log('Account linking error');
-      }
-    }
-  }
-
   const handleBookingStatus = async () => {
     if (!phone) {
-      45;
       setErrorMsg('Enter phone number');
       return;
     }

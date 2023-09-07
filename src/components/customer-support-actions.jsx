@@ -99,7 +99,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
         phone: bookingDetails.phone,
         comment: otherOption ? otherOption : comment,
         courseId,
-        source: 'HomePage',
+        source: 'app',
       };
 
       setInquiryLoading(true);

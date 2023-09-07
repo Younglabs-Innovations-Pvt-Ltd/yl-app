@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Linking, ToastAndroid} from 'react-native';
+import {Linking} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -7,10 +7,10 @@ import {
 } from '@react-navigation/stack';
 
 import {Provider} from 'react-redux';
-
 import {store} from './src/store/store';
 
 import SplashScreen from 'react-native-splash-screen';
+import {SENTRY_DSN} from '@env';
 
 // Native mmodules
 import {checkForUpdate} from './src/natiive-modules/inapp-update';
@@ -25,6 +25,12 @@ import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
 import CourseDetails from './src/screens/course-details.screen';
 // import {getCurrentAppVersion} from './src/natiive-modules/app-version';
+
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+});
 
 const Stack = createStackNavigator();
 
@@ -168,4 +174,4 @@ function App() {
   );
 }
 
-export default App;
+export default Sentry.wrap(App);
