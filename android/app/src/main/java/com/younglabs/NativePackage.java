@@ -17,8 +17,9 @@ public class NativePackage implements ReactPackage {
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactApplicationContext) {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new NotificationModule(reactApplicationContext));
-        modules.add(new ZoomManager(reactApplicationContext));
         modules.add(new InAppUpdateModule(reactApplicationContext));
+        modules.add(new TeamModule(reactApplicationContext));
+        modules.add(new AppVersionModule(reactApplicationContext));
         return modules;
     }
 

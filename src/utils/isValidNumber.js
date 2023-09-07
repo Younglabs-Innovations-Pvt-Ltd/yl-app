@@ -11,3 +11,5 @@ export const isValidNumber = (phone, countryCode) => {
     return false;
   }
 };
+
+export const checkPhoneLength = countryCode => {};

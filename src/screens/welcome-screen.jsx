@@ -9,7 +9,6 @@ import {
   StatusBar,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
-import Button from '../components/button.component';
 
 import {COLORS, FONTS} from '../assets/theme/theme';
 
@@ -25,6 +24,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {isValidNumber} from '../utils/isValidNumber';
+import {phoneNumberLength} from '../utils/phoneNumbersLength';
+
+import auth from '@react-native-firebase/auth';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -64,8 +66,47 @@ const DemoClassScreen = ({navigation}) => {
     }
   }, [ipData]);
 
+  const handlePhone = e => {
+    const phoneRegex = /^[0-9]*$/;
+    if (phoneRegex.test(e)) {
+      setPhone(e);
+    }
+  };
+
+  async function verifyPhoneNumber(phoneNumber) {
+    const confirm = await auth().verifyPhoneNumber(
+      `${country.callingCode}${phoneNumber}`,
+    );
+    console.log(
+      '-------------------------------------------------------------------',
+    );
+    console.log(confirm);
+    if (confirm) {
+      confirmCode(confirm);
+    }
+  }
+
+  // Handle confirm code button press
+  async function confirmCode(confirm) {
+    try {
+      const credential = auth.PhoneAuthProvider.credential(
+        confirm.verificationId,
+        code,
+      );
+      let userData = await auth().currentUser.linkWithCredential(credential);
+      console.log(userData.user);
+    } catch (error) {
+      if (error.code == 'auth/invalid-verification-code') {
+        console.log('Invalid code.');
+      } else {
+        console.log('Account linking error');
+      }
+    }
+  }
+
   const handleBookingStatus = async () => {
     if (!phone) {
+      45;
       setErrorMsg('Enter phone number');
       return;
     }
@@ -84,7 +125,7 @@ const DemoClassScreen = ({navigation}) => {
       if (response.status === 400) {
         setLoading(false);
         // Booking not found
-        navigation.navigate('CourseDetails', {phone});
+        navigation.navigate('BookDemoForm', {phone});
         if (errorMsg) setErrorMsg('');
         return;
       }
@@ -237,6 +278,7 @@ const DemoClassScreen = ({navigation}) => {
           {
             opacity: animatedButtons,
             flex: 1,
+            maxHeight: 180,
             justifyContent: 'flex-start',
           },
         ]}>
@@ -265,9 +307,13 @@ const DemoClassScreen = ({navigation}) => {
               style={styles.input}
               selectionColor={COLORS.black}
               value={phone}
-              onChangeText={e => setPhone(e)}
+              onChangeText={handlePhone}
               inputMode="numeric"
               placeholderTextColor={'gray'}
+              maxLength={
+                country?.countryCode &&
+                (phoneNumberLength[country.countryCode.cca2] || 15)
+              }
             />
           </View>
           {errorMsg && (
@@ -276,15 +322,6 @@ const DemoClassScreen = ({navigation}) => {
             </TextWrapper>
           )}
           <Spacer space={12} />
-          {/* <Button
-            textSize={18}
-            bg={COLORS.pgreen}
-            textColor={COLORS.white}
-            rounded={4}
-            onPress={handleBookingStatus}
-            loading={loading}>
-            Continue
-          </Button> */}
           <Pressable
             style={({pressed}) => [
               styles.btnContinue,

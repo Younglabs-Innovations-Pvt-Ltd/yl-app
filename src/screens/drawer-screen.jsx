@@ -51,6 +51,8 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       await AsyncStorage.removeItem('countdown_notification');
       await AsyncStorage.removeItem('bookingid');
       await AsyncStorage.removeItem('calling_code');
+      await AsyncStorage.removeItem('acsTokenExpire');
+      await AsyncStorage.removeItem('acsToken');
       await cancleNotifications();
 
       removeRegisterNotificationTimer();

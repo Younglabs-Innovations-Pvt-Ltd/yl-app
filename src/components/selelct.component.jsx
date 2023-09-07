@@ -2,6 +2,7 @@ import React, {useState, useRef, useContext} from 'react';
 import {Pressable, StyleSheet, View, Modal, ScrollView} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import {COLORS} from '../assets/theme/theme';
+import Icon from './icon.component';
 
 const SelectContext = React.createContext();
 const useSelectContext = () => useContext(SelectContext);
@@ -39,6 +40,11 @@ export const Select = ({children, defaultValue, onSelect}) => {
         style={styles.select}
         onLayout={onLayout}>
         <TextWrapper>{defaultValue}</TextWrapper>
+        <Icon
+          name={!visible ? 'chevron-down-outline' : 'chevron-up-outline'}
+          size={20}
+          color={COLORS.black}
+        />
       </Pressable>
 
       <Modal visible={visible} transparent={true} animationType="none">
@@ -97,8 +103,10 @@ export const SelectItem = ({children, value, onSelect, currentValue}) => {
 const styles = StyleSheet.create({
   select: {
     height: 48,
-    paddingLeft: 12,
-    justifyContent: 'center',
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 4,

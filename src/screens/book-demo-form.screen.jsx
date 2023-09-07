@@ -13,7 +13,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import CountryList from '../components/country-list.component';
 import {isValidNumber} from '../utils/isValidNumber';
 import Spinner from '../components/spinner.component';
-import {DropdownList, Dropdown} from '../components/dropdown.component';
 import Input from '../components/input.component';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
@@ -26,54 +25,36 @@ import {
 } from '../store/book-demo/book-demo.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import Center from '../components/center.component';
+import {Dropdown, DropdownList} from '../components/dropdown.component';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 const INITIAL_sTATE = {
-  name: '',
-  childAge: null,
-  phone: '',
+  parentName: '',
   childName: '',
 };
 
 const BookDemoScreen = ({route, navigation}) => {
-  const {phone} = route.params;
+  const {phone: phoneNumber} = route.params;
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
-  const [formFields, setFormFields] = useState({
-    name: '',
-    childAge: null,
-    phone: phone || '',
-    childName: '',
-  });
-  const [errorMessage, setErrorMessage] = useState({
-    phone: '',
-    name: '',
-    childAge: '',
-    childName: '',
-  });
+  const [phone, setPhone] = useState(phoneNumber);
+  const [childAge, setChildAge] = useState(null);
+  const [fileds, setFields] = useState(INITIAL_sTATE);
+
+  const [errorMessage, setErrorMessage] = useState('');
   const [visible, setVisible] = useState(false);
   const [country, setCountry] = useState({callingCode: ''});
 
   const dispatch = useDispatch();
 
   const isActive = useMemo(() => {
-    if (
-      !formFields.childAge ||
-      !formFields.name ||
-      !formFields.phone ||
-      !formFields.childName
-    ) {
+    if (!fileds.parentName || !fileds.childName || !phone || !childAge) {
       return false;
     }
 
     return true;
-  }, [
-    formFields.childAge,
-    formFields.name,
-    formFields.phone,
-    formFields.childName,
-  ]);
+  }, [fileds.childName, fileds.parentName, phone, childAge]);
 
   const {
     ipData,
@@ -102,41 +83,31 @@ const BookDemoScreen = ({route, navigation}) => {
     }
   }, [ipData]);
 
-  const handleChangeValue = item => {
-    setFormFields(preValue => ({...preValue, ...item}));
+  const handleChangeValue = e => {
+    const {name, value} = e;
+    const regex = /^[A-Za-z\s]*$/;
+    if (regex.test(value)) {
+      setFields(preVal => ({...preVal, [name]: value}));
+    }
+  };
+
+  const handlePhone = e => {
+    const phoneRegex = /^[0-9]*$/;
+    if (phoneRegex.test(e)) {
+      setPhone(e);
+    }
   };
 
   const handleOnClose = () => setOpen(false);
 
   const handleDemoSlots = async () => {
-    const {childAge, name, phone} = formFields;
-
-    if (!childAge || !name || !phone) {
-      setErrorMessage({
-        ...errorMessage,
-        name: 'Fields are required.',
-        childAge: 'Fields are required.',
-        phone: 'Fields are required.',
-      });
-      return;
-    }
-
-    if (!childAge) {
-      setErrorMessage({...errorMessage, childAge: 'Select child age'});
-      return;
-    } else if (!name) {
-      setErrorMessage({...errorMessage, name: 'Please enter your name'});
-      return;
-    } else if (!phone) {
-      setErrorMessage({...errorMessage, phone: 'Please enter phone number'});
-      return;
-    }
-
     const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
     if (!isValidPhone) {
       setErrorMessage({...errorMessage, phone: 'Please enter a valid number'});
       return;
     }
+
+    const formFields = {...fileds, phone, childAge};
 
     navigation.navigate('BookDemoSlots', {formFields, country});
   };
@@ -160,32 +131,27 @@ const BookDemoScreen = ({route, navigation}) => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         bounces={false}
-        style={{height: '100%'}}>
+        style={{height: '100%'}}
+        contentContainerStyle={{paddingBottom: 40}}>
         <View style={styles.container}>
           <View>
             <Input
               inputMode="text"
               placeholder="Enter parent name"
-              value={formFields.name}
-              onChangeText={name => handleChangeValue({name})}
+              value={fileds.parentName}
+              onChangeText={e =>
+                handleChangeValue({name: 'parentName', value: e})
+              }
             />
-            {errorMessage.name && (
-              <TextWrapper fs={14} color={COLORS.pred}>
-                {errorMessage.name}
-              </TextWrapper>
-            )}
             <Spacer />
             <Input
               inputMode="text"
               placeholder="Enter child name"
-              value={formFields.childName}
-              onChangeText={childName => handleChangeValue({childName})}
+              value={fileds.childName}
+              onChangeText={e =>
+                handleChangeValue({name: 'childName', value: e})
+              }
             />
-            {errorMessage.name && (
-              <TextWrapper fs={14} color={COLORS.pred}>
-                {errorMessage.name}
-              </TextWrapper>
-            )}
             <Spacer />
             <View style={styles.row}>
               <Pressable
@@ -203,17 +169,12 @@ const BookDemoScreen = ({route, navigation}) => {
                 placeholder="Enter your phone number"
                 style={styles.input}
                 selectionColor={COLORS.black}
-                value={formFields.phone}
-                onChangeText={phone => handleChangeValue({phone})}
+                value={phone}
+                onChangeText={handlePhone}
                 inputMode="numeric"
                 placeholderTextColor={'gray'}
               />
             </View>
-            {errorMessage.phone && (
-              <TextWrapper fs={14} color={COLORS.pred}>
-                {errorMessage.phone}
-              </TextWrapper>
-            )}
 
             <TextWrapper fs={14} color="gray">
               Please enter valid whatsapp number to receive further class
@@ -223,7 +184,7 @@ const BookDemoScreen = ({route, navigation}) => {
             <Spacer />
             <Dropdown
               defaultValue="Select child age"
-              value={formFields.childAge}
+              value={childAge}
               onPress={() => setOpen(true)}
               open={open}
               onLayout={event =>
@@ -232,9 +193,9 @@ const BookDemoScreen = ({route, navigation}) => {
                 )
               }
             />
-            {errorMessage.childAge && (
+            {errorMessage && (
               <TextWrapper fs={14} color={COLORS.pred}>
-                {errorMessage.childAge}
+                {errorMessage}
               </TextWrapper>
             )}
           </View>
@@ -268,9 +229,9 @@ const BookDemoScreen = ({route, navigation}) => {
         <DropdownList
           data={ageList}
           gutter={gutter}
-          currentValue={formFields.childAge}
+          currentValue={childAge}
           onClose={handleOnClose}
-          onChange={handleChangeValue}
+          onChange={({childAge}) => setChildAge(childAge)}
         />
       )}
       <Modal

@@ -13,11 +13,7 @@ import {store} from './src/store/store';
 import SplashScreen from 'react-native-splash-screen';
 
 // Native mmodules
-import {initZoomSdk} from './src/natiive-modules/zoom-modules';
-import {
-  checkForUpdate,
-  addUpdateStatusListener,
-} from './src/natiive-modules/inapp-update';
+import {checkForUpdate} from './src/natiive-modules/inapp-update';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FONTS} from './src/assets/theme/theme';
 
@@ -28,6 +24,7 @@ import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
 import CourseDetails from './src/screens/course-details.screen';
+// import {getCurrentAppVersion} from './src/natiive-modules/app-version';
 
 const Stack = createStackNavigator();
 
@@ -40,6 +37,15 @@ function App() {
   useEffect(() => {
     SplashScreen.hide();
   }, []);
+
+  // Get current app version
+  // useEffect(() => {
+  //   getCurrentAppVersion(data => {
+  //     console.log(data);
+
+  //     const {versionCode} = data;
+  //   });
+  // }, []);
 
   // Check for update
   useEffect(() => {
@@ -59,36 +65,12 @@ function App() {
   //   addUpdateStatusListener(status => console.log(status));
   // }, []);
 
-  // Initialize Zoom
-  useEffect(() => {
-    const initializeZoom = async () => {
-      try {
-        const res = await initZoomSdk();
-        if (process.env.NODE_ENV !== 'production') {
-          ToastAndroid.showWithGravity(
-            res,
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM,
-          );
-        }
-      } catch (error) {
-        console.log('Zoom initialize error', error);
-      }
-    };
-
-    initializeZoom();
-  }, []);
-
   // Handle redirect url (Deep Link)
   useEffect(() => {
     const handleRedirectUrl = url => {
       if (!url) {
         return;
       }
-      // const appPackage = 'com.younglabs';
-      // if (url.includes('openStore=true')) {
-      //   Linking.openURL(`market://details?id=${appPackage}`);
-      // }
 
       const parseUrl = url.split('?')[1];
       const parseBookingId = parseUrl.split('=')[1];

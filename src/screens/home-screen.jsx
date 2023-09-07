@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View, Pressable, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  ScrollView,
+  ToastAndroid,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
@@ -8,11 +14,6 @@ import {
   startFetchBookingDetailsFromId,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import {
-  joinClassOnZoom,
-  classStatusChangeListener,
-} from '../natiive-modules/zoom-modules';
-import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
 import {setCountdownTriggerNotification} from '../utils/notifications';
 
 import Input from '../components/input.component';
@@ -32,6 +33,7 @@ import Center from '../components/center.component';
 import {MARK_ATTENDENCE_URL, UPDATE_CHILD_NAME} from '@env';
 import Features from '../components/features.component';
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
+import {startCallComposite} from '../natiive-modules/team-module';
 
 const INITIAL_TIME = {
   days: 0,
@@ -39,6 +41,9 @@ const INITIAL_TIME = {
   minutes: 0,
   seconds: 0,
 };
+
+const ACS_TOKEN_URL =
+  'https://younglabsapis-33heck6yza-el.a.run.app/admin/msteams/getacstoken';
 
 const getTimeRemaining = bookingDate => {
   const countDownTime = new Date(bookingDate).getTime();
@@ -63,35 +68,16 @@ const HomeScreen = ({navigation}) => {
   const [bookingTime, setBookingTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
-  const [zoomData, setZoomData] = useState(null);
   const [showJoinButton, setShowJoinButton] = useState(false);
   const [isAttended, setIsAttended] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
   const [isAttendenceMarked, setIsAttendenceMarked] = useState(false);
   const [isChildName, setIsChildName] = useState(false);
+  const [teamUrl, setTeamUrl] = useState(null);
 
   const dispatch = useDispatch();
   const {demoData, loading, demoPhoneNumber, bookingDetails, demoBookingId} =
     useSelector(joinDemoSelector);
-
-  // class status callback
-  const handleClassStatusCallback = async () => {
-    try {
-      const phone = await AsyncStorage.getItem('phone');
-      const reponse = await fetchBookingDetailsFromPhone(phone);
-      const {
-        demoDate: {_seconds},
-      } = await reponse.json();
-      setBookingTime(_seconds * 1000);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // Class status callback listener
-  useEffect(() => {
-    classStatusChangeListener(handleClassStatusCallback);
-  }, []);
 
   // Set demo phone number
   useEffect(() => {
@@ -120,10 +106,9 @@ const HomeScreen = ({navigation}) => {
       try {
         const {
           demoDate: {_seconds},
-          meetingId,
-          pwd,
           attendedOrNot,
           bookingId: bookingIdFromDemoData,
+          teamUrl: meetingLink,
         } = demoData;
 
         const demodate = new Date(_seconds * 1000);
@@ -144,19 +129,24 @@ const HomeScreen = ({navigation}) => {
               }),
             });
 
-            const markAttendenceData = await markAttendenceResponse.json();
+            const {message} = await markAttendenceResponse.json();
+            console.log(message);
 
-            console.log(markAttendenceData);
-            if (markAttendenceData.message === 'Attendance Marked') {
+            if (process.env.NODE_ENV !== 'production') {
+              ToastAndroid.showWithGravity(
+                message,
+                ToastAndroid.SHORT,
+                ToastAndroid.BOTTOM,
+              );
+            }
+            if (message === 'Attendance Marked') {
               setIsAttendenceMarked(true);
             }
           }
         }
 
-        // If marked attendence, set zoom data(meetingId, password)
-        if (meetingId && pwd) {
-          console.log('Got zoom data successfully.', {meetingId, pwd});
-          setZoomData({meetingId, pwd});
+        if (meetingLink) {
+          setTeamUrl(meetingLink);
           setShowJoinButton(true);
           setIsAttended(attendedOrNot);
         }
@@ -387,7 +377,6 @@ const HomeScreen = ({navigation}) => {
         .toLowerCase()
         .includes('your child');
       if (isCN) {
-        console.log('isCN', isCN);
         setChildName(bookingDetails.childName);
       }
       setIsChildName(demoData.cN);
@@ -406,18 +395,12 @@ const HomeScreen = ({navigation}) => {
 
   // Join Class
   const handleJoinClass = async () => {
-    if (!zoomData || !childName) {
-      console.log('No class data found');
-      return;
-    }
-
     try {
       const notChildName = bookingDetails.childName
         .toLowerCase()
         .includes('your child');
       if (notChildName) {
-        console.log('not child name');
-        const res = await fetch(UPDATE_CHILD_NAME, {
+        await fetch(UPDATE_CHILD_NAME, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -427,22 +410,58 @@ const HomeScreen = ({navigation}) => {
             cN: childName,
           }),
         });
-
-        console.log(await res.json());
       }
-      const {meetingId, pwd} = zoomData;
 
-      const res = await joinClassOnZoom(
-        JSON.stringify(meetingId),
-        pwd,
-        childName,
-      );
-      console.log('Join Class', res);
-      // if (res === 'class joined.') {
-      //   if (new Date(bookingTime).getTime() <= new Date().getTime()) {
-      //     demoData.attendedOrNot && setIsAttended(true);
-      //   }
-      // }
+      if (teamUrl) {
+        let token = await AsyncStorage.getItem('acsToken');
+        const tokenExpireTime = await AsyncStorage.getItem('acsTokenExpire');
+        const currentTime = Date.now();
+
+        if (token) {
+          const isTokenExpired =
+            currentTime > new Date(parseInt(tokenExpireTime)).getTime();
+
+          if (isTokenExpired) {
+            const response = await fetch(ACS_TOKEN_URL, {
+              method: 'GET',
+            });
+
+            const data = await response.json();
+
+            if (data?.token) {
+              const expire = data.expireOn;
+              if (expire) {
+                await AsyncStorage.setItem(
+                  'acsTokenExpire',
+                  new Date(expire).getTime().toString(),
+                );
+              }
+              await AsyncStorage.setItem('acsToken', data.token);
+              token = data.token;
+            }
+          }
+        } else {
+          const response = await fetch(ACS_TOKEN_URL, {
+            method: 'GET',
+          });
+
+          const data = await response.json();
+
+          if (data?.token) {
+            const expire = data.expireOn;
+            if (expire) {
+              await AsyncStorage.setItem(
+                'acsTokenExpire',
+                new Date(expire).getTime().toString(),
+              );
+            }
+            await AsyncStorage.setItem('acsToken', data.token);
+            token = data.token;
+          }
+        }
+
+        startCallComposite(childName, teamUrl, token);
+      }
     } catch (error) {
       console.log('Join class error', error);
     }
@@ -517,7 +536,7 @@ const HomeScreen = ({navigation}) => {
               : null}
             {bookingTime &&
               new Date(bookingTime).getTime() <= new Date().getTime() &&
-              !zoomData && (
+              !teamUrl && (
                 <View
                   style={{
                     paddingVertical: 16,

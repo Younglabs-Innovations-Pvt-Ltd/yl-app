@@ -32,7 +32,7 @@ const BookDemoSlots = ({route, navigation}) => {
   const [disableButton, setDisableButton] = useState(false);
 
   const {
-    formFields: {childAge, name, phone, childName},
+    formFields: {childAge, parentName: name, phone, childName},
   } = route.params;
 
   const dispatch = useDispatch();

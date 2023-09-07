@@ -75,34 +75,34 @@ public class InAppUpdateModule extends ReactContextBaseJavaModule implements Ins
 
         // Checks that the platform will allow the specified type of update.
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-//            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-//                    // This example applies an immediate update. To apply a flexible update
-//                    // instead, pass in AppUpdateType.FLEXIBLE
-//                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-//                    // Request the update.
-//                    try {
-//                        appUpdateManager.startUpdateFlowForResult(
-//                                appUpdateInfo,
-//                                AppUpdateType.IMMEDIATE,
-//                                reactContext.getCurrentActivity(),
-//                                MY_REQUEST_CODE);
-//                    } catch (IntentSender.SendIntentException e) {
-//                        e.printStackTrace();
-//                    }
-//            }
-
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                        && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                    // Request the update.
                     try {
                         appUpdateManager.startUpdateFlowForResult(
                                 appUpdateInfo,
-                                AppUpdateType.FLEXIBLE,
+                                AppUpdateType.IMMEDIATE,
                                 reactContext.getCurrentActivity(),
                                 MY_REQUEST_CODE);
                     } catch (IntentSender.SendIntentException e) {
                         e.printStackTrace();
                     }
-                }
+            }
+
+//            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+//                        && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+//                    try {
+//                        appUpdateManager.startUpdateFlowForResult(
+//                                appUpdateInfo,
+//                                AppUpdateType.FLEXIBLE,
+//                                reactContext.getCurrentActivity(),
+//                                MY_REQUEST_CODE);
+//                    } catch (IntentSender.SendIntentException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
         });
     }
 
