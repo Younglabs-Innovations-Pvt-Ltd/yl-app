@@ -14,6 +14,8 @@ import {SENTRY_DSN} from '@env';
 
 // Native mmodules
 import {checkForUpdate} from './src/natiive-modules/inapp-update';
+// import {getCurrentAppVersion} from './src/natiive-modules/app-version';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FONTS} from './src/assets/theme/theme';
 
@@ -24,7 +26,6 @@ import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
 import CourseDetails from './src/screens/course-details.screen';
-// import {getCurrentAppVersion} from './src/natiive-modules/app-version';
 
 import * as Sentry from '@sentry/react-native';
 
@@ -53,23 +54,10 @@ function App() {
   //   });
   // }, []);
 
-  // Check for update
+  // Check for app update
   useEffect(() => {
-    const update = async () => {
-      try {
-        const res = await checkForUpdate();
-        console.log('app update', res);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    update();
     checkForUpdate();
   }, []);
-
-  // useEffect(() => {
-  //   addUpdateStatusListener(status => console.log(status));
-  // }, []);
 
   // Handle redirect url (Deep Link)
   useEffect(() => {

@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Pressable, View} from 'react-native';
+import {StyleSheet, Pressable, View, Linking} from 'react-native';
 import {CommonActions} from '@react-navigation/native';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
 import Spinner from '../components/spinner.component';
 import Button from '../components/button.component';
+import Modal from '../components/modal.component';
 import {COLORS} from '../assets/theme/theme';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -27,9 +28,9 @@ const BookDemoSlots = ({route, navigation}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
-  const [errorMessage, setErrorMessage] = useState('');
   const [popup, setPopup] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
+  const [isBookingLimitExceeded, setIsBookingLimitExceeded] = useState(false);
 
   const {
     formFields: {childAge, parentName: name, phone, childName},
@@ -129,17 +130,17 @@ const BookDemoSlots = ({route, navigation}) => {
       });
 
       const bookingDetails = await response.json();
+      console.log(bookingDetails);
 
       if (response.status === 200) {
-        await AsyncStorage.setItem('phone', phone);
+        await AsyncStorage.setItem('phone', phone.toString());
         await AsyncStorage.setItem('calling_code', ipData.calling_code);
 
         setPopup(true);
         setDisableButton(false);
       } else if (response.status === 400) {
         console.log('booking data', bookingDetails);
-
-        setErrorMessage(bookingDetails.message);
+        setIsBookingLimitExceeded(true);
         setDisableButton(false);
       }
     } catch (error) {
@@ -149,7 +150,6 @@ const BookDemoSlots = ({route, navigation}) => {
   };
 
   const handlePopup = async () => {
-    if (errorMessage) setErrorMessage('');
     const resetAction = CommonActions.reset({
       index: 0,
       routes: [{name: 'Main'}],
@@ -161,6 +161,25 @@ const BookDemoSlots = ({route, navigation}) => {
     }
     navigation.dispatch(resetAction);
   };
+
+  const handleContactUs = async () => {
+    const phoneNumber = '+919289029696';
+    let url = '';
+
+    if (Platform.OS === 'android') {
+      url = `whatsapp://send?phone=${phoneNumber}&text=My booking limit of English Handwriting free Class is exceeded on app, I want to book the class again.`;
+    } else if (Platform.OS === 'ios') {
+      url = `whatsapp://wa.me/${phoneNumber}&text=My booking limit of English Handwriting free Class is exceeded on app, I want to book the class again.`;
+    }
+
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error('Error opening WhatsApp:', error);
+    }
+  };
+
+  const closeModal = () => setIsBookingLimitExceeded(false);
 
   return bookingSlotsLoading ? (
     <Spinner style={{alignSelf: 'center'}} />
@@ -229,9 +248,47 @@ const BookDemoSlots = ({route, navigation}) => {
               })}
           </View>
         </View>
-        {errorMessage && (
-          <TextWrapper color={COLORS.pred}>{errorMessage}</TextWrapper>
-        )}
+        <Modal visible={isBookingLimitExceeded} onRequestClose={closeModal}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.25)',
+              justifyContent: 'center',
+            }}>
+            <View
+              style={{
+                width: '100%',
+                maxWidth: 348,
+                minHeight: 180,
+                alignSelf: 'center',
+                justifyContent: 'center',
+                backgroundColor: COLORS.white,
+                padding: 16,
+                borderRadius: 4,
+              }}>
+              <View style={{paddingBottom: 18, alignItems: 'flex-end'}}>
+                <Pressable onPress={closeModal}>
+                  <Icon name="close-outline" size={24} color={COLORS.black} />
+                </Pressable>
+              </View>
+              <TextWrapper color={COLORS.black}>
+                Your booking limit exceeded, Contact us to book again.
+              </TextWrapper>
+              <Spacer space={16} />
+              <Pressable style={styles.btnBookAgain} onPress={handleContactUs}>
+                <Icon
+                  name="logo-whatsapp"
+                  size={24}
+                  color={COLORS.white}
+                  style={{marginRight: 8}}
+                />
+                <TextWrapper fs={18} color={COLORS.white}>
+                  Contact us
+                </TextWrapper>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
       </View>
       <View style={styles.footer}>
         <Button
@@ -323,5 +380,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  btnBookAgain: {
+    width: '100%',
+    height: 48,
+    paddingVertical: 6,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.pgreen,
+    flexDirection: 'row',
+    borderRadius: 4,
   },
 });

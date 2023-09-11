@@ -387,6 +387,7 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     if (bookingTime) {
       const currentTime = Date.now();
+
       if (bookingTime > currentTime) {
         registerNotificationTimer(bookingTime);
       }
@@ -471,14 +472,10 @@ const HomeScreen = ({navigation}) => {
   const handleShowDrawer = () => navigation.openDrawer();
 
   const rescheduleFreeClass = () => {
-    const {childAge, parentName} = bookingDetails;
-    const formFields = {childAge, name: parentName, phone: demoPhoneNumber};
+    const {childAge, parentName, phone, childName} = bookingDetails;
+    const formFields = {childAge, parentName, phone, childName};
 
-    if (!demoPhoneNumber) {
-      navigation.navigate('BookDemoForm');
-    } else {
-      navigation.navigate('BookDemoSlots', {formFields});
-    }
+    navigation.navigate('BookDemoSlots', {formFields});
   };
 
   return loading ? (

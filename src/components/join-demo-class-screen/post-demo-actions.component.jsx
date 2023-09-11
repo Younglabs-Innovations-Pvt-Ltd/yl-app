@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {StyleSheet, View, Pressable, Linking} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../assets/theme/theme';
 import Icon from '../icon.component';
@@ -19,7 +20,25 @@ const PostDemoAction = () => {
   const [loading, setLoading] = useState(true);
   const [disableButton, setDisableButton] = useState(false);
 
-  const {demoData} = useSelector(state => state.joinDemo);
+  const {demoData, bookingDetails} = useSelector(state => state.joinDemo);
+
+  const navigation = useNavigation();
+
+  const isAllowToReschedule = useMemo(() => {
+    if (demoData) {
+      const {
+        demoDate: {_seconds},
+      } = demoData;
+      const currentTime = Date.now();
+      const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24 * 10;
+
+      if (currentTime > afterTenDays) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }, [demoData]);
 
   useEffect(() => {
     const checkForRating = async () => {
@@ -114,6 +133,13 @@ const PostDemoAction = () => {
     }
   };
 
+  const rescheduleFreeClass = () => {
+    const {childAge, parentName, phone, childName} = bookingDetails;
+    const formFields = {childAge, parentName, phone, childName};
+
+    navigation.navigate('BookDemoSlots', {formFields});
+  };
+
   if (loading) return null;
 
   return (
@@ -159,6 +185,17 @@ const PostDemoAction = () => {
             handwriting?
           </TextWrapper>
           <View style={styles.ctas}>
+            {isAllowToReschedule && (
+              <Pressable
+                style={({pressed}) => [
+                  styles.ctaButton,
+                  {opacity: pressed ? 0.8 : 1},
+                ]}
+                onPress={rescheduleFreeClass}>
+                {/* <MIcon name="web" size={22} color={COLORS.black} /> */}
+                <TextWrapper>Reschedule a new class</TextWrapper>
+              </Pressable>
+            )}
             <Pressable
               style={({pressed}) => [
                 styles.ctaButton,

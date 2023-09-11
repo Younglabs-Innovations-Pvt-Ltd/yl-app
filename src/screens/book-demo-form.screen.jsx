@@ -40,7 +40,7 @@ const BookDemoScreen = ({route, navigation}) => {
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState(phoneNumber);
   const [childAge, setChildAge] = useState(null);
-  const [fileds, setFields] = useState(INITIAL_sTATE);
+  const [fields, setFields] = useState(INITIAL_sTATE);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [visible, setVisible] = useState(false);
@@ -49,12 +49,12 @@ const BookDemoScreen = ({route, navigation}) => {
   const dispatch = useDispatch();
 
   const isActive = useMemo(() => {
-    if (!fileds.parentName || !fileds.childName || !phone || !childAge) {
+    if (!fields.parentName || !fields.childName || !phone || !childAge) {
       return false;
     }
 
     return true;
-  }, [fileds.childName, fileds.parentName, phone, childAge]);
+  }, [fields.childName, fields.parentName, phone, childAge]);
 
   const {
     ipData,
@@ -107,9 +107,9 @@ const BookDemoScreen = ({route, navigation}) => {
       return;
     }
 
-    const formFields = {...fileds, phone, childAge};
+    const formFields = {...fields, phone, childAge};
 
-    navigation.navigate('BookDemoSlots', {formFields, country});
+    navigation.navigate('BookDemoSlots', {formFields});
   };
 
   const handleSelectCountry = country => {
@@ -138,7 +138,7 @@ const BookDemoScreen = ({route, navigation}) => {
             <Input
               inputMode="text"
               placeholder="Enter parent name"
-              value={fileds.parentName}
+              value={fields.parentName}
               onChangeText={e =>
                 handleChangeValue({name: 'parentName', value: e})
               }
@@ -147,7 +147,7 @@ const BookDemoScreen = ({route, navigation}) => {
             <Input
               inputMode="text"
               placeholder="Enter child name"
-              value={fileds.childName}
+              value={fields.childName}
               onChangeText={e =>
                 handleChangeValue({name: 'childName', value: e})
               }
