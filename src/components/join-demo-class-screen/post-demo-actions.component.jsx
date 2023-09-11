@@ -4,7 +4,6 @@ import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../assets/theme/theme';
 import Icon from '../icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Button from '../button.component';
 
 import {useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -72,20 +71,25 @@ const PostDemoAction = () => {
   const markNeedMoreInfo = async () => {
     try {
       setDisableButton(true);
-      const response = await fetch(MARK_MORE_INFO_API, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          bookingId: demoData.bookingId,
-          source: NMI_SOURCE,
-        }),
-      });
+      const isNmi = await AsyncStorage.getItem('nmi');
+      if (!isNmi) {
+        const response = await fetch(MARK_MORE_INFO_API, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            bookingId: demoData.bookingId,
+            source: NMI_SOURCE,
+          }),
+        });
 
-      if (response.status === 200) {
-        openWhatsApp();
+        if (response.status === 200) {
+          await AsyncStorage.setItem('nmi', 'true');
+        }
       }
+
+      openWhatsApp();
       setDisableButton(false);
     } catch (error) {
       console.log('nmi error', error);
@@ -102,10 +106,6 @@ const PostDemoAction = () => {
     } else if (Platform.OS === 'ios') {
       url = `whatsapp://wa.me/${phoneNumber}&text=Hello, I need more info about the full course`;
     }
-
-    const canOpen = await Linking.canOpenURL(url);
-
-    if (!canOpen) return;
 
     try {
       await Linking.openURL(url);

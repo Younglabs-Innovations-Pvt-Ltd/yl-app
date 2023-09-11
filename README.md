@@ -9,7 +9,8 @@ Documentation for every update of app
 ### Version 1.1.0
 
 Date: 06/09/2023
-Microsoft Team integrated
+
+1. Microsoft Team integrated
 
 <!-- This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 

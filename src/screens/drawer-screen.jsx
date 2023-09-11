@@ -97,11 +97,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       whatappUrl = `whatsapp://wa.me/${phoneNumber}`;
     }
     try {
-      const canOpen = await Linking.canOpenURL(whatappUrl);
-
-      if (canOpen) {
-        await Linking.openURL(whatappUrl);
-      }
+      await Linking.openURL(whatappUrl);
     } catch (error) {
       console.log('join demo screen whatsapp redirect error', error);
     }
