@@ -11,13 +11,15 @@ import {store} from './src/store/store';
 
 import SplashScreen from 'react-native-splash-screen';
 import {SENTRY_DSN} from '@env';
+import {LOCAL_KEYS} from './src/utils/constants/local-keys';
 
 // Native mmodules
 import {checkForUpdate} from './src/natiive-modules/inapp-update';
 // import {getCurrentAppVersion} from './src/natiive-modules/app-version';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {FONTS} from './src/assets/theme/theme';
+import {FONTS} from './src/utils/constants/fonts';
+import {SCREEN_NAMES} from './src/utils/constants/screen-names';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
@@ -28,6 +30,7 @@ import MainScreen from './src/screens/main-screen';
 import CourseDetails from './src/screens/course-details.screen';
 
 import * as Sentry from '@sentry/react-native';
+import {navigationRef} from './src/navigationRef';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -82,8 +85,8 @@ function App() {
     const isUserAlreadyLoggedIn = async () => {
       try {
         setLoading(true);
-        const phone = await AsyncStorage.getItem('phone');
-        const bookingId = await AsyncStorage.getItem('bookingid');
+        const phone = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
+        const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
 
         if (phone) {
           setIsPhone(true);
@@ -103,9 +106,16 @@ function App() {
 
   if (loading) return null;
 
+  // UI Constants
+  let initialRouteName = SCREEN_NAMES.WELCOME;
+
+  if (isPhone || bookingId) {
+    initialRouteName = SCREEN_NAMES.MAIN;
+  }
+
   return (
     <Provider store={store}>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <Stack.Navigator
           screenOptions={{
             // headerShown: false,
@@ -123,33 +133,36 @@ function App() {
             cardStyle: {backgroundColor: '#fff'},
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
           }}
-          initialRouteName={isPhone || bookingId ? 'Main' : 'Welcome'}>
+          initialRouteName={initialRouteName}>
           <Stack.Screen
-            name="Welcome"
+            name={SCREEN_NAMES.WELCOME}
             component={WelcomeScreen}
             options={{headerShown: false}}
           />
           <Stack.Screen
-            name="Main"
+            name={SCREEN_NAMES.MAIN}
             component={MainScreen}
             options={{headerShown: false}}
             initialParams={{bookingId}}
           />
-          <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
           <Stack.Screen
-            name="BookDemoForm"
+            name={SCREEN_NAMES.ON_BOARDING}
+            component={OnBoardingScreen}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.BOOK_DEMO_FORM}
             component={BookDemoFormScreen}
             options={{
               title: 'Book Free Handwriting Class',
             }}
           />
           <Stack.Screen
-            name="BookDemoSlots"
+            name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
             component={BookDemoSlotsScreen}
             options={{title: 'Book Free Handwriting Class'}}
           />
           <Stack.Screen
-            name="CourseDetails"
+            name={SCREEN_NAMES.COURSE_DETAILS}
             component={CourseDetails}
             options={{
               // headerStyle: {elevation: 0},

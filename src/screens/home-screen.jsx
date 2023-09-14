@@ -1,20 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  ScrollView,
-  ToastAndroid,
-} from 'react-native';
+import React, {useEffect, useState, useMemo} from 'react';
+import {StyleSheet, View, Pressable, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
-  setDemoPhone,
   startFetchBookingDetailsFromPhone,
   startFetchBookingDetailsFromId,
+  setPhoneAsync,
+  setDemoData,
+  setDemoNotifications,
+  joinFreeClass,
+  setShowJoinButton,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import {setCountdownTriggerNotification} from '../utils/notifications';
 
 import Input from '../components/input.component';
 import Button from '../components/button.component';
@@ -25,15 +22,13 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DemoWaiting from '../components/join-demo-class-screen/demo-waiting.component';
 import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 import TextWrapper from '../components/text-wrapper.component';
 import Center from '../components/center.component';
 
-import {MARK_ATTENDENCE_URL, UPDATE_CHILD_NAME} from '@env';
 import Features from '../components/features.component';
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
-import {startCallComposite} from '../natiive-modules/team-module';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 const INITIAL_TIME = {
   days: 0,
@@ -42,12 +37,9 @@ const INITIAL_TIME = {
   seconds: 0,
 };
 
-const ACS_TOKEN_URL =
-  'https://younglabsapis-33heck6yza-el.a.run.app/admin/msteams/getacstoken';
-
 const getTimeRemaining = bookingDate => {
   const countDownTime = new Date(bookingDate).getTime();
-  const now = new Date().getTime();
+  const now = Date.now();
 
   const remainingTime = countDownTime - now;
 
@@ -65,101 +57,35 @@ const getTimeRemaining = bookingDate => {
 
 const HomeScreen = ({navigation}) => {
   const [childName, setChildName] = useState('');
-  const [bookingTime, setBookingTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
-  const [showJoinButton, setShowJoinButton] = useState(false);
-  const [isAttended, setIsAttended] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
-  const [isAttendenceMarked, setIsAttendenceMarked] = useState(false);
-  const [isChildName, setIsChildName] = useState(false);
-  const [teamUrl, setTeamUrl] = useState(null);
+  const [cn, setCn] = useState(false);
 
   const dispatch = useDispatch();
-  const {demoData, loading, demoPhoneNumber, bookingDetails, demoBookingId} =
-    useSelector(joinDemoSelector);
+  const {
+    demoData,
+    loading,
+    demoPhoneNumber,
+    bookingDetails,
+    demoBookingId,
+    teamUrl,
+    isAttended,
+    isAttendenceMarked,
+    bookingTime,
+    showJoinButton,
+    message,
+  } = useSelector(joinDemoSelector);
 
   // Set demo phone number
   useEffect(() => {
-    const getPhone = async () => {
-      try {
-        const phoneFromAsyncStorage = await AsyncStorage.getItem('phone');
-
-        if (phoneFromAsyncStorage) {
-          dispatch(setDemoPhone(phoneFromAsyncStorage));
-        }
-      } catch (error) {
-        console.log('Async storage error', error);
-      }
-    };
-
-    getPhone();
+    dispatch(setPhoneAsync());
   }, []);
 
   // set demo data
   useEffect(() => {
-    const setDemoData = async () => {
-      // If user put wrong number
-      if (demoData.hasOwnProperty('message')) {
-        return;
-      }
-      try {
-        const {
-          demoDate: {_seconds},
-          attendedOrNot,
-          bookingId: bookingIdFromDemoData,
-          teamUrl: meetingLink,
-        } = demoData;
-
-        const demodate = new Date(_seconds * 1000);
-        const today = new Date().getDate();
-
-        // Mark attendence
-        if (demodate.getDate() === today) {
-          if (!attendedOrNot) {
-            const markAttendenceResponse = await fetch(MARK_ATTENDENCE_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                type: 'student',
-                bId: bookingIdFromDemoData,
-                source: 'app',
-              }),
-            });
-
-            const {message} = await markAttendenceResponse.json();
-            console.log(message);
-
-            if (process.env.NODE_ENV !== 'production') {
-              ToastAndroid.showWithGravity(
-                message,
-                ToastAndroid.SHORT,
-                ToastAndroid.BOTTOM,
-              );
-            }
-            if (message === 'Attendance Marked') {
-              setIsAttendenceMarked(true);
-            }
-          }
-        }
-
-        if (meetingLink) {
-          setTeamUrl(meetingLink);
-          setShowJoinButton(true);
-          setIsAttended(attendedOrNot);
-        }
-
-        // Set booking time for timer
-        if (_seconds) setBookingTime(_seconds * 1000 + 1000 * 60);
-      } catch (error) {
-        console.log('setDemoData_error', error);
-      }
-    };
-
     if (demoData) {
-      setDemoData();
+      dispatch(setDemoData({demoData}));
     }
   }, [demoData]);
 
@@ -177,6 +103,8 @@ const HomeScreen = ({navigation}) => {
     }
   }, [demoBookingId, dispatch]);
 
+  // Get demo data
+  // If a user came after start class
   useEffect(() => {
     if (isAttendenceMarked) {
       console.log('marked');
@@ -225,137 +153,15 @@ const HomeScreen = ({navigation}) => {
 
       if (afterHalfHourFromDemoDate <= new Date().getTime()) {
         // Hide class join button
-        setShowJoinButton(false);
+        dispatch(setShowJoinButton(false));
       }
     }
   }, [bookingTime, demoData]);
 
   // Notification
   useEffect(() => {
-    const setNotification = async () => {
-      const classDate = new Date(bookingTime);
-      const currentTime = Date.now();
-
-      // If class passed
-      if (currentTime > classDate) {
-        return;
-      }
-
-      const ONE_HOUR = 60 * 60 * 1000;
-      const TEN_MINUTES = 10 * 60 * 1000;
-      const FIVE_MINUTES = 5 * 60 * 1000;
-      const ONE_DAY = 24 * 60 * 60 * 1000;
-
-      const beforeOneHour = classDate.getTime() - ONE_HOUR;
-      const beforeTenMinutes = classDate.getTime() - TEN_MINUTES;
-      const afterFiveMinutes = classDate.getTime() + FIVE_MINUTES;
-      // Set for 11am notification
-      const morningNotification = new Date(bookingTime);
-      morningNotification.setHours(11);
-
-      const hours = classDate.getHours();
-      const body = `Your have a class on ${classDate.toDateString()} at ${
-        hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
-      }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
-
-      const morningNotificationBody = `You have a class at ${
-        hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
-      }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
-
-      try {
-        const isNotification = await AsyncStorage.getItem(
-          'countdown_notification',
-        );
-
-        // If already set notifications
-        if (isNotification) return;
-
-        // Check for today
-        if (new Date().getDate() === classDate.getDate()) {
-          console.log('all notifications for today');
-          if (currentTime < classDate) {
-            if (currentTime < beforeTenMinutes) {
-              await setCountdownTriggerNotification(
-                'countdown',
-                'countdown',
-                beforeTenMinutes,
-                'Your class is about to start in 10 minutes.',
-              );
-            }
-            if (currentTime < beforeOneHour) {
-              await setCountdownTriggerNotification(
-                'countdown',
-                'countdown',
-                beforeOneHour,
-                'Your class starts in 1 hour. Kindly, join on time.',
-              );
-            }
-
-            if (new Date().getHours() < 11) {
-              await setCountdownTriggerNotification(
-                'countdown',
-                'countdown',
-                morningNotification.getTime(),
-                morningNotificationBody,
-              );
-            }
-
-            await setCountdownTriggerNotification(
-              'countdown',
-              'countdown',
-              afterFiveMinutes,
-              'Hurry! your class has already started, join now.',
-            );
-          }
-        } else {
-          console.log('set future notifications');
-          // Set notifications for future class
-          await setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            beforeTenMinutes,
-            'Your class is about to start in 10 minutes.',
-          );
-          await setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            beforeOneHour,
-            'Your class starts in 1 hour. Kindly, join on time.',
-          );
-          await setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            afterFiveMinutes,
-            'Hurry! your class has already started, join now.',
-          );
-
-          await setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            morningNotification.getTime(),
-            morningNotificationBody,
-          );
-
-          if (new Date().getHours() < 20) {
-            const beforeOneDay = new Date(classDate.getTime() - ONE_DAY);
-            beforeOneDay.setHours(20);
-            await setCountdownTriggerNotification(
-              'countdown',
-              'countdown',
-              beforeOneDay.getTime(),
-              body,
-            );
-          }
-        }
-
-        await AsyncStorage.setItem('countdown_notification', 'saved');
-      } catch (error) {
-        console.log('notification error', error);
-      }
-    };
-
     if (bookingTime) {
-      setNotification();
+      dispatch(setDemoNotifications({bookingTime}));
     }
   }, [bookingTime]);
 
@@ -379,7 +185,7 @@ const HomeScreen = ({navigation}) => {
       if (isCN) {
         setChildName(bookingDetails.childName);
       }
-      setIsChildName(demoData.cN);
+      setCn(demoData.cN);
     }
   }, [demoData, bookingDetails]);
 
@@ -394,78 +200,13 @@ const HomeScreen = ({navigation}) => {
     }
   }, [bookingTime]);
 
+  const onChangeChildName = e => {
+    setChildName(e);
+  };
+
   // Join Class
   const handleJoinClass = async () => {
-    try {
-      const notChildName = bookingDetails.childName
-        .toLowerCase()
-        .includes('your child');
-      if (notChildName) {
-        await fetch(UPDATE_CHILD_NAME, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            bId: bookingDetails.bookingId,
-            cN: childName,
-          }),
-        });
-      }
-
-      if (teamUrl) {
-        let token = await AsyncStorage.getItem('acsToken');
-        const tokenExpireTime = await AsyncStorage.getItem('acsTokenExpire');
-        const currentTime = Date.now();
-
-        if (token) {
-          const isTokenExpired =
-            currentTime > new Date(parseInt(tokenExpireTime)).getTime();
-
-          if (isTokenExpired) {
-            const response = await fetch(ACS_TOKEN_URL, {
-              method: 'GET',
-            });
-
-            const data = await response.json();
-
-            if (data?.token) {
-              const expire = data.expireOn;
-              if (expire) {
-                await AsyncStorage.setItem(
-                  'acsTokenExpire',
-                  new Date(expire).getTime().toString(),
-                );
-              }
-              await AsyncStorage.setItem('acsToken', data.token);
-              token = data.token;
-            }
-          }
-        } else {
-          const response = await fetch(ACS_TOKEN_URL, {
-            method: 'GET',
-          });
-
-          const data = await response.json();
-
-          if (data?.token) {
-            const expire = data.expireOn;
-            if (expire) {
-              await AsyncStorage.setItem(
-                'acsTokenExpire',
-                new Date(expire).getTime().toString(),
-              );
-            }
-            await AsyncStorage.setItem('acsToken', data.token);
-            token = data.token;
-          }
-        }
-
-        startCallComposite(childName, teamUrl, token);
-      }
-    } catch (error) {
-      console.log('Join class error', error);
-    }
+    dispatch(joinFreeClass({bookingDetails, childName, teamUrl}));
   };
 
   // show drawer
@@ -475,8 +216,45 @@ const HomeScreen = ({navigation}) => {
     const {childAge, parentName, phone, childName} = bookingDetails;
     const formFields = {childAge, parentName, phone, childName};
 
-    navigation.navigate('BookDemoSlots', {formFields});
+    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
   };
+
+  // UI Constants
+  // show countdown timer
+  const SHOW_TIMER = useMemo(() => {
+    if (!bookingTime) return null;
+
+    return new Date(bookingTime).getTime() > Date.now();
+  }, [bookingTime, isTimeover]);
+
+  // show join button to join class
+  const SHOW_JOIN_BUTTON = useMemo(() => {
+    return isTimeover && showJoinButton;
+  }, [isTimeover, showJoinButton]);
+
+  // If there is no child name in booking details
+  // then show input field for childname
+  // otherwise show text
+  const IS_CHILD_NAME = useMemo(() => {
+    return !cn ? (
+      <>
+        <Input
+          placeholder="Child Name"
+          value={childName}
+          onChangeText={onChangeChildName}
+        />
+        {message && (
+          <TextWrapper fs={14} color={COLORS.pred}>
+            {message}
+          </TextWrapper>
+        )}
+      </>
+    ) : (
+      <TextWrapper color={COLORS.black} fs={18} styles={{textAlign: 'left'}}>
+        Class is on going, Join now.
+      </TextWrapper>
+    );
+  }, [cn, childName, message]);
 
   return loading ? (
     <Center bg={COLORS.white}>
@@ -497,60 +275,42 @@ const HomeScreen = ({navigation}) => {
       </View>
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         <View style={styles.container}>
-          <View style={{width: '100%', maxWidth: 428, alignSelf: 'center'}}>
-            {bookingTime
-              ? new Date(bookingTime).getTime() > new Date().getTime() && (
-                  <DemoWaiting timeLeft={timeLeft} />
-                )
-              : null}
-            {isTimeover
-              ? showJoinButton && (
-                  <>
-                    {!isChildName ? (
-                      <Input
-                        placeholder="Child Name"
-                        value={childName}
-                        onChangeText={e => setChildName(e)}
-                      />
-                    ) : (
-                      <TextWrapper
-                        color={COLORS.black}
-                        fs={18}
-                        styles={{textAlign: 'left'}}>
-                        Class is on going, Join now.
-                      </TextWrapper>
-                    )}
-                    <Spacer />
-                    <Button
-                      rounded={4}
-                      onPress={handleJoinClass}
-                      bg={COLORS.pgreen}
-                      textColor={COLORS.white}>
-                      Enter Class
-                    </Button>
-                  </>
-                )
-              : null}
-            {bookingTime &&
-              new Date(bookingTime).getTime() <= new Date().getTime() &&
-              !teamUrl && (
-                <View
-                  style={{
-                    paddingVertical: 16,
-                  }}>
-                  <TextWrapper fs={20}>
-                    Looks like you missed the class, please reschedule one
-                  </TextWrapper>
-                  <Spacer />
-                  <Button
-                    textColor={COLORS.white}
-                    bg={COLORS.pgreen}
-                    rounded={6}
-                    onPress={rescheduleFreeClass}>
-                    Reschedule
-                  </Button>
-                </View>
-              )}
+          <View style={styles.contentWrapper}>
+            {/* Timer */}
+            {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
+
+            {/* Show join button */}
+            {SHOW_JOIN_BUTTON && (
+              <>
+                {IS_CHILD_NAME}
+                <Spacer />
+                <Button
+                  rounded={4}
+                  onPress={handleJoinClass}
+                  bg={COLORS.pgreen}
+                  textColor={COLORS.white}>
+                  Enter Class
+                </Button>
+              </>
+            )}
+            {isTimeover && !teamUrl && (
+              <View
+                style={{
+                  paddingVertical: 16,
+                }}>
+                <TextWrapper fs={20}>
+                  Looks like you missed the class, please reschedule one
+                </TextWrapper>
+                <Spacer />
+                <Button
+                  textColor={COLORS.white}
+                  bg={COLORS.pgreen}
+                  rounded={6}
+                  onPress={rescheduleFreeClass}>
+                  Reschedule
+                </Button>
+              </View>
+            )}
             {
               // If user attended demo class
               // Demo has ended
@@ -582,5 +342,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: COLORS.white,
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: 428,
+    alignSelf: 'center',
   },
 });

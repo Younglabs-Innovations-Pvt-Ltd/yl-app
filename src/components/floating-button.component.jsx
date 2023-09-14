@@ -1,15 +1,10 @@
 import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {COLORS} from '../assets/theme/theme';
-import TextWrapper from './text-wrapper.component';
+import {Pressable, StyleSheet, View} from 'react-native';
+import {COLORS} from '../utils/constants/colors';
 
 const FloatingButton = ({children, bg = COLORS.white, ...otherProps}) => {
   return (
     <View style={[styles.btnWrapper]}>
-      {/* <View style={styles.tooltip}>
-        <View style={styles.tiphead} />
-        <TextWrapper color={COLORS.black}>{'Tooltip'}</TextWrapper>
-      </View> */}
       <Pressable
         style={({pressed}) => [
           styles.fbutton,

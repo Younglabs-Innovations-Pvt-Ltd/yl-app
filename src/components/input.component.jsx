@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, TextInput} from 'react-native';
-import {COLORS, FONTS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
+import {FONTS} from '../utils/constants/fonts';
 
 const Input = ({noBorder, ...props}) => {
   return (

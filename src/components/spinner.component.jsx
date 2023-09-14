@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {StyleSheet, Animated} from 'react-native';
 import {Easing} from 'react-native-reanimated';
+import {IMAGES} from '../utils/constants/images';
 
 const Spinner = ({style}) => {
   const rotation = useRef(new Animated.Value(0)).current;
@@ -16,18 +17,20 @@ const Spinner = ({style}) => {
     ).start();
   }, []);
 
+  const rotate = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
     <Animated.Image
-      source={require('../assets/images/spinner.png')}
+      source={IMAGES.SPINNER}
       style={[
         styles.spinner,
         {
           transform: [
             {
-              rotate: rotation.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0deg', '360deg'],
-              }),
+              rotate,
             },
           ],
           ...style,

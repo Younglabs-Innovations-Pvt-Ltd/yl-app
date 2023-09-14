@@ -1,7 +1,7 @@
 import React, {useState, useRef, useContext} from 'react';
 import {Pressable, StyleSheet, View, Modal, ScrollView} from 'react-native';
 import TextWrapper from './text-wrapper.component';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 import Icon from './icon.component';
 
 const SelectContext = React.createContext();
@@ -32,6 +32,12 @@ export const Select = ({children, defaultValue, onSelect}) => {
     onClose,
   };
 
+  // UI Constants
+  let DROPDOWN_ICON = 'chevron-up-outline';
+  if (!visible) {
+    DROPDOWN_ICON = 'chevron-down-outline';
+  }
+
   return (
     <SelectContext.Provider value={value}>
       <Pressable
@@ -40,11 +46,7 @@ export const Select = ({children, defaultValue, onSelect}) => {
         style={styles.select}
         onLayout={onLayout}>
         <TextWrapper>{defaultValue}</TextWrapper>
-        <Icon
-          name={!visible ? 'chevron-down-outline' : 'chevron-up-outline'}
-          size={20}
-          color={COLORS.black}
-        />
+        <Icon name={DROPDOWN_ICON} size={20} color={COLORS.black} />
       </Pressable>
 
       <Modal visible={visible} transparent={true} animationType="none">
@@ -80,21 +82,21 @@ export const SelectContent = ({children, onSelect}) => {
 export const SelectItem = ({children, value, onSelect, currentValue}) => {
   const {onClose} = useSelectContext();
 
-  const handleOnSelect = val => {
-    onSelect(val);
+  const handleOnSelect = () => {
+    onSelect(value);
     onClose();
   };
 
+  const btnStyle = ({pressed}) => [
+    styles.selectItem,
+    {
+      opacity: pressed ? 0.75 : 1,
+      backgroundColor: value === currentValue ? '#eee' : 'transparent',
+    },
+  ];
+
   return (
-    <Pressable
-      style={({pressed}) => [
-        styles.selectItem,
-        {
-          opacity: pressed ? 0.75 : 1,
-          backgroundColor: value === currentValue ? '#eee' : 'transparent',
-        },
-      ]}
-      onPress={() => handleOnSelect(value)}>
+    <Pressable style={btnStyle} onPress={handleOnSelect}>
       <TextWrapper>{children}</TextWrapper>
     </Pressable>
   );

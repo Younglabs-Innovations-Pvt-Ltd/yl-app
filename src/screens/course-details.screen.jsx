@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -12,7 +12,8 @@ import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Video from 'react-native-video';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 const VIDEO_URL =
   'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/Course%20Cover%20Videos%2FENGLISH%20HANDWRITING%20COURSE%20STRUCTURE%20VIDEO.mp4?alt=media&token=8ccbe67d-3655-43da-be89-0fa482b32682';
@@ -83,7 +84,8 @@ const ITEM_WIDTH = deviceWidth * 0.75;
 const CourseDetails = ({route, navigation}) => {
   const {phone} = route.params;
 
-  const goToForm = () => navigation.navigate('BookDemoForm', {phone});
+  const goToForm = () =>
+    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_FORM, {phone});
 
   const onBuffer = buffer => {
     console.log(buffer);

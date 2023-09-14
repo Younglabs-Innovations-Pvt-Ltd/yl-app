@@ -4,7 +4,7 @@ import Icon from './icon.component';
 import TextWrapper from './text-wrapper.component';
 import Spacer from './spacer.component';
 import Button from './button.component';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 
 const SuccessPopup = ({open, msg, onContinue}) => {
   return (

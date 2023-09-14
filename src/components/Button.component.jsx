@@ -29,19 +29,18 @@ const Button = ({
   textSize = 16,
   ...otherProps
 }) => {
+  const buttonStyle = ({pressed}) => [
+    styles.button,
+    {
+      opacity: pressed ? 0.75 : 1,
+      borderRadius: rounded || 0,
+      elevation: shadow ? 2 : 0,
+    },
+    button_styles.styles(bg, outlined, outlineColor),
+  ];
+
   return (
-    <Pressable
-      {...otherProps}
-      style={({pressed}) => [
-        styles.button,
-        {
-          opacity: pressed ? 0.75 : 1,
-          borderRadius: rounded || 0,
-          elevation: shadow ? 2 : 0,
-        },
-        button_styles.styles(bg, outlined, outlineColor),
-      ]}
-      disabled={loading}>
+    <Pressable {...otherProps} style={buttonStyle} disabled={loading}>
       <TextWrapper
         fs={textSize}
         fw="700"

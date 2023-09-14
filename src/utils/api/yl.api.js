@@ -1,5 +1,24 @@
-import {BOOKING_URL, MARK_ATTENDENCE_URL, BOOKING_DETAILS} from '@env';
+import {
+  BOOKING_URL,
+  MARK_ATTENDENCE_URL,
+  BOOKING_DETAILS,
+  ADD_BOOKINGS_API,
+  UPDATE_CHILD_NAME,
+  ACS_TOKEN_URL,
+} from '@env';
 
+// Make new booking
+export const makeNewBooking = async data => {
+  return await fetch(ADD_BOOKINGS_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+};
+
+// Fetch booking details
 export const fetchBookingDetils = async data => {
   const body = data.phone
     ? JSON.stringify({phone: data.phone})
@@ -14,6 +33,7 @@ export const fetchBookingDetils = async data => {
   });
 };
 
+// Demo class details via phone
 export const fetchBookingDetailsFromPhone = async phone => {
   return await fetch(BOOKING_URL, {
     method: 'POST',
@@ -24,6 +44,7 @@ export const fetchBookingDetailsFromPhone = async phone => {
   });
 };
 
+// Demo class details via booking id
 export const fetchBookingDetailsFromBookingId = async bookingId => {
   return await fetch(BOOKING_URL, {
     method: 'POST',
@@ -34,15 +55,38 @@ export const fetchBookingDetailsFromBookingId = async bookingId => {
   });
 };
 
-export const markattendence = async () => {
-  const response = await fetch(MARK_ATTENDENCE_URL, {
+// mark attendance
+export const markAttendance = async ({bookingId}) => {
+  return await fetch(MARK_ATTENDENCE_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       type: 'student',
-      bId: JSON.parse(demoBookingId),
+      bId: bookingId,
+      source: 'app',
     }),
+  });
+};
+
+// update child name
+export const updateChildName = async ({bookingDetails, childName}) => {
+  return await fetch(UPDATE_CHILD_NAME, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      bId: bookingDetails.bookingId,
+      cN: childName,
+    }),
+  });
+};
+
+// Get acs token
+export const getAcsToken = async () => {
+  return await fetch(ACS_TOKEN_URL, {
+    method: 'GET',
   });
 };

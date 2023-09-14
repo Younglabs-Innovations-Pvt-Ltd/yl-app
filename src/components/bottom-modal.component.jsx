@@ -53,6 +53,10 @@ const BottomModal = ({open, onSelect}) => {
     setUpdatedData(filteredCountry);
   }, [search, countriesData]);
 
+  const onChangeSearch = e => {
+    setSearch(e);
+  };
+
   return (
     <View>
       <View style={{flex: 1}}>
@@ -60,7 +64,7 @@ const BottomModal = ({open, onSelect}) => {
           placeholder="Search..."
           noBorder={true}
           value={search}
-          onChangeText={e => setSearch(e)}
+          onChangeText={onChangeSearch}
         />
         {loading && <Spinner style={{alignSelf: 'center'}} />}
         <FlatList

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useMemo} from 'react';
 import {
   StyleSheet,
   View,
@@ -10,20 +10,27 @@ import {
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 
-import {COLORS, FONTS} from '../assets/theme/theme';
+import {FONTS} from '../utils/constants/fonts';
+import {COLORS} from '../utils/constants/colors';
+import {IMAGES} from '../utils/constants/images';
 
 import TextWrapper from '../components/text-wrapper.component';
 import ModalComponent from '../components/modal.component';
 import Center from '../components/center.component';
 import Spinner from '../components/spinner.component';
-import {fetchBookingDetailsFromPhone} from '../utils/api/yl.api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryList from '../components/country-list.component';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
+import {
+  setCountry,
+  setModalVisible,
+  fetchBookingStatusStart,
+} from '../store/welcome-screen/reducer';
+
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {isValidNumber} from '../utils/isValidNumber';
+import {welcomeScreenSelector} from '../store/welcome-screen/selector';
+
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 
 const {width: deviceWidth} = Dimensions.get('window');
@@ -31,18 +38,15 @@ const IMAGE_WIDTH = deviceWidth * 0.7;
 const IMAGE_HEIGHT = deviceWidth * 0.7;
 
 // Main Component
-const DemoClassScreen = ({navigation}) => {
+const DemoClassScreen = () => {
   const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [visible, setVisible] = useState(false);
-  const [country, setCountry] = useState({callingCode: ''});
-
-  const isTablet = deviceWidth > 540;
 
   const dispatch = useDispatch();
 
   const {ipData} = useSelector(bookDemoSelector);
+  const {country, message, loading, modalVisible} = useSelector(
+    welcomeScreenSelector,
+  );
 
   useEffect(() => {
     StatusBar.setBackgroundColor(COLORS.pgreen);
@@ -57,10 +61,12 @@ const DemoClassScreen = ({navigation}) => {
 
   useEffect(() => {
     if (ipData) {
-      setCountry({
-        callingCode: ipData.calling_code,
-        countryCode: {cca2: ipData.country_code2},
-      });
+      dispatch(
+        setCountry({
+          callingCode: ipData.calling_code,
+          countryCode: {cca2: ipData.country_code2},
+        }),
+      );
     }
   }, [ipData]);
 
@@ -72,40 +78,7 @@ const DemoClassScreen = ({navigation}) => {
   };
 
   const handleBookingStatus = async () => {
-    if (!phone) {
-      setErrorMsg('Enter phone number');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
-      if (!isValidPhone) {
-        setErrorMsg('Please enter a valid number');
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetchBookingDetailsFromPhone(phone);
-
-      if (response.status === 400) {
-        setLoading(false);
-        // Booking not found
-        navigation.navigate('BookDemoForm', {phone});
-        if (errorMsg) setErrorMsg('');
-        return;
-      }
-
-      if (response.status === 200) {
-        await AsyncStorage.setItem('phone', phone);
-        await AsyncStorage.setItem('calling_code', country.callingCode);
-        if (errorMsg) setErrorMsg('');
-        navigation.replace('Main');
-      }
-      setLoading(false);
-    } catch (error) {
-      console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR', error);
-    }
+    dispatch(fetchBookingStatusStart({phone, country}));
   };
 
   const handleSelectCountry = country => {
@@ -113,14 +86,17 @@ const DemoClassScreen = ({navigation}) => {
     if (country.callingCode?.root && country.callingCode?.suffixes.length) {
       code = country.callingCode.root.concat(country.callingCode.suffixes[0]);
     }
-    setCountry({
-      callingCode: code,
-      countryCode: {cca2: country.countryCode.cca2},
-    });
-    setVisible(false);
+    dispatch(
+      setCountry({
+        callingCode: code,
+        countryCode: {cca2: country.countryCode.cca2},
+      }),
+    );
+    dispatch(setModalVisible(false));
   };
 
-  const onCloseBottomSheet = () => setVisible(false);
+  const onCloseBottomSheet = () => dispatch(setModalVisible(false));
+  const showCountryList = () => dispatch(setModalVisible(true));
 
   // Animation stuff
   const SLOGN_TEXT = 'Helping parents raise capable, skillful & happy children';
@@ -170,102 +146,99 @@ const DemoClassScreen = ({navigation}) => {
     }).start();
   }, []);
 
+  const imageTranslateY = imageAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [100, 0],
+  });
+
+  // UI Constants
+  const ANIMATED_TEXT = useMemo(() => {
+    if (!animatedValues.length) return null;
+
+    const TEXT = SLOGN_TEXT.split(' ');
+    return TEXT.map((word, index) => {
+      return (
+        <Animated.Text
+          key={word}
+          style={[
+            styles.animatedText,
+            {
+              opacity: animatedValues[index],
+              transform: [
+                {
+                  translateY: Animated.multiply(
+                    animatedValues[index],
+                    new Animated.Value(-5),
+                  ),
+                },
+              ],
+            },
+          ]}>
+          {word}
+          {index <= TEXT.length ? ' ' : ''}
+        </Animated.Text>
+      );
+    });
+  }, [animatedValues]);
+
+  const maxPhoneLength = useMemo(() => {
+    if (!country?.countryCode) {
+      return 15;
+    }
+    return phoneNumberLength[country.countryCode.cca2];
+  }, [country]);
+
+  const isTablet = deviceWidth > 540;
+  let CONTAINER_STYLE = {};
+  let CONTAINER_FLEX_STYLE = 2;
+
+  if (isTablet) {
+    CONTAINER_STYLE = {
+      alignItems: 'flex-end',
+      justifyContent: 'flex-end',
+    };
+
+    CONTAINER_FLEX_STYLE = 1;
+  }
+
+  const btnContinueStyle = ({pressed}) => [
+    styles.btnContinue,
+    {opacity: pressed ? 0.8 : 1},
+  ];
+
   return (
     <View style={styles.wrapper}>
-      <View style={{flex: isTablet ? 1 : 2}}>
-        <View
-          style={{
-            flex: 1,
-            paddingHorizontal: 16,
-            position: 'relative',
-            alignItems: isTablet ? 'flex-end' : 'center',
-            justifyContent: isTablet ? 'flex-end' : 'center',
-            paddingTop: 20,
-          }}>
+      <View style={{flex: CONTAINER_FLEX_STYLE}}>
+        <View style={[styles.container, CONTAINER_STYLE]}>
           <View>
             <Animated.Image
-              source={require('../assets/images/YoungLabsLogo.png')}
-              style={{
-                alignSelf: 'center',
-                width: IMAGE_WIDTH,
-                height: IMAGE_HEIGHT,
-                maxWidth: 240,
-                maxHeight: 240,
-                objectFit: 'contain',
-                transform: [
-                  {
-                    translateY: imageAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [100, 0],
-                    }),
-                  },
-                ],
-              }}
+              source={IMAGES.LOGO}
+              style={[
+                styles.animatedImage,
+                {
+                  transform: [
+                    {
+                      translateY: imageTranslateY,
+                    },
+                  ],
+                },
+              ]}
             />
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                paddingBottom: 12,
-              }}>
-              {animatedValues.length > 0 &&
-                SLOGN_TEXT.split(' ').map((word, index) => {
-                  return (
-                    <Animated.Text
-                      key={word}
-                      style={[
-                        styles.animatedText,
-                        {
-                          opacity: animatedValues[index],
-                          transform: [
-                            {
-                              translateY: Animated.multiply(
-                                animatedValues[index],
-                                new Animated.Value(-5),
-                              ),
-                            },
-                          ],
-                        },
-                      ]}>
-                      {word}
-                      {index <= SLOGN_TEXT.split(' ').length ? ' ' : ''}
-                    </Animated.Text>
-                  );
-                })}
-            </View>
+            <View style={styles.animtedTextWrapper}>{ANIMATED_TEXT}</View>
           </View>
         </View>
       </View>
       {/* Footer */}
       <Animated.View
         style={[
+          styles.footer,
           {
             opacity: animatedButtons,
-            flex: 1,
-            maxHeight: 180,
-            justifyContent: 'flex-start',
           },
         ]}>
-        <View
-          style={{
-            backgroundColor: COLORS.white,
-            padding: 16,
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            height: '100%',
-            justifyContent: 'center',
-            elevation: 8,
-          }}>
+        <View style={styles.footerContent}>
           <View style={styles.row}>
-            <Pressable
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                paddingHorizontal: 8,
-              }}
-              onPress={() => setVisible(p => !p)}>
+            <Pressable style={styles.btnCountryCode} onPress={showCountryList}>
               <TextWrapper>{country.callingCode}</TextWrapper>
             </Pressable>
             <TextInput
@@ -276,23 +249,17 @@ const DemoClassScreen = ({navigation}) => {
               onChangeText={handlePhone}
               inputMode="numeric"
               placeholderTextColor={'gray'}
-              maxLength={
-                country?.countryCode &&
-                (phoneNumberLength[country.countryCode.cca2] || 15)
-              }
+              maxLength={maxPhoneLength}
             />
           </View>
-          {errorMsg && (
+          {message && (
             <TextWrapper fs={14} color={COLORS.pred}>
-              {errorMsg}
+              {message}
             </TextWrapper>
           )}
           <Spacer space={12} />
           <Pressable
-            style={({pressed}) => [
-              styles.btnContinue,
-              {opacity: pressed ? 0.8 : 1},
-            ]}
+            style={btnContinueStyle}
             disabled={loading}
             onPress={handleBookingStatus}>
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
@@ -307,7 +274,7 @@ const DemoClassScreen = ({navigation}) => {
         </Center>
       </ModalComponent>
       <CountryList
-        visible={visible}
+        visible={modalVisible}
         onClose={onCloseBottomSheet}
         onSelect={handleSelectCountry}
       />
@@ -318,6 +285,14 @@ const DemoClassScreen = ({navigation}) => {
 export default DemoClassScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 20,
+  },
   wrapper: {
     flex: 1,
     backgroundColor: COLORS.white,
@@ -333,6 +308,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 12,
     alignSelf: 'center',
+  },
+  animtedTextWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    paddingBottom: 12,
   },
   animatedText: {
     fontSize: 20,
@@ -373,5 +355,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: COLORS.pgreen,
     borderRadius: 54,
+  },
+  animatedImage: {
+    alignSelf: 'center',
+    width: IMAGE_WIDTH,
+    height: IMAGE_HEIGHT,
+    maxWidth: 240,
+    maxHeight: 240,
+    objectFit: 'contain',
+  },
+  footer: {
+    flex: 1,
+    maxHeight: 180,
+    justifyContent: 'flex-start',
+  },
+  footerContent: {
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    height: '100%',
+    justifyContent: 'center',
+    elevation: 8,
+  },
+  btnCountryCode: {
+    display: 'flex',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
   },
 });

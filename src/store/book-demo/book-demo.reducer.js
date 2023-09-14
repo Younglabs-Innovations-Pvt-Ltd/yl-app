@@ -5,9 +5,13 @@ const INITIAL_STATE = {
   ipData: null,
   country: {callingCode: ''},
   bookingSlots: [],
+  errorMessage: '',
+  popup: false,
+  isBookingLimitExceeded: false,
   loading: {
     ipDataLoading: false,
     bookingSlotsLoading: false,
+    bookingLoading: false,
   },
 };
 
@@ -31,8 +35,26 @@ const reducer = {
     state.bookingSlots = action.payload;
   },
   setIpDataLoadingState(state, action) {
-    console.log(payload);
     state.ipDataLoading = action.payload;
+  },
+  setNewBookingStart(state) {
+    state.loading.bookingLoading = true;
+  },
+  setNewBookingSuccess(state) {
+    state.loading.bookingLoading = false;
+    state.isBookingLimitExceeded = false;
+    state.popup = true;
+  },
+  setNewBookingFailed(state, payload) {
+    state.loading.bookingLoading = false;
+    state.errorMessage = payload;
+  },
+  setIsBookingLimitExceeded(state, action) {
+    state.isBookingLimitExceeded = action.payload;
+    state.loading.bookingLoading = false;
+  },
+  closePopup(state, action) {
+    state.popup = action.payload;
   },
 };
 
@@ -51,6 +73,11 @@ export const {
   startFetchingBookingSlots,
   fetchBookingSlotsSuccess,
   setIpDataLoadingState,
+  setNewBookingStart,
+  setNewBookingFailed,
+  setNewBookingSuccess,
+  setIsBookingLimitExceeded,
+  closePopup,
 } = bookDemoSlice.actions;
 
 // reducer

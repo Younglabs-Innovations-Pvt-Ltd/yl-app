@@ -1,6 +1,6 @@
 import React from 'react';
 import Icon from './icon.component';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 
 const BackButton = props => {
   return (

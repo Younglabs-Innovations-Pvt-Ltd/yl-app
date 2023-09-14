@@ -1,14 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  Pressable,
-  Image,
-  StatusBar,
-} from 'react-native';
+import {StyleSheet, View, FlatList, Pressable, Image} from 'react-native';
 import TextWrapper from './text-wrapper.component';
-import {COLORS, FONTS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
+import {FONTS} from '../utils/constants/fonts';
 import Spinner from './spinner.component';
 import Modal from './modal.component';
 import Input from './input.component';
@@ -71,16 +65,7 @@ const CountryList = ({visible, onClose, onSelect}) => {
       <View style={styles.container}>
         <View style={styles.header}>
           <TextWrapper fs={18}>Select country</TextWrapper>
-          <Pressable
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 36,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#eee',
-            }}
-            onPress={onClose}>
+          <Pressable style={styles.btnClose} onPress={onClose}>
             <Icon name="close-outline" color={COLORS.black} size={24} />
           </Pressable>
         </View>
@@ -96,23 +81,29 @@ const CountryList = ({visible, onClose, onSelect}) => {
         <FlatList
           data={updatedData}
           keyExtractor={country => country.name.official}
-          renderItem={({item}) => {
-            return (
-              <Pressable
-                key={item.name.official}
-                style={({pressed}) => [
-                  styles.listItem,
-                  pressed && {backgroundColor: '#eee'},
-                ]}
-                onPress={() => onSelect(item)}>
-                <Image source={{uri: item.flags.png}} style={styles.flag} />
-                <TextWrapper>{item.name.common}</TextWrapper>
-              </Pressable>
-            );
-          }}
+          renderItem={({item}) => (
+            <CountryItem item={item} onSelect={onSelect} />
+          )}
         />
       </View>
     </Modal>
+  );
+};
+
+const CountryItem = ({item, onSelect}) => {
+  const handleOnSelect = () => onSelect(item);
+
+  return (
+    <Pressable
+      key={item.name.official}
+      style={({pressed}) => [
+        styles.listItem,
+        pressed && {backgroundColor: '#eee'},
+      ]}
+      onPress={handleOnSelect}>
+      <Image source={{uri: item.flags.png}} style={styles.flag} />
+      <TextWrapper>{item.name.common}</TextWrapper>
+    </Pressable>
   );
 };
 
@@ -153,5 +144,13 @@ const styles = StyleSheet.create({
     flex: 1,
     color: COLORS.black,
     fontFamily: FONTS.roboto,
+  },
+  btnClose: {
+    width: 36,
+    height: 36,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#eee',
   },
 });

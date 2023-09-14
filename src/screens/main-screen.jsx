@@ -5,11 +5,12 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Tabbar from '../components/tabbar-component';
 import DrawerScreen from './drawer-screen';
 
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch} from 'react-redux';
 import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 const Tab = createBottomTabNavigator();
 
@@ -34,7 +35,7 @@ const MainScreen = ({route}) => {
     // only then set booking id
     const checkForPhone = async () => {
       try {
-        const isPhoneExists = await AsyncStorage.getItem('phone');
+        const isPhoneExists = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
         if (!isPhoneExists) {
           dispatch(setDemoBookingId(data.bookingId));
         }

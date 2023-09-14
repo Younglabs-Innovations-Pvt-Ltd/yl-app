@@ -2,13 +2,15 @@ import React, {useEffect, useState, useMemo} from 'react';
 import {StyleSheet, View, Pressable, Linking} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import TextWrapper from '../text-wrapper.component';
-import {COLORS} from '../../assets/theme/theme';
+import {COLORS} from '../../utils/constants/colors';
 import Icon from '../icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RATING_API, MARK_MORE_INFO_API} from '@env';
+import {SCREEN_NAMES} from '../../utils/constants/screen-names';
+import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
@@ -30,7 +32,7 @@ const PostDemoAction = () => {
         demoDate: {_seconds},
       } = demoData;
       const currentTime = Date.now();
-      const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24 * 10;
+      const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24;
 
       if (currentTime > afterTenDays) {
         return true;
@@ -43,7 +45,7 @@ const PostDemoAction = () => {
   useEffect(() => {
     const checkForRating = async () => {
       try {
-        const rating = await AsyncStorage.getItem('isRated');
+        const rating = await AsyncStorage.getItem(LOCAL_KEYS.IS_RATED);
         if (rating === 'true') {
           setIsRated(true);
         }
@@ -72,7 +74,7 @@ const PostDemoAction = () => {
       });
 
       if (response.status === 200) {
-        await AsyncStorage.setItem('isRated', 'true');
+        await AsyncStorage.setItem(LOCAL_KEYS.IS_RATED, 'true');
         setIsRated(true);
       }
     } catch (error) {
@@ -90,7 +92,7 @@ const PostDemoAction = () => {
   const markNeedMoreInfo = async () => {
     try {
       setDisableButton(true);
-      const isNmi = await AsyncStorage.getItem('nmi');
+      const isNmi = await AsyncStorage.getItem(LOCAL_KEYS.NMI);
       if (!isNmi) {
         const response = await fetch(MARK_MORE_INFO_API, {
           method: 'POST',
@@ -104,7 +106,7 @@ const PostDemoAction = () => {
         });
 
         if (response.status === 200) {
-          await AsyncStorage.setItem('nmi', 'true');
+          await AsyncStorage.setItem(LOCAL_KEYS.NMI, 'true');
         }
       }
 
@@ -137,8 +139,25 @@ const PostDemoAction = () => {
     const {childAge, parentName, phone, childName} = bookingDetails;
     const formFields = {childAge, parentName, phone, childName};
 
-    navigation.navigate('BookDemoSlots', {formFields});
+    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
   };
+
+  // UI Constants
+  const RATING_STARS = useMemo(() => {
+    return Array.from({length: 5}, (_, i) => {
+      return (
+        <Pressable key={i} onPress={() => onChangeRating(i + 1)}>
+          <Icon
+            name={
+              rating ? (i < rating ? 'star' : 'star-outline') : 'star-outline'
+            }
+            size={32}
+            color={rating ? (i < rating ? COLORS.pgreen : 'gray') : 'gray'}
+          />
+        </Pressable>
+      );
+    });
+  }, [rating]);
 
   if (loading) return null;
 
@@ -155,27 +174,7 @@ const PostDemoAction = () => {
           </TextWrapper>
           <View style={styles.ratingWrapper}>
             <TextWrapper fs={20}>Please rate your class experience</TextWrapper>
-            <View style={styles.starsContainer}>
-              {Array.from({length: 5}, (_, i) => {
-                return (
-                  <Pressable key={i} onPress={() => onChangeRating(i + 1)}>
-                    <Icon
-                      name={
-                        rating
-                          ? i < rating
-                            ? 'star'
-                            : 'star-outline'
-                          : 'star-outline'
-                      }
-                      size={32}
-                      color={
-                        rating ? (i < rating ? COLORS.pgreen : 'gray') : 'gray'
-                      }
-                    />
-                  </Pressable>
-                );
-              })}
-            </View>
+            <View style={styles.starsContainer}>{RATING_STARS}</View>
           </View>
         </View>
       ) : (
@@ -192,7 +191,6 @@ const PostDemoAction = () => {
                   {opacity: pressed ? 0.8 : 1},
                 ]}
                 onPress={rescheduleFreeClass}>
-                {/* <MIcon name="web" size={22} color={COLORS.black} /> */}
                 <TextWrapper>Reschedule a new class</TextWrapper>
               </Pressable>
             )}

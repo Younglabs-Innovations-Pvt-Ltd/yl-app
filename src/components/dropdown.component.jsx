@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, Pressable, ScrollView, View} from 'react-native';
 import TextWrapper from './text-wrapper.component';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 import Icon from './icon.component';
 
 export const Dropdown = ({defaultValue, value, open, ...otherProps}) => {
@@ -51,19 +51,17 @@ const DropdownItem = ({age, onChangeValue, onClose, currentValue}) => {
     onClose();
   };
 
+  const btnStyle = e => [
+    styles.item,
+    {opacity: e.pressed ? 0.25 : 1},
+    {
+      backgroundColor: currentValue === age ? '#eee' : 'transparent',
+    },
+  ];
+
   return (
-    <Pressable
-      style={e => [
-        styles.item,
-        {opacity: e.pressed ? 0.25 : 1},
-        {
-          backgroundColor: currentValue === age ? 'gray' : 'transparent',
-        },
-      ]}
-      onPress={handleChange}>
-      <TextWrapper color={currentValue === age ? COLORS.white : COLORS.black}>
-        {age}
-      </TextWrapper>
+    <Pressable style={btnStyle} onPress={handleChange}>
+      <TextWrapper color={COLORS.black}>{age}</TextWrapper>
     </Pressable>
   );
 };
@@ -82,7 +80,7 @@ const styles = StyleSheet.create({
   },
   listWrapper: {
     width: '100%',
-    paddingHorizontal: 12,
+    padding: 12,
     backgroundColor: COLORS.white,
     height: 240,
     shadowColor: '#171717',

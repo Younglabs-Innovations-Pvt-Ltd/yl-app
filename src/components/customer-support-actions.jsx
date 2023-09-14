@@ -18,7 +18,8 @@ import Modal from './modal.component';
 
 import {Select, SelectContent, SelectItem} from './selelct.component';
 
-import {COLORS, FONTS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
+import {FONTS} from '../utils/constants/fonts';
 
 import {useSelector} from 'react-redux';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
@@ -36,8 +37,6 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const [inquiryLoading, setInquiryLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const isTablet = deviceWidth > 540;
 
   // entries
   const [courseId, setCourseId] = useState('');
@@ -58,14 +57,14 @@ const CustomerSupportActions = ({visible, onClose}) => {
       whatappUrl = `whatsapp://wa.me/${phoneNumber}&text=I would like to know more about your courses`;
     }
     try {
-      const canOpen = await Linking.canOpenURL(whatappUrl);
-
-      if (canOpen) {
-        await Linking.openURL(whatappUrl);
-      }
+      await Linking.openURL(whatappUrl);
     } catch (error) {
       console.log('join demo screen whatsapp redirect error', error);
     }
+  };
+
+  const onChangeOtherOptions = e => {
+    setOtherOption(e);
   };
 
   const onSelectComment = val => {
@@ -73,7 +72,9 @@ const CustomerSupportActions = ({visible, onClose}) => {
     if (errorMessage) setErrorMessage('');
   };
 
-  const onSelectCourseId = id => setCourseId(id);
+  const onSelectCourseId = id => {
+    setCourseId(id);
+  };
 
   const onCloseForm = () => {
     setOtherOption('');
@@ -131,25 +132,27 @@ const CustomerSupportActions = ({visible, onClose}) => {
     if (errorMessage) setErrorMessage('');
   };
 
+  // UI Constants
+  const isTablet = deviceWidth > 540;
+  let TABLE_MODAL_CONTENT_PADDING = {};
+  let MODAL_WRAPPER_PADDING_TOP = 120;
+
+  if (isTablet) {
+    TABLE_MODAL_CONTENT_PADDING = {
+      paddingHorizontal: 20,
+      paddingVertical: 40,
+    };
+    MODAL_WRAPPER_PADDING_TOP = 200;
+  }
+
   return (
     <>
       <View style={styles.customerSupportActions}>
         <Modal visible={visible} onRequestClose={onClose}>
-          <Pressable
-            style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.3)'}}
-            onPress={onClose}>
-            <View
-              style={{
-                position: 'absolute',
-                right: 12,
-                bottom: 68,
-              }}>
+          <Pressable style={styles.container} onPress={onClose}>
+            <View style={styles.actionsContainer}>
               <Pressable style={styles.btnCta} onPress={handleShowFormVisible}>
-                <View
-                  style={{
-                    paddingVertical: 8,
-                    borderRadius: 4,
-                  }}>
+                <View style={styles.btnCtaContentContainer}>
                   <TextWrapper color={COLORS.black}>
                     Request callback
                   </TextWrapper>
@@ -158,11 +161,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
               </Pressable>
               <Spacer space={4} />
               <Pressable style={styles.btnCta} onPress={openWhatsapp}>
-                <View
-                  style={{
-                    paddingVertical: 8,
-                    borderRadius: 4,
-                  }}>
+                <View style={styles.btnCtaContentContainer}>
                   <TextWrapper color={COLORS.black}>Chat with us</TextWrapper>
                 </View>
                 <Icon name="logo-whatsapp" size={32} color={COLORS.pgreen} />
@@ -173,25 +172,13 @@ const CustomerSupportActions = ({visible, onClose}) => {
       </View>
       <Modal visible={formVisible} onRequestClose={onCloseForm}>
         <View
-          style={{
-            flex: 1,
-            paddingTop: isTablet ? 200 : 120,
-            paddingHorizontal: 16,
-            backgroundColor: 'rgba(0,0,0,0.25)',
-          }}>
+          style={[
+            styles.modalWrapper,
+            {paddingTop: MODAL_WRAPPER_PADDING_TOP},
+          ]}>
           <KeyboardAvoidingView>
             <ScrollView showsVerticalScrollIndicator={false}>
-              <View
-                style={{
-                  backgroundColor: COLORS.white,
-                  borderRadius: 6,
-                  paddingHorizontal: isTablet ? 20 : 12,
-                  paddingVertical: isTablet ? 40 : 20,
-                  maxWidth: 380,
-                  width: '100%',
-                  alignSelf: 'center',
-                  elevation: 2,
-                }}>
+              <View style={[styles.modalContent, TABLE_MODAL_CONTENT_PADDING]}>
                 <View
                   style={{
                     justifyContent: 'space-between',
@@ -268,7 +255,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
                   <Input
                     placeholder="Enter your option"
                     value={otherOption}
-                    onChangeText={e => setOtherOption(e)}
+                    onChangeText={onChangeOtherOptions}
                   />
                 )}
                 {errorMessage && (
@@ -310,12 +297,18 @@ const CustomerSupportActions = ({visible, onClose}) => {
 export default CustomerSupportActions;
 
 const styles = StyleSheet.create({
+  container: {flex: 1, backgroundColor: 'rgba(0,0,0,0.3)'},
   customerSupportActions: {
     position: 'absolute',
     bottom: 20,
     right: 20,
     alignItems: 'flex-end',
     zIndex: 1000,
+  },
+  actionsContainer: {
+    position: 'absolute',
+    right: 12,
+    bottom: 68,
   },
   btnCustomerSupport: {
     width: 48,
@@ -325,6 +318,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: COLORS.white,
     elevation: 4,
+  },
+  btnCtaContentContainer: {
+    paddingVertical: 8,
+    borderRadius: 4,
   },
   btnCta: {
     flexDirection: 'row',
@@ -369,5 +366,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.pgreen,
     borderRadius: 4,
+  },
+  modalWrapper: {
+    flex: 1,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  modalContent: {
+    backgroundColor: COLORS.white,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 20,
+    maxWidth: 380,
+    width: '100%',
+    alignSelf: 'center',
+    elevation: 2,
   },
 });

@@ -5,7 +5,7 @@ import Spacer from './spacer.component';
 import Input from './input.component';
 import Icon from './icon.component';
 import Button from './button.component';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 
 import {SEND_CLASS_LINK_URL} from '@env';
 import Spinner from './spinner.component';
@@ -15,6 +15,7 @@ const Features = ({demoData}) => {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [emailSent, setEmailSent] = useState(demoData?.emailSent || false);
 
   const demoTime = demoData.demoDate._seconds * 1000;
@@ -22,7 +23,22 @@ const Features = ({demoData}) => {
 
   const isDemoOver = currentTime > demoTime;
 
+  const onChangeEmail = e => {
+    setEmail(e);
+  };
+
   const sendLinkOnEmail = async () => {
+    if (!email) {
+      setErrorMessage('Please enter email');
+      return;
+    }
+
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage('Please enter a valid email');
+      return;
+    }
+
     try {
       setEmailLoading(true);
       const res = await fetch(SEND_CLASS_LINK_URL, {
@@ -38,6 +54,10 @@ const Features = ({demoData}) => {
         setEmailSent(true);
         setEmailLoading(false);
       }
+
+      if (errorMessage) {
+        setErrorMessage('');
+      }
     } catch (error) {
       console.log('SEND_LINK_ON_EMAIL_ERROR_DEMO_WAITING', error);
       setEmailLoading(false);
@@ -45,10 +65,10 @@ const Features = ({demoData}) => {
   };
 
   const handleSendLink = () => {
-    if (email) {
-      sendLinkOnEmail();
-    } else {
+    if (!show) {
       setShow(true);
+    } else {
+      sendLinkOnEmail();
     }
   };
 
@@ -75,9 +95,17 @@ const Features = ({demoData}) => {
                     placeholder="Enter your email"
                     inputMode="email"
                     value={email}
-                    onChangeText={e => setEmail(e)}
+                    onChangeText={onChangeEmail}
                     autoCapitalize="none"
                   />
+                )}
+                {errorMessage && (
+                  <TextWrapper
+                    fs={14}
+                    color={COLORS.pred}
+                    styles={{alignSelf: 'flex-start'}}>
+                    {errorMessage}
+                  </TextWrapper>
                 )}
                 <Spacer />
                 <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
@@ -87,17 +115,7 @@ const Features = ({demoData}) => {
                 </Button>
               </View>
             ) : (
-              <View
-                style={{
-                  width: '100%',
-                  height: 48,
-                  paddingVertical: 6,
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: COLORS.pgreen,
-                  borderRadius: 4,
-                }}>
+              <View style={styles.btnSendLink}>
                 <TextWrapper
                   fs={16}
                   fw="700"
@@ -237,5 +255,15 @@ const styles = StyleSheet.create({
   featureContent: {
     alignItems: 'center',
     marginTop: 16,
+  },
+  btnSendLink: {
+    width: '100%',
+    height: 48,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.pgreen,
+    borderRadius: 4,
   },
 });

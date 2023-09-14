@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {StyleSheet, View, Pressable, Image} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 import CustomerSupportActions from './customer-support-actions';
 
 const Icons = (name, focused) => {

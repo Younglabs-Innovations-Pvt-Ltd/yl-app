@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 
 const Header = ({text}) => {

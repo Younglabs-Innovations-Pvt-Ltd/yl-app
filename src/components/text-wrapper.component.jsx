@@ -1,6 +1,7 @@
 import React from 'react';
 import {Text} from 'react-native';
-import {FONTS, COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
+import {FONTS} from '../utils/constants/fonts';
 
 const TextWrapper = ({
   fs = 16,

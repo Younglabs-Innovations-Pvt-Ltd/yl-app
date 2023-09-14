@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {StyleSheet, Pressable, View, Linking} from 'react-native';
 import {CommonActions} from '@react-navigation/native';
 
@@ -7,7 +7,7 @@ import Spacer from '../components/spacer.component';
 import Spinner from '../components/spinner.component';
 import Button from '../components/button.component';
 import Modal from '../components/modal.component';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
@@ -16,21 +16,21 @@ import {
   startFetchingBookingSlots,
   startFetchingIpData,
   setTimezone,
+  setNewBookingStart,
+  setIsBookingLimitExceeded,
+  closePopup,
 } from '../store/book-demo/book-demo.reducer';
 import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
-
-import {ADD_BOOKINGS_API} from '@env';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 const BookDemoSlots = ({route, navigation}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
-  const [popup, setPopup] = useState(false);
-  const [disableButton, setDisableButton] = useState(false);
-  const [isBookingLimitExceeded, setIsBookingLimitExceeded] = useState(false);
 
   const {
     formFields: {childAge, parentName: name, phone, childName},
@@ -41,7 +41,9 @@ const BookDemoSlots = ({route, navigation}) => {
     bookingSlots,
     timezone,
     ipData,
-    loading: {bookingSlotsLoading},
+    isBookingLimitExceeded,
+    popup,
+    loading: {bookingSlotsLoading, bookingLoading},
   } = useSelector(bookDemoSelector);
 
   const {demoBookingId} = useSelector(joinDemoSelector);
@@ -119,46 +121,20 @@ const BookDemoSlots = ({route, navigation}) => {
       countryCode: ipData.calling_code,
     };
 
-    try {
-      setDisableButton(true);
-      const response = await fetch(ADD_BOOKINGS_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bodyData),
-      });
-
-      const bookingDetails = await response.json();
-      console.log(bookingDetails);
-
-      if (response.status === 200) {
-        await AsyncStorage.setItem('phone', phone.toString());
-        await AsyncStorage.setItem('calling_code', ipData.calling_code);
-
-        setPopup(true);
-        setDisableButton(false);
-      } else if (response.status === 400) {
-        console.log('booking data', bookingDetails);
-        setIsBookingLimitExceeded(true);
-        setDisableButton(false);
-      }
-    } catch (error) {
-      console.log('booking error', error);
-      setDisableButton(false);
-    }
+    dispatch(setNewBookingStart({data: bodyData, ipData}));
   };
 
   const handlePopup = async () => {
     const resetAction = CommonActions.reset({
       index: 0,
-      routes: [{name: 'Main'}],
+      routes: [{name: SCREEN_NAMES.MAIN}],
     });
 
     if (demoBookingId) {
-      await AsyncStorage.removeItem('bookingid');
+      await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
       dispatch(setDemoBookingId(''));
     }
+    dispatch(closePopup());
     navigation.dispatch(resetAction);
   };
 
@@ -179,7 +155,60 @@ const BookDemoSlots = ({route, navigation}) => {
     }
   };
 
-  const closeModal = () => setIsBookingLimitExceeded(false);
+  const closeModal = () => dispatch(setIsBookingLimitExceeded(false));
+
+  // UI Constants
+  // Slot dates
+  const SLOT_DATES = useMemo(() => {
+    return bookingSlots.map(slot => {
+      return (
+        <Pressable
+          style={[
+            styles.slotDate,
+            currentSlotDate === slot.showDate
+              ? {backgroundColor: COLORS.pgreen}
+              : {borderWidth: 1, borderColor: 'gray'},
+          ]}
+          key={slot.showDate}
+          onPress={() => handleCurrentSlotDate(slot.showDate)}>
+          <TextWrapper
+            color={
+              currentSlotDate === slot.showDate ? COLORS.white : COLORS.black
+            }>
+            {slot.showDate}
+          </TextWrapper>
+        </Pressable>
+      );
+    });
+  }, [bookingSlots, currentSlotDate]);
+
+  //
+  const SLOT_TIMES = useMemo(() => {
+    if (!slotsTime) return null;
+
+    return slotsTime[currentSlotDate].map(slotTime => {
+      return (
+        <Pressable
+          style={[
+            styles.slotDate,
+            currentSlotTime.showTimings === slotTime.showTimings
+              ? {backgroundColor: COLORS.pgreen}
+              : {borderWidth: 1, borderColor: 'gray'},
+          ]}
+          key={slotTime.slotId}
+          onPress={() => handleCurrentSlotTime(slotTime)}>
+          <TextWrapper
+            color={
+              currentSlotTime.showTimings === slotTime.showTimings
+                ? COLORS.white
+                : COLORS.black
+            }>
+            {slotTime.showTimings}
+          </TextWrapper>
+        </Pressable>
+      );
+    });
+  }, [slotsTime, currentSlotDate, currentSlotTime]);
 
   return bookingSlotsLoading ? (
     <Spinner style={{alignSelf: 'center'}} />
@@ -190,30 +219,8 @@ const BookDemoSlots = ({route, navigation}) => {
           <TextWrapper fs={20} color={COLORS.black} fw="bold">
             Select date:
           </TextWrapper>
-          <View style={styles.slotDateList}>
-            {bookingSlots.map(slot => {
-              return (
-                <Pressable
-                  style={[
-                    styles.slotDate,
-                    currentSlotDate === slot.showDate
-                      ? {backgroundColor: COLORS.pgreen}
-                      : {borderWidth: 1, borderColor: 'gray'},
-                  ]}
-                  key={slot.showDate}
-                  onPress={() => handleCurrentSlotDate(slot.showDate)}>
-                  <TextWrapper
-                    color={
-                      currentSlotDate === slot.showDate
-                        ? COLORS.white
-                        : COLORS.black
-                    }>
-                    {slot.showDate}
-                  </TextWrapper>
-                </Pressable>
-              );
-            })}
-          </View>
+          {/* Slot dates */}
+          <View style={styles.slotDateList}>{SLOT_DATES}</View>
         </View>
 
         <Spacer />
@@ -222,50 +229,12 @@ const BookDemoSlots = ({route, navigation}) => {
           <TextWrapper fs={20} color={COLORS.black} fw="bold">
             Select time:
           </TextWrapper>
-          <View style={styles.slotDateList}>
-            {slotsTime &&
-              slotsTime[currentSlotDate].map(slotTime => {
-                return (
-                  <Pressable
-                    style={[
-                      styles.slotDate,
-                      currentSlotTime.showTimings === slotTime.showTimings
-                        ? {backgroundColor: COLORS.pgreen}
-                        : {borderWidth: 1, borderColor: 'gray'},
-                    ]}
-                    key={slotTime.slotId}
-                    onPress={() => handleCurrentSlotTime(slotTime)}>
-                    <TextWrapper
-                      color={
-                        currentSlotTime.showTimings === slotTime.showTimings
-                          ? COLORS.white
-                          : COLORS.black
-                      }>
-                      {slotTime.showTimings}
-                    </TextWrapper>
-                  </Pressable>
-                );
-              })}
-          </View>
+          {/* Slot times */}
+          <View style={styles.slotDateList}>{SLOT_TIMES}</View>
         </View>
         <Modal visible={isBookingLimitExceeded} onRequestClose={closeModal}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: 'rgba(0,0,0,0.25)',
-              justifyContent: 'center',
-            }}>
-            <View
-              style={{
-                width: '100%',
-                maxWidth: 348,
-                minHeight: 180,
-                alignSelf: 'center',
-                justifyContent: 'center',
-                backgroundColor: COLORS.white,
-                padding: 16,
-                borderRadius: 4,
-              }}>
+          <View style={styles.bookingModalContainer}>
+            <View style={styles.bookingModal}>
               <View style={{paddingBottom: 18, alignItems: 'flex-end'}}>
                 <Pressable onPress={closeModal}>
                   <Icon name="close-outline" size={24} color={COLORS.black} />
@@ -292,7 +261,6 @@ const BookDemoSlots = ({route, navigation}) => {
       </View>
       <View style={styles.footer}>
         <Button
-          loading={disableButton}
           bg={COLORS.pgreen}
           onPress={handleBookNow}
           textColor={COLORS.white}>
@@ -301,6 +269,11 @@ const BookDemoSlots = ({route, navigation}) => {
       </View>
       {/* show popup */}
       {popup && <Popup onHandlePopup={handlePopup} />}
+      <Modal visible={bookingLoading}>
+        <Center bg="rgba(0,0,0,0.2)">
+          <Spinner />
+        </Center>
+      </Modal>
     </>
   );
 };
@@ -364,7 +337,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   popup: {
-    maxWidth: 324,
+    maxWidth: 348,
     backgroundColor: COLORS.white,
     borderRadius: 4,
     paddingHorizontal: 12,
@@ -391,5 +364,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.pgreen,
     flexDirection: 'row',
     borderRadius: 4,
+  },
+  bookingModal: {
+    width: '100%',
+    maxWidth: 348,
+    minHeight: 180,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+    padding: 16,
+    borderRadius: 4,
+  },
+  bookingModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    justifyContent: 'center',
   },
 });

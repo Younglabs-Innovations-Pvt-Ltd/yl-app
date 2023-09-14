@@ -5,27 +5,18 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Pressable,
-  TextInput,
 } from 'react-native';
-import {COLORS} from '../assets/theme/theme';
+import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch, useSelector} from 'react-redux';
-import CountryList from '../components/country-list.component';
-import {isValidNumber} from '../utils/isValidNumber';
-import Spinner from '../components/spinner.component';
 import Input from '../components/input.component';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
-import Modal from '../components/modal.component';
 
-import {
-  setTimezone,
-  startFetchingIpData,
-  setIpDataLoadingState,
-} from '../store/book-demo/book-demo.reducer';
+import {setTimezone} from '../store/book-demo/book-demo.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import Center from '../components/center.component';
 import {Dropdown, DropdownList} from '../components/dropdown.component';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -35,53 +26,35 @@ const INITIAL_sTATE = {
 };
 
 const BookDemoScreen = ({route, navigation}) => {
-  const {phone: phoneNumber} = route.params;
+  const {phone, country} = route.params;
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
-  const [phone, setPhone] = useState(phoneNumber);
   const [childAge, setChildAge] = useState(null);
   const [fields, setFields] = useState(INITIAL_sTATE);
-
-  const [errorMessage, setErrorMessage] = useState('');
-  const [visible, setVisible] = useState(false);
-  const [country, setCountry] = useState({callingCode: ''});
 
   const dispatch = useDispatch();
 
   const isActive = useMemo(() => {
-    if (!fields.parentName || !fields.childName || !phone || !childAge) {
+    if (!fields.parentName || !fields.childName || !childAge) {
       return false;
     }
 
     return true;
-  }, [fields.childName, fields.parentName, phone, childAge]);
+  }, [fields.childName, fields.parentName, childAge]);
 
-  const {
-    ipData,
-    loading: {ipDataLoading},
-  } = useSelector(bookDemoSelector);
-
-  useEffect(() => {
-    if (!ipData) {
-      dispatch(startFetchingIpData());
-    }
-  }, [ipData]);
-
-  useEffect(() => {
-    if (ipData) {
-      setCountry({
-        callingCode: ipData.calling_code,
-        countryCode: {cca2: ipData.country_code2},
-      });
-    }
-  }, [ipData]);
+  const {ipData} = useSelector(bookDemoSelector);
 
   useEffect(() => {
     if (ipData) {
       const tz = ipData.time_zone.offset + ipData.time_zone.dst_savings;
+
       dispatch(setTimezone(tz));
     }
   }, [ipData]);
+
+  const onLayoutChange = event => {
+    setGutter(event.nativeEvent.layout.y + event.nativeEvent.layout.height);
+  };
 
   const handleChangeValue = e => {
     const {name, value} = e;
@@ -91,40 +64,27 @@ const BookDemoScreen = ({route, navigation}) => {
     }
   };
 
-  const handlePhone = e => {
-    const phoneRegex = /^[0-9]*$/;
-    if (phoneRegex.test(e)) {
-      setPhone(e);
-    }
-  };
-
   const handleOnClose = () => setOpen(false);
 
   const handleDemoSlots = async () => {
-    const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
-    if (!isValidPhone) {
-      setErrorMessage({...errorMessage, phone: 'Please enter a valid number'});
-      return;
-    }
-
     const formFields = {...fields, phone, childAge};
 
-    navigation.navigate('BookDemoSlots', {formFields});
+    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
   };
 
-  const handleSelectCountry = country => {
-    let code = '';
-    if (country.callingCode?.root && country.callingCode?.suffixes.length) {
-      code = country.callingCode.root.concat(country.callingCode.suffixes[0]);
-    }
-    setCountry({
-      callingCode: code,
-      countryCode: {cca2: country.countryCode.cca2},
-    });
-    setVisible(false);
+  const handleChildAge = ({childAge}) => {
+    setChildAge(childAge);
   };
 
-  const onCloseBottomSheet = () => setVisible(false);
+  const onChangeOpen = () => setOpen(true);
+
+  const btnNextStyle = ({pressed}) => [
+    styles.btnNext,
+    {
+      opacity: pressed ? 0.8 : 1,
+      backgroundColor: !isActive ? '#eaeaea' : COLORS.pgreen,
+    },
+  ];
 
   return (
     <KeyboardAvoidingView>
@@ -135,6 +95,18 @@ const BookDemoScreen = ({route, navigation}) => {
         contentContainerStyle={{paddingBottom: 40}}>
         <View style={styles.container}>
           <View>
+            <View style={styles.row}>
+              <View style={styles.phoneBox}>
+                <TextWrapper
+                  fs={18}
+                  styles={{letterSpacing: 1}}
+                  fw="bold"
+                  color={
+                    'gray'
+                  }>{`${country.callingCode} ${phone}`}</TextWrapper>
+              </View>
+            </View>
+            <Spacer />
             <Input
               inputMode="text"
               placeholder="Enter parent name"
@@ -153,63 +125,19 @@ const BookDemoScreen = ({route, navigation}) => {
               }
             />
             <Spacer />
-            <View style={styles.row}>
-              <Pressable
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  paddingHorizontal: 8,
-                  borderBottomWidth: 1,
-                  borderBottomColor: COLORS.black,
-                }}
-                onPress={() => setVisible(p => !p)}>
-                <TextWrapper>{country.callingCode}</TextWrapper>
-              </Pressable>
-              <TextInput
-                placeholder="Enter your phone number"
-                style={styles.input}
-                selectionColor={COLORS.black}
-                value={phone}
-                onChangeText={handlePhone}
-                inputMode="numeric"
-                placeholderTextColor={'gray'}
-              />
-            </View>
-
-            <TextWrapper fs={14} color="gray">
-              Please enter valid whatsapp number to receive further class
-              details
-              {/* <Icon name="logo-whatsapp" size={18} color={COLORS.pgreen} /> */}
-            </TextWrapper>
-            <Spacer />
             <Dropdown
               defaultValue="Select child age"
               value={childAge}
-              onPress={() => setOpen(true)}
+              onPress={onChangeOpen}
               open={open}
-              onLayout={event =>
-                setGutter(
-                  event.nativeEvent.layout.y + event.nativeEvent.layout.height,
-                )
-              }
+              onLayout={onLayoutChange}
             />
-            {errorMessage && (
-              <TextWrapper fs={14} color={COLORS.pred}>
-                {errorMessage}
-              </TextWrapper>
-            )}
           </View>
         </View>
       </ScrollView>
       <View style={styles.footer}>
         <Pressable
-          style={({pressed}) => [
-            styles.btnNext,
-            {
-              opacity: pressed ? 0.8 : 1,
-              backgroundColor: !isActive ? '#eaeaea' : COLORS.pgreen,
-            },
-          ]}
+          style={btnNextStyle}
           disabled={!isActive}
           onPress={handleDemoSlots}>
           <TextWrapper
@@ -220,27 +148,15 @@ const BookDemoScreen = ({route, navigation}) => {
           </TextWrapper>
         </Pressable>
       </View>
-      <CountryList
-        visible={visible}
-        onClose={onCloseBottomSheet}
-        onSelect={handleSelectCountry}
-      />
       {open && (
         <DropdownList
           data={ageList}
           gutter={gutter}
           currentValue={childAge}
           onClose={handleOnClose}
-          onChange={({childAge}) => setChildAge(childAge)}
+          onChange={handleChildAge}
         />
       )}
-      <Modal
-        visible={ipDataLoading}
-        onRequestClose={() => setIpDataLoadingState(false)}>
-        <Center>
-          <Spinner />
-        </Center>
-      </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -280,5 +196,19 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  btnCallingCode: {
+    display: 'flex',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.black,
+  },
+  phoneBox: {
+    width: '100%',
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 4,
   },
 });
