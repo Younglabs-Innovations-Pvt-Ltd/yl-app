@@ -7,8 +7,9 @@ import Icon from './icon.component';
 import Button from './button.component';
 import {COLORS} from '../utils/constants/colors';
 
-import {SEND_CLASS_LINK_URL} from '@env';
+import {BASE_URL, SEND_CLASS_LINK_URL} from '@env';
 import Spinner from './spinner.component';
+import {i18nContext} from '../context/lang.context';
 
 const Features = ({demoData}) => {
   if (!demoData) return null;
@@ -17,6 +18,8 @@ const Features = ({demoData}) => {
   const [emailLoading, setEmailLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [emailSent, setEmailSent] = useState(demoData?.emailSent || false);
+
+  const {localLang} = i18nContext();
 
   const demoTime = demoData.demoDate._seconds * 1000;
   const currentTime = Date.now();
@@ -41,7 +44,7 @@ const Features = ({demoData}) => {
 
     try {
       setEmailLoading(true);
-      const res = await fetch(SEND_CLASS_LINK_URL, {
+      const res = await fetch(`${BASE_URL}${SEND_CLASS_LINK_URL}`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -88,7 +91,7 @@ const Features = ({demoData}) => {
               <View
                 style={{marginTop: 20, width: '100%', alignItems: 'center'}}>
                 <TextWrapper color={COLORS.black} fs={18}>
-                  Want to join class on other device?
+                  {localLang.sendEmailLabel}
                 </TextWrapper>
                 {show && (
                   <Input
@@ -110,7 +113,7 @@ const Features = ({demoData}) => {
                 <Spacer />
                 <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
                   <TextWrapper fs={17} fw="700" color={COLORS.white}>
-                    {'Get class link on email'}
+                    {localLang.sendEmailButtonText}
                   </TextWrapper>
                 </Button>
               </View>
@@ -121,7 +124,7 @@ const Features = ({demoData}) => {
                   fw="700"
                   color={COLORS.white}
                   styles={{marginRight: 4}}>
-                  Class link shared on your email
+                  {localLang.sendEmailInformText}
                 </TextWrapper>
                 <Icon name="mail-outline" size={24} color={COLORS.white} />
               </View>
@@ -131,7 +134,7 @@ const Features = ({demoData}) => {
       </View>
       <View style={[styles.features]}>
         <TextWrapper fs={28} styles={{textAlign: 'center'}}>
-          Course Features
+          {localLang.courseFeaturesLabel}
         </TextWrapper>
         <View style={styles.feature}>
           <Image
@@ -140,11 +143,11 @@ const Features = ({demoData}) => {
           />
           <View style={styles.featureContent}>
             <TextWrapper fs={18} fw="700">
-              Submit Homework
+              {localLang.courseFeatureLabel1}
             </TextWrapper>
             <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-              Submit homework and get feedback from your teacher.
+              {localLang.courseFeatureText1}
             </TextWrapper>
           </View>
         </View>
@@ -157,11 +160,11 @@ const Features = ({demoData}) => {
           />
           <View style={styles.featureContent}>
             <TextWrapper fs={18} fw="700">
-              Download Worksheets
+              {localLang.courseFeatureLabel2}
             </TextWrapper>
             <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-              Get access to worksheets of the course and practice.
+              {localLang.courseFeatureText2}
             </TextWrapper>
           </View>
         </View>
@@ -174,11 +177,11 @@ const Features = ({demoData}) => {
           />
           <View style={styles.featureContent}>
             <TextWrapper fs={18} fw="700">
-              View Recordings
+              {localLang.courseFeatureLabel3}
             </TextWrapper>
             <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-              Watch the recordings of the classes you missed.
+              {localLang.courseFeatureText3}
             </TextWrapper>
           </View>
         </View>
@@ -189,11 +192,11 @@ const Features = ({demoData}) => {
           />
           <View style={styles.featureContent}>
             <TextWrapper fs={18} fw="700">
-              Reschedule Classes
+              {localLang.courseFeatureLabel4}
             </TextWrapper>
             <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-              Won't be able to attend a class? Reschedule it.
+              {localLang.courseFeatureText4}
             </TextWrapper>
           </View>
         </View>
@@ -206,12 +209,11 @@ const Features = ({demoData}) => {
           />
           <View style={styles.featureContent}>
             <TextWrapper fs={18} fw="700">
-              Customer Support
+              {localLang.courseFeatureLabel5}
             </TextWrapper>
             <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-              Facing any issues? Our customer support team is always there to
-              help you.
+              {localLang.courseFeatureText5}
             </TextWrapper>
           </View>
         </View>
@@ -222,11 +224,11 @@ const Features = ({demoData}) => {
           />
           <View style={styles.featureContent}>
             <TextWrapper fs={18} fw="700">
-              Certificate of Completion
+              {localLang.courseFeatureLabel6}
             </TextWrapper>
             <Spacer space={4} />
             <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-              Get a certificate of completion after completing the course
+              {localLang.courseFeatureText6}
             </TextWrapper>
           </View>
         </View>

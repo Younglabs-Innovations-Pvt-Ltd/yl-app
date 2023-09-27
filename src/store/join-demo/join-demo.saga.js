@@ -6,6 +6,8 @@ import {
   updateChildName,
   getAcsToken,
   markAttendance,
+  saveFreeClassRating,
+  saveNeedMoreInfo,
 } from '../../utils/api/yl.api';
 
 import {
@@ -23,7 +25,15 @@ import {
   setDemoNotifications,
   joinFreeClass,
   setErrorMessage,
+  saveRating,
+  setIsRated,
+  checkForRating,
+  setRatingLoading,
+  markNMI,
+  markNMISuccess,
 } from './join-demo.reducer';
+
+import {Linking} from 'react-native';
 
 import {setCountdownTriggerNotification} from '../../utils/notifications';
 import {startCallComposite} from '../../natiive-modules/team-module';
@@ -31,9 +41,19 @@ import {startCallComposite} from '../../natiive-modules/team-module';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
+import {openWhatsApp} from '../../utils/redirect-whatsapp';
+
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
-// Fetch booking details from phone number
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param payload phone number
+ * @description
+ * Fetch demo details using phone number
+ * Also fetch booking details
+ * Save phone number to local storage
+ */
 function* fetchDemoDetailsFromPhone({payload}) {
   try {
     const response = yield call(fetchBookingDetailsFromPhone, payload);
@@ -60,7 +80,15 @@ function* fetchDemoDetailsFromPhone({payload}) {
   }
 }
 
-// Fetch booking details from booking id
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param payload booking id
+ * @description
+ * Fetch demo details using booking id
+ * Also fetch booking details
+ * Save booking id to local storage
+ */
 function* fetchDemoDetailsFromBookingId({payload}) {
   try {
     const response = yield call(fetchBookingDetailsFromBookingId, payload);
@@ -99,7 +127,12 @@ function* getPhoneFromStorage() {
   }
 }
 
-// Set demo data
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param {object} payload demoData
+ * @description Set demo data to states
+ */
 function* onSetDemoData({payload: {demoData}}) {
   // If user put wrong number
   if (demoData.hasOwnProperty('message')) {
@@ -144,7 +177,11 @@ function* onSetDemoData({payload: {demoData}}) {
   }
 }
 
-// Notifications
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @description Register Notifications for demo classs
+ */
 function* demoNotifications({payload: {bookingTime}}) {
   const classDate = new Date(bookingTime);
   const currentTime = Date.now();
@@ -281,7 +318,16 @@ function* saveAcsTokenInLocalStorage({data}) {
   return data.token;
 }
 
-// Join class
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param bookingDetails an object that contains all booking related info
+ * @param childName child name to join class
+ * @param teamUrl join class using team url
+ * @description
+ * Join Demo Class
+ * Save acs token to local storage using saveAcsTokenInLocalStorage function
+ */
 function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
   if (!childName) {
     yield put(setErrorMessage('Please enter child name'));
@@ -330,7 +376,70 @@ function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
   }
 }
 
-// Listener functions
+/**
+ * @author Shobhit
+ * @since 25/09/2023
+ * @param bookingId booking id of free class
+ * @param rating that user gives
+ * @description Save user rating
+ */
+function* saveUserRating({payload: {bookingId, rating}}) {
+  try {
+    const response = yield call(saveFreeClassRating, {bookingId, rating});
+
+    if (response.status === 200) {
+      yield AsyncStorage.setItem(LOCAL_KEYS.IS_RATED, 'true');
+      yield put(setIsRated(true));
+    }
+  } catch (error) {
+    console.log('JOIN_CLASS_ERROR_JOIN_DEMO_SAGA_RATING', error);
+  }
+}
+
+// Check rating from local storage
+function* checkRatingFromLocalStorage() {
+  try {
+    const rating = yield AsyncStorage.getItem(LOCAL_KEYS.IS_RATED);
+    if (rating === 'true') {
+      yield put(setIsRated(true));
+    }
+    yield put(setRatingLoading(false));
+  } catch (error) {
+    console.log('async rated error', error);
+  }
+}
+
+/**
+ * @author Shobhit
+ * @since 25/09/2023
+ * @param bookingId booking id of free class
+ * @description Mark need more info
+ */
+function* handleNMI({payload: {bookingId}}) {
+  const text = 'Hello, I need more info about the full course';
+  try {
+    const isNmi = yield AsyncStorage.getItem(LOCAL_KEYS.NMI);
+    if (!isNmi) {
+      const response = yield saveNeedMoreInfo({bookingId});
+
+      if (response.status === 200) {
+        yield AsyncStorage.setItem(LOCAL_KEYS.NMI, 'true');
+      }
+    }
+
+    yield put(markNMISuccess());
+
+    const url = openWhatsApp(text);
+    yield Linking.openURL(url);
+  } catch (error) {
+    console.log('nmi error', error);
+    yield put(setErrorMessage(error.message));
+  }
+}
+
+/**
+ * Listener functions that call when dispatch a related action
+ */
 
 // start for phone number
 function* demoBookingDetailsFromPhone() {
@@ -368,6 +477,21 @@ function* joinClass() {
   yield takeLatest(joinFreeClass.type, handleJoinClass);
 }
 
+// Save user rating for free class
+function* userRating() {
+  yield takeLatest(saveRating.type, saveUserRating);
+}
+
+// Check for rating from local storage
+function* checkRatingAsync() {
+  yield takeLatest(checkForRating.type, checkRatingFromLocalStorage);
+}
+
+// Mark need more info
+function* markNeedMoreInfo() {
+  yield takeLatest(markNMI.type, handleNMI);
+}
+
 // main saga
 export function* joinDemoSaga() {
   yield all([
@@ -377,5 +501,8 @@ export function* joinDemoSaga() {
     call(startSetDemoData),
     call(setNotifications),
     call(joinClass),
+    call(userRating),
+    call(checkRatingAsync),
+    call(markNeedMoreInfo),
   ]);
 }

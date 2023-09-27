@@ -12,9 +12,21 @@ import {isValidNumber} from '../../utils/isValidNumber';
 import {navigate, replace} from '../../navigationRef';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {LOCAL_KEYS} from '../../utils/constants/local-keys';
+import {
+  setCountryCallingCodeAsync,
+  setLocalPhoneAsync,
+} from '../../utils/storage/storage-provider';
 
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param phone Phone number of user
+ * @param country Object of country code and calling code
+ * @description
+ * Check for a booking against phone number
+ * If booking then redirect to home screen
+ * If not redirect to create new booking screen
+ */
 function* handleBookingStatus({payload: {phone, country}}) {
   if (!phone) {
     yield put(setErrorMessage('Enter phone number'));
@@ -22,6 +34,8 @@ function* handleBookingStatus({payload: {phone, country}}) {
   }
 
   try {
+    // Check for length of a phone number according to country
+    // Return true or false
     const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
 
     if (!isValidPhone) {
@@ -29,20 +43,21 @@ function* handleBookingStatus({payload: {phone, country}}) {
       return;
     }
 
+    // Get booking data
     const response = yield fetchBookingDetailsFromPhone(phone);
 
     if (response.status === 400) {
       // Booking not found
-      navigate(SCREEN_NAMES.BOOK_DEMO_FORM, {phone, country});
+      navigate(SCREEN_NAMES.BOOK_DEMO_FORM, {phone, country}); //Redirect to BookDemoForm Screen
       yield put(setErrorMessage(''));
       return;
     }
 
     if (response.status === 200) {
-      yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
-      yield AsyncStorage.setItem(LOCAL_KEYS.CALLING_CODE, country.callingCode);
+      yield setLocalPhoneAsync(phone);
+      yield setCountryCallingCodeAsync(country.callingCode);
       yield put(fetchBookingStatusSuccess(''));
-      replace(SCREEN_NAMES.MAIN);
+      replace(SCREEN_NAMES.MAIN); // Redirect to main screen
     }
   } catch (error) {
     console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR_SAGA', error);
@@ -50,10 +65,16 @@ function* handleBookingStatus({payload: {phone, country}}) {
   }
 }
 
+/**
+ * Listener functions that call when dispatch a related action
+ */
+
+// Set booking status
 function* startBookingStatus() {
   yield takeLatest(fetchBookingStatusStart.type, handleBookingStatus);
 }
 
+// Main saga
 export function* welcomeScreenSagas() {
   yield all([call(startBookingStatus)]);
 }

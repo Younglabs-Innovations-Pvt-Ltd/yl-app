@@ -32,6 +32,8 @@ import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
+import {i18nContext} from '../context/lang.context';
+import LanguageSelection from '../components/language-selection.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -39,6 +41,8 @@ const IMAGE_HEIGHT = deviceWidth * 0.7;
 
 // Main Component
 const DemoClassScreen = () => {
+  const {localLang, currentLang} = i18nContext();
+
   const [phone, setPhone] = useState('');
 
   const dispatch = useDispatch();
@@ -48,17 +52,33 @@ const DemoClassScreen = () => {
     welcomeScreenSelector,
   );
 
+  // Setting background color and style of Statusbar
   useEffect(() => {
     StatusBar.setBackgroundColor(COLORS.pgreen);
     StatusBar.setBarStyle('light-content');
   }, []);
 
+  /**
+   * @author Shobhit
+   * @since 20/09/2023
+   * @description
+   * Calling ip geolocation api to fetch ip data(like country calling code, country code and timezone)
+   * Check if ipData is available
+   * If not only then fetch (to avoid make api calls on every render)
+   */
   useEffect(() => {
     if (!ipData) {
       dispatch(startFetchingIpData());
     }
   }, [ipData]);
 
+  /**
+   * @author Shobhit
+   * @since 20/09/2023
+   * @description
+   * Setting calling code and country code to country state
+   * To show default calling code in input
+   */
   useEffect(() => {
     if (ipData) {
       dispatch(
@@ -71,16 +91,26 @@ const DemoClassScreen = () => {
   }, [ipData]);
 
   const handlePhone = e => {
-    const phoneRegex = /^[0-9]*$/;
+    const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
     if (phoneRegex.test(e)) {
       setPhone(e);
     }
   };
 
+  /**
+   * @author Shobhit
+   * @since 20/09/2023
+   * @description
+   * Check booking against a phone number
+   * Dispatch an action to welcome screen reducer
+   * Takes two parameter phone number and country({callingCode, countryCode})
+   */
   const handleBookingStatus = async () => {
     dispatch(fetchBookingStatusStart({phone, country}));
   };
 
+  // Select different countries
+  // Get country and calling code of selected country
   const handleSelectCountry = country => {
     let code = '';
     if (country.callingCode?.root && country.callingCode?.suffixes.length) {
@@ -99,24 +129,28 @@ const DemoClassScreen = () => {
   const showCountryList = () => dispatch(setModalVisible(true));
 
   // Animation stuff
-  const SLOGN_TEXT = 'Helping parents raise capable, skillful & happy children';
+  const [slognText, setSlognText] = useState(localLang.tagline);
   const [animatedValues, setAnimatedValues] = useState([]);
   const animatedButtons = useRef(new Animated.Value(0)).current;
   const imageAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    setSlognText(localLang.tagline);
+  }, [currentLang]);
+
+  useEffect(() => {
     let animations = [];
-    SLOGN_TEXT.split(' ').forEach((_, i) => {
+    slognText.split(' ').forEach((_, i) => {
       animations[i] = new Animated.Value(0);
     });
 
     setAnimatedValues(animations);
-  }, []);
+  }, [slognText]);
 
   useEffect(() => {
     if (!animatedValues.length) return;
 
-    const animations = SLOGN_TEXT.split(' ').map((_, i) => {
+    const animations = slognText.split(' ').map((_, i) => {
       return Animated.timing(animatedValues[i], {
         useNativeDriver: true,
         toValue: 1,
@@ -152,10 +186,11 @@ const DemoClassScreen = () => {
   });
 
   // UI Constants
+  // Animated text
   const ANIMATED_TEXT = useMemo(() => {
     if (!animatedValues.length) return null;
 
-    const TEXT = SLOGN_TEXT.split(' ');
+    const TEXT = slognText.split(' ');
     return TEXT.map((word, index) => {
       return (
         <Animated.Text
@@ -181,6 +216,7 @@ const DemoClassScreen = () => {
     });
   }, [animatedValues]);
 
+  // Check for max length of a phone number according country
   const maxPhoneLength = useMemo(() => {
     if (!country?.countryCode) {
       return 15;
@@ -208,6 +244,7 @@ const DemoClassScreen = () => {
 
   return (
     <View style={styles.wrapper}>
+      <LanguageSelection />
       <View style={{flex: CONTAINER_FLEX_STYLE}}>
         <View style={[styles.container, CONTAINER_STYLE]}>
           <View>

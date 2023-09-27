@@ -1,38 +1,46 @@
 import React, {useEffect, useState, useMemo} from 'react';
-import {StyleSheet, View, Pressable, Linking} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Linking,
+  ActivityIndicator,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../utils/constants/colors';
 import Icon from '../icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {useSelector} from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {RATING_API, MARK_MORE_INFO_API} from '@env';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  markNMI,
+  saveRating,
+  checkForRating,
+} from '../../store/join-demo/join-demo.reducer';
+
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
-import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
-const NMI_SOURCE = 'app';
-
 const PostDemoAction = () => {
   const [rating, setRating] = useState(0);
-  const [isRated, setIsRated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [disableButton, setDisableButton] = useState(false);
 
-  const {demoData, bookingDetails} = useSelector(state => state.joinDemo);
+  const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading} =
+    useSelector(state => state.joinDemo);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
+  // Show reschedule button
+  // After 10 days when user join free class
   const isAllowToReschedule = useMemo(() => {
     if (demoData) {
       const {
         demoDate: {_seconds},
       } = demoData;
       const currentTime = Date.now();
-      const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24;
+      const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24 * 10;
 
       if (currentTime > afterTenDays) {
         return true;
@@ -42,99 +50,41 @@ const PostDemoAction = () => {
     }
   }, [demoData]);
 
+  // Check for rating from local storage
+  // If rating then show post demos ctas
   useEffect(() => {
-    const checkForRating = async () => {
-      try {
-        const rating = await AsyncStorage.getItem(LOCAL_KEYS.IS_RATED);
-        if (rating === 'true') {
-          setIsRated(true);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.log('async rated error', error);
-      }
-    };
-
-    checkForRating();
+    dispatch(checkForRating());
   }, []);
 
+  // Save rating of user
+  // Dispatch an action to reducer
+  // That join saga is listening
   const handleSaveRating = async rate => {
     const rated = rate * 2;
 
-    try {
-      const response = await fetch(RATING_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bookingId: demoData.bookingId,
-          rating: rated,
-        }),
-      });
-
-      if (response.status === 200) {
-        await AsyncStorage.setItem(LOCAL_KEYS.IS_RATED, 'true');
-        setIsRated(true);
-      }
-    } catch (error) {
-      console.log('Demo rating error', error);
-    }
+    dispatch(saveRating({bookingId: demoData.bookingId, rating: rated}));
   };
 
+  // On change rating state
   const onChangeRating = rate => {
     setRating(rate);
     handleSaveRating(rate);
   };
 
-  const redirectToWebsiteToBuyCourse = () => Linking.openURL(COURSE_URL);
+  const redirectToWebsiteToBuyCourse = async () => {
+    try {
+      await Linking.openURL(COURSE_URL);
+    } catch (error) {
+      console.log('POST_DEMO_ACTIONS_REDIRECT_ERROR=', error);
+    }
+  };
 
+  // Marked need more info
   const markNeedMoreInfo = async () => {
-    try {
-      setDisableButton(true);
-      const isNmi = await AsyncStorage.getItem(LOCAL_KEYS.NMI);
-      if (!isNmi) {
-        const response = await fetch(MARK_MORE_INFO_API, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({
-            bookingId: demoData.bookingId,
-            source: NMI_SOURCE,
-          }),
-        });
-
-        if (response.status === 200) {
-          await AsyncStorage.setItem(LOCAL_KEYS.NMI, 'true');
-        }
-      }
-
-      openWhatsApp();
-      setDisableButton(false);
-    } catch (error) {
-      console.log('nmi error', error);
-      setDisableButton(false);
-    }
+    dispatch(markNMI({bookingId: demoData.bookingId}));
   };
 
-  const openWhatsApp = async () => {
-    const phoneNumber = '+919289029696';
-    let url = '';
-
-    if (Platform.OS === 'android') {
-      url = `whatsapp://send?phone=${phoneNumber}&text=Hello, I need more info about the full course`;
-    } else if (Platform.OS === 'ios') {
-      url = `whatsapp://wa.me/${phoneNumber}&text=Hello, I need more info about the full course`;
-    }
-
-    try {
-      await Linking.openURL(url);
-    } catch (error) {
-      console.error('Error opening WhatsApp:', error);
-    }
-  };
-
+  // Reschedule a free class
   const rescheduleFreeClass = () => {
     const {childAge, parentName, phone, childName} = bookingDetails;
     const formFields = {childAge, parentName, phone, childName};
@@ -159,7 +109,20 @@ const PostDemoAction = () => {
     });
   }, [rating]);
 
-  if (loading) return null;
+  // Loading indicator while mark nmi
+  const NMI_LOADING = useMemo(() => {
+    if (!nmiLoading) return null;
+
+    return (
+      <ActivityIndicator
+        color={COLORS.black}
+        size={'large'}
+        style={{alignSelf: 'flex-end'}}
+      />
+    );
+  }, [nmiLoading]);
+
+  if (ratingLoading) return null;
 
   return (
     <View style={styles.container}>
@@ -199,10 +162,11 @@ const PostDemoAction = () => {
                 styles.ctaButton,
                 {opacity: pressed ? 0.8 : 1},
               ]}
-              disabled={disableButton}
+              disabled={nmiLoading}
               onPress={markNeedMoreInfo}>
               <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
               <TextWrapper>Yes, need more info</TextWrapper>
+              {NMI_LOADING}
             </Pressable>
             <Pressable
               style={({pressed}) => [
@@ -256,7 +220,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 1.85,
     borderRadius: 4,
-    // paddingLeft: 30,
     gap: 8,
     backgroundColor: COLORS.white,
   },

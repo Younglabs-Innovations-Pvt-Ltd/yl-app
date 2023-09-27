@@ -30,6 +30,11 @@ import Features from '../components/features.component';
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
+import {i18nContext} from '../context/lang.context';
+import LanguageSelection from '../components/language-selection.component';
+
+import * as Sentry from '@sentry/react-native';
+
 const INITIAL_TIME = {
   days: 0,
   hours: 0,
@@ -62,6 +67,8 @@ const HomeScreen = ({navigation}) => {
   const [showPostActions, setShowPostActions] = useState(false);
   const [cn, setCn] = useState(false);
 
+  const {localLang} = i18nContext();
+
   const dispatch = useDispatch();
   const {
     demoData,
@@ -77,34 +84,69 @@ const HomeScreen = ({navigation}) => {
     message,
   } = useSelector(joinDemoSelector);
 
-  // Set demo phone number
+  /**
+   * @author Shobhit
+   * @since 22/09/2023
+   * @description Set parent name and phone as username to Sentry to specify errors
+   */
+  useEffect(() => {
+    if (bookingDetails) {
+      Sentry.setUser({
+        username: `${bookingDetails.parentName}-${bookingDetails.phone}`,
+      });
+    }
+  }, [bookingDetails]);
+
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Set demo phone number from localStorage to redux state
+   */
   useEffect(() => {
     dispatch(setPhoneAsync());
   }, []);
 
-  // set demo data
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description
+   * set demo data
+   */
   useEffect(() => {
     if (demoData) {
       dispatch(setDemoData({demoData}));
     }
   }, [demoData]);
 
-  // Call api to get booking status from phone number
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Call api to get booking status from phone number
+   */
   useEffect(() => {
     if (demoPhoneNumber) {
       dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
     }
   }, [demoPhoneNumber, dispatch]);
 
-  // Call api to get booking status from booking id
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Call api to get booking status from booking id
+   */
   useEffect(() => {
     if (demoBookingId) {
       dispatch(startFetchBookingDetailsFromId(demoBookingId));
     }
   }, [demoBookingId, dispatch]);
 
-  // Get demo data
-  // If a user came after start class
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description
+   * Get demo data
+   * If a user came after start class
+   */
   useEffect(() => {
     if (isAttendenceMarked) {
       console.log('marked');
@@ -118,7 +160,11 @@ const HomeScreen = ({navigation}) => {
     }
   }, [isAttendenceMarked]);
 
-  // Timer
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Countdown Timer
+   */
   useEffect(() => {
     let timer;
 
@@ -145,27 +191,40 @@ const HomeScreen = ({navigation}) => {
     };
   }, [bookingTime, demoPhoneNumber, dispatch]);
 
-  // Do not show join button after 50 minutes of demo ended
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Do not show join button after 50 minutes of demo ended
+   */
   useEffect(() => {
     if (bookingTime) {
       const afterHalfHourFromDemoDate =
         new Date(bookingTime).getTime() + 1000 * 60 * 50;
 
-      if (afterHalfHourFromDemoDate <= new Date().getTime()) {
+      // Check after demo ended
+      if (afterHalfHourFromDemoDate <= Date.now()) {
         // Hide class join button
         dispatch(setShowJoinButton(false));
       }
     }
   }, [bookingTime, demoData]);
 
-  // Notification
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Set  Notifications for demo class
+   */
   useEffect(() => {
     if (bookingTime) {
       dispatch(setDemoNotifications({bookingTime}));
     }
   }, [bookingTime]);
 
-  // Post Actions
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Post Actions after join class successfuly
+   */
   useEffect(() => {
     if (!bookingTime) return;
 
@@ -177,6 +236,11 @@ const HomeScreen = ({navigation}) => {
     }
   }, [bookingTime, isAttended]);
 
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Update child name if child name not exist or contains your child text
+   */
   useEffect(() => {
     if (demoData && bookingDetails) {
       const isCN = !bookingDetails.childName
@@ -189,7 +253,11 @@ const HomeScreen = ({navigation}) => {
     }
   }, [demoData, bookingDetails]);
 
-  // show notification timer
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description show notification timer on notification panel
+   */
   useEffect(() => {
     if (bookingTime) {
       const currentTime = Date.now();
@@ -200,6 +268,7 @@ const HomeScreen = ({navigation}) => {
     }
   }, [bookingTime]);
 
+  // on change for child name
   const onChangeChildName = e => {
     setChildName(e);
   };
@@ -212,6 +281,7 @@ const HomeScreen = ({navigation}) => {
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
 
+  // Reschedule a class
   const rescheduleFreeClass = () => {
     const {childAge, parentName, phone, childName} = bookingDetails;
     const formFields = {childAge, parentName, phone, childName};
@@ -269,9 +339,12 @@ const HomeScreen = ({navigation}) => {
           styles={{textTransform: 'capitalize'}}>
           English handwriting
         </TextWrapper>
-        <Pressable onPress={handleShowDrawer}>
-          <MIcon name="account-circle" size={28} color={COLORS.black} />
-        </Pressable>
+        <View style={styles.rightNavButtons}>
+          <LanguageSelection />
+          <Pressable onPress={handleShowDrawer}>
+            <MIcon name="account-circle" size={28} color={COLORS.black} />
+          </Pressable>
+        </View>
       </View>
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         <View style={styles.container}>
@@ -298,16 +371,14 @@ const HomeScreen = ({navigation}) => {
                 style={{
                   paddingVertical: 16,
                 }}>
-                <TextWrapper fs={20}>
-                  Looks like you missed the class, please reschedule one
-                </TextWrapper>
+                <TextWrapper fs={20}>{localLang.rescheduleText}</TextWrapper>
                 <Spacer />
                 <Button
                   textColor={COLORS.white}
                   bg={COLORS.pgreen}
                   rounded={6}
                   onPress={rescheduleFreeClass}>
-                  Reschedule
+                  {localLang.rescheduleButtonText}
                 </Button>
               </View>
             )}
@@ -347,5 +418,10 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 428,
     alignSelf: 'center',
+  },
+  rightNavButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
 });

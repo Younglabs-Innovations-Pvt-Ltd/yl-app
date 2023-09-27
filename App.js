@@ -6,6 +6,8 @@ import {
   createStackNavigator,
 } from '@react-navigation/stack';
 
+import {I18NProvider} from './src/context/lang.context';
+
 import {Provider} from 'react-redux';
 import {store} from './src/store/store';
 
@@ -114,64 +116,66 @@ function App() {
   }
 
   return (
-    <Provider store={store}>
-      <NavigationContainer ref={navigationRef}>
-        <Stack.Navigator
-          screenOptions={{
-            // headerShown: false,
-            headerStyle: {
-              elevation: 0,
-              shadowOpacity: 0,
-              borderBottomWidth: 1,
-              borderBottomColor: '#eaeaea',
-            },
-            headerTitleStyle: {
-              fontSize: 18,
-              fontFamily: FONTS.gelasio_semibold,
-              fontWeight: '700',
-            },
-            cardStyle: {backgroundColor: '#fff'},
-            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-          }}
-          initialRouteName={initialRouteName}>
-          <Stack.Screen
-            name={SCREEN_NAMES.WELCOME}
-            component={WelcomeScreen}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.MAIN}
-            component={MainScreen}
-            options={{headerShown: false}}
-            initialParams={{bookingId}}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.ON_BOARDING}
-            component={OnBoardingScreen}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.BOOK_DEMO_FORM}
-            component={BookDemoFormScreen}
-            options={{
-              title: 'Book Free Handwriting Class',
+    <I18NProvider>
+      <Provider store={store}>
+        <NavigationContainer ref={navigationRef}>
+          <Stack.Navigator
+            screenOptions={{
+              // headerShown: false,
+              headerStyle: {
+                elevation: 0,
+                shadowOpacity: 0,
+                borderBottomWidth: 1,
+                borderBottomColor: '#eaeaea',
+              },
+              headerTitleStyle: {
+                fontSize: 18,
+                fontFamily: FONTS.gelasio_semibold,
+                fontWeight: '700',
+              },
+              cardStyle: {backgroundColor: '#fff'},
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
             }}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
-            component={BookDemoSlotsScreen}
-            options={{title: 'Book Free Handwriting Class'}}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.COURSE_DETAILS}
-            component={CourseDetails}
-            options={{
-              // headerStyle: {elevation: 0},
-              headerTitle: 'Course Detail',
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Provider>
+            initialRouteName={initialRouteName}>
+            <Stack.Screen
+              name={SCREEN_NAMES.WELCOME}
+              component={WelcomeScreen}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.MAIN}
+              component={MainScreen}
+              options={{headerShown: false}}
+              initialParams={{bookingId}}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.ON_BOARDING}
+              component={OnBoardingScreen}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.BOOK_DEMO_FORM}
+              component={BookDemoFormScreen}
+              options={{
+                title: 'Book Free Handwriting Class',
+              }}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
+              component={BookDemoSlotsScreen}
+              options={{title: 'Book Free Handwriting Class'}}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.COURSE_DETAILS}
+              component={CourseDetails}
+              options={{
+                // headerStyle: {elevation: 0},
+                headerTitle: 'Course Detail',
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Provider>
+    </I18NProvider>
   );
 }
 

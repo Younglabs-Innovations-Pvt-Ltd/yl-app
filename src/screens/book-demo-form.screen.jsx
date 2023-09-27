@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useMemo} from 'react';
 import {
   StyleSheet,
   View,
@@ -8,13 +8,10 @@ import {
 } from 'react-native';
 import {COLORS} from '../utils/constants/colors';
 
-import {useDispatch, useSelector} from 'react-redux';
 import Input from '../components/input.component';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
 
-import {setTimezone} from '../store/book-demo/book-demo.reducer';
-import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {Dropdown, DropdownList} from '../components/dropdown.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
@@ -32,8 +29,9 @@ const BookDemoScreen = ({route, navigation}) => {
   const [childAge, setChildAge] = useState(null);
   const [fields, setFields] = useState(INITIAL_sTATE);
 
-  const dispatch = useDispatch();
-
+  /**
+   * Check if any field is not empty
+   */
   const isActive = useMemo(() => {
     if (!fields.parentName || !fields.childName || !childAge) {
       return false;
@@ -41,16 +39,6 @@ const BookDemoScreen = ({route, navigation}) => {
 
     return true;
   }, [fields.childName, fields.parentName, childAge]);
-
-  const {ipData} = useSelector(bookDemoSelector);
-
-  useEffect(() => {
-    if (ipData) {
-      const tz = ipData.time_zone.offset + ipData.time_zone.dst_savings;
-
-      dispatch(setTimezone(tz));
-    }
-  }, [ipData]);
 
   const onLayoutChange = event => {
     setGutter(event.nativeEvent.layout.y + event.nativeEvent.layout.height);

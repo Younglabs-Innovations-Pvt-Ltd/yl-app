@@ -14,11 +14,11 @@ import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {
   startFetchingBookingSlots,
-  startFetchingIpData,
   setTimezone,
   setNewBookingStart,
   setIsBookingLimitExceeded,
   closePopup,
+  startFetchingIpData,
 } from '../store/book-demo/book-demo.reducer';
 import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,6 +37,7 @@ const BookDemoSlots = ({route, navigation}) => {
   } = route.params;
 
   const dispatch = useDispatch();
+
   const {
     bookingSlots,
     timezone,
@@ -48,12 +49,14 @@ const BookDemoSlots = ({route, navigation}) => {
 
   const {demoBookingId} = useSelector(joinDemoSelector);
 
+  // Set ip data
   useEffect(() => {
     if (!ipData) {
       dispatch(startFetchingIpData());
     }
   }, [ipData]);
 
+  // Set timezone
   useEffect(() => {
     if (ipData) {
       const tz = ipData.time_zone.offset + ipData.time_zone.dst_savings;
@@ -100,10 +103,14 @@ const BookDemoSlots = ({route, navigation}) => {
     setCurrentSlotTime(slotsTime[date][0]);
   };
 
-  // set current slots time
+  // Set current slots time
   const handleCurrentSlotTime = slotTime => setCurrentSlotTime(slotTime);
 
-  // Book a demo
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Book a new demo class
+   */
   const handleBookNow = async () => {
     const bodyData = {
       name,
@@ -124,6 +131,11 @@ const BookDemoSlots = ({route, navigation}) => {
     dispatch(setNewBookingStart({data: bodyData, ipData}));
   };
 
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Show a popup after creating a booking successfully
+   */
   const handlePopup = async () => {
     const resetAction = CommonActions.reset({
       index: 0,
@@ -138,6 +150,11 @@ const BookDemoSlots = ({route, navigation}) => {
     navigation.dispatch(resetAction);
   };
 
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Contact us, Redirect to Whatsapp
+   */
   const handleContactUs = async () => {
     const phoneNumber = '+919289029696';
     let url = '';
@@ -155,6 +172,7 @@ const BookDemoSlots = ({route, navigation}) => {
     }
   };
 
+  // Close booking limit exceeded modal
   const closeModal = () => dispatch(setIsBookingLimitExceeded(false));
 
   // UI Constants
@@ -182,7 +200,7 @@ const BookDemoSlots = ({route, navigation}) => {
     });
   }, [bookingSlots, currentSlotDate]);
 
-  //
+  // Slot time against slot dates
   const SLOT_TIMES = useMemo(() => {
     if (!slotsTime) return null;
 
@@ -232,6 +250,7 @@ const BookDemoSlots = ({route, navigation}) => {
           {/* Slot times */}
           <View style={styles.slotDateList}>{SLOT_TIMES}</View>
         </View>
+        {/* Booking limit exceeded Modal */}
         <Modal visible={isBookingLimitExceeded} onRequestClose={closeModal}>
           <View style={styles.bookingModalContainer}>
             <View style={styles.bookingModal}>
@@ -269,6 +288,7 @@ const BookDemoSlots = ({route, navigation}) => {
       </View>
       {/* show popup */}
       {popup && <Popup onHandlePopup={handlePopup} />}
+      {/* Loading spinner */}
       <Modal visible={bookingLoading}>
         <Center bg="rgba(0,0,0,0.2)">
           <Spinner />

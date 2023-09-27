@@ -3037,6 +3037,11 @@ commander@^2.20.0:
   resolved "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
+commander@^4.0.0:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-4.1.1.tgz#9fd602bd936294e9e9ef46a3f4d6964044b18068"
+  integrity sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==
+
 commander@^9.4.1:
   version "9.5.0"
   resolved "https://registry.npmjs.org/commander/-/commander-9.5.0.tgz"
@@ -3119,7 +3124,7 @@ cosmiconfig@^5.0.5, cosmiconfig@^5.1.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-cross-spawn@^7.0.2, cross-spawn@^7.0.3:
+cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
   version "7.0.3"
   resolved "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.3.tgz"
   integrity sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==
@@ -3290,6 +3295,14 @@ encodeurl@~1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/encodeurl/-/encodeurl-1.0.2.tgz"
   integrity sha512-TPJXq8JqFaVYm2CWmPvnP2Iyo4ZSM7/QKcSmuMLDObfpH5fi7RUGmd/rTDf+rut/saiDiQEeVTNgAmJEdAOx0w==
+
+env-cmd@^10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/env-cmd/-/env-cmd-10.1.0.tgz#c7f5d3b550c9519f137fdac4dd8fb6866a8c8c4b"
+  integrity sha512-mMdWTT9XKN7yNth/6N6g2GuKuJTsKMDHlQFUDacb/heQRRWOTIZ42t1rMHnQu4jYxU1ajdTeJM+9eEETlqToMA==
+  dependencies:
+    commander "^4.0.0"
+    cross-spawn "^7.0.0"
 
 envinfo@^7.7.2:
   version "7.10.0"
@@ -4997,6 +5010,11 @@ localforage@^1.8.1:
   dependencies:
     lie "3.1.1"
 
+localized-strings@^0.2.0:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/localized-strings/-/localized-strings-0.2.4.tgz#9d61c06b60cc7b5edf7c46e6c7f2d1ecb84aeb2c"
+  integrity sha512-TKDhqFPkIIN/if2FSvVVZTaM/GP9TzfgdQ2uY65mr32xgFu5nqkKXprXbzy5rfx32DF5LDvS/y1UqYF/mAscYA==
+
 locate-path@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/locate-path/-/locate-path-3.0.0.tgz"
@@ -6251,6 +6269,13 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-localization@^1.0.17:
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/react-localization/-/react-localization-1.0.19.tgz#b65a7fa58096cff6aa38bc3a0c4817ec97469ef0"
+  integrity sha512-f4E6T8xRis19K8qMOnnhjGV2quy1YH2lrSsnAiytvgt7uOSp6WgDhrZH6XZEaEFqupTOCFSf8uagIoIAkjl4JA==
+  dependencies:
+    localized-strings "^0.2.0"
+
 react-native-dotenv@^3.4.9:
   version "3.4.9"
   resolved "https://registry.yarnpkg.com/react-native-dotenv/-/react-native-dotenv-3.4.9.tgz#621c5b0c1d0c5c7f569bfe5a1d804bec7885c010"
@@ -6281,6 +6306,13 @@ react-native-keyboard-aware-scroll-view@^0.9.5:
   dependencies:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
+
+react-native-localization@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-localization/-/react-native-localization-2.3.2.tgz#ac82089519681a8e53fa39dcf7a9f5b6be2c5cb6"
+  integrity sha512-9i2wkCFwvKVXq0w6tu1eTCGUZuKBQXoCGWBWbW4HYsFJe+MEQsFCYdrhoBsn8IAr/KA9AYUiEyxxuN3hLRxF4w==
+  dependencies:
+    react-localization "^1.0.17"
 
 react-native-reanimated@^3.3.0:
   version "3.3.0"

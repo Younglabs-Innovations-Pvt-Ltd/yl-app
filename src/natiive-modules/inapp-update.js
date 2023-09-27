@@ -19,6 +19,11 @@ const {InAppUpdate} = NativeModules;
 //   // Handle the event in your JavaScript code
 // });
 
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @description Check for app update available
+ */
 export const checkForUpdate = () => {
   return InAppUpdate.checkForAppUpdate();
 };

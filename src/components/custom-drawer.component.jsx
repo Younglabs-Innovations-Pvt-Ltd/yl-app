@@ -26,9 +26,12 @@ import {cancleNotifications} from '../utils/notifications';
 import Share from 'react-native-share';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
+import {i18nContext} from '../context/lang.context';
+
 const WEBSITE_URL = 'https://www.younglabs.in/';
 
 const CustomDrawerContent = ({navigation, ...props}) => {
+  const {localLang} = i18nContext();
   const dispatch = useDispatch();
   const {bookingDetails} = useSelector(joinDemoSelector);
   const windowDimensions = useWindowDimensions();
@@ -136,7 +139,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
           </View>
           <View style={{flex: 1, justifyContent: 'center'}}>
             <TextWrapper fs={20} styles={{textAlign: 'center'}}>
-              Checkout our website for other courses
+              {localLang.drawerWebsiteText}
             </TextWrapper>
             <Spacer space={4} />
             <Pressable
@@ -147,7 +150,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               onPress={redirectToWebsite}>
               <MIcon name="web" size={24} color={COLORS.black} />
               <TextWrapper fs={18} styles={{letterSpacing: 1.02}}>
-                Visit website
+                {localLang.drawerWebsiteButtonText}
               </TextWrapper>
             </Pressable>
           </View>
@@ -171,11 +174,11 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               color={COLORS.black}
               fs={16.5}
               styles={{marginLeft: 8}}>
-              Share with friends
+              {localLang.shareButtonText}
             </TextWrapper>
           </Pressable>
           <View style={styles.socialContainer}>
-            <TextWrapper>Get in touch</TextWrapper>
+            <TextWrapper>{localLang.socialMediaButtonText}</TextWrapper>
             <View style={styles.socialMediaIconsWrapper}>
               <Pressable style={styles.btnSocialMedia} onPress={openFacebook}>
                 <Icon name="logo-facebook" size={30} color="blue" />
@@ -196,7 +199,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               ]}
               onPress={handleLogout}>
               <TextWrapper color={COLORS.black} fs={16.5}>
-                Logout
+                {localLang.logoutButtonText}
               </TextWrapper>
               <Icon name="log-out-outline" size={24} color={COLORS.black} />
             </Pressable>

@@ -10,13 +10,19 @@ import {
   setIsBookingLimitExceeded,
 } from './book-demo.reducer';
 
-import {GEO_LOCATION_API, GET_SLOTS_API, ADD_BOOKINGS_API} from '@env';
+import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makeNewBooking} from '../../utils/api/yl.api';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
-// Fetch ip address data
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @description
+ * Fetch ip data related to current location
+ * Contains timezone, country code and calling code
+ */
 function* fetchIpData() {
   try {
     const response = yield fetch(GEO_LOCATION_API, {
@@ -30,10 +36,15 @@ function* fetchIpData() {
   }
 }
 
-// fetch booking slots
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param payload An object that contains courseId, childAge, timezone, type
+ * @description Fetch booking slots calling from BookDemoSlots Screen
+ */
 function* fetchBookingSlots({payload}) {
   try {
-    const response = yield fetch(GET_SLOTS_API, {
+    const response = yield fetch(`${BASE_URL}${GET_SLOTS_API}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,6 +59,15 @@ function* fetchBookingSlots({payload}) {
   }
 }
 
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param data booking related data
+ * @param ipData Object that contains ip data
+ * @description
+ * Create new booking
+ * Save calling code from ipData and phone to local storage
+ */
 function* handleNewBooking({payload: {data, ipData}}) {
   try {
     const response = yield makeNewBooking(data);
@@ -69,15 +89,21 @@ function* handleNewBooking({payload: {data, ipData}}) {
   }
 }
 
-// start functions
+/**
+ * Listener functions that call when dispatch a related action
+ */
+
+// Fetch Ip data
 function* startFetchIpData() {
   yield takeLatest(startFetchingIpData.type, fetchIpData);
 }
 
+// Fetch booking slots
 function* startFetchingSlots() {
   yield takeLatest(startFetchingBookingSlots.type, fetchBookingSlots);
 }
 
+// Handle new booking
 function* startHandleNewBooking() {
   yield takeLatest(setNewBookingStart.type, handleNewBooking);
 }

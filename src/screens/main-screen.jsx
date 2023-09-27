@@ -12,6 +12,8 @@ import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
+import {i18nContext} from '../context/lang.context';
+
 const Tab = createBottomTabNavigator();
 
 function ContactScreen() {
@@ -21,6 +23,7 @@ function ContactScreen() {
 const MainScreen = ({route}) => {
   const data = route.params;
   const dispatch = useDispatch();
+  const {localLang} = i18nContext();
 
   useEffect(() => {
     StatusBar.setHidden(false);
@@ -28,11 +31,20 @@ const MainScreen = ({route}) => {
     StatusBar.setBarStyle('light-content');
   }, []);
 
+  // useEffect(() => {
+
+  // }, []);
+
   useEffect(() => {
     if (!data) return;
 
-    // If not phone exists already
-    // only then set booking id
+    /**
+     * @author Shobhit
+     * @since 20/09/2023
+     * @description
+     * Check is phone number exists in local storage
+     * If it does not exist only then set booking id by dispatching an action
+     */
     const checkForPhone = async () => {
       try {
         const isPhoneExists = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
@@ -54,10 +66,14 @@ const MainScreen = ({route}) => {
         component={DrawerScreen}
         options={{
           headerShown: false,
-          tabBarLabel: 'Home',
+          tabBarLabel: localLang.tabNavHome,
         }}
       />
-      <Tab.Screen name="Contact" component={ContactScreen} />
+      <Tab.Screen
+        name={'Contact'}
+        options={{tabBarLabel: localLang.tabNavContact}}
+        component={ContactScreen}
+      />
     </Tab.Navigator>
   );
 };

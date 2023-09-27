@@ -11,6 +11,9 @@ const INITIAL_STATE = {
   isAttended: false,
   bookingTime: null,
   isAttendenceMarked: false,
+  isRated: false,
+  ratingLoading: true,
+  nmiLoading: false,
   message: '',
 };
 
@@ -58,16 +61,31 @@ const reducer = {
   setIsAttended(state, action) {
     state.isAttended = action.payload;
   },
+  setIsRated(state, action) {
+    state.isRated = action.payload;
+  },
+  setRatingLoading(state, action) {
+    state.ratingLoading = action.payload;
+  },
   setBookingTime(state, action) {
     state.bookingTime = action.payload;
   },
+  markNMI(state) {
+    state.nmiLoading = true;
+  },
+  markNMISuccess(state) {
+    state.nmiLoading = false;
+  },
   setErrorMessage(state, action) {
     state.message = action.payload;
+    state.nmiLoading = false;
   },
   setPhoneAsync() {},
   setDemoData() {},
   setDemoNotifications() {},
   joinFreeClass() {},
+  saveRating() {},
+  checkForRating() {},
 };
 
 // slice
@@ -95,6 +113,13 @@ export const {
   setDemoNotifications,
   joinFreeClass,
   setErrorMessage,
+  setIsRated,
+  saveRating,
+  checkForRating,
+  setRatingLoading,
+  markNMI,
+  setIsRedirectToWhatsApp,
+  markNMISuccess,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

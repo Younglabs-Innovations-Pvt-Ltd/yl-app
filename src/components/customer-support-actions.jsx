@@ -26,7 +26,9 @@ import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import SuccessPopup from './success-popup.component';
 import Input from './input.component';
 
-import {ADD_INQUIRY_URL} from '@env';
+import {i18nContext} from '../context/lang.context';
+
+import {BASE_URL, ADD_INQUIRY_URL} from '@env';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -43,6 +45,8 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const [comment, setComment] = useState('');
   const [otherOption, setOtherOption] = useState('');
 
+  const {localLang} = i18nContext();
+
   const {bookingDetails} = useSelector(joinDemoSelector);
 
   const handleShowFormVisible = () => setFormVisible(true);
@@ -54,6 +58,8 @@ const CustomerSupportActions = ({visible, onClose}) => {
     if (Platform.OS === 'android') {
       whatappUrl = `whatsapp://send?phone=${phoneNumber}&text=I would like to know more about your courses`;
     } else if (Platform.OS === 'ios') {
+      console.log("it's ios");
+
       whatappUrl = `whatsapp://wa.me/${phoneNumber}&text=I would like to know more about your courses`;
     }
     try {
@@ -105,7 +111,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
 
       setInquiryLoading(true);
 
-      const response = await fetch(ADD_INQUIRY_URL, {
+      const response = await fetch(`${BASE_URL}${ADD_INQUIRY_URL}`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -154,7 +160,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
               <Pressable style={styles.btnCta} onPress={handleShowFormVisible}>
                 <View style={styles.btnCtaContentContainer}>
                   <TextWrapper color={COLORS.black}>
-                    Request callback
+                    {localLang.CSACallbackRequest}
                   </TextWrapper>
                 </View>
                 <MIcon name="phone-in-talk" size={32} color={COLORS.pblue} />
@@ -162,7 +168,9 @@ const CustomerSupportActions = ({visible, onClose}) => {
               <Spacer space={4} />
               <Pressable style={styles.btnCta} onPress={openWhatsapp}>
                 <View style={styles.btnCtaContentContainer}>
-                  <TextWrapper color={COLORS.black}>Chat with us</TextWrapper>
+                  <TextWrapper color={COLORS.black}>
+                    {localLang.CSAChatWithUs}
+                  </TextWrapper>
                 </View>
                 <Icon name="logo-whatsapp" size={32} color={COLORS.pgreen} />
               </Pressable>

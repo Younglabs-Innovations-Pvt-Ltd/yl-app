@@ -5,6 +5,7 @@ import CountDown from '../countdown.component';
 import Spacer from '../spacer.component';
 import {COLORS} from '../../utils/constants/colors';
 import {useSelector} from 'react-redux';
+import {i18nContext} from '../../context/lang.context';
 
 const months = [
   'Jan',
@@ -27,9 +28,12 @@ const getClassDate = seconds => {
   const year = date.getFullYear();
   const time = date.getHours();
   const month = date.getMonth();
+  const minutes = date.getMinutes();
 
   const classTime =
-    time >= 12 ? `${time === 12 ? time : time - 12}:00 PM` : `${time}:00 AM`;
+    time >= 12
+      ? `${time === 12 ? time : time - 12}:${minutes > 0 ? minutes : '00'} PM`
+      : `${time}:${minutes > 0 ? minutes : '00'} AM`;
 
   return `${classDate} ${months[month]} ${year} at ${classTime}`;
 };
@@ -39,6 +43,8 @@ const requirement_1 =
 
 const DemoWaiting = ({timeLeft}) => {
   const {demoData} = useSelector(state => state.joinDemo);
+
+  const {localLang} = i18nContext();
 
   if (!demoData) return;
 
@@ -61,10 +67,11 @@ const DemoWaiting = ({timeLeft}) => {
         }>{`Once this timer ends Click on ENTER CLASS button (shown after timer ends)`}</TextWrapper>
       <View>
         <Spacer space={6} />
-        <TextWrapper fs={20}>Requirements for class:</TextWrapper>
+        <TextWrapper
+          fs={20}>{`${localLang.classRequirementHeading}:`}</TextWrapper>
         <View style={styles.listStyle}>
           <View style={styles.listItem}>
-            <TextWrapper fs={18}>{requirement_1}</TextWrapper>
+            <TextWrapper fs={18}>{localLang.classRequirementText}</TextWrapper>
           </View>
         </View>
       </View>
