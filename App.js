@@ -12,7 +12,7 @@ import {Provider} from 'react-redux';
 import {store} from './src/store/store';
 
 import SplashScreen from 'react-native-splash-screen';
-import {SENTRY_DSN, BASE_URL} from '@env';
+import {SENTRY_DSN} from '@env';
 import {LOCAL_KEYS} from './src/utils/constants/local-keys';
 
 // Notification Permissions
@@ -63,10 +63,6 @@ function App() {
   // Check for app update
   useEffect(() => {
     checkForUpdate();
-  }, []);
-
-  useEffect(() => {
-    Alert.alert(BASE_URL);
   }, []);
 
   // Handle redirect url (Deep Link)
@@ -121,6 +117,7 @@ function App() {
   const saveDeviceId = async () => {
     try {
       const token = await getCurrentDeviceId();
+
       const deviceId = await AsyncStorage.getItem(LOCAL_KEYS.DEVICE_ID);
 
       if (!deviceId) {

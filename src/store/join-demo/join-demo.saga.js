@@ -41,7 +41,7 @@ import {startCallComposite} from '../../natiive-modules/team-module';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
-import {openWhatsApp} from '../../utils/redirect-whatsapp';
+import {getWhatsappRedirectUrl} from '../../utils/redirect-whatsapp';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
@@ -435,7 +435,7 @@ function* handleNMI({payload: {bookingId}}) {
 
     yield put(markNMISuccess());
 
-    const url = openWhatsApp(text);
+    const url = getWhatsappRedirectUrl(text);
     yield Linking.openURL(url);
   } catch (error) {
     console.log('nmi error', error);

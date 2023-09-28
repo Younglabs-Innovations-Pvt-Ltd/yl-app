@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Pressable,
@@ -21,47 +21,52 @@ import {Select, SelectContent, SelectItem} from './selelct.component';
 import {COLORS} from '../utils/constants/colors';
 import {FONTS} from '../utils/constants/fonts';
 
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
+import {csaSelector} from '../store/customer-support-action/selector';
+
+import {
+  setFormVisible,
+  addInquiryStart,
+  setOtherOption,
+  setComment,
+  setCourseId,
+  resetState,
+} from '../store/customer-support-action/reducer';
+
 import SuccessPopup from './success-popup.component';
 import Input from './input.component';
 
 import {i18nContext} from '../context/lang.context';
 
-import {BASE_URL, ADD_INQUIRY_URL} from '@env';
+import {getWhatsappRedirectUrl} from '../utils/redirect-whatsapp';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
 const CustomerSupportActions = ({visible, onClose}) => {
   if (!visible) return null;
 
-  const [formVisible, setFormVisible] = useState(false);
-  const [inquiryLoading, setInquiryLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  // entries
-  const [courseId, setCourseId] = useState('');
-  const [comment, setComment] = useState('');
-  const [otherOption, setOtherOption] = useState('');
-
   const {localLang} = i18nContext();
+
+  const dispatch = useDispatch();
+
+  const {
+    formVisible,
+    message,
+    success,
+    loading,
+    courseId,
+    comment,
+    otherOption,
+  } = useSelector(csaSelector);
 
   const {bookingDetails} = useSelector(joinDemoSelector);
 
-  const handleShowFormVisible = () => setFormVisible(true);
+  const handleShowFormVisible = () => dispatch(setFormVisible(true));
 
   const openWhatsapp = async () => {
-    let whatappUrl = '';
-    const phoneNumber = '+919289029696';
-
-    if (Platform.OS === 'android') {
-      whatappUrl = `whatsapp://send?phone=${phoneNumber}&text=I would like to know more about your courses`;
-    } else if (Platform.OS === 'ios') {
-      console.log("it's ios");
-
-      whatappUrl = `whatsapp://wa.me/${phoneNumber}&text=I would like to know more about your courses`;
-    }
+    const text = 'I would like to know more about your courses';
+    const whatappUrl = getWhatsappRedirectUrl(text);
     try {
       await Linking.openURL(whatappUrl);
     } catch (error) {
@@ -69,73 +74,34 @@ const CustomerSupportActions = ({visible, onClose}) => {
     }
   };
 
+  // Set other option
   const onChangeOtherOptions = e => {
-    setOtherOption(e);
+    dispatch(setOtherOption(e));
   };
 
+  // Set comment
   const onSelectComment = val => {
-    setComment(val);
-    if (errorMessage) setErrorMessage('');
+    dispatch(setComment(val));
   };
 
+  // Set course id
   const onSelectCourseId = id => {
-    setCourseId(id);
+    dispatch(setCourseId(id));
   };
 
+  // close form
   const onCloseForm = () => {
-    setOtherOption('');
-    setComment('');
-    setCourseId('');
-    setFormVisible(false);
-    if (errorMessage) setErrorMessage('');
+    dispatch(resetState());
   };
 
+  // Save inquiry
   const handleAddInquiry = async () => {
-    try {
-      if (!courseId || !comment) {
-        return;
-      }
-
-      if (comment === 'Other' && !otherOption) {
-        setErrorMessage('Field is required.');
-        return;
-      }
-
-      const body = {
-        fullName: bookingDetails?.parentName,
-        phone: bookingDetails.phone,
-        comment: otherOption ? otherOption : comment,
-        courseId,
-        source: 'app',
-      };
-
-      setInquiryLoading(true);
-
-      const response = await fetch(`${BASE_URL}${ADD_INQUIRY_URL}`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      console.log(await response.text());
-
-      if (response.ok) {
-        setSuccess(true);
-        setInquiryLoading(false);
-      }
-    } catch (error) {
-      console.log('ADD_INQUIRY_ERROR_CUSTOMER_SUPPORT_ACTION= ', error);
-    }
+    dispatch(addInquiryStart({courseId, comment, otherOption, bookingDetails}));
   };
 
+  // Continue, close form and reset state
   const handleOnContinue = () => {
-    setSuccess(false);
-    setOtherOption('');
-    setComment('');
-    setCourseId('');
-    if (errorMessage) setErrorMessage('');
+    dispatch(resetState());
   };
 
   // UI Constants
@@ -266,9 +232,9 @@ const CustomerSupportActions = ({visible, onClose}) => {
                     onChangeText={onChangeOtherOptions}
                   />
                 )}
-                {errorMessage && (
+                {message && (
                   <TextWrapper fs={14} color={COLORS.pred}>
-                    {errorMessage}
+                    {message}
                   </TextWrapper>
                 )}
                 <Spacer />
@@ -293,7 +259,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
         msg="We will call you soon"
         onContinue={handleOnContinue}
       />
-      <Modal visible={inquiryLoading}>
+      <Modal visible={loading}>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Spinner />
         </View>

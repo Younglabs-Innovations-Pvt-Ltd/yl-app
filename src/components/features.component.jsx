@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {StyleSheet, Image, View} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import Spacer from './spacer.component';
@@ -75,6 +75,69 @@ const Features = ({demoData}) => {
     }
   };
 
+  // UI Constants
+
+  // Send free class link to email
+  const EMAIL_COMPONENT = useMemo(() => {
+    return emailLoading ? (
+      <Spinner style={{alignSelf: 'center'}} />
+    ) : !isDemoOver ? (
+      <>
+        {!emailSent ? (
+          <View style={{marginTop: 20, width: '100%', alignItems: 'center'}}>
+            <TextWrapper color={COLORS.black} fs={18}>
+              {localLang.sendEmailLabel}
+            </TextWrapper>
+            {show && (
+              <Input
+                placeholder="Enter your email"
+                inputMode="email"
+                value={email}
+                onChangeText={onChangeEmail}
+                autoCapitalize="none"
+              />
+            )}
+            {errorMessage && (
+              <TextWrapper
+                fs={14}
+                color={COLORS.pred}
+                styles={{alignSelf: 'flex-start'}}>
+                {errorMessage}
+              </TextWrapper>
+            )}
+            <Spacer />
+            <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
+              <TextWrapper fs={17} fw="700" color={COLORS.white}>
+                {localLang.sendEmailButtonText}
+              </TextWrapper>
+            </Button>
+          </View>
+        ) : (
+          <View style={styles.btnSendLink}>
+            <TextWrapper
+              fs={16}
+              fw="700"
+              color={COLORS.white}
+              styles={{marginRight: 4}}>
+              {localLang.sendEmailInformText}
+            </TextWrapper>
+            <Icon name="mail-outline" size={24} color={COLORS.white} />
+          </View>
+        )}
+      </>
+    ) : null;
+  }, [
+    emailLoading,
+    isDemoOver,
+    emailSent,
+    show,
+    errorMessage,
+    email,
+    localLang.sendEmailLabel,
+    localLang.sendEmailButtonText,
+    localLang.sendEmailInformText,
+  ]);
+
   return (
     <>
       <View
@@ -83,54 +146,7 @@ const Features = ({demoData}) => {
           width: '100%',
           alignItems: 'center',
         }}>
-        {emailLoading ? (
-          <Spinner style={{alignSelf: 'center'}} />
-        ) : !isDemoOver ? (
-          <>
-            {!emailSent ? (
-              <View
-                style={{marginTop: 20, width: '100%', alignItems: 'center'}}>
-                <TextWrapper color={COLORS.black} fs={18}>
-                  {localLang.sendEmailLabel}
-                </TextWrapper>
-                {show && (
-                  <Input
-                    placeholder="Enter your email"
-                    inputMode="email"
-                    value={email}
-                    onChangeText={onChangeEmail}
-                    autoCapitalize="none"
-                  />
-                )}
-                {errorMessage && (
-                  <TextWrapper
-                    fs={14}
-                    color={COLORS.pred}
-                    styles={{alignSelf: 'flex-start'}}>
-                    {errorMessage}
-                  </TextWrapper>
-                )}
-                <Spacer />
-                <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
-                  <TextWrapper fs={17} fw="700" color={COLORS.white}>
-                    {localLang.sendEmailButtonText}
-                  </TextWrapper>
-                </Button>
-              </View>
-            ) : (
-              <View style={styles.btnSendLink}>
-                <TextWrapper
-                  fs={16}
-                  fw="700"
-                  color={COLORS.white}
-                  styles={{marginRight: 4}}>
-                  {localLang.sendEmailInformText}
-                </TextWrapper>
-                <Icon name="mail-outline" size={24} color={COLORS.white} />
-              </View>
-            )}
-          </>
-        ) : null}
+        {EMAIL_COMPONENT}
       </View>
       <View style={[styles.features]}>
         <TextWrapper fs={28} styles={{textAlign: 'center'}}>

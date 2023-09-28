@@ -1,4 +1,4 @@
-export const openWhatsApp = text => {
+export const getWhatsappRedirectUrl = text => {
   const phoneNumber = '+919289029696';
   let url = '';
 
