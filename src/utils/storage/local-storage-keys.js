@@ -8,6 +8,7 @@ const localKeys = {
   NMI: 'nmi',
   IS_RATED: 'isRated',
   LANGUAGE_KEY: 'lang',
+  DEVICE_ID: 'deviceId',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);
