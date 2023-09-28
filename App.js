@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Linking, Alert} from 'react-native';
+import {Linking} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -12,11 +12,8 @@ import {Provider} from 'react-redux';
 import {store} from './src/store/store';
 
 import SplashScreen from 'react-native-splash-screen';
-import {SENTRY_DSN, BASE_URL} from '@env';
+import {SENTRY_DSN} from '@env';
 import {LOCAL_KEYS} from './src/utils/constants/local-keys';
-
-// Notification Permissions
-import {request, PERMISSIONS} from 'react-native-permissions';
 
 // Native mmodules
 import {checkForUpdate} from './src/natiive-modules/inapp-update';
@@ -25,9 +22,6 @@ import {checkForUpdate} from './src/natiive-modules/inapp-update';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FONTS} from './src/utils/constants/fonts';
 import {SCREEN_NAMES} from './src/utils/constants/screen-names';
-
-// Snackbar
-import Snackbar from 'react-native-snackbar';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
@@ -39,10 +33,6 @@ import CourseDetails from './src/screens/course-details.screen';
 
 import * as Sentry from '@sentry/react-native';
 import {navigationRef} from './src/navigationRef';
-
-import {COLORS} from './src/utils/constants/colors';
-import {getCurrentDeviceId} from './src/utils/deviceId';
-import {storeDeviceId} from './src/utils/api/yl.api';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -60,13 +50,18 @@ function App() {
     SplashScreen.hide();
   }, []);
 
+  // Get current app version
+  // useEffect(() => {
+  //   getCurrentAppVersion(data => {
+  //     console.log(data);
+
+  //     const {versionCode} = data;
+  //   });
+  // }, []);
+
   // Check for app update
   useEffect(() => {
     checkForUpdate();
-  }, []);
-
-  useEffect(() => {
-    Alert.alert(BASE_URL);
   }, []);
 
   // Handle redirect url (Deep Link)
@@ -88,8 +83,6 @@ function App() {
       .catch(err => console.log(err));
   }, []);
 
-  // Check if user already logged in
-  // then redirect to home screen
   useEffect(() => {
     const isUserAlreadyLoggedIn = async () => {
       try {
@@ -112,74 +105,6 @@ function App() {
 
     isUserAlreadyLoggedIn();
   }, []);
-
-  // Save Device id
-  useEffect(() => {
-    saveDeviceId();
-  }, []);
-
-  const saveDeviceId = async () => {
-    try {
-      const token = await getCurrentDeviceId();
-      const deviceId = await AsyncStorage.getItem(LOCAL_KEYS.DEVICE_ID);
-
-      if (!deviceId) {
-        const response = await storeDeviceId(token);
-
-        if (response.status === 200) {
-          await AsyncStorage.setItem(LOCAL_KEYS.DEVICE_ID, 'true');
-        }
-      }
-    } catch (error) {
-      console.log('DEVICE_ID_ERROR_APP=', error);
-    }
-  };
-
-  // Request for Notification permission
-  useEffect(() => {
-    requestPermissions();
-  }, []);
-
-  // Request for Notifications permission to above android 13 or above
-  const requestPermissions = async () => {
-    try {
-      const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
-
-      if (result === 'denied') {
-        Alert.alert(
-          'Permission required',
-          'To be able to update for events and offers, please grant permission.',
-          [
-            {
-              text: 'OK',
-              onPress: () => requestPermissions(),
-            },
-          ],
-        );
-      } else if (result === 'blocked') {
-        Snackbar.show({
-          text: 'Notification permission blocked, go to app setting to grant it.',
-          textColor: COLORS.white,
-          duration: Snackbar.LENGTH_LONG,
-          action: {
-            text: 'GRANT',
-            textColor: COLORS.white,
-            onPress: openAppSetting,
-          },
-        });
-      }
-    } catch (error) {
-      console.log('REQUEST_NOTIFICATION_PERMISSION_ERROR=', error);
-    }
-  };
-
-  const openAppSetting = async () => {
-    try {
-      await Linking.openSettings();
-    } catch (error) {
-      console.log('OPEN_SETTING_ERROR=', error);
-    }
-  };
 
   if (loading) return null;
 

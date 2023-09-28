@@ -8,7 +8,6 @@ import {
   ACS_TOKEN_URL,
   RATING_API,
   MARK_MORE_INFO_API,
-  DEVICE_ID_URL,
 } from '@env';
 
 const SOURCE = 'app';
@@ -62,22 +61,6 @@ export const fetchBookingDetailsFromPhone = async phone => {
       'content-type': 'application/json',
     },
     body: JSON.stringify({phone: parseInt(phone), source: SOURCE}),
-  });
-};
-
-/**
- * @author Shobhit
- * @since 20/09/2023
- * @param phone
- * @description Fetch booking details by phone number
- */
-export const fetchBookingStatusFromPhone = async (phone, deviceId) => {
-  return await fetch(`${BASE_URL}${BOOKING_URL}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({phone: parseInt(phone), source: SOURCE, deviceId}),
   });
 };
 
@@ -175,16 +158,5 @@ export const saveNeedMoreInfo = async ({bookingId}) => {
       bookingId: bookingId,
       source: SOURCE,
     }),
-  });
-};
-
-// Store every device id to database
-export const storeDeviceId = async deviceId => {
-  return fetch(`${BASE_URL}${DEVICE_ID_URL}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({deviceId}),
   });
 };

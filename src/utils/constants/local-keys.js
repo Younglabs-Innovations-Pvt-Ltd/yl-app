@@ -7,7 +7,6 @@ const localKeys = {
   ACS_TOKEN: 'acsToken',
   NMI: 'nmi',
   IS_RATED: 'isRated',
-  DEVICE_ID: 'deviceId',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);

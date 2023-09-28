@@ -8,7 +8,6 @@ import {name as appName} from './app.json';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import notifee, {EventType} from '@notifee/react-native';
-import messaging from '@react-native-firebase/messaging';
 
 notifee.onBackgroundEvent(async ({type, detail}) => {
   const {notification} = detail;
@@ -16,7 +15,5 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
     notifee.cancelNotification(notification.id);
   }
 });
-
-messaging().setBackgroundMessageHandler(async remoteMessage => {});
 
 AppRegistry.registerComponent(appName, () => App);

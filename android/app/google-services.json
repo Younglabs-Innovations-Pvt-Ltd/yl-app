@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "54129267828",
-    "firebase_url": "https://younglabs-8c353-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "younglabs-8c353",
-    "storage_bucket": "younglabs-8c353.appspot.com"
+    "project_number": "635469009265",
+    "firebase_url": "https://fir-chat-7ad43-default-rtdb.firebaseio.com",
+    "project_id": "fir-chat-7ad43",
+    "storage_bucket": "fir-chat-7ad43.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:54129267828:android:c54ca9c59d613eff462d21",
+        "mobilesdk_app_id": "1:635469009265:android:cfa101d833db07990c66d0",
         "android_client_info": {
           "package_name": "com.younglabs"
         }
       },
       "oauth_client": [
         {
-          "client_id": "54129267828-73o9bu1af3djrmh0e9krbk59s1g47rsp.apps.googleusercontent.com",
+          "client_id": "635469009265-vs0ek2qmh5ucogtsh4c06kt9t7v7qa2m.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD59OUXft6SwtbKvCwPpLa1RdsQOmQcH7M"
+          "current_key": "AIzaSyD302oOYQm8_3bAf3BZblS8U0tbzbCVefI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "54129267828-1ncbjs5tds7e884ijgc8a83mgp32kp2u.apps.googleusercontent.com",
+              "client_id": "635469009265-vs0ek2qmh5ucogtsh4c06kt9t7v7qa2m.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
