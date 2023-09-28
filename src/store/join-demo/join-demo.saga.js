@@ -1,13 +1,13 @@
 import {all, call, put, takeLatest} from 'redux-saga/effects';
 import {
   fetchBookingDetailsFromBookingId,
-  fetchBookingDetailsFromPhone,
   fetchBookingDetils,
   updateChildName,
   getAcsToken,
   markAttendance,
   saveFreeClassRating,
   saveNeedMoreInfo,
+  fetchBookingStatusFromPhone,
 } from '../../utils/api/yl.api';
 
 import {
@@ -42,6 +42,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
 import {openWhatsApp} from '../../utils/redirect-whatsapp';
+import {getCurrentDeviceId} from '../../utils/deviceId';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -56,7 +57,10 @@ const TAG = 'JOIN_DEMO_SAGA_ERROR';
  */
 function* fetchDemoDetailsFromPhone({payload}) {
   try {
-    const response = yield call(fetchBookingDetailsFromPhone, payload);
+    // Get device id
+    const token = yield getCurrentDeviceId();
+
+    const response = yield call(fetchBookingStatusFromPhone, payload, token);
     const data = yield response.json();
 
     let callingCode = yield AsyncStorage.getItem(LOCAL_KEYS.CALLING_CODE);
@@ -66,7 +70,9 @@ function* fetchDemoDetailsFromPhone({payload}) {
     const detailsResponse = yield call(fetchBookingDetils, {
       phone: JSON.parse(callingCode.concat(payload)),
     });
+
     const bookingDetails = yield detailsResponse.json();
+
     // // set phone to local storage
     const phoneFromAsync = yield AsyncStorage.getItem(LOCAL_KEYS.PHONE);
 
