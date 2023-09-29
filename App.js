@@ -46,6 +46,7 @@ import {storeDeviceId} from './src/utils/api/yl.api';
 
 Sentry.init({
   dsn: SENTRY_DSN,
+  enabled: process.env.NODE_ENV === 'production',
 });
 
 const Stack = createStackNavigator();

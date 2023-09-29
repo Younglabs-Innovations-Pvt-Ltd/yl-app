@@ -53,31 +53,19 @@ export const fetchBookingDetils = async data => {
  * @author Shobhit
  * @since 20/09/2023
  * @param phone
- * @description Fetch booking details by phone number
+ * @description Fetch booking status by phone number
  */
-export const fetchBookingDetailsFromPhone = async phone => {
-  return await fetch(`${BASE_URL}${BOOKING_URL}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({phone: parseInt(phone), source: SOURCE}),
-  });
-};
+export const fetchBookingDetailsFromPhone = async (phone, deviceId) => {
+  let body = deviceId
+    ? JSON.stringify({phone: parseInt(phone), source: SOURCE, deviceId})
+    : JSON.stringify({phone: parseInt(phone), source: SOURCE});
 
-/**
- * @author Shobhit
- * @since 20/09/2023
- * @param phone
- * @description Fetch booking details by phone number
- */
-export const fetchBookingStatusFromPhone = async (phone, deviceId) => {
   return await fetch(`${BASE_URL}${BOOKING_URL}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({phone: parseInt(phone), source: SOURCE, deviceId}),
+    body: body,
   });
 };
 

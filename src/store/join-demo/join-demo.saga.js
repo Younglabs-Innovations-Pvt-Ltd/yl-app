@@ -7,7 +7,7 @@ import {
   markAttendance,
   saveFreeClassRating,
   saveNeedMoreInfo,
-  fetchBookingStatusFromPhone,
+  fetchBookingDetailsFromPhone,
 } from '../../utils/api/yl.api';
 
 import {
@@ -60,7 +60,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
     // Get device id
     const token = yield getCurrentDeviceId();
 
-    const response = yield call(fetchBookingStatusFromPhone, payload, token);
+    const response = yield call(fetchBookingDetailsFromPhone, payload, token);
     const data = yield response.json();
 
     let callingCode = yield AsyncStorage.getItem(LOCAL_KEYS.CALLING_CODE);

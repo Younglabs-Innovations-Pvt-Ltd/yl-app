@@ -38,9 +38,6 @@ const getClassDate = seconds => {
   return `${classDate} ${months[month]} ${year} at ${classTime}`;
 };
 
-const requirement_1 =
-  'Please make sure that your child is ready with a pencil/pen and a notebook (4 Line Notebook or 2 line Notebook for 11+ ages) before the session';
-
 const DemoWaiting = ({timeLeft}) => {
   const {demoData} = useSelector(state => state.joinDemo);
 
