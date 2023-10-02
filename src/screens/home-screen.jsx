@@ -229,10 +229,12 @@ const HomeScreen = ({navigation}) => {
     if (!bookingTime) return;
 
     const isDemoOver =
-      new Date(bookingTime).getTime() + 1000 * 60 * 50 <= new Date().getTime();
+      new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
 
     if (isDemoOver && isAttended) {
       setShowPostActions(true);
+    } else {
+      setShowPostActions(false);
     }
   }, [bookingTime, isAttended]);
 
@@ -325,6 +327,8 @@ const HomeScreen = ({navigation}) => {
       </TextWrapper>
     );
   }, [cn, childName, message]);
+
+  // console.log(showPostActions);
 
   return loading ? (
     <Center bg={COLORS.white}>

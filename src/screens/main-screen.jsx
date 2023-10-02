@@ -31,33 +31,29 @@ const MainScreen = ({route}) => {
     StatusBar.setBarStyle('light-content');
   }, []);
 
-  // useEffect(() => {
-
-  // }, []);
-
   useEffect(() => {
     if (!data) return;
 
-    /**
-     * @author Shobhit
-     * @since 20/09/2023
-     * @description
-     * Check is phone number exists in local storage
-     * If it does not exist only then set booking id by dispatching an action
-     */
-    const checkForPhone = async () => {
-      try {
-        const isPhoneExists = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
-        if (!isPhoneExists) {
-          dispatch(setDemoBookingId(data.bookingId));
-        }
-      } catch (error) {
-        console.log('CHECK_FOR_PHONE_MAIN_SCREEN', error);
-      }
-    };
-
     checkForPhone();
   }, []);
+
+  /**
+   * @author Shobhit
+   * @since 20/09/2023
+   * @description
+   * Check is phone number exists in local storage
+   * If it does not exist only then set booking id by dispatching an action
+   */
+  const checkForPhone = async () => {
+    try {
+      const isPhoneExists = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
+      if (!isPhoneExists) {
+        dispatch(setDemoBookingId(data.bookingId));
+      }
+    } catch (error) {
+      console.log('CHECK_FOR_PHONE_MAIN_SCREEN', error);
+    }
+  };
 
   return (
     <Tab.Navigator tabBar={props => <Tabbar {...props} />}>
