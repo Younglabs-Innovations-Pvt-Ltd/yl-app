@@ -31,7 +31,10 @@ import {
   setRatingLoading,
   markNMI,
   markNMISuccess,
+  setLoading,
 } from './join-demo.reducer';
+
+import {setCurrentNetworkState} from '../network/reducer';
 
 import {Linking} from 'react-native';
 
@@ -43,6 +46,7 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
 import {getWhatsappRedirectUrl} from '../../utils/redirect-whatsapp';
 import {getCurrentDeviceId} from '../../utils/deviceId';
+import {ERROR_MESSAGES} from '../../utils/constants/errorMsgs';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -82,7 +86,13 @@ function* fetchDemoDetailsFromPhone({payload}) {
 
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
-    console.log(TAG, error);
+    console.log('error');
+    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
+    //   yield put(setLoading(false));
+    //   yield put(
+    //     setCurrentNetworkState(startFetchBookingDetailsFromPhone(payload)),
+    //   );
+    // }
   }
 }
 
@@ -117,6 +127,13 @@ function* fetchDemoDetailsFromBookingId({payload}) {
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
     console.log(TAG, error);
+    console.log('error');
+    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
+    //   yield put(setLoading(false));
+    //   yield put(
+    //     setCurrentNetworkState(startFetchBookingDetailsFromId(payload)),
+    //   );
+    // }
   }
 }
 
@@ -162,7 +179,6 @@ function* onSetDemoData({payload: {demoData}}) {
         const markAttendenceResponse = yield call(markAttendance, {bookingId});
 
         const {message} = yield markAttendenceResponse.json();
-        console.log(message);
 
         if (message === 'Attendance Marked') {
           yield put(setIsAttendenceMarked(true));
@@ -426,20 +442,34 @@ function* handleNMI({payload: {bookingId}}) {
   try {
     const isNmi = yield AsyncStorage.getItem(LOCAL_KEYS.NMI);
     if (!isNmi) {
+      console.log('no nmi');
       const response = yield saveNeedMoreInfo({bookingId});
 
       if (response.status === 200) {
         yield AsyncStorage.setItem(LOCAL_KEYS.NMI, 'true');
+        yield put(markNMISuccess());
+
+        const url = getWhatsappRedirectUrl(text);
+        yield Linking.openURL(url);
       }
+    } else {
+      console.log('nmi');
+      yield new Promise(resolve => setTimeout(resolve, 1000));
+
+      yield put(markNMISuccess());
+
+      const url = getWhatsappRedirectUrl(text);
+      yield Linking.openURL(url);
     }
-
-    yield put(markNMISuccess());
-
-    const url = getWhatsappRedirectUrl(text);
-    yield Linking.openURL(url);
   } catch (error) {
-    console.log('nmi error', error);
-    yield put(setErrorMessage(error.message));
+    console.log(error);
+    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
+    //   yield put(setCurrentNetworkState(markNMI({bookingId})));
+    // } else {
+    //   yield put(
+    //     setErrorMessage('Something went wrong. Can not redirect on WhatsApp.'),
+    //   );
+    // }
   }
 }
 

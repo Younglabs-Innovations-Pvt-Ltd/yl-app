@@ -91,18 +91,18 @@ public class InAppUpdateModule extends ReactContextBaseJavaModule implements Ins
                     }
             }
 
-//            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-//                        && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-//                    try {
-//                        appUpdateManager.startUpdateFlowForResult(
-//                                appUpdateInfo,
-//                                AppUpdateType.FLEXIBLE,
-//                                reactContext.getCurrentActivity(),
-//                                MY_REQUEST_CODE);
-//                    } catch (IntentSender.SendIntentException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+        //    if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+        //                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+        //            try {
+        //                appUpdateManager.startUpdateFlowForResult(
+        //                        appUpdateInfo,
+        //                        AppUpdateType.FLEXIBLE,
+        //                        reactContext.getCurrentActivity(),
+        //                        MY_REQUEST_CODE);
+        //            } catch (IntentSender.SendIntentException e) {
+        //                e.printStackTrace();
+        //            }
+        //        }
         });
     }
 

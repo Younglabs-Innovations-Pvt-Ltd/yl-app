@@ -33,6 +33,9 @@ const reducer = {
     state.bookingDetails = bookingDetails;
     state.loading = false;
   },
+  setLoading(state, action) {
+    state.loading = action.payload;
+  },
   setDemoPhone(state, action) {
     state.demoPhoneNumber = action.payload;
   },
@@ -120,6 +123,7 @@ export const {
   markNMI,
   setIsRedirectToWhatsApp,
   markNMISuccess,
+  setLoading,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

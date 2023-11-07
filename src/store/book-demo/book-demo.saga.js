@@ -8,6 +8,7 @@ import {
   setNewBookingFailed,
   setNewBookingSuccess,
   setIsBookingLimitExceeded,
+  stopLoading,
 } from './book-demo.reducer';
 
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
@@ -15,6 +16,8 @@ import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makeNewBooking} from '../../utils/api/yl.api';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
+import {ERROR_MESSAGES} from '../../utils/constants/errorMsgs';
+import {setCurrentNetworkState} from '../network/reducer';
 
 /**
  * @author Shobhit
@@ -56,6 +59,10 @@ function* fetchBookingSlots({payload}) {
     yield put(fetchBookingSlotsSuccess(slotsData));
   } catch (error) {
     console.log('Slots error', error);
+    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
+    //   yield put(stopLoading());
+    //   yield put(setCurrentNetworkState(startFetchingBookingSlots(payload)));
+    // }
   }
 }
 
@@ -80,7 +87,6 @@ function* handleNewBooking({payload: {data, ipData}}) {
 
       yield put(setNewBookingSuccess());
     } else if (response.status === 400) {
-      console.log('booking data', bookingDetails);
       yield put(setIsBookingLimitExceeded(true));
     }
   } catch (error) {

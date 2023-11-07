@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useMemo} from 'react';
-import {StyleSheet, View, Pressable, ScrollView} from 'react-native';
+import {StyleSheet, View, Pressable, ScrollView, Alert} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
@@ -11,7 +11,9 @@ import {
   joinFreeClass,
   setShowJoinButton,
 } from '../store/join-demo/join-demo.reducer';
+import {resetCurrentNetworkState} from '../store/network/reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
+import {networkSelector} from '../store/network/selector';
 
 import Input from '../components/input.component';
 import Button from '../components/button.component';
@@ -32,6 +34,7 @@ import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 import {i18nContext} from '../context/lang.context';
 import LanguageSelection from '../components/language-selection.component';
+import NetInfo from '@react-native-community/netinfo';
 
 import * as Sentry from '@sentry/react-native';
 
@@ -84,6 +87,10 @@ const HomeScreen = ({navigation}) => {
     message,
   } = useSelector(joinDemoSelector);
 
+  const {
+    networkState: {isConnected, alertAction},
+  } = useSelector(networkSelector);
+
   /**
    * @author Shobhit
    * @since 22/09/2023
@@ -118,6 +125,22 @@ const HomeScreen = ({navigation}) => {
     }
   }, [demoData]);
 
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(async state => {
+      if (state.isConnected && isConnected) {
+        if (demoPhoneNumber) {
+          dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+        } else if (demoBookingId) {
+          dispatch(startFetchBookingDetailsFromId(demoBookingId));
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [demoPhoneNumber, demoBookingId, dispatch, isConnected]);
+
   /**
    * @author Shobhit
    * @since 07/08/2023
@@ -149,7 +172,6 @@ const HomeScreen = ({navigation}) => {
    */
   useEffect(() => {
     if (isAttendenceMarked) {
-      console.log('marked');
       if (demoPhoneNumber) {
         dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
       }
@@ -270,6 +292,16 @@ const HomeScreen = ({navigation}) => {
     }
   }, [bookingTime]);
 
+  // useEffect(() => {
+  //   if (bookingTime) {
+  //     const timeOver = bookingTime < Date.now();
+  //     console.log('timeOver=', timeOver);
+  //     if (!timeOver) {
+  //       setIsTimeover(false);
+  //     }
+  //   }
+  // }, [bookingTime]);
+
   // on change for child name
   const onChangeChildName = e => {
     setChildName(e);
@@ -297,7 +329,7 @@ const HomeScreen = ({navigation}) => {
     if (!bookingTime) return null;
 
     return new Date(bookingTime).getTime() > Date.now();
-  }, [bookingTime, isTimeover]);
+  }, [bookingTime]);
 
   // show join button to join class
   const SHOW_JOIN_BUTTON = useMemo(() => {
@@ -328,7 +360,27 @@ const HomeScreen = ({navigation}) => {
     );
   }, [cn, childName, message]);
 
-  // console.log(showPostActions);
+  if (!isConnected) {
+    Alert.alert(
+      '',
+      'We cannot continue due to network problem. Please check your network connection.',
+      [
+        {
+          text: 'Refresh',
+          onPress: () => {
+            dispatch(resetCurrentNetworkState());
+            dispatch(alertAction);
+          },
+        },
+        {
+          text: 'CANCEL',
+          onPress: () => {
+            dispatch(resetCurrentNetworkState());
+          },
+        },
+      ],
+    );
+  }
 
   return loading ? (
     <Center bg={COLORS.white}>
@@ -344,7 +396,7 @@ const HomeScreen = ({navigation}) => {
           English handwriting
         </TextWrapper>
         <View style={styles.rightNavButtons}>
-          <LanguageSelection />
+          {/* <LanguageSelection /> */}
           <Pressable onPress={handleShowDrawer}>
             <MIcon name="account-circle" size={28} color={COLORS.black} />
           </Pressable>

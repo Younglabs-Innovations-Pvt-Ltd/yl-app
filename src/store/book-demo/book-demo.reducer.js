@@ -56,6 +56,11 @@ const reducer = {
   closePopup(state, action) {
     state.popup = action.payload;
   },
+  stopLoading(state) {
+    state.loading.ipDataLoading = false;
+    state.loading.bookingSlotsLoading = false;
+    state.bookingLoading = false;
+  },
 };
 
 // slice
@@ -78,6 +83,7 @@ export const {
   setNewBookingSuccess,
   setIsBookingLimitExceeded,
   closePopup,
+  stopLoading,
 } = bookDemoSlice.actions;
 
 // reducer

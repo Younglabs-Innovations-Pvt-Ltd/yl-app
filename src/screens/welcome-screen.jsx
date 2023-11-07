@@ -7,6 +7,7 @@ import {
   Animated,
   TextInput,
   StatusBar,
+  Alert,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 
@@ -30,10 +31,14 @@ import {
 
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
+import {networkSelector} from '../store/network/selector';
 
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
 import LanguageSelection from '../components/language-selection.component';
+import {resetCurrentNetworkState} from '../store/network/reducer';
+
+import NetInfo from '@react-native-community/netinfo';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -47,6 +52,9 @@ const DemoClassScreen = () => {
 
   const dispatch = useDispatch();
 
+  const {
+    networkState: {isConnected, alertAction},
+  } = useSelector(networkSelector);
   const {ipData} = useSelector(bookDemoSelector);
   const {country, message, loading, modalVisible} = useSelector(
     welcomeScreenSelector,
@@ -57,6 +65,24 @@ const DemoClassScreen = () => {
     StatusBar.setBackgroundColor(COLORS.pgreen);
     StatusBar.setBarStyle('light-content');
   }, []);
+
+  /**
+   * @author Shobhit
+   * @since 03/10/2023
+   * @description  Checking for internet connected or not
+   * If connected and ipData is not null then fetch ipData and update state silently
+   */
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (state.isConnected && !ipData) {
+        dispatch(startFetchingIpData());
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [ipData]);
 
   /**
    * @author Shobhit
@@ -242,9 +268,31 @@ const DemoClassScreen = () => {
     {opacity: pressed ? 0.8 : 1},
   ];
 
+  if (!isConnected) {
+    Alert.alert(
+      '',
+      'We cannot continue due to network problem. Please check your network connection.',
+      [
+        {
+          text: 'Refresh',
+          onPress: () => {
+            dispatch(resetCurrentNetworkState());
+            dispatch(alertAction);
+          },
+        },
+        {
+          text: 'CANCEL',
+          onPress: () => {
+            dispatch(resetCurrentNetworkState());
+          },
+        },
+      ],
+    );
+  }
+
   return (
     <View style={styles.wrapper}>
-      <LanguageSelection />
+      {/* <LanguageSelection /> */}
       <View style={{flex: CONTAINER_FLEX_STYLE}}>
         <View style={[styles.container, CONTAINER_STYLE]}>
           <View>

@@ -4,6 +4,7 @@ import {
   fetchBookingStatusFailed,
   fetchBookingStatusSuccess,
   setErrorMessage,
+  setLoading,
 } from './reducer';
 
 import {fetchBookingDetailsFromPhone} from '../../utils/api/yl.api';
@@ -16,6 +17,9 @@ import {
   setCountryCallingCodeAsync,
   setLocalPhoneAsync,
 } from '../../utils/storage/storage-provider';
+
+import {setCurrentNetworkState} from '../network/reducer';
+import {ERROR_MESSAGES} from '../../utils/constants/errorMsgs';
 
 /**
  * @author Shobhit
@@ -61,6 +65,15 @@ function* handleBookingStatus({payload: {phone, country}}) {
     }
   } catch (error) {
     console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR_SAGA', error);
+    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
+    //   yield put(setLoading(false));
+    //   yield put(
+    //     setCurrentNetworkState(fetchBookingStatusStart({phone, country})),
+    //   );
+    // } else {
+    //   yield put(fetchBookingStatusFailed('Something went wrong'));
+    // }
+
     yield put(fetchBookingStatusFailed('Something went wrong'));
   }
 }

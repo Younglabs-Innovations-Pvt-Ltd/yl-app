@@ -43,6 +43,7 @@ import {navigationRef} from './src/navigationRef';
 import {COLORS} from './src/utils/constants/colors';
 import {getCurrentDeviceId} from './src/utils/deviceId';
 import {storeDeviceId} from './src/utils/api/yl.api';
+import {NetworkProvider} from './src/context/network.state';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -189,65 +190,70 @@ function App() {
   }
 
   return (
+    // Provider for language
     <I18NProvider>
-      <Provider store={store}>
-        <NavigationContainer ref={navigationRef}>
-          <Stack.Navigator
-            screenOptions={{
-              // headerShown: false,
-              headerStyle: {
-                elevation: 0,
-                shadowOpacity: 0,
-                borderBottomWidth: 1,
-                borderBottomColor: '#eaeaea',
-              },
-              headerTitleStyle: {
-                fontSize: 18,
-                fontFamily: FONTS.gelasio_semibold,
-                fontWeight: '700',
-              },
-              cardStyle: {backgroundColor: '#fff'},
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-            }}
-            initialRouteName={initialRouteName}>
-            <Stack.Screen
-              name={SCREEN_NAMES.WELCOME}
-              component={WelcomeScreen}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.MAIN}
-              component={MainScreen}
-              options={{headerShown: false}}
-              initialParams={{bookingId}}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.ON_BOARDING}
-              component={OnBoardingScreen}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.BOOK_DEMO_FORM}
-              component={BookDemoFormScreen}
-              options={{
-                title: 'Book Free Handwriting Class',
+      {/* Provider for checking internet state */}
+      <NetworkProvider>
+        {/* Provider for redux store */}
+        <Provider store={store}>
+          <NavigationContainer ref={navigationRef}>
+            <Stack.Navigator
+              screenOptions={{
+                // headerShown: false,
+                headerStyle: {
+                  elevation: 0,
+                  shadowOpacity: 0,
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#eaeaea',
+                },
+                headerTitleStyle: {
+                  fontSize: 18,
+                  fontFamily: FONTS.gelasio_semibold,
+                  fontWeight: '700',
+                },
+                cardStyle: {backgroundColor: '#fff'},
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
               }}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
-              component={BookDemoSlotsScreen}
-              options={{title: 'Book Free Handwriting Class'}}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.COURSE_DETAILS}
-              component={CourseDetails}
-              options={{
-                // headerStyle: {elevation: 0},
-                headerTitle: 'Course Detail',
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>
+              initialRouteName={initialRouteName}>
+              <Stack.Screen
+                name={SCREEN_NAMES.WELCOME}
+                component={WelcomeScreen}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.MAIN}
+                component={MainScreen}
+                options={{headerShown: false}}
+                initialParams={{bookingId}}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.ON_BOARDING}
+                component={OnBoardingScreen}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.BOOK_DEMO_FORM}
+                component={BookDemoFormScreen}
+                options={{
+                  title: 'Book Free Handwriting Class',
+                }}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
+                component={BookDemoSlotsScreen}
+                options={{title: 'Book Free Handwriting Class'}}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.COURSE_DETAILS}
+                component={CourseDetails}
+                options={{
+                  // headerStyle: {elevation: 0},
+                  headerTitle: 'Course Detail',
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </Provider>
+      </NetworkProvider>
     </I18NProvider>
   );
 }

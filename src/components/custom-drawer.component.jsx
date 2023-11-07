@@ -49,6 +49,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN_EXPIRE);
       await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN);
       await AsyncStorage.removeItem(LOCAL_KEYS.NMI);
+      await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
       await cancleNotifications();
 
       removeRegisterNotificationTimer();

@@ -21,7 +21,9 @@ const reducer = {
   fetchBookingStatusStart(state) {
     state.loading = true;
   },
-
+  setLoading(state, action) {
+    state.loading = action.payload;
+  },
   fetchBookingStatusSuccess(state, action) {
     state.loading = false;
     state.message = action.payload;

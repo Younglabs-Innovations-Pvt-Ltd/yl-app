@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {StyleSheet, Pressable, View, Linking} from 'react-native';
+import {StyleSheet, Pressable, View, Linking, Alert} from 'react-native';
 import {CommonActions} from '@react-navigation/native';
 
 import TextWrapper from '../components/text-wrapper.component';
@@ -12,6 +12,7 @@ import {COLORS} from '../utils/constants/colors';
 import {useDispatch, useSelector} from 'react-redux';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
+import {networkSelector} from '../store/network/selector';
 import {
   startFetchingBookingSlots,
   setTimezone,
@@ -21,11 +22,16 @@ import {
   startFetchingIpData,
 } from '../store/book-demo/book-demo.reducer';
 import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
+import {
+  setCurrentNetworkState,
+  resetCurrentNetworkState,
+} from '../store/network/reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import NetInfo from '@react-native-community/netinfo';
 
 const BookDemoSlots = ({route, navigation}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
@@ -48,6 +54,9 @@ const BookDemoSlots = ({route, navigation}) => {
   } = useSelector(bookDemoSelector);
 
   const {demoBookingId} = useSelector(joinDemoSelector);
+  const {
+    networkState: {isConnected, alertAction},
+  } = useSelector(networkSelector);
 
   // Set ip data
   useEffect(() => {
@@ -55,6 +64,29 @@ const BookDemoSlots = ({route, navigation}) => {
       dispatch(startFetchingIpData());
     }
   }, [ipData]);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (state.isConnected && isConnected) {
+        if (!ipData) {
+          dispatch(startFetchingIpData());
+        } else {
+          const body = {
+            courseId: 'Eng_Hw',
+            childAge: childAge,
+            timeZone: timezone.toString(),
+            type: 'website',
+          };
+
+          dispatch(startFetchingBookingSlots(body));
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [isConnected, ipData]);
 
   // Set timezone
   useEffect(() => {
@@ -127,6 +159,8 @@ const BookDemoSlots = ({route, navigation}) => {
       country: ipData.country_name.toUpperCase(),
       countryCode: ipData.calling_code,
     };
+
+    console.log('currentSlotId=', currentSlotTime.slotId);
 
     dispatch(setNewBookingStart({data: bodyData, ipData}));
   };
@@ -227,6 +261,28 @@ const BookDemoSlots = ({route, navigation}) => {
       );
     });
   }, [slotsTime, currentSlotDate, currentSlotTime]);
+
+  if (!isConnected) {
+    Alert.alert(
+      '',
+      'We cannot continue due to network problem. Please check your network connection.',
+      [
+        {
+          text: 'Refresh',
+          onPress: () => {
+            dispatch(resetCurrentNetworkState());
+            dispatch(alertAction);
+          },
+        },
+        {
+          text: 'CANCEL',
+          onPress: () => {
+            dispatch(resetCurrentNetworkState());
+          },
+        },
+      ],
+    );
+  }
 
   return bookingSlotsLoading ? (
     <Spinner style={{alignSelf: 'center'}} />
