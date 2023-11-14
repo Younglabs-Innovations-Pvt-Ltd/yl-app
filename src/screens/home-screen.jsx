@@ -87,6 +87,8 @@ const HomeScreen = ({navigation}) => {
     message,
   } = useSelector(joinDemoSelector);
 
+  // console.log('demo', demoData);
+
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
@@ -121,7 +123,7 @@ const HomeScreen = ({navigation}) => {
    */
   useEffect(() => {
     if (demoData) {
-      dispatch(setDemoData({demoData}));
+      dispatch(setDemoData({demoData, phone: demoPhoneNumber}));
     }
   }, [demoData]);
 

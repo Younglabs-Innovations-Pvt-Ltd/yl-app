@@ -89,6 +89,7 @@ const reducer = {
   joinFreeClass() {},
   saveRating() {},
   checkForRating() {},
+  joinDemo() {},
 };
 
 // slice
@@ -124,6 +125,7 @@ export const {
   setIsRedirectToWhatsApp,
   markNMISuccess,
   setLoading,
+  joinDemo,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

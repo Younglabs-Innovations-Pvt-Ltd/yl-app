@@ -32,7 +32,10 @@ import {
   markNMI,
   markNMISuccess,
   setLoading,
+  joinDemo,
 } from './join-demo.reducer';
+
+import {BASE_URL} from '@env';
 
 import {setCurrentNetworkState} from '../network/reducer';
 
@@ -156,7 +159,7 @@ function* getPhoneFromStorage() {
  * @param {object} payload demoData
  * @description Set demo data to states
  */
-function* onSetDemoData({payload: {demoData}}) {
+function* onSetDemoData({payload: {demoData, phone}}) {
   // If user put wrong number
   if (demoData.hasOwnProperty('message')) {
     return;
@@ -170,7 +173,9 @@ function* onSetDemoData({payload: {demoData}}) {
       teamUrl: meetingLink,
     } = demoData;
 
-    const demodate = new Date(_seconds * 1000);
+    const demoTime = _seconds * 1000;
+
+    const demodate = new Date(demoTime);
     const today = new Date().getDate();
 
     // Mark attendence
@@ -178,12 +183,17 @@ function* onSetDemoData({payload: {demoData}}) {
       if (!attendedOrNot) {
         const markAttendenceResponse = yield call(markAttendance, {bookingId});
 
-        const {message} = yield markAttendenceResponse.json();
-
-        if (message === 'Attendance Marked') {
-          yield put(setIsAttendenceMarked(true));
+        if (markAttendenceResponse.status === 200) {
+          console.log('attendance marked.');
         }
       }
+    }
+
+    const timeover = demoTime < Date.now();
+    const afterOneHour = demoTime + 1000 * 60 * 60 > Date.now();
+
+    if (timeover && afterOneHour) {
+      yield put(joinDemo({bookingId, phone}));
     }
 
     if (meetingLink) {
@@ -193,7 +203,7 @@ function* onSetDemoData({payload: {demoData}}) {
     }
 
     // Set booking time for timer
-    if (_seconds) yield put(setBookingTime(_seconds * 1000 + 1000 * 60));
+    if (_seconds) yield put(setBookingTime(demoTime + 1000 * 60));
   } catch (error) {
     console.log('setDemoData_error', error);
   }
@@ -473,6 +483,26 @@ function* handleNMI({payload: {bookingId}}) {
   }
 }
 
+function* handleJoinDemo({payload: {bookingId, phone}}) {
+  try {
+    const API_URL = `${BASE_URL}/admin/demoallocation/joindemo`;
+    const response = yield fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({bookingId}),
+    });
+    const res = yield response.json();
+    console.log('joinDemoRes=', res);
+    if (response.status === 200) {
+      yield call(fetchDemoDetailsFromPhone, {payload: phone});
+    }
+  } catch (error) {
+    console.log('joinDemoError=', error);
+  }
+}
+
 /**
  * Listener functions that call when dispatch a related action
  */
@@ -528,6 +558,10 @@ function* markNeedMoreInfo() {
   yield takeLatest(markNMI.type, handleNMI);
 }
 
+function* joinDemoStart() {
+  yield takeLatest(joinDemo.type, handleJoinDemo);
+}
+
 // main saga
 export function* joinDemoSaga() {
   yield all([
@@ -540,5 +574,6 @@ export function* joinDemoSaga() {
     call(userRating),
     call(checkRatingAsync),
     call(markNeedMoreInfo),
+    call(joinDemoStart),
   ]);
 }
