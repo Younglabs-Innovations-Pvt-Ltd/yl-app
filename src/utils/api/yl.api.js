@@ -176,3 +176,19 @@ export const storeDeviceId = async deviceId => {
     body: JSON.stringify({deviceId}),
   });
 };
+
+/**
+ * @author Shobhit
+ * @since 20/09/2023
+ * @param phone
+ * @description Fetch booking status by phone number
+ */
+export const checkBookingStatus = async phone => {
+  return await fetch(`${BASE_URL}${BOOKING_URL}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({phone}),
+  });
+};

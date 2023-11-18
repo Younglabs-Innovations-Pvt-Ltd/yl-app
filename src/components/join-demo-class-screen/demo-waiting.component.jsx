@@ -48,15 +48,22 @@ const DemoWaiting = ({timeLeft}) => {
   const {demoDate} = demoData;
   const seconds = demoDate._seconds;
   return (
-    <View style={{paddingVertical: 12}}>
-      <TextWrapper color="gray" fw="600">
+    <View
+      style={{
+        paddingVertical: 12,
+        backgroundColor: COLORS.pgreen,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+        marginBottom: 12,
+      }}>
+      <TextWrapper color={COLORS.white}>
         Your class is on{' '}
-        <TextWrapper color={COLORS.black} fw="bold">
+        <TextWrapper color={COLORS.white} fw="bold">
           {getClassDate(seconds)}
         </TextWrapper>
       </TextWrapper>
       <CountDown timeLeft={timeLeft} />
-      <Spacer space={4} />
+      {/* <Spacer space={4} />
       <TextWrapper
         color={'gray'}
         fs={
@@ -71,7 +78,7 @@ const DemoWaiting = ({timeLeft}) => {
             <TextWrapper fs={18}>{localLang.classRequirementText}</TextWrapper>
           </View>
         </View>
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -80,7 +87,6 @@ export default DemoWaiting;
 
 const styles = StyleSheet.create({
   listStyle: {
-    width: '100%',
     paddingVertical: 4,
     paddingHorizontal: 12,
   },

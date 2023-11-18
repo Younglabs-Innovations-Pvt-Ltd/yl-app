@@ -50,19 +50,19 @@ function* handleBookingStatus({payload: {phone, country}}) {
     // Get booking data
     const response = yield fetchBookingDetailsFromPhone(phone);
 
-    if (response.status === 400) {
-      // Booking not found
-      navigate(SCREEN_NAMES.BOOK_DEMO_FORM, {phone, country}); //Redirect to BookDemoForm Screen
-      yield put(setErrorMessage(''));
-      return;
-    }
+    // if (response.status === 400) {
+    //   // Booking not found
+    //   navigate(SCREEN_NAMES.BOOK_DEMO_FORM, {phone, country}); //Redirect to BookDemoForm Screen
+    //   yield put(setErrorMessage(''));
+    //   return;
+    // }
 
-    if (response.status === 200) {
-      yield setLocalPhoneAsync(phone);
-      yield setCountryCallingCodeAsync(country.callingCode);
-      yield put(fetchBookingStatusSuccess(''));
-      replace(SCREEN_NAMES.MAIN); // Redirect to main screen
-    }
+    // if (response.status === 200) {
+    yield setLocalPhoneAsync(phone);
+    yield setCountryCallingCodeAsync(country.callingCode);
+    yield put(fetchBookingStatusSuccess(''));
+    replace(SCREEN_NAMES.MAIN); // Redirect to main screen
+    // }
   } catch (error) {
     console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR_SAGA', error);
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {

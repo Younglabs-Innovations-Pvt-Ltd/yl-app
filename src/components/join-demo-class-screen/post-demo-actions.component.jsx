@@ -180,21 +180,7 @@ const PostDemoAction = () => {
     <View style={styles.container}>
       {!attended && (
         <View style={styles.paContainer}>
-          {/* <Image source={{uri: IMAGE_URI}} style={styles.paImage} /> */}
-          <TextWrapper fs={24} fw="700" styles={{textAlign: 'center'}}>
-            Hello, {bookingDetails?.parentName}
-          </TextWrapper>
-          <Spacer space={4} />
-          <TextWrapper fs={17} styles={{textAlign: 'center'}}>
-            We had a wonderful handwriting session at{' '}
-            <TextWrapper fw="700">{demoTime}</TextWrapper>.
-          </TextWrapper>
-          <Spacer />
-          <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-            We covered basic letters, joining, and a sentence too! We'll
-            continue the classes in the next session and start with basic
-            strokes which help in handwriting improvement.
-          </TextWrapper>
+          <TextWrapper fs={22}>Did you attend your free class?</TextWrapper>
           <Spacer />
           <View style={styles.paButtons}>
             <Pressable
@@ -225,64 +211,99 @@ const PostDemoAction = () => {
           </View>
         </View>
       )}
-      {attended ? (
-        !isRated ? (
-          <View style={styles.ratingContainer}>
-            <TextWrapper
-              fs={28}
-              color={COLORS.pgreen}
-              fw="600"
-              styles={{textAlign: 'center'}}>
-              Congratulations for attending your free class.
-            </TextWrapper>
-            <View style={styles.ratingWrapper}>
-              <TextWrapper fs={20}>
-                Please rate your class experience
-              </TextWrapper>
-              <View style={styles.starsContainer}>{RATING_STARS}</View>
-            </View>
+      {!isRated && attended && (
+        <View style={styles.ratingContainer}>
+          <TextWrapper
+            fs={24}
+            color={COLORS.pgreen}
+            fw="600"
+            styles={{textAlign: 'center'}}>
+            Congratulations for attending your free class.
+          </TextWrapper>
+          <View style={styles.ratingWrapper}>
+            <TextWrapper fs={20}>Please rate your class experience</TextWrapper>
+            <View style={styles.starsContainer}>{RATING_STARS}</View>
           </View>
-        ) : (
-          <View style={styles.ctasWrapper}>
-            <TextWrapper fs={20} styles={{lineHeight: 28}}>
-              Would you like to continue with the course and improve your
-              child's handwriting?
-            </TextWrapper>
-            <View style={styles.ctas}>
-              {isAllowToReschedule && (
-                <Pressable
-                  style={({pressed}) => [
-                    styles.ctaButton,
-                    {opacity: pressed ? 0.8 : 1},
-                  ]}
-                  onPress={rescheduleFreeClass}>
-                  <TextWrapper>Reschedule a new class</TextWrapper>
-                </Pressable>
-              )}
+        </View>
+      )}
+      {isRated && (
+        <View style={styles.ctasWrapper}>
+          <TextWrapper fs={20} styles={{lineHeight: 28}}>
+            Would you like to continue with the course and improve your child's
+            handwriting?
+          </TextWrapper>
+          <View style={styles.ctas}>
+            {isAllowToReschedule && (
               <Pressable
                 style={({pressed}) => [
                   styles.ctaButton,
                   {opacity: pressed ? 0.8 : 1},
                 ]}
-                disabled={nmiLoading}
-                onPress={markNeedMoreInfo}>
-                <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
-                <TextWrapper>Yes, need more info</TextWrapper>
-                {NMI_LOADING}
+                onPress={rescheduleFreeClass}>
+                <TextWrapper>Reschedule a new class</TextWrapper>
               </Pressable>
-              <Pressable
-                style={({pressed}) => [
-                  styles.ctaButton,
-                  {opacity: pressed ? 0.8 : 1},
-                ]}
-                onPress={redirectToWebsiteToBuyCourse}>
-                <MIcon name="web" size={22} color={COLORS.black} />
-                <TextWrapper>Buy on website</TextWrapper>
-              </Pressable>
-            </View>
+            )}
+            <Pressable
+              style={({pressed}) => [
+                styles.ctaButton,
+                {opacity: pressed ? 0.8 : 1},
+              ]}
+              disabled={nmiLoading}
+              onPress={markNeedMoreInfo}>
+              <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
+              <TextWrapper>Yes, need more info</TextWrapper>
+              {NMI_LOADING}
+            </Pressable>
+            <Pressable
+              style={({pressed}) => [
+                styles.ctaButton,
+                {opacity: pressed ? 0.8 : 1},
+              ]}
+              onPress={redirectToWebsiteToBuyCourse}>
+              <MIcon name="web" size={22} color={COLORS.black} />
+              <TextWrapper>Buy on website</TextWrapper>
+            </Pressable>
           </View>
-        )
-      ) : null}
+        </View>
+      )}
+      {/* <View style={styles.ctasWrapper}>
+        <TextWrapper fs={20} styles={{lineHeight: 28}}>
+          Would you like to continue with the course and improve your child's
+          handwriting?
+        </TextWrapper>
+        <View style={styles.ctas}>
+          {isAllowToReschedule && (
+            <Pressable
+              style={({pressed}) => [
+                styles.ctaButton,
+                {opacity: pressed ? 0.8 : 1},
+              ]}
+              onPress={rescheduleFreeClass}>
+              <TextWrapper>Reschedule a new class</TextWrapper>
+            </Pressable>
+          )}
+          <Pressable
+            style={({pressed}) => [
+              styles.ctaButton,
+              {opacity: pressed ? 0.8 : 1},
+            ]}
+            disabled={nmiLoading}
+            onPress={markNeedMoreInfo}>
+            <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
+            <TextWrapper>Yes, need more info</TextWrapper>
+            {NMI_LOADING}
+          </Pressable>
+          <Pressable
+            style={({pressed}) => [
+              styles.ctaButton,
+              {opacity: pressed ? 0.8 : 1},
+            ]}
+            onPress={redirectToWebsiteToBuyCourse}>
+            <MIcon name="web" size={22} color={COLORS.black} />
+            <TextWrapper>Buy on website</TextWrapper>
+          </Pressable>
+        </View>
+      </View> */}
     </View>
   );
 };
@@ -291,10 +312,9 @@ export default PostDemoAction;
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
+    // paddingTop: 12,
   },
   ratingContainer: {
-    marginTop: 16,
     height: 200,
   },
   ratingWrapper: {
@@ -308,12 +328,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ctasWrapper: {
-    paddingVertical: 12,
+    // paddingVertical: 12,
+    paddingBottom: 20,
   },
   ctas: {
-    flex: 1,
     gap: 10,
-    marginTop: 20,
   },
   ctaButton: {
     height: 48,
@@ -327,8 +346,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   paContainer: {
-    paddingTop: 16,
     maxWidth: 450,
+    paddingBottom: 16,
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
@@ -340,7 +359,6 @@ const styles = StyleSheet.create({
   },
   paButtons: {
     width: 200,
-    paddingTop: 16,
   },
   paButton: {
     width: '100%',

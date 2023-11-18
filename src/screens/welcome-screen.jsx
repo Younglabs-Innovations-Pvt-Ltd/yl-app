@@ -39,13 +39,14 @@ import LanguageSelection from '../components/language-selection.component';
 import {resetCurrentNetworkState} from '../store/network/reducer';
 
 import NetInfo from '@react-native-community/netinfo';
+import Button from '../components/button.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
 const IMAGE_HEIGHT = deviceWidth * 0.7;
 
 // Main Component
-const DemoClassScreen = () => {
+const DemoClassScreen = ({navigation: {navigate}}) => {
   const {localLang, currentLang} = i18nContext();
 
   const [phone, setPhone] = useState('');

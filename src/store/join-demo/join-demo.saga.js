@@ -87,6 +87,10 @@ function* fetchDemoDetailsFromPhone({payload}) {
       yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, payload);
     }
 
+    if (response.status === 400) {
+      yield put(setLoading(false));
+    }
+
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
     console.log('error');
@@ -204,6 +208,8 @@ function* onSetDemoData({payload: {demoData, phone}}) {
 
     // Set booking time for timer
     if (_seconds) yield put(setBookingTime(demoTime + 1000 * 60));
+
+    yield put(setLoading(false));
   } catch (error) {
     console.log('setDemoData_error', error);
   }
@@ -361,10 +367,13 @@ function* saveAcsTokenInLocalStorage({data}) {
  * Save acs token to local storage using saveAcsTokenInLocalStorage function
  */
 function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
+  console.log(childName, teamUrl, bookingDetails);
   if (!childName) {
     yield put(setErrorMessage('Please enter child name'));
     return;
   }
+
+  console.log('hit');
 
   try {
     const notChildName = bookingDetails.childName

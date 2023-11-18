@@ -31,7 +31,7 @@ const reducer = {
     } = action;
     state.demoData = demoData;
     state.bookingDetails = bookingDetails;
-    state.loading = false;
+    // state.loading = false;
   },
   setLoading(state, action) {
     state.loading = action.payload;

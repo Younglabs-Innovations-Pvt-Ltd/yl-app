@@ -25,7 +25,7 @@ const CountDown = ({timeLeft}) => {
   }, [timeLeft]);
 
   return (
-    <View style={{alignItems: 'center'}}>
+    <View>
       <View style={styles.countdown}>
         <View style={styles.containerList}>{TIMER}</View>
       </View>
@@ -37,36 +37,33 @@ export default CountDown;
 
 const styles = StyleSheet.create({
   countdown: {
-    width: '100%',
-    maxWidth: 448,
-    paddingTop: 8,
+    // maxWidth: 448,
+    // paddingTop: 8,
   },
   timeContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.pgreen,
-    borderRadius: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    // backgroundColor: COLORS.pgreen,
+    // borderRadius: 4,
+    // paddingVertical: 8,
+    // paddingHorizontal: 10,
   },
   timeLabel: {
     fontSize: 14,
     fontWeight: '500',
     color: COLORS.white,
-    marginTop: 2,
+    // marginTop: 2,
     fontFamily: FONTS.roboto,
   },
   timeText: {
-    fontSize: 52,
+    fontSize: 40,
     color: COLORS.white,
     fontFamily: FONTS.bigShoulders_semibold,
   },
   containerList: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
+    // width: '100%',
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-between',
+    // gap: 8,
   },
 });

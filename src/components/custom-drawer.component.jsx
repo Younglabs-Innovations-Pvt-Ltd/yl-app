@@ -33,12 +33,10 @@ const WEBSITE_URL = 'https://www.younglabs.in/';
 const CustomDrawerContent = ({navigation, ...props}) => {
   const {localLang} = i18nContext();
   const dispatch = useDispatch();
-  const {bookingDetails} = useSelector(joinDemoSelector);
+  const {bookingDetails, demoPhoneNumber} = useSelector(joinDemoSelector);
   const windowDimensions = useWindowDimensions();
 
   if (!bookingDetails) return null;
-
-  const {phone, parentName} = bookingDetails;
 
   const handleLogout = async () => {
     try {
@@ -108,7 +106,10 @@ const CustomDrawerContent = ({navigation, ...props}) => {
     }
   };
 
-  const fullName = parentName.slice(0, 1).toUpperCase() + parentName.slice(1);
+  const fullName = bookingDetails?.parentName
+    ? bookingDetails.parentName.slice(0, 1).toUpperCase() +
+      bookingDetails.parentName.slice(1)
+    : null;
 
   const shareApp = async () => {
     const message =
@@ -136,7 +137,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             <TextWrapper fs={28} numberOfLines={1}>
               {fullName || 'Guest'}
             </TextWrapper>
-            <TextWrapper>{phone}</TextWrapper>
+            <TextWrapper>{demoPhoneNumber}</TextWrapper>
           </View>
           <View style={{flex: 1, justifyContent: 'center'}}>
             <TextWrapper fs={20} styles={{textAlign: 'center'}}>

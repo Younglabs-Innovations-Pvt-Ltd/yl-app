@@ -81,6 +81,8 @@ function* handleNewBooking({payload: {data, ipData}}) {
 
     const bookingDetails = yield response.json();
 
+    console.log(bookingDetails);
+
     if (response.status === 200) {
       yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, data.phone.toString());
       yield AsyncStorage.setItem(LOCAL_KEYS.CALLING_CODE, ipData.calling_code);

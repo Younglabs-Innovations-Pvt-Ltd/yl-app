@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
 import {StyleSheet, Pressable, View, Linking, Alert} from 'react-native';
-import {CommonActions} from '@react-navigation/native';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
@@ -21,7 +20,10 @@ import {
   closePopup,
   startFetchingIpData,
 } from '../store/book-demo/book-demo.reducer';
-import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
+import {
+  setDemoBookingId,
+  startFetchBookingDetailsFromPhone,
+} from '../store/join-demo/join-demo.reducer';
 import {
   setCurrentNetworkState,
   resetCurrentNetworkState,
@@ -29,11 +31,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import NetInfo from '@react-native-community/netinfo';
 
-const BookDemoSlots = ({route, navigation}) => {
+const BookDemoSlots = ({route, onClose}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
@@ -171,17 +172,13 @@ const BookDemoSlots = ({route, navigation}) => {
    * @description Show a popup after creating a booking successfully
    */
   const handlePopup = async () => {
-    const resetAction = CommonActions.reset({
-      index: 0,
-      routes: [{name: SCREEN_NAMES.MAIN}],
-    });
-
     if (demoBookingId) {
       await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
       dispatch(setDemoBookingId(''));
     }
     dispatch(closePopup());
-    navigation.dispatch(resetAction);
+    onClose();
+    dispatch(startFetchBookingDetailsFromPhone(phone));
   };
 
   /**

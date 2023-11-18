@@ -29,6 +29,7 @@ export const setCountdownTriggerNotification = async (
       title: 'Class Reminder',
       body,
       android: {
+        sound: 'default',
         channelId,
         autoCancel: false,
         smallIcon: 'ic_small_icon',
@@ -43,10 +44,52 @@ export const setCountdownTriggerNotification = async (
   );
 };
 
+// All Trigger notification ids
 export const getAllTriggerNotificationIds = async () => {
   return await notifee.getTriggerNotificationIds();
 };
 
+// Cancel all notifications
 export const cancleNotifications = async () => {
   return await notifee.cancelAllNotifications();
+};
+
+// Display Reminder notifications
+export const displayReminderNotification = async notification => {
+  const groupId = await notifee.createChannelGroup({
+    id: 'Reminder',
+    name: 'Reminder',
+  });
+
+  await notifee.createChannel({
+    id: 'reminders',
+    name: 'reminders',
+    sound: 'default',
+    groupId: groupId,
+    vibration: true,
+  });
+
+  await notifee.displayNotification({
+    ...notification,
+  });
+};
+
+// Display Remarketing notifications
+export const displayRemarketingNotification = async notification => {
+  const groupId = await notifee.createChannelGroup({
+    id: 'Remarketing',
+    name: 'Remarketing',
+  });
+
+  await notifee.createChannel({
+    id: 'remarketing',
+    name: 'remarketing',
+    sound: 'default',
+    groupId: groupId,
+    vibration: true,
+  });
+
+  await notifee.displayNotification({
+    ...notification,
+  });
 };

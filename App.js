@@ -36,6 +36,7 @@ import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
 import CourseDetails from './src/screens/course-details.screen';
+import Home from './src/screens/Home.screen';
 
 import * as Sentry from '@sentry/react-native';
 import {navigationRef} from './src/navigationRef';
@@ -241,6 +242,11 @@ function App() {
                 name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
                 component={BookDemoSlotsScreen}
                 options={{title: 'Book Free Handwriting Class'}}
+              />
+              <Stack.Screen
+                name={'home'}
+                component={Home}
+                // options={{title: 'Book Free Handwriting Class'}}
               />
               <Stack.Screen
                 name={SCREEN_NAMES.COURSE_DETAILS}
