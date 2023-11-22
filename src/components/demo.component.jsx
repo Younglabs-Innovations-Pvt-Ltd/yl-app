@@ -241,6 +241,7 @@ export default Demo;
 
 const styles = StyleSheet.create({
   contentWrapper: {
+    width: '100%',
     // maxWidth: 428,
     // alignSelf: 'center',
   },

@@ -5640,6 +5640,11 @@ mkdirp@^0.5.1:
   dependencies:
     minimist "^1.2.6"
 
+moment@^2.29.4:
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
+  integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
+
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz"
@@ -6263,6 +6268,11 @@ react-native-permissions@^3.9.2:
   version "3.9.2"
   resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-3.9.2.tgz#729ee7fe9ca437ee8e87f1ecec59acfe89bbb840"
   integrity sha512-mBGoRDKi4twYH+UsPomPdi0dLpV6dGLmKzLpIgB5cLK/dzfM8Sr02Kch1xghVwT13ZkyCyd8DpcL4HgBJ4GQQg==
+
+react-native-razorpay@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-razorpay/-/react-native-razorpay-2.3.0.tgz#e89f3c635e439bc85e4c7972eb2d67e2c0e0abc3"
+  integrity sha512-xxiZCPuZmiRq5UHDr+D4OoyxEjMu0ujC+RaE+rYo938EK0Vc21dZRUVxMVP1L2WgzA8PYwmD5FWvdHNtWLQC4Q==
 
 react-native-reanimated@^3.3.0:
   version "3.3.0"

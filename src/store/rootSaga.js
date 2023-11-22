@@ -4,6 +4,7 @@ import {joinDemoSaga} from './join-demo/join-demo.saga';
 import {bookDemoSaga} from './book-demo/book-demo.saga';
 import {welcomeScreenSagas} from './welcome-screen/saga';
 import {csaSagas} from './customer-support-action/saga';
+import {courseSagas} from './course/course.saga';
 
 export function* rootSaga() {
   yield all([
@@ -11,5 +12,6 @@ export function* rootSaga() {
     call(bookDemoSaga),
     call(welcomeScreenSagas),
     call(csaSagas),
+    call(courseSagas),
   ]);
 }
