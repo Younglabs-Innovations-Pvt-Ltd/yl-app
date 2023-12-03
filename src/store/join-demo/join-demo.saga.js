@@ -50,6 +50,7 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getWhatsappRedirectUrl} from '../../utils/redirect-whatsapp';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import {ERROR_MESSAGES} from '../../utils/constants/errorMsgs';
+import {setAuthToken} from '../auth/reducer';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -148,9 +149,14 @@ function* fetchDemoDetailsFromBookingId({payload}) {
 function* getPhoneFromStorage() {
   try {
     const phoneFromAsyncStorage = yield AsyncStorage.getItem(LOCAL_KEYS.PHONE);
+    const token = yield AsyncStorage.getItem(LOCAL_KEYS.AUTH_TOKEN);
 
     if (phoneFromAsyncStorage) {
       yield put(setDemoPhone(phoneFromAsyncStorage));
+    }
+
+    if (token) {
+      yield put(setAuthToken(token));
     }
   } catch (error) {
     console.log(TAG, error);

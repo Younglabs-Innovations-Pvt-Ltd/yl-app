@@ -9,6 +9,7 @@ const localKeys = {
   IS_RATED: 'isRated',
   DEVICE_ID: 'deviceId',
   SAVE_ATTENDED: 'attended',
+  AUTH_TOKEN: 'token',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);

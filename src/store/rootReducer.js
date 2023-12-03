@@ -5,6 +5,7 @@ import {bookDemoReducer} from './book-demo/book-demo.reducer';
 import {welcomeScreenReducer} from './welcome-screen/reducer';
 import {csaReducer} from './customer-support-action/reducer';
 import {networkReducer} from './network/reducer';
+import {authReducer} from './auth/reducer';
 
 export const rootReducer = combineReducers({
   joinDemo: joinDemoReducer,
@@ -12,4 +13,5 @@ export const rootReducer = combineReducers({
   welcome: welcomeScreenReducer,
   csa: csaReducer,
   networkState: networkReducer,
+  auth: authReducer,
 });

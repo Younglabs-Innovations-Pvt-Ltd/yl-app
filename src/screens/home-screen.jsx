@@ -6,9 +6,7 @@ import {
   ScrollView,
   Alert,
   StatusBar,
-  Image,
   FlatList,
-  Dimensions,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -61,6 +59,7 @@ import Reviews from '../components/reviews.component';
 
 import Worksheets from '../components/worksheets.component';
 import VideoPlayer from '../components/video.component';
+import {authSelector} from '../store/auth/selector';
 
 const INITIAL_TIME = {
   days: 0,
@@ -165,6 +164,15 @@ const HomeScreen = ({navigation}) => {
 
   /**
    * @author Shobhit
+   * @since 07/08/2023
+   * @description Set demo phone number from localStorage to redux state
+   */
+  useEffect(() => {
+    dispatch(setPhoneAsync());
+  }, []);
+
+  /**
+   * @author Shobhit
    * @since 22/09/2023
    * @description Set parent name and phone as username to Sentry to specify errors
    */
@@ -175,15 +183,6 @@ const HomeScreen = ({navigation}) => {
       });
     }
   }, [bookingDetails]);
-
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description Set demo phone number from localStorage to redux state
-   */
-  useEffect(() => {
-    dispatch(setPhoneAsync());
-  }, []);
 
   /**
    * @author Shobhit
@@ -575,6 +574,8 @@ const HomeScreen = ({navigation}) => {
   // const onReadyForDisplay = () => {
   //   console.log('ready for display');
   // }
+
+  const {token} = useSelector(authSelector);
 
   return (
     <View style={{flex: 1}}>

@@ -41,6 +41,13 @@ import {resetCurrentNetworkState} from '../store/network/reducer';
 import NetInfo from '@react-native-community/netinfo';
 import Button from '../components/button.component';
 
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import {phoneAuthStart, setAuthToken, verifyCode} from '../store/auth/reducer';
+import {authSelector} from '../store/auth/selector';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
+
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
 const IMAGE_HEIGHT = deviceWidth * 0.7;
@@ -50,8 +57,16 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
   const {localLang, currentLang} = i18nContext();
 
   const [phone, setPhone] = useState('');
+  const [code, setCode] = useState(null);
+  const [visible, setVisible] = useState(false);
 
   const dispatch = useDispatch();
+
+  const {
+    confirm,
+    message: authMsg,
+    loading: authLoading,
+  } = useSelector(state => state.auth);
 
   const {
     networkState: {isConnected, alertAction},
@@ -116,6 +131,12 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
       );
     }
   }, [ipData]);
+
+  useEffect(() => {
+    if (confirm) {
+      setVisible(true);
+    }
+  }, [confirm]);
 
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
@@ -291,6 +312,40 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
     );
   }
 
+  // Handle the button press
+  async function signInWithPhoneNumber() {
+    dispatch(phoneAuthStart({phone}));
+    // await AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
+  }
+
+  function confirmCode() {
+    dispatch(verifyCode({confirm, verificationCode: code}));
+  }
+
+  async function onAuthStateChanged(user) {
+    if (user) {
+      try {
+        const tokenResult = await auth().currentUser.getIdTokenResult();
+        const token = await AsyncStorage.getItem(LOCAL_KEYS.AUTH_TOKEN);
+        if (!token) {
+          await AsyncStorage.setItem(LOCAL_KEYS.AUTH_TOKEN, tokenResult.token);
+          await AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
+          dispatch(setAuthToken(tokenResult.token));
+        }
+
+        setVisible(false);
+        navigate(SCREEN_NAMES.MAIN);
+      } catch (error) {
+        console.error('Error getting ID token:', error);
+      }
+    }
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
   return (
     <View style={styles.wrapper}>
       {/* <LanguageSelection /> */}
@@ -338,16 +393,24 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
               maxLength={maxPhoneLength}
             />
           </View>
-          {message && (
+          {/* {message && (
             <TextWrapper fs={14} color={COLORS.pred}>
               {message}
             </TextWrapper>
+          )} */}
+          {!authMsg && <Spacer space={6} />}
+          {authMsg && (
+            <TextWrapper
+              fs={14}
+              color={COLORS.pred}
+              styles={{marginVertical: 4, marginLeft: 8}}>
+              {authMsg}
+            </TextWrapper>
           )}
-          <Spacer space={12} />
           <Pressable
             style={btnContinueStyle}
             disabled={loading}
-            onPress={handleBookingStatus}>
+            onPress={signInWithPhoneNumber}>
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
               Continue
             </TextWrapper>
@@ -364,6 +427,40 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
         onClose={onCloseBottomSheet}
         onSelect={handleSelectCountry}
       />
+      <ModalComponent
+        visible={visible}
+        onRequestClose={() => setVisible(false)}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.25)',
+            paddingHorizontal: 16,
+          }}>
+          <View
+            style={{
+              padding: 16,
+              borderRadius: 8,
+              backgroundColor: COLORS.white,
+            }}>
+            <TextInput
+              placeholder="Enter code"
+              style={{
+                padding: 8,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: 'gray',
+                borderRadius: 4,
+              }}
+              selectionColor={COLORS.black}
+              value={code}
+              onChangeText={e => setCode(e)}
+              inputMode="numeric"
+              placeholderTextColor={'gray'}
+            />
+            <Button onPress={confirmCode}>Confirm</Button>
+          </View>
+        </View>
+      </ModalComponent>
     </View>
   );
 };
