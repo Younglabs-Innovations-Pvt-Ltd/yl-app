@@ -61,7 +61,7 @@ export const displayReminderNotification = async notification => {
     name: 'Reminder',
   });
 
-  await notifee.createChannel({
+  const remindersChannelId = await notifee.createChannel({
     id: 'reminders',
     name: 'reminders',
     sound: 'default',
@@ -69,8 +69,11 @@ export const displayReminderNotification = async notification => {
     vibration: true,
   });
 
+  let notificationData = notification;
+  notificationData.android.channelId = remindersChannelId;
+
   await notifee.displayNotification({
-    ...notification,
+    ...notificationData,
   });
 };
 
@@ -81,7 +84,7 @@ export const displayRemarketingNotification = async notification => {
     name: 'Remarketing',
   });
 
-  await notifee.createChannel({
+  const remarketingChannelId = await notifee.createChannel({
     id: 'remarketing',
     name: 'remarketing',
     sound: 'default',
@@ -89,7 +92,10 @@ export const displayRemarketingNotification = async notification => {
     vibration: true,
   });
 
+  let notificationData = notification;
+  notificationData.android.channelId = remarketingChannelId;
+
   await notifee.displayNotification({
-    ...notification,
+    ...notificationData,
   });
 };

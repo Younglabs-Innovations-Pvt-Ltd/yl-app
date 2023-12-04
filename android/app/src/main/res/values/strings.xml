@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Younglabs</string>
+    <string name="facebook_app_id">365530592091832</string>
+    <string name="fb_login_protocol_scheme">fb365530592091832</string>
+    <string name="facebook_client_token">1fc8df8a117d945c114149c2740b3f37</string>
 </resources>

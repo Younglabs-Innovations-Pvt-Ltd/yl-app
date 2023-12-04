@@ -206,14 +206,15 @@ const PostDemoAction = () => {
   if (ratingLoading || attendedLoading || loading) return null;
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      pagingEnabled
-      style={{borderWidth: 2}}>
+    <View style={{width: '100%'}}>
       {!attended && (
         <View style={styles.paContainer}>
-          <TextWrapper fs={22}>Did you attend your free class?</TextWrapper>
+          <TextWrapper
+            fs={20}
+            color={COLORS.white}
+            styles={{textAlign: 'center'}}>
+            Did you attend your free class?
+          </TextWrapper>
           <Spacer />
           <View style={styles.paButtons}>
             <Pressable
@@ -261,7 +262,10 @@ const PostDemoAction = () => {
       )}
       {isRated && !isNmi && (
         <View style={styles.ctasWrapper}>
-          <TextWrapper fs={20} styles={{lineHeight: 28}}>
+          <TextWrapper
+            fs={17.5}
+            color={COLORS.white}
+            styles={{marginBottom: 8}}>
             Would you like to continue with the course and improve your child's
             handwriting?
           </TextWrapper>
@@ -287,7 +291,7 @@ const PostDemoAction = () => {
               <TextWrapper>Yes, need more info</TextWrapper>
               {NMI_LOADING}
             </Pressable>
-            <Pressable
+            {/* <Pressable
               style={({pressed}) => [
                 styles.ctaButton,
                 {opacity: pressed ? 0.8 : 1},
@@ -295,16 +299,17 @@ const PostDemoAction = () => {
               onPress={redirectToWebsiteToBuyCourse}>
               <MIcon name="web" size={22} color={COLORS.black} />
               <TextWrapper>No I don't want</TextWrapper>
-            </Pressable>
+            </Pressable> */}
           </View>
         </View>
       )}
       {isNmi && (
         <View
           style={{
+            width: '100%',
             flexDirection: 'row',
             gap: 8,
-            backgroundColor: COLORS.pblue,
+            // backgroundColor: COLORS.pblue,
             padding: 16,
           }}>
           <Pressable
@@ -324,7 +329,7 @@ const PostDemoAction = () => {
           </Pressable>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -336,10 +341,8 @@ const styles = StyleSheet.create({
   },
   ratingContainer: {
     width: '100%',
-    height: 200,
   },
   ratingWrapper: {
-    height: 146,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -353,7 +356,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   ctas: {
-    gap: 10,
+    gap: 8,
   },
   ctaButton: {
     height: 48,
@@ -367,13 +370,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   paContainer: {
-    borderWidth: 2,
-    borderColor: 'red',
     width: '100%',
-    maxWidth: 428,
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   paImage: {
     width: 250,
@@ -381,10 +378,11 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
   },
   paButtons: {
-    width: 200,
+    flexDirection: 'row',
+    gap: 8,
   },
   paButton: {
-    width: '100%',
+    paddingHorizontal: 22,
     paddingVertical: 12,
     justifyContent: 'center',
     alignItems: 'center',

@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.younglabs">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -25,7 +25,7 @@
         android:exported="true"
         android:hardwareAccelerated="true"
         android:screenOrientation="portrait">
-        <intent-filter>
+        <intent-filter android:autoVerify="true">
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
             <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
@@ -34,7 +34,15 @@
             <action android:name="android.intent.action.VIEW"/>
             <category android:name="android.intent.category.DEFAULT"/>
             <category android:name="android.intent.category.BROWSABLE"/>
-            <data android:scheme="https" android:host="www.younglabs.in"/>
+            <data android:scheme="https" />
+            <data android:host="www.younglabs.in" />
+        </intent-filter>
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW"/>
+            <category android:name="android.intent.category.DEFAULT"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="app" />
+            <data android:host="open.com.younglabs.android" />
         </intent-filter>
       </activity>
         <service android:name=".NotificationTimerService"></service>
@@ -42,12 +50,17 @@
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_small_icon"
             />
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
     </application>
     <queries>
-+   <intent>
-+     <action android:name="android.intent.action.VIEW" />
-+     <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
-+     <data android:mimeType="*/*" />
-+   </intent>
-+ </queries>
+    +   <intent>
+    +     <action android:name="android.intent.action.VIEW" />
+    +     <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+    +     <data android:mimeType="*/*" />
+    +   </intent>
++   </queries>
+    <queries>
+        <package android:name="com.younglabs" />
+    </queries>
 </manifest>

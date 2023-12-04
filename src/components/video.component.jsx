@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -10,14 +10,29 @@ import Video from 'react-native-video';
 import Icon from './icon.component';
 import {COLORS} from '../utils/constants/colors';
 import Modal from './modal.component';
+import {
+  useNavigation,
+  useFocusEffect,
+  useIsFocused,
+} from '@react-navigation/native';
 
 const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
-const VideoPlayer = ({uri, poster}) => {
+const VideoPlayer = ({uri}) => {
   const videoRef = useRef();
+  const thumbRef = useRef();
   const [visible, setVisible] = useState(false);
   const [muted, setMuted] = useState(false);
   const [loading, setLoding] = useState(false);
+  const [isEnded, setIsEnded] = useState(false);
+  const [thumbLoading, setThumbLoading] = useState(true);
+
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    console.log(isFocused);
+  }, [isFocused]);
 
   const onLoadStart = () => {
     setLoding(true);
@@ -43,33 +58,61 @@ const VideoPlayer = ({uri, poster}) => {
     setVisible(false);
   };
 
+  const onEnd = () => {
+    setIsEnded(true);
+  };
+
+  const onThumReadyForDisplay = () => {
+    setThumbLoading(false);
+  };
+
   return (
     <>
       <View style={styles.container}>
-        <View style={styles.tile}>
-          <Video
-            source={{uri}}
-            style={{width: '100%', height: '100%'}}
-            muted={true}
-            resizeMode="cover"
-            poster={poster}
-            posterResizeMode="cover"
-            paused={true}
-          />
-        </View>
-        <View style={styles.poster}>
+        <Video
+          ref={thumbRef}
+          source={{uri}}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          focusable={false}
+          muted={true}
+          onReadyForDisplay={onThumReadyForDisplay}
+          onEnd={onEnd}
+          resizeMode="cover"
+          disableFocus={true}
+        />
+        {thumbLoading && (
           <View
             style={{
-              width: '100%',
-              height: '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Pressable onPress={onOpen}>
-              <Icon name="play-circle-outline" size={64} color={COLORS.white} />
-            </Pressable>
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              backgroundColor: '#eee',
+            }}></View>
+        )}
+        {isEnded && (
+          <View style={styles.poster}>
+            <View
+              style={{
+                width: '100%',
+                height: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Pressable onPress={onOpen}>
+                <Icon
+                  name="play-circle-outline"
+                  size={64}
+                  color={COLORS.white}
+                />
+              </Pressable>
+            </View>
           </View>
-        </View>
+        )}
       </View>
       <Modal visible={visible} transparent={false} onRequestClose={onClose}>
         <View style={styles.modalContainer}>
@@ -87,7 +130,7 @@ const VideoPlayer = ({uri, poster}) => {
             onLoadStart={onLoadStart}
             onReadyForDisplay={onReadyForDisplay}
             muted={muted}
-            resizeMode={'contain'}
+            resizeMode="contain"
           />
           <View style={styles.videoOverlay}>
             <View
@@ -121,16 +164,11 @@ export default VideoPlayer;
 
 const styles = StyleSheet.create({
   container: {
-    width: deviceWidth * 0.5,
-    maxWidth: 200,
-    height: 250,
+    width: 135,
+    aspectRatio: 9 / 16,
     position: 'relative',
-    paddingVertical: 12,
-  },
-  tile: {
-    borderRadius: 6,
+    borderRadius: 8,
     overflow: 'hidden',
-    position: 'relative',
   },
   poster: {
     position: 'absolute',
@@ -138,10 +176,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'transparent',
     zIndex: 1,
-    marginVertical: 12,
-    borderRadius: 6,
   },
   modalContainer: {
     flex: 1,

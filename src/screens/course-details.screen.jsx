@@ -1,88 +1,113 @@
 import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
-  FlatList,
   View,
   Dimensions,
   ScrollView,
-  Image,
   Pressable,
 } from 'react-native';
+import moment from 'moment';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Video from 'react-native-video';
 import {COLORS} from '../utils/constants/colors';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
-import {getCourseDetails} from '../utils/api/course.api';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchCourseStart} from '../store/course/course.reducer';
 import {courseSelector} from '../store/course/course.selector';
-import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import moment from 'moment';
+import {generateOffering} from '../utils/offering';
+import RazorpayCheckout from 'react-native-razorpay';
+import Icon from '../components/icon.component';
+import BatchCard from '../components/batch-card.component';
+import Collapsible from 'react-native-collapsible';
+
+import {
+  setCurrentAgeGroup,
+  setCurrentSelectedBatch,
+  setLevelText,
+} from '../store/course/course.reducer';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import {generateOffering} from '../utils/offering';
-import RazorpayCheckout from 'react-native-razorpay';
+import Spinner from '../components/spinner.component';
 
-const {width: deviceWidth} = Dimensions.get('window');
+const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
 const ITEM_WIDTH = deviceWidth * 0.75;
 
 const BASE_URL =
   'https://111f-2401-4900-1c5a-6d3e-cd37-1829-ad3-43b6.ngrok-free.app';
 
+const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+
 const CourseDetails = ({route, navigation}) => {
-  const [currentAgeGroup, setCurrentAgeGroup] = useState('');
-  const [currentSelectedBatch, setCurrentSelectedBatch] = useState(null);
   const [filteredBatches, setFilteredBatches] = useState([]);
-  const [currentLevel, setCurrentLevel] = useState(1);
-  const [levelText, setLevelText] = useState('');
+  const [currentChildAge, setCurrentChildAge] = useState(0);
+  const [visibleAge, setVisibleAge] = useState(false);
+  const [gutter, setGutter] = useState(null);
+  const [visibleCheckout, setVisibleCheckout] = useState(false);
+  const [collapsedButton, setCollapsedButton] = useState(true);
+  const [steps, setSteps] = useState({
+    step1: true,
+    step2: true,
+    step3: true,
+  });
 
   const dispatch = useDispatch();
 
   const {
     courseDetails,
     ageGroups,
-    courseId,
     batches,
     prices,
-    message,
     loading,
+    currentAgeGroup,
+    currentSelectedBatch,
+    levelText,
+    currentLevel,
   } = useSelector(courseSelector);
   const {ipData} = useSelector(bookDemoSelector);
   const {bookingDetails} = useSelector(joinDemoSelector);
 
-  const onBuffer = buffer => {
-    console.log(buffer);
-  };
-
   useEffect(() => {
-    if (!ipData) {
-      dispatch(startFetchingIpData());
+    if (bookingDetails) {
+      setCurrentChildAge(bookingDetails.childAge);
     }
-  }, [ipData]);
-
-  useEffect(() => {
-    if (currentLevel === 1) {
-      setLevelText('Foundation');
-    } else if (currentLevel === 2) {
-      setLevelText('Advanced');
-    } else {
-      setLevelText('Foundation + Advanced');
-    }
-  }, [currentLevel]);
+  }, [bookingDetails]);
 
   useEffect(() => {
     dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
   }, []);
 
   useEffect(() => {
-    if (ageGroups.length) {
-      setCurrentAgeGroup(ageGroups[0].ageGroup);
+    let timeout;
+    if (currentAgeGroup) {
+      timeout = setTimeout(() => {
+        setSteps(b => ({...b, step1: true, step2: false}));
+      }, 200);
     }
-  }, [ageGroups.length]);
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [currentAgeGroup]);
+
+  useEffect(() => {
+    let timeout;
+    if (levelText) {
+      timeout = setTimeout(() => {
+        setSteps(b => ({...b, step2: true}));
+        setCollapsedButton(false);
+      }, 200);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [levelText]);
 
   useEffect(() => {
     if (currentAgeGroup) {
@@ -215,131 +240,213 @@ const CourseDetails = ({route, navigation}) => {
       });
   };
 
+  const onLayoutChange = event => {
+    setGutter(event.nativeEvent.layout.y + event.nativeEvent.layout.height);
+  };
+
+  const handleCurrentChildAge = age => {
+    setCurrentChildAge(age);
+    setVisibleAge(false);
+  };
+
+  const handleCurrentAgeGroup = group => {
+    dispatch(setCurrentAgeGroup(group));
+  };
+
+  const SECTIONS = [
+    {
+      title: 'First',
+      content: 'Lorem ipsum...',
+    },
+    {
+      title: 'Second',
+      content: 'Lorem ipsum...',
+    },
+  ];
+
   return (
     <View style={{flex: 1}}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{flex: 1}}
-        contentContainerStyle={{padding: 16}}>
-        {/* Steps */}
-        <View>
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <TextWrapper fs={54} fw="700" color={COLORS.pblue}>
-              1
-            </TextWrapper>
-            <View>
-              <TextWrapper fs={18} fw="700" color={COLORS.pblue}>
-                Select a batch
+      {loading ? (
+        <Spinner style={{alignSelf: 'center'}} />
+      ) : (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{flex: 1}}
+          contentContainerStyle={{padding: 16}}>
+          {/* Age groups */}
+          <View style={{padding: 12, backgroundColor: '#eee', borderRadius: 4}}>
+            <Pressable
+              onPress={() => setSteps(s => ({...s, step1: !s.step1}))}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              <TextWrapper fs={22} fw="700">
+                1. Select age group
               </TextWrapper>
-              <TextWrapper>
-                Choose a batch according to your child's age
-              </TextWrapper>
-            </View>
+              {!currentAgeGroup ? (
+                <Icon
+                  name={`chevron-${!steps.step1 ? 'up' : 'down'}-outline`}
+                  size={24}
+                  color={COLORS.black}
+                />
+              ) : (
+                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
+              )}
+            </Pressable>
+            <Collapsible collapsed={steps.step1} duration={450}>
+              <AgeSelector
+                ageGroups={ageGroups}
+                currentAgeGroup={currentAgeGroup}
+                handleCurrentAgeGroup={handleCurrentAgeGroup}
+                setSteps={setSteps}
+              />
+            </Collapsible>
           </View>
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <TextWrapper fs={54} fw="700" color={COLORS.pgreen}>
-              2
-            </TextWrapper>
-            <View>
-              <TextWrapper fs={18} fw="700" color={COLORS.pgreen}>
-                Fill details
-              </TextWrapper>
-              <TextWrapper>Fill the required information</TextWrapper>
-            </View>
-          </View>
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <TextWrapper fs={54} fw="700" color={COLORS.orange}>
-              3
-            </TextWrapper>
-            <View>
-              <TextWrapper fs={18} fw="700" color={COLORS.orange}>
-                Make payment
-              </TextWrapper>
-              <TextWrapper>Get access to the course</TextWrapper>
-            </View>
-          </View>
-        </View>
 
-        {/* Age groups */}
-        <View
-          style={{
-            paddingTop: 20,
-            paddingBottom: 16,
-          }}>
-          <TextWrapper fs={24} fw="700" styles={{textAlign: 'center'}}>
-            Select age group:
-          </TextWrapper>
-          <AgeSelector
-            ageGroups={ageGroups}
-            currentAgeGroup={currentAgeGroup}
-            setCurrentAgeGroup={setCurrentAgeGroup}
-          />
-        </View>
-
-        {/* Batch card */}
-        {filteredBatches.length > 0 && (
+          {/* Batch card */}
+          <View style={{marginTop: 12}}>
+            <Pressable
+              style={{
+                padding: 12,
+                opacity: !currentAgeGroup ? 0.7 : 1,
+                borderRadius: 4,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: '#eee',
+              }}
+              disabled={!currentAgeGroup}
+              onPress={() => setSteps(s => ({...s, step2: !s.step2}))}>
+              <TextWrapper fs={22} fw="700">
+                2. Select a batch
+              </TextWrapper>
+              {!currentSelectedBatch ? (
+                <Icon
+                  name={`chevron-${!steps.step2 ? 'up' : 'down'}-outline`}
+                  size={24}
+                  color={COLORS.black}
+                />
+              ) : (
+                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
+              )}
+            </Pressable>
+            {filteredBatches.length > 0 && (
+              <View style={{paddingTop: 8}}>
+                <Collapsible collapsed={steps.step2} duration={450}>
+                  <BatchCard
+                    ipData={ipData}
+                    ageGroups={ageGroups}
+                    courseDetails={courseDetails}
+                    prices={prices}
+                    level={1}
+                    batchOptions={filteredBatches.filter(
+                      batch => batch.level === 1,
+                    )}
+                    currentSelectedBatch={currentSelectedBatch}
+                    levelText={levelText}
+                    currentAgeGroup={currentAgeGroup}
+                    handleBuyNowClick={handleBuyNowClick}
+                    setVisibleCheckout={setVisibleCheckout}
+                  />
+                  <Spacer space={4} />
+                  <BatchCard
+                    ipData={ipData}
+                    ageGroups={ageGroups}
+                    courseDetails={courseDetails}
+                    prices={prices}
+                    level={2}
+                    batchOptions={filteredBatches.filter(
+                      batch => batch.level === 2,
+                    )}
+                    currentSelectedBatch={currentSelectedBatch}
+                    levelText={levelText}
+                    currentAgeGroup={currentAgeGroup}
+                    handleBuyNowClick={handleBuyNowClick}
+                    setVisibleCheckout={setVisibleCheckout}
+                  />
+                  <Spacer space={4} />
+                  <BatchCard
+                    ipData={ipData}
+                    ageGroups={ageGroups}
+                    courseDetails={courseDetails}
+                    prices={prices}
+                    level={3}
+                    batchOptions={filteredBatches.filter(
+                      batch => batch.level === 1,
+                    )}
+                    currentSelectedBatch={currentSelectedBatch}
+                    levelText={levelText}
+                    currentAgeGroup={currentAgeGroup}
+                    handleBuyNowClick={handleBuyNowClick}
+                    setVisibleCheckout={setVisibleCheckout}
+                  />
+                </Collapsible>
+              </View>
+            )}
+          </View>
           <View
             style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
+              padding: 12,
+              backgroundColor: '#eee',
+              borderRadius: 4,
+              marginTop: 12,
             }}>
-            <BatchCard
-              ipData={ipData}
-              ageGroups={ageGroups}
-              courseDetails={courseDetails}
-              prices={prices}
-              level={1}
-              batchOptions={filteredBatches.filter(batch => batch.level === 1)}
-              setCurrentSelectedBatch={setCurrentSelectedBatch}
-              currentSelectedBatch={currentSelectedBatch}
-              currentLevel={currentLevel}
-              setCurrentLevel={setCurrentLevel}
-              levelText={levelText}
-              setLevelText={setLevelText}
-              currentAgeGroup={currentAgeGroup}
-              handleBuyNowClick={handleBuyNowClick}
-            />
-            <BatchCard
-              ipData={ipData}
-              ageGroups={ageGroups}
-              courseDetails={courseDetails}
-              prices={prices}
-              level={2}
-              batchOptions={filteredBatches.filter(batch => batch.level === 2)}
-              setCurrentSelectedBatch={setCurrentSelectedBatch}
-              currentSelectedBatch={currentSelectedBatch}
-              currentLevel={currentLevel}
-              setCurrentLevel={setCurrentLevel}
-              levelText={levelText}
-              setLevelText={setLevelText}
-              currentAgeGroup={currentAgeGroup}
-              handleBuyNowClick={handleBuyNowClick}
-            />
-            <BatchCard
-              ipData={ipData}
-              ageGroups={ageGroups}
-              courseDetails={courseDetails}
-              prices={prices}
-              level={3}
-              batchOptions={filteredBatches.filter(batch => batch.level === 1)}
-              setCurrentSelectedBatch={setCurrentSelectedBatch}
-              currentSelectedBatch={currentSelectedBatch}
-              currentLevel={currentLevel}
-              setCurrentLevel={setCurrentLevel}
-              levelText={levelText}
-              setLevelText={setLevelText}
-              currentAgeGroup={currentAgeGroup}
-              handleBuyNowClick={handleBuyNowClick}
-            />
+            <Pressable
+              onPress={() => setCollapsedButton(p => !p)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                opacity: currentAgeGroup && currentSelectedBatch ? 1 : 0.7,
+              }}
+              disabled={!currentAgeGroup || !currentSelectedBatch}>
+              <TextWrapper fs={22} fw="700">
+                3. Make payment
+              </TextWrapper>
+              {currentSelectedBatch && currentAgeGroup ? (
+                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
+              ) : (
+                <Icon
+                  name={`chevron-${!steps.step3 ? 'up' : 'down'}-outline`}
+                  size={24}
+                  color={COLORS.black}
+                />
+              )}
+            </Pressable>
+            <Collapsible collapsed={collapsedButton}>
+              <Pressable
+                style={({pressed}) => [
+                  styles.payButton,
+                  {
+                    opacity: pressed ? 0.8 : 1,
+                    marginTop: 20,
+                  },
+                ]}
+                onPress={() => navigation.navigate(SCREEN_NAMES.PAYMENT)}>
+                <TextWrapper fs={18} fw="700" color={COLORS.white}>
+                  Pay and Enroll
+                </TextWrapper>
+              </Pressable>
+            </Collapsible>
           </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      )}
     </View>
   );
 };
 
-const AgeSelector = ({ageGroups, currentAgeGroup, setCurrentAgeGroup}) => {
+const AgeSelector = ({
+  ageGroups,
+  currentAgeGroup,
+  handleCurrentAgeGroup,
+  setSteps,
+}) => {
+  const selectBatch = item => {
+    handleCurrentAgeGroup(item.ageGroup);
+  };
+
   return (
     <View
       style={{
@@ -358,7 +465,7 @@ const AgeSelector = ({ageGroups, currentAgeGroup, setCurrentAgeGroup}) => {
             backgroundColor:
               currentAgeGroup === item.ageGroup ? COLORS.pblue : 'transparent',
           }}
-          onPress={() => setCurrentAgeGroup(item.ageGroup)}>
+          onPress={() => selectBatch(item)}>
           <TextWrapper
             fs={20}
             fw="700"
@@ -370,200 +477,6 @@ const AgeSelector = ({ageGroups, currentAgeGroup, setCurrentAgeGroup}) => {
         </Pressable>
       ))}
     </View>
-  );
-};
-
-const BatchCard = ({
-  batchOptions,
-  level,
-  ageGroups,
-  courseDetails,
-  prices,
-  setCurrentSelectedBatch,
-  currentSelectedBatch,
-  levelText,
-  setLevelText,
-  currentLevel,
-  setCurrentLevel,
-  currentAgeGroup,
-  ipData,
-  handleBuyNowClick,
-}) => {
-  const [price, setPrice] = useState(0);
-  const [strikeThroughPrice, setStrikeThroughPrice] = useState(0);
-
-  useEffect(() => {
-    if (prices && ipData) {
-      const batchPrices = prices.prices.batchPrices;
-      const country = batchPrices?.find(
-        item => item.countryCode === ipData.country_code2,
-      );
-      // const offeringDetails = prices.prices.offeringDetails
-
-      if (level === 1) {
-        setPrice(country?.prices?.level1?.offer);
-        setStrikeThroughPrice(country?.prices?.level1?.price);
-      } else if (level === 2) {
-        setPrice(country?.prices?.level2?.offer);
-        setStrikeThroughPrice(country?.prices?.level2?.price);
-      } else {
-        setPrice(country?.prices?.combo?.offer);
-        setStrikeThroughPrice(country?.prices?.combo?.price);
-      }
-    }
-  }, [ipData, prices]);
-
-  useEffect(() => {
-    if (batchOptions.length) {
-      setCurrentSelectedBatch(batchOptions[0]);
-    }
-  }, []);
-
-  return (
-    <View
-      style={{
-        marginTop: 12,
-        width: '100%',
-        maxWidth: 380,
-        alignSelf: 'center',
-      }}>
-      <View
-        style={{
-          padding: 16,
-          borderRadius: 6,
-          elevation: 1.25,
-        }}>
-        <TextWrapper
-          fs={24}
-          fw="700"
-          color={level === 1 ? '#2A6AC9' : COLORS.orange}
-          styles={{textAlign: 'center'}}>
-          {level === 1
-            ? 'Foundation'
-            : level === 2
-            ? 'Advanced'
-            : 'Foundation + Advanced'}
-        </TextWrapper>
-        <Spacer />
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-          <MIcon name="book-variant" size={36} color={COLORS.black} />
-          <TextWrapper fs={24}>
-            Total Classess: {level === 1 || level === 2 ? 12 : 24}
-          </TextWrapper>
-        </View>
-        <Spacer space={8} />
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-          <MIcon name="cake-variant" size={36} color={COLORS.black} />
-          <TextWrapper fs={24}>For Ages: {currentAgeGroup}</TextWrapper>
-        </View>
-        <Spacer />
-        <TextWrapper fs={22} color={COLORS.pgreen}>
-          Select batch start date and time
-        </TextWrapper>
-        <Spacer />
-        <View style={{gap: 8}}>
-          {batchOptions.length > 0 &&
-            currentSelectedBatch &&
-            batchOptions.map((batch, index) => {
-              return (
-                <BatchDateAndTime
-                  key={index}
-                  batch={batch}
-                  setCurrentSelectedBatch={setCurrentSelectedBatch}
-                  currentSelectedBatch={currentSelectedBatch}
-                  option={level === 1 ? 'Foundation' : 'Foundation + Advanced'}
-                  levelText={levelText}
-                  setLevelText={setLevelText}
-                  level={level}
-                  currentLevel={currentLevel}
-                  setCurrentLevel={setCurrentLevel}
-                />
-              );
-            })}
-        </View>
-        <View style={{paddingVertical: 16, marginTop: 8}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4,
-            }}>
-            <TextWrapper
-              fs={24}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
-            <TextWrapper
-              styles={{textDecorationLine: 'line-through'}}
-              fs={
-                18
-              }>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
-          </View>
-        </View>
-        <View style={{}}>
-          <Pressable
-            style={({pressed}) => [
-              styles.payButton,
-              {opacity: pressed ? 0.8 : 1},
-            ]}
-            onPress={() => handleBuyNowClick(price, strikeThroughPrice)}>
-            <TextWrapper fs={18} fw="700" color={COLORS.white}>
-              Pay and Enroll
-            </TextWrapper>
-          </Pressable>
-        </View>
-      </View>
-    </View>
-  );
-};
-
-const BatchDateAndTime = ({
-  batch,
-  currentSelectedBatch,
-  setCurrentSelectedBatch,
-  level,
-  currentLevel,
-  setCurrentLevel,
-}) => {
-  if (!batch) return null;
-
-  const date = new Date(batch.startDate._seconds * 1000);
-  const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
-
-  const handleBatch = () => {
-    setCurrentSelectedBatch(batch);
-    setCurrentLevel(level);
-  };
-
-  return (
-    <Pressable
-      style={{
-        padding: 16,
-        borderRadius: 6,
-        elevation: 1.25,
-        backgroundColor:
-          currentSelectedBatch.batchId === batch.batchId &&
-          currentLevel === level
-            ? COLORS.pblue
-            : 'transparent',
-      }}
-      onPress={handleBatch}>
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-        <MIcon name="calendar-month" size={28} color={COLORS.black} />
-        <TextWrapper fs={20}>{dateAndTime}</TextWrapper>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 8,
-          marginTop: 16,
-        }}>
-        {batch.daysArr.split(',').map((item, index) => (
-          <TextWrapper key={index} fs={18} color={COLORS.black}>
-            {item}
-          </TextWrapper>
-        ))}
-      </View>
-    </Pressable>
   );
 };
 
@@ -610,7 +523,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.pblue,
+    backgroundColor: COLORS.pgreen,
     borderRadius: 4,
   },
 });

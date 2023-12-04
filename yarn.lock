@@ -6188,6 +6188,11 @@ react-native-blob-util@^0.19.2:
     base-64 "0.1.0"
     glob "^7.2.3"
 
+react-native-collapsible@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-collapsible/-/react-native-collapsible-1.6.1.tgz#27e289831a6955aebde98abff2424a7710f36f02"
+  integrity sha512-orF4BeiXd2hZW7fu9YcqIJXzN6TJcFcddY807D3MAOVktLuW9oQ+RIkrTJ5DR3v9ZOFfREkOjEmS79qeUTvkBQ==
+
 react-native-compressor@^1.8.15:
   version "1.8.15"
   resolved "https://registry.yarnpkg.com/react-native-compressor/-/react-native-compressor-1.8.15.tgz#90eb9eea7290a6af0ec62764d7b102caa4d9150d"
@@ -6206,6 +6211,13 @@ react-native-dotenv@^3.4.9:
   integrity sha512-dbyd+mcy7SUzxEgmt33TRf1FGcNe6swJhXmB0unKkI49F7+pidog9kPtjxMLTAfmKA8gcN2XHQSKltGfGbGCLQ==
   dependencies:
     dotenv "^16.3.1"
+
+react-native-element-dropdown@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/react-native-element-dropdown/-/react-native-element-dropdown-2.10.0.tgz#f4ec2310b37ff3ba64927286ab775c0ed28b681e"
+  integrity sha512-aFjw0JbUIKGkqklHxDm8aDCZW6Q1GICP7pIHc0sllvpWpEamItzOwAMV4G1mBIKxED77Mp+nkq9p0Dhsr/faVw==
+  dependencies:
+    lodash "^4.17.21"
 
 react-native-file-viewer@^2.1.5:
   version "2.1.5"
