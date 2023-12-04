@@ -241,8 +241,8 @@ export default Demo;
 
 const styles = StyleSheet.create({
   contentWrapper: {
-    // maxWidth: 428,
-    // alignSelf: 'center',
+    maxWidth: 428,
+    alignSelf: 'center',
   },
   rightNavButtons: {
     flexDirection: 'row',

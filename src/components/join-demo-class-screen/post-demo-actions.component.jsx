@@ -1,13 +1,14 @@
 import React, {useEffect, useState, useMemo} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {
   StyleSheet,
   View,
   Pressable,
   Linking,
   ActivityIndicator,
-  Image,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../utils/constants/colors';
 import Icon from '../icon.component';
@@ -19,6 +20,7 @@ import {
   markNMI,
   saveRating,
   checkForRating,
+  setNMI,
 } from '../../store/join-demo/join-demo.reducer';
 
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
@@ -30,12 +32,15 @@ const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 const IMAGE_URI =
   'https://live-server-8353.wati.io/api/file/showFile?fileName=data/images/WhatsApp_Image_2022_06_17_at_4.58.13_PM-47559edc-8e40-4c7a-9ce3-db0ac32b085d.jpg&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4YTlhMjgwYi1jNGI5LTQxMDYtOWU0NS04MDY4MGY0OWRiZTYiLCJ1bmlxdWVfbmFtZSI6ImtyaXNobmEua0B5b3VuZ2xhYnMuaW4iLCJuYW1laWQiOiJrcmlzaG5hLmtAeW91bmdsYWJzLmluIiwiZW1haWwiOiJrcmlzaG5hLmtAeW91bmdsYWJzLmluIiwiYXV0aF90aW1lIjoiMTAvMzAvMjAyMyAwNTowODoxMiIsImRiX25hbWUiOiI4MzUzIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQURNSU5JU1RSQVRPUiIsImV4cCI6MjUzNDAyMzAwODAwLCJpc3MiOiJDbGFyZV9BSSIsImF1ZCI6IkNsYXJlX0FJIn0.PYlZDcDz6SezkwsvsCaLHkTA2TNAnsBmUgDtkMOF3F8';
 
+const {width: deviceWidth} = Dimensions.get('window');
+
 const PostDemoAction = () => {
   const [rating, setRating] = useState(0);
   const [attended, setAttended] = useState(false);
   const [attendedLoading, setAttendedLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading} =
+  const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
     useSelector(state => state.joinDemo);
 
   const navigation = useNavigation();
@@ -79,6 +84,7 @@ const PostDemoAction = () => {
     dispatch(checkForRating());
   }, []);
 
+  // Check for Attended
   useEffect(() => {
     const checkAttended = async () => {
       try {
@@ -97,6 +103,25 @@ const PostDemoAction = () => {
     };
 
     checkAttended();
+  }, []);
+
+  // Check NMI
+  useEffect(() => {
+    const checkNMI = async () => {
+      try {
+        const nmi = await AsyncStorage.getItem(LOCAL_KEYS.NMI);
+        console.log('nmi', nmi);
+        if (nmi) {
+          dispatch(setNMI(true));
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    checkNMI();
   }, []);
 
   // Save rating of user
@@ -144,6 +169,10 @@ const PostDemoAction = () => {
     navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
   };
 
+  const courseDetails = () => {
+    navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
+  };
+
   // UI Constants
   const RATING_STARS = useMemo(() => {
     return Array.from({length: 5}, (_, i) => {
@@ -174,13 +203,18 @@ const PostDemoAction = () => {
     );
   }, [nmiLoading]);
 
-  if (ratingLoading || attendedLoading) return null;
+  if (ratingLoading || attendedLoading || loading) return null;
 
   return (
-    <View style={styles.container}>
+    <View style={{width: '100%'}}>
       {!attended && (
         <View style={styles.paContainer}>
-          <TextWrapper fs={22}>Did you attend your free class?</TextWrapper>
+          <TextWrapper
+            fs={20}
+            color={COLORS.white}
+            styles={{textAlign: 'center'}}>
+            Did you attend your free class?
+          </TextWrapper>
           <Spacer />
           <View style={styles.paButtons}>
             <Pressable
@@ -226,9 +260,12 @@ const PostDemoAction = () => {
           </View>
         </View>
       )}
-      {isRated && (
+      {isRated && !isNmi && (
         <View style={styles.ctasWrapper}>
-          <TextWrapper fs={20} styles={{lineHeight: 28}}>
+          <TextWrapper
+            fs={17.5}
+            color={COLORS.white}
+            styles={{marginBottom: 8}}>
             Would you like to continue with the course and improve your child's
             handwriting?
           </TextWrapper>
@@ -250,60 +287,48 @@ const PostDemoAction = () => {
               ]}
               disabled={nmiLoading}
               onPress={markNeedMoreInfo}>
-              <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
+              {/* <MIcon name="whatsapp" size={22} color={COLORS.pgreen} /> */}
               <TextWrapper>Yes, need more info</TextWrapper>
               {NMI_LOADING}
             </Pressable>
-            <Pressable
+            {/* <Pressable
               style={({pressed}) => [
                 styles.ctaButton,
                 {opacity: pressed ? 0.8 : 1},
               ]}
               onPress={redirectToWebsiteToBuyCourse}>
               <MIcon name="web" size={22} color={COLORS.black} />
-              <TextWrapper>Buy on website</TextWrapper>
-            </Pressable>
+              <TextWrapper>No I don't want</TextWrapper>
+            </Pressable> */}
           </View>
         </View>
       )}
-      {/* <View style={styles.ctasWrapper}>
-        <TextWrapper fs={20} styles={{lineHeight: 28}}>
-          Would you like to continue with the course and improve your child's
-          handwriting?
-        </TextWrapper>
-        <View style={styles.ctas}>
-          {isAllowToReschedule && (
-            <Pressable
-              style={({pressed}) => [
-                styles.ctaButton,
-                {opacity: pressed ? 0.8 : 1},
-              ]}
-              onPress={rescheduleFreeClass}>
-              <TextWrapper>Reschedule a new class</TextWrapper>
-            </Pressable>
-          )}
+      {isNmi && (
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            gap: 8,
+            // backgroundColor: COLORS.pblue,
+            padding: 16,
+          }}>
           <Pressable
             style={({pressed}) => [
               styles.ctaButton,
-              {opacity: pressed ? 0.8 : 1},
+              {flex: 1, opacity: pressed ? 0.8 : 1},
             ]}
-            disabled={nmiLoading}
-            onPress={markNeedMoreInfo}>
-            <MIcon name="whatsapp" size={22} color={COLORS.pgreen} />
-            <TextWrapper>Yes, need more info</TextWrapper>
-            {NMI_LOADING}
+            onPress={courseDetails}>
+            <TextWrapper>Course details</TextWrapper>
           </Pressable>
           <Pressable
             style={({pressed}) => [
               styles.ctaButton,
-              {opacity: pressed ? 0.8 : 1},
-            ]}
-            onPress={redirectToWebsiteToBuyCourse}>
-            <MIcon name="web" size={22} color={COLORS.black} />
-            <TextWrapper>Buy on website</TextWrapper>
+              {flex: 1, opacity: pressed ? 0.8 : 1},
+            ]}>
+            <TextWrapper>Batch details</TextWrapper>
           </Pressable>
         </View>
-      </View> */}
+      )}
     </View>
   );
 };
@@ -315,10 +340,9 @@ const styles = StyleSheet.create({
     // paddingTop: 12,
   },
   ratingContainer: {
-    height: 200,
+    width: '100%',
   },
   ratingWrapper: {
-    height: 146,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -332,7 +356,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   ctas: {
-    gap: 10,
+    gap: 8,
   },
   ctaButton: {
     height: 48,
@@ -346,11 +370,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   paContainer: {
-    maxWidth: 450,
-    paddingBottom: 16,
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '100%',
   },
   paImage: {
     width: 250,
@@ -358,10 +378,11 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
   },
   paButtons: {
-    width: 200,
+    flexDirection: 'row',
+    gap: 8,
   },
   paButton: {
-    width: '100%',
+    paddingHorizontal: 22,
     paddingVertical: 12,
     justifyContent: 'center',
     alignItems: 'center',

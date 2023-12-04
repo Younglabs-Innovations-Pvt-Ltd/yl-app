@@ -63,14 +63,18 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
       },
     };
 
-    if (message.channelId) {
-      notification.android.channelId = message.channelId;
-    }
-
     if (message.image) {
       notification.android.style = {
         type: AndroidStyle.BIGPICTURE,
         picture: message.image,
+        largeIcon: null,
+      };
+    }
+
+    if (message.largeText) {
+      notification.android.style = {
+        type: AndroidStyle.BIGTEXT,
+        text: message.largeText,
       };
     }
 
@@ -80,8 +84,8 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
       notification.data = message;
     }
 
+    console.log('payload', notification);
     if (message.type === 'remarketing') {
-      console.log('payload', notification);
       await displayRemarketingNotification(notification);
     } else if (message.type === 'reminders') {
       await displayReminderNotification(notification);

@@ -61,6 +61,15 @@ import Worksheets from '../components/worksheets.component';
 import VideoPlayer from '../components/video.component';
 import {authSelector} from '../store/auth/selector';
 
+// Icons
+import TipsIcon from '../assets/icons/tipsandtricks.png';
+import WorksheetIcon from '../assets/icons/document.png';
+import ReviewIcon from '../assets/icons/reviews.png';
+import ImprovementIcon from '../assets/icons/improvement.png';
+import Video from 'react-native-video';
+import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
+
 const INITIAL_TIME = {
   days: 0,
   hours: 0,
@@ -132,6 +141,19 @@ const improvementsData = [
   },
 ];
 
+const tipsAndTricksData = [
+  {
+    id: 1,
+    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fvideos%2FVID-20231124-WA0005.mp4?alt=media&token=6f9db89f-86b2-4988-be66-3352a6a271df',
+  },
+  {
+    id: 2,
+    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fvideos%2FVID-20231119-WA0023.mp4?alt=media&token=c30092d2-dfc0-4960-a3a9-ec2a1de76fad',
+  },
+];
+
+const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
+
 const HomeScreen = ({navigation}) => {
   const [childName, setChildName] = useState('');
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
@@ -142,6 +164,7 @@ const HomeScreen = ({navigation}) => {
   const {localLang} = i18nContext();
 
   const dispatch = useDispatch();
+
   const {
     demoData,
     loading,
@@ -156,11 +179,11 @@ const HomeScreen = ({navigation}) => {
     message,
   } = useSelector(joinDemoSelector);
 
-  // console.log('demo', demoData);
-
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
+
+  const {ipData} = useSelector(bookDemoSelector);
 
   /**
    * @author Shobhit
@@ -183,6 +206,21 @@ const HomeScreen = ({navigation}) => {
       });
     }
   }, [bookingDetails]);
+
+  /**
+   * @author Shobhit
+   * @since 07/08/2023
+   * @description Set demo phone number from localStorage to redux state
+   */
+  useEffect(() => {
+    dispatch(setPhoneAsync());
+  }, []);
+
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData]);
 
   /**
    * @author Shobhit
@@ -481,127 +519,24 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
-  // return loading ? (
-  //   <Center bg={COLORS.white}>
-  //     <Spinner />
-  //   </Center>
-  // ) : (
-  //   <View style={{flex: 1}}>
-  //     <View style={styles.header}>
-  //       <TextWrapper
-  //         fs={18}
-  //         color={COLORS.black}
-  //         styles={{textTransform: 'capitalize'}}>
-  //         English handwriting
-  //       </TextWrapper>
-  //       <View style={styles.rightNavButtons}>
-  //         {/* <LanguageSelection /> */}
-  //         <Pressable onPress={handleShowDrawer}>
-  //           <MIcon name="account-circle" size={28} color={COLORS.black} />
-  //         </Pressable>
-  //       </View>
-  //     </View>
-  //     <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
-  //       <View style={styles.container}>
-  //         <View style={styles.contentWrapper}>
-  //           {/* Timer */}
-  //           {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
-
-  //           {/* Show join button */}
-  //           {SHOW_JOIN_BUTTON && (
-  //             <>
-  //               {IS_CHILD_NAME}
-  //               <Spacer />
-  //               <Button
-  //                 rounded={4}
-  //                 onPress={handleJoinClass}
-  //                 bg={COLORS.pgreen}
-  //                 textColor={COLORS.white}>
-  //                 Enter Class
-  //               </Button>
-  //             </>
-  //           )}
-  //           {isTimeover && !teamUrl && (
-  //             <View
-  //               style={{
-  //                 paddingVertical: 16,
-  //               }}>
-  //               <TextWrapper fs={20}>{localLang.rescheduleText}</TextWrapper>
-  //               <Spacer />
-  //               <Button
-  //                 textColor={COLORS.white}
-  //                 bg={COLORS.pgreen}
-  //                 rounded={6}
-  //                 onPress={rescheduleFreeClass}>
-  //                 {localLang.rescheduleButtonText}
-  //               </Button>
-  //             </View>
-  //           )}
-  //           {
-  //             // If user attended demo class
-  //             // Demo has ended
-  //             // Show post action after demo class
-  //             showPostActions ? (
-  //               <PostDemoAction />
-  //             ) : (
-  //               <Features demoData={demoData} />
-  //             )
-  //           }
-  //         </View>
-  //       </View>
-  //     </ScrollView>
-  //   </View>
-  // );
-  const [isPlaying, setPlaying] = useState(false);
-
-  const playPauseVideo = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setPlaying(!isPlaying);
-    }
-  };
-
-  // const pauseVideo = () => {
-  //   if (videoRef.current) {
-  //     console.log(videoRef.current.pause());
-  //   }
-  // };
-
-  // const onReadyForDisplay = () => {
-  //   console.log('ready for display');
-  // }
-
-  const {token} = useSelector(authSelector);
-
   return (
-    <View style={{flex: 1}}>
-      <View style={styles.header}>
-        <TextWrapper
-          fs={18}
-          color={COLORS.black}
-          styles={{textTransform: 'capitalize'}}>
-          English handwriting
-        </TextWrapper>
-        <View style={styles.rightNavButtons}>
-          {/* <LanguageSelection /> */}
-          <Pressable onPress={handleShowDrawer}>
-            <MIcon name="account-circle" size={28} color={COLORS.black} />
-          </Pressable>
+    <View style={{flex: 1, backgroundColor: '#04364A'}}>
+      <View style={styles.topSection}>
+        <StatusBar backgroundColor={'#04364A'} barStyle={'light-content'} />
+        <View style={styles.header}>
+          <TextWrapper
+            fs={18}
+            color={COLORS.white}
+            styles={{textTransform: 'capitalize'}}>
+            English handwriting
+          </TextWrapper>
+          <View style={styles.rightNavButtons}>
+            {/* <LanguageSelection /> */}
+            <Pressable onPress={handleShowDrawer}>
+              <MIcon name="account-circle" size={28} color={COLORS.white} />
+            </Pressable>
+          </View>
         </View>
-      </View>
-      <ScrollView
-        style={styles.container}
-        showsVerticalScrollIndicator={false}
-        bouncesZoom={false}
-        contentContainerStyle={{
-          paddingTop: 16,
-          paddingHorizontal: 8,
-          paddingBottom: StatusBar.currentHeight * 0.6,
-        }}>
         {loading ? (
           <Spinner style={{alignSelf: 'center'}} />
         ) : (
@@ -611,18 +546,105 @@ const HomeScreen = ({navigation}) => {
             showPostActions={showPostActions}
           />
         )}
+      </View>
+      <ScrollView
+        style={[
+          styles.container,
+          {
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            backgroundColor: '#FFF',
+            elevation: StyleSheet.hairlineWidth,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+        bouncesZoom={false}
+        contentContainerStyle={{
+          paddingBottom: StatusBar.currentHeight * 0.6,
+          paddingHorizontal: 16,
+          paddingTop: 16,
+        }}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            width: '100%',
+            paddingVertical: 8,
+            rowGap: 16,
+            // columnGap: 4,
+            justifyContent: 'space-between',
+          }}>
+          <View style={[styles.iconRow]}>
+            <View style={styles.iconContainer}>
+              <Image style={styles.icon} source={TipsIcon} />
+            </View>
+            <TextWrapper>Tips & Tricks</TextWrapper>
+          </View>
+          <View style={styles.iconRow}>
+            <View style={[styles.iconContainer, {width: 46, height: 46}]}>
+              <Image style={styles.icon} source={WorksheetIcon} />
+            </View>
+            <TextWrapper>Worksheets</TextWrapper>
+          </View>
+          <View style={[styles.iconRow]}>
+            <View style={styles.iconContainer}>
+              <Image
+                style={[styles.icon, {width: 46, height: 46}]}
+                source={ReviewIcon}
+              />
+            </View>
+            <TextWrapper>Reviews</TextWrapper>
+          </View>
+          <View style={styles.iconRow}>
+            <View style={styles.iconContainer}>
+              <Image style={styles.icon} source={ImprovementIcon} />
+            </View>
+            <TextWrapper>Before & After</TextWrapper>
+          </View>
+        </View>
+
         {/* Top Banner */}
-        <View style={{flexDirection: 'row', marginVertical: 12}}>
+        {/* <View style={{flexDirection: 'row', marginVertical: 12}}>
           <View
-            style={{width: '75%', padding: 8, backgroundColor: COLORS.orange}}>
+            style={{
+              width: '75%',
+              padding: 8,
+              backgroundColor: COLORS.orange,
+            }}>
             <TextWrapper>
               Get a custom handwriting improvement plan worth Rs.500
             </TextWrapper>
           </View>
           <View
-            style={{width: '25%', padding: 8, backgroundColor: COLORS.pgreen}}>
+            style={{
+              width: '25%',
+              padding: 8,
+              backgroundColor: COLORS.pgreen,
+            }}>
             <TextWrapper>Send a photo of handwriting</TextWrapper>
           </View>
+        </View> */}
+
+        {/* Video slider */}
+        <View style={{paddingVertical: 16}}>
+          <TextWrapper fs={20} fw="700">
+            Tips & Tricks
+          </TextWrapper>
+          <TextWrapper>Tips and tricks every week.</TextWrapper>
+          <Spacer />
+          <FlatList
+            data={tipsAndTricksData}
+            keyExtractor={item => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => (
+              <View style={{marginHorizontal: 8}} />
+            )}
+            renderItem={({item}) => (
+              <VideoPlayer key={item.id.toString()} uri={item.uri} />
+            )}
+          />
         </View>
 
         {/* Worksheets */}
@@ -650,11 +672,6 @@ const HomeScreen = ({navigation}) => {
               />
             )}
           />
-          {/* <TextWrapper
-            fs={18}
-            styles={{textAlign: 'center', marginVertical: 12}}>
-            {sliderData[0].text}
-          </TextWrapper> */}
         </View>
 
         {/* Video slider */}
@@ -679,153 +696,10 @@ const HomeScreen = ({navigation}) => {
               />
             )}
           />
-          {/* <TextWrapper
-            fs={18}
-            styles={{textAlign: 'center', marginVertical: 12}}>
-            {sliderData[0].text}
-          </TextWrapper> */}
         </View>
-
-        {/* Upload Image */}
-        {/* <View style={{maxWidth: 378, alignSelf: 'center'}}>
-          <View>
-            <TextWrapper fs={18}>
-              Take picture of your child's english handwriting and upload.
-            </TextWrapper>
-            <Pressable
-              style={({pressed}) => [
-                styles.cameraView,
-                {
-                  opacity: pressed ? 0.8 : 1,
-                  justifyContent: selectedImage ? 'flex-start' : 'center',
-                },
-              ]}
-              onPress={pickFile}>
-              {!selectedImage ? (
-                <Icon
-                  name="camera"
-                  size={64}
-                  color={COLORS.black}
-                  style={{alignSelf: 'center'}}
-                />
-              ) : (
-                <Image
-                  style={styles.hImage}
-                  source={{uri: selectedImage?.uri}}
-                />
-              )}
-
-              {selectedImage && (
-                <Pressable style={styles.btnClose} onPress={closeImage}>
-                  <Icon name="close-outline" size={28} color={COLORS.black} />
-                </Pressable>
-              )}
-
-              {selectedImage && (
-                <Pressable
-                  style={styles.btnUpload}
-                  onPress={uploadHandwritingImage}>
-                  <Icon
-                    name="cloud-upload-outline"
-                    size={24}
-                    color={COLORS.black}
-                  />
-                  <TextWrapper>Upload</TextWrapper>
-                </Pressable>
-              )}
-            </Pressable>
-          </View>
-        </View> */}
-
-        {/* Feature Section*/}
-        {/* <View style={styles.improvements}>
-          <View style={styles.improvementItem}>
-            <TextWrapper fs={24}>Heading 1</TextWrapper>
-            <Spacer space={4} />
-            <TextWrapper>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea quis
-              veniam expedita minus, animi dolorem eveniet deserunt totam
-              similique, reiciendis at? Officiis voluptatum tempore tempora
-              alias perferendis ducimus odio eos!
-            </TextWrapper>
-            <Spacer space={8} />
-            <Image
-              style={{width: '100%', height: 200, borderRadius: 4}}
-              source={{uri: image1}}
-            />
-          </View>
-          <View style={styles.improvementItem}>
-            <TextWrapper fs={24}>Heading 2</TextWrapper>
-            <Spacer space={4} />
-            <TextWrapper>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea quis
-              veniam expedita minus, animi dolorem eveniet deserunt totam
-              similique, reiciendis at? Officiis voluptatum tempore tempora
-              alias perferendis ducimus odio eos!
-            </TextWrapper>
-            <Spacer space={8} />
-            <Image
-              style={{width: '100%', height: 200, borderRadius: 4}}
-              source={{uri: image2}}
-            />
-          </View>
-          <View style={styles.improvementItem}>
-            <TextWrapper fs={24}>Heading 3</TextWrapper>
-            <Spacer space={4} />
-            <TextWrapper>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea quis
-              veniam expedita minus, animi dolorem eveniet deserunt totam
-              similique, reiciendis at? Officiis voluptatum tempore tempora
-              alias perferendis ducimus odio eos!
-            </TextWrapper>
-            <Spacer space={8} />
-            <Image
-              style={{width: '100%', height: 200, borderRadius: 4}}
-              source={{uri: image3}}
-            />
-          </View>
-        </View> */}
-
-        {/* <View style={styles.worksheetContainer}>
-            <TextWrapper fs={22}>Worksheets</TextWrapper>
-            <TextWrapper>
-              Download worksheets for practice before the class.
-            </TextWrapper>
-            <View style={styles.worksheets}>
-              <View style={styles.worksheet}></View>
-            </View>
-          </View> */}
         {/* Reviews */}
         <View style={{paddingVertical: 16}}>
           <Reviews />
-        </View>
-
-        {/* Improvements */}
-        <View style={{}}>
-          {/* <Image
-            source={require('../assets/test.jpeg')}
-            style={{width: '100%', aspectRatio: 3 / 2}}
-            resizeMethod="scale"
-            resizeMode="cover"
-          />
-          <Image
-            source={require('../assets/test1.jpeg')}
-            style={{width: '100%', aspectRatio: 3 / 2}}
-            resizeMethod="scale"
-            resizeMode="cover"
-          />
-          <Image
-            source={require('../assets/test2.jpeg')}
-            style={{width: '100%', aspectRatio: 3 / 2}}
-            resizeMethod="scale"
-            resizeMode="cover"
-          />
-          <Image
-            source={require('../assets/test3.jpeg')}
-            style={{width: '100%', aspectRatio: 3 / 2}}
-            resizeMethod="scale"
-            resizeMode="cover"
-          /> */}
         </View>
       </ScrollView>
     </View>
@@ -835,10 +709,12 @@ const HomeScreen = ({navigation}) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  topSection: {
+    height: deviceHeight * 0.35,
+    minHeight: 160,
+  },
   container: {
     flex: 1,
-    maxWidth: 540,
-    alignSelf: 'center',
   },
   cameraView: {
     height: 180,
@@ -892,9 +768,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: COLORS.white,
+    backgroundColor: 'transparent',
   },
   contentWrapper: {
     width: '100%',
@@ -905,5 +779,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+
+  iconContainer: {
+    width: 50,
+    height: 50,
+  },
+  icon: {
+    width: '100%',
+    height: '100%',
+  },
+  iconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '48%',
+    paddingHorizontal: 4,
+    paddingVertical: 12,
+    gap: 4,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 7,
+    elevation: 1.5,
   },
 });

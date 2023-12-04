@@ -4,9 +4,15 @@ import TextWrapper from './text-wrapper.component';
 import {COLORS} from '../utils/constants/colors';
 import Icon from './icon.component';
 
-export const Dropdown = ({defaultValue, value, open, ...otherProps}) => {
+export const Dropdown = ({
+  width = '100%',
+  defaultValue,
+  value,
+  open,
+  ...otherProps
+}) => {
   return (
-    <Pressable style={styles.dropdown} {...otherProps}>
+    <Pressable style={[styles.dropdown, {width: width}]} {...otherProps}>
       <TextWrapper color={COLORS.black}>{value || defaultValue}</TextWrapper>
       <Icon
         name={!open ? 'chevron-down-outline' : 'chevron-up-outline'}
@@ -68,7 +74,6 @@ const DropdownItem = ({age, onChangeValue, onClose, currentValue}) => {
 
 const styles = StyleSheet.create({
   dropdown: {
-    width: '100%',
     paddingHorizontal: 8,
     paddingVertical: 14,
     borderWidth: 1,

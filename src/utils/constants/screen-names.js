@@ -5,4 +5,5 @@ export const SCREEN_NAMES = {
   BOOK_DEMO_FORM: 'BookDemoForm',
   BOOK_DEMO_SLOTS: 'BookDemoSlots',
   COURSE_DETAILS: 'CourseDetails',
+  PAYMENT: 'payment',
 };

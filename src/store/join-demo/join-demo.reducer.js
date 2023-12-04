@@ -14,6 +14,7 @@ const INITIAL_STATE = {
   isRated: false,
   ratingLoading: true,
   nmiLoading: false,
+  isNmi: false,
   message: '',
 };
 
@@ -78,6 +79,10 @@ const reducer = {
   },
   markNMISuccess(state) {
     state.nmiLoading = false;
+    state.isNmi = true;
+  },
+  setNMI(state, action) {
+    state.isNmi = action.payload;
   },
   setErrorMessage(state, action) {
     state.message = action.payload;
@@ -126,6 +131,7 @@ export const {
   markNMISuccess,
   setLoading,
   joinDemo,
+  setNMI,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

@@ -465,27 +465,26 @@ function* checkRatingFromLocalStorage() {
 function* handleNMI({payload: {bookingId}}) {
   const text = 'Hello, I need more info about the full course';
   try {
-    const isNmi = yield AsyncStorage.getItem(LOCAL_KEYS.NMI);
-    if (!isNmi) {
-      console.log('no nmi');
-      const response = yield saveNeedMoreInfo({bookingId});
+    // const isNmi = yield AsyncStorage.getItem(LOCAL_KEYS.NMI);
+    // if (!isNmi) {
+    const response = yield saveNeedMoreInfo({bookingId});
 
-      if (response.status === 200) {
-        yield AsyncStorage.setItem(LOCAL_KEYS.NMI, 'true');
-        yield put(markNMISuccess());
+    console.log(yield response.json());
 
-        const url = getWhatsappRedirectUrl(text);
-        yield Linking.openURL(url);
-      }
-    } else {
-      console.log('nmi');
-      yield new Promise(resolve => setTimeout(resolve, 1000));
-
+    if (response.status === 200) {
+      yield AsyncStorage.setItem(LOCAL_KEYS.NMI, 'true');
       yield put(markNMISuccess());
-
-      const url = getWhatsappRedirectUrl(text);
-      yield Linking.openURL(url);
+      // const url = getWhatsappRedirectUrl(text);
+      // yield Linking.openURL(url);
     }
+    // } else {
+    //   yield new Promise(resolve => setTimeout(resolve, 1000));
+
+    //   yield put(markNMISuccess());
+
+    //   const url = getWhatsappRedirectUrl(text);
+    //   yield Linking.openURL(url);
+    // }
   } catch (error) {
     console.log(error);
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
@@ -573,6 +572,7 @@ function* markNeedMoreInfo() {
   yield takeLatest(markNMI.type, handleNMI);
 }
 
+// Assign demo
 function* joinDemoStart() {
   yield takeLatest(joinDemo.type, handleJoinDemo);
 }

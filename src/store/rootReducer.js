@@ -6,6 +6,7 @@ import {welcomeScreenReducer} from './welcome-screen/reducer';
 import {csaReducer} from './customer-support-action/reducer';
 import {networkReducer} from './network/reducer';
 import {authReducer} from './auth/reducer';
+import {courseReducer} from './course/course.reducer';
 
 export const rootReducer = combineReducers({
   joinDemo: joinDemoReducer,
@@ -14,4 +15,5 @@ export const rootReducer = combineReducers({
   csa: csaReducer,
   networkState: networkReducer,
   auth: authReducer,
+  course: courseReducer,
 });
