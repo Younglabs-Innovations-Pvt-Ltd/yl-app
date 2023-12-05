@@ -6,11 +6,29 @@ import {
   setVerificationLoading,
   setConfirm,
   verifyCode,
+  setFailedVerification,
 } from './reducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LOCAL_KEYS} from '../../utils/storage/local-storage-keys';
+import {isValidNumber} from '../../utils/isValidNumber';
 
-function* phoneAuthentication({payload: {phone}}) {
+function* phoneAuthentication({payload: {phone, country}}) {
   try {
+    if (!phone) {
+      yield put(phoneAuthFailed('Enter phone number'));
+      return;
+    }
+
+    const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
+
+    if (!isValidPhone) {
+      yield put(phoneAuthFailed('Please enter a valid number'));
+      return;
+    }
+
+    yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
     const confirmation = yield auth().signInWithPhoneNumber(`+91${phone}`);
+    console.log(confirmation);
     yield put(setConfirm(confirmation));
   } catch (error) {
     console.log(error);
@@ -30,9 +48,9 @@ function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
     console.log(error);
     yield put(setVerificationLoading(false));
     if (error.code === 'auth/invalid-verification-code') {
-      yield put(phoneAuthFailed('Invalid verification code.'));
+      yield put(setFailedVerification('Invalid verification code.'));
     } else {
-      yield put(phoneAuthFailed(error.message));
+      yield put(setFailedVerification(error.message));
     }
   }
 }

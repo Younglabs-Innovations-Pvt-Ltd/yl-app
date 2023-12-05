@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   token: '',
   loading: false,
   verificationLoading: false,
+  verificationErrorMessage: '',
   message: '',
   confirm: null,
 };
@@ -25,9 +26,9 @@ const reducers = {
     state.loading = false;
     state.confirm = action.payload;
   },
-  verifyCode() {
+  verifyCode(state, action) {
     state.verificationLoading = true;
-    state.message = '';
+    state.verificationErrorMessage = '';
   },
   setAuthLoading(state, action) {
     state.loading = action.payload;
@@ -37,6 +38,10 @@ const reducers = {
   },
   setAuthToken(state, action) {
     state.token = action.payload;
+  },
+  setFailedVerification(state, action) {
+    state.verificationLoading = false;
+    state.verificationErrorMessage = action.payload;
   },
 };
 
@@ -55,6 +60,7 @@ export const {
   setAuthLoading,
   setVerificationLoading,
   setAuthToken,
+  setFailedVerification,
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

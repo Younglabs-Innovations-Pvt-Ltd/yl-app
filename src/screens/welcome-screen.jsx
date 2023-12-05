@@ -8,6 +8,7 @@ import {
   TextInput,
   StatusBar,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
 
@@ -47,13 +48,14 @@ import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {phoneAuthStart, setAuthToken, verifyCode} from '../store/auth/reducer';
 import {authSelector} from '../store/auth/selector';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import Icon from '../components/icon.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
 const IMAGE_HEIGHT = deviceWidth * 0.7;
 
 // Main Component
-const DemoClassScreen = ({navigation: {navigate}}) => {
+const DemoClassScreen = ({navigation}) => {
   const {localLang, currentLang} = i18nContext();
 
   const [phone, setPhone] = useState('');
@@ -66,7 +68,9 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
     confirm,
     message: authMsg,
     loading: authLoading,
-  } = useSelector(state => state.auth);
+    verificationErrorMessage,
+    verificationLoading,
+  } = useSelector(authSelector);
 
   const {
     networkState: {isConnected, alertAction},
@@ -314,8 +318,7 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
 
   // Handle the button press
   async function signInWithPhoneNumber() {
-    dispatch(phoneAuthStart({phone}));
-    // await AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
+    dispatch(phoneAuthStart({phone, country}));
   }
 
   function confirmCode() {
@@ -329,12 +332,11 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
         const token = await AsyncStorage.getItem(LOCAL_KEYS.AUTH_TOKEN);
         if (!token) {
           await AsyncStorage.setItem(LOCAL_KEYS.AUTH_TOKEN, tokenResult.token);
-          await AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
           dispatch(setAuthToken(tokenResult.token));
         }
 
         setVisible(false);
-        navigate(SCREEN_NAMES.MAIN);
+        navigation.replace(SCREEN_NAMES.MAIN);
       } catch (error) {
         console.error('Error getting ID token:', error);
       }
@@ -414,6 +416,13 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
               Continue
             </TextWrapper>
+            {authLoading && (
+              <ActivityIndicator
+                size={'small'}
+                color={COLORS.white}
+                style={{marginLeft: 4}}
+              />
+            )}
           </Pressable>
         </View>
       </Animated.View>
@@ -433,7 +442,7 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
         <View
           style={{
             flex: 1,
-            alignItems: 'center',
+            justifyContent: 'center',
             backgroundColor: 'rgba(0,0,0,0.25)',
             paddingHorizontal: 16,
           }}>
@@ -443,6 +452,17 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
               borderRadius: 8,
               backgroundColor: COLORS.white,
             }}>
+            <View
+              style={{
+                paddingBottom: 16,
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+                width: '100%',
+              }}>
+              <Pressable style={{padding: 4}} onPress={() => setVisible(false)}>
+                <Icon name="close-outline" size={24} color={COLORS.black} />
+              </Pressable>
+            </View>
             <TextInput
               placeholder="Enter code"
               style={{
@@ -457,7 +477,33 @@ const DemoClassScreen = ({navigation: {navigate}}) => {
               inputMode="numeric"
               placeholderTextColor={'gray'}
             />
-            <Button onPress={confirmCode}>Confirm</Button>
+            {verificationErrorMessage && (
+              <TextWrapper
+                fs={14}
+                color={COLORS.pred}
+                styles={{marginBottom: 4}}>
+                {verificationErrorMessage}
+              </TextWrapper>
+            )}
+            <Pressable
+              style={({pressed}) => [
+                styles.btnConfirm,
+                {
+                  opacity: pressed ? 0.8 : 1,
+                  backgroundColor: !code ? '#f4f4f4' : '#F1EEE9',
+                },
+              ]}
+              disabled={!code}
+              onPress={confirmCode}>
+              <TextWrapper fs={18}>Confirm</TextWrapper>
+              {verificationLoading && (
+                <ActivityIndicator
+                  size={'small'}
+                  color={COLORS.black}
+                  style={{marginLeft: 4}}
+                />
+              )}
+            </Pressable>
           </View>
         </View>
       </ModalComponent>
@@ -536,6 +582,7 @@ const styles = StyleSheet.create({
     height: 54,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
     backgroundColor: COLORS.pgreen,
     borderRadius: 54,
   },
@@ -565,5 +612,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     paddingHorizontal: 8,
+  },
+  btnConfirm: {
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    marginTop: 10,
   },
 });
