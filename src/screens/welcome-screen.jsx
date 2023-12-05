@@ -36,12 +36,8 @@ import {networkSelector} from '../store/network/selector';
 
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
-import LanguageSelection from '../components/language-selection.component';
 import {resetCurrentNetworkState} from '../store/network/reducer';
-
 import NetInfo from '@react-native-community/netinfo';
-import Button from '../components/button.component';
-
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
@@ -61,6 +57,7 @@ const DemoClassScreen = ({navigation}) => {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -76,9 +73,7 @@ const DemoClassScreen = ({navigation}) => {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
   const {ipData} = useSelector(bookDemoSelector);
-  const {country, message, loading, modalVisible} = useSelector(
-    welcomeScreenSelector,
-  );
+  const {country, modalVisible} = useSelector(welcomeScreenSelector);
 
   // Setting background color and style of Statusbar
   useEffect(() => {
@@ -328,6 +323,8 @@ const DemoClassScreen = ({navigation}) => {
   async function onAuthStateChanged(user) {
     if (user) {
       try {
+        setVisible(false);
+        setLoading(true);
         const tokenResult = await auth().currentUser.getIdTokenResult();
         const token = await AsyncStorage.getItem(LOCAL_KEYS.AUTH_TOKEN);
         if (!token) {
@@ -335,9 +332,10 @@ const DemoClassScreen = ({navigation}) => {
           dispatch(setAuthToken(tokenResult.token));
         }
 
-        setVisible(false);
+        setLoading(false);
         navigation.replace(SCREEN_NAMES.MAIN);
       } catch (error) {
+        setLoading(false);
         console.error('Error getting ID token:', error);
       }
     }
@@ -411,7 +409,7 @@ const DemoClassScreen = ({navigation}) => {
           )}
           <Pressable
             style={btnContinueStyle}
-            disabled={loading}
+            disabled={authLoading}
             onPress={signInWithPhoneNumber}>
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
               Continue

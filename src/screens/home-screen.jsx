@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -7,6 +7,8 @@ import {
   Alert,
   StatusBar,
   FlatList,
+  Dimensions,
+  Image,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -23,34 +25,20 @@ import {resetCurrentNetworkState} from '../store/network/reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {networkSelector} from '../store/network/selector';
 
-import Input from '../components/input.component';
-import Button from '../components/button.component';
 import Spacer from '../components/spacer.component';
 import Spinner from '../components/spinner.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import DemoWaiting from '../components/join-demo-class-screen/demo-waiting.component';
-import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
-
 import {COLORS} from '../utils/constants/colors';
 import TextWrapper from '../components/text-wrapper.component';
-import Center from '../components/center.component';
 
-import Features from '../components/features.component';
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
-import {i18nContext} from '../context/lang.context';
-import LanguageSelection from '../components/language-selection.component';
 import NetInfo from '@react-native-community/netinfo';
-
-import Icon from '../components/icon.component';
 import DocumentPicker, {types} from 'react-native-document-picker';
 
 import Storage from '@react-native-firebase/storage';
 import RNFS from 'react-native-fs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 import Demo from '../components/demo.component';
 
@@ -59,14 +47,12 @@ import Reviews from '../components/reviews.component';
 
 import Worksheets from '../components/worksheets.component';
 import VideoPlayer from '../components/video.component';
-import {authSelector} from '../store/auth/selector';
 
 // Icons
 import TipsIcon from '../assets/icons/tipsandtricks.png';
 import WorksheetIcon from '../assets/icons/document.png';
 import ReviewIcon from '../assets/icons/reviews.png';
 import ImprovementIcon from '../assets/icons/improvement.png';
-import Video from 'react-native-video';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 
@@ -152,17 +138,13 @@ const tipsAndTricksData = [
   },
 ];
 
-const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
+const {height: deviceHeight} = Dimensions.get('window');
 
 const HomeScreen = ({navigation}) => {
-  const [childName, setChildName] = useState('');
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  const {localLang} = i18nContext();
-
   const dispatch = useDispatch();
 
   const {
@@ -175,8 +157,6 @@ const HomeScreen = ({navigation}) => {
     isAttended,
     isAttendenceMarked,
     bookingTime,
-    showJoinButton,
-    message,
   } = useSelector(joinDemoSelector);
 
   const {
@@ -396,16 +376,6 @@ const HomeScreen = ({navigation}) => {
     }
   }, [bookingTime]);
 
-  // on change for child name
-  const onChangeChildName = e => {
-    setChildName(e);
-  };
-
-  // Join Class
-  const handleJoinClass = async () => {
-    dispatch(joinFreeClass({bookingDetails, childName, teamUrl}));
-  };
-
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
 
@@ -416,43 +386,6 @@ const HomeScreen = ({navigation}) => {
 
     navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
   };
-
-  // UI Constants
-  // show countdown timer
-  const SHOW_TIMER = useMemo(() => {
-    if (!bookingTime) return null;
-
-    return new Date(bookingTime).getTime() > Date.now();
-  }, [bookingTime]);
-
-  // show join button to join class
-  const SHOW_JOIN_BUTTON = useMemo(() => {
-    return isTimeover && showJoinButton;
-  }, [isTimeover, showJoinButton]);
-
-  // If there is no child name in booking details
-  // then show input field for childname
-  // otherwise show text
-  // const IS_CHILD_NAME = useMemo(() => {
-  //   return !cn ? (
-  //     <>
-  //       <Input
-  //         placeholder="Child Name"
-  //         value={childName}
-  //         onChangeText={onChangeChildName}
-  //       />
-  //       {message && (
-  //         <TextWrapper fs={14} color={COLORS.pred}>
-  //           {message}
-  //         </TextWrapper>
-  //       )}
-  //     </>
-  //   ) : (
-  //     <TextWrapper color={COLORS.black} fs={18} styles={{textAlign: 'left'}}>
-  //       Class is on going, Join now.
-  //     </TextWrapper>
-  //   );
-  // }, [cn, childName, message]);
 
   if (!isConnected) {
     Alert.alert(
@@ -603,28 +536,6 @@ const HomeScreen = ({navigation}) => {
             <TextWrapper>Before & After</TextWrapper>
           </View>
         </View>
-
-        {/* Top Banner */}
-        {/* <View style={{flexDirection: 'row', marginVertical: 12}}>
-          <View
-            style={{
-              width: '75%',
-              padding: 8,
-              backgroundColor: COLORS.orange,
-            }}>
-            <TextWrapper>
-              Get a custom handwriting improvement plan worth Rs.500
-            </TextWrapper>
-          </View>
-          <View
-            style={{
-              width: '25%',
-              padding: 8,
-              backgroundColor: COLORS.pgreen,
-            }}>
-            <TextWrapper>Send a photo of handwriting</TextWrapper>
-          </View>
-        </View> */}
 
         {/* Video slider */}
         <View style={{paddingVertical: 16}}>
