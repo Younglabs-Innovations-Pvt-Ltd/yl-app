@@ -19,31 +19,47 @@ import {
 } from './src/utils/notifications';
 
 const CAPTURE_NOTIFICATION_URL =
-  'http://192.168.1.5/admin/messages/captureNotificationClick';
+  'https://7ac0-2401-4900-1c5b-616b-5579-110b-2807-3dcc.ngrok-free.app/admin/messages/captureNotificationClicks';
 
 notifee.onBackgroundEvent(async ({type, detail}) => {
-  const notification = detail.notification;
+  try {
+    const notification = detail.notification;
 
-  if (type === EventType.PRESS) {
-    if (notification.data.type) {
-      if (notification.data.type === 'reminders') {
-        const slotId = notification.data.slotId;
-        const templateName = notification.data.templateName;
-        console.log(slotId, templateName);
-        // const res = await fetch(CAPTURE_NOTIFICATION_URL, {
-        //   method: 'POST',
-        //   headers: {
-        //     'content-type': 'application/json',
-        //   },
-        //   body: JSON.stringify({slotId, templateName}),
-        // });
+    if (type === EventType.PRESS) {
+      if (notification.data.type) {
+        if (notification.data.type === 'reminders') {
+          const slotId = notification.data.slotId;
+          const templateName = notification.data.templateName;
+          console.log(slotId, templateName);
+          const res = await fetch(CAPTURE_NOTIFICATION_URL, {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({slotId, templateName, type: 'reminders'}),
+          });
 
-        // console.log('response=', await res.json());
-      } else if (notification.data.type === 'remarketing') {
-        console.log(notification.data.notificationId);
+          console.log('response=', await res.json());
+        } else if (notification.data.type === 'remarketing') {
+          console.log(notification.data.notificationId);
+          const res = await fetch(CAPTURE_NOTIFICATION_URL, {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+              notificationId: notification.data.notificationId,
+              type: 'remarketing',
+            }),
+          });
+
+          console.log(await res.json());
+        }
       }
+      notifee.cancelNotification(notification.id);
     }
-    notifee.cancelNotification(notification.id);
+  } catch (error) {
+    console.log('BACKGROUND_NOTIFICATION_ERROR: ' + error);
   }
 });
 
