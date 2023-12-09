@@ -17,8 +17,6 @@ import {
   startFetchBookingDetailsFromId,
   setPhoneAsync,
   setDemoData,
-  setDemoNotifications,
-  joinFreeClass,
   setShowJoinButton,
 } from '../store/join-demo/join-demo.reducer';
 import {resetCurrentNetworkState} from '../store/network/reducer';
@@ -352,11 +350,11 @@ const HomeScreen = ({navigation}) => {
    * @since 07/08/2023
    * @description Set  Notifications for demo class
    */
-  useEffect(() => {
-    if (bookingTime) {
-      dispatch(setDemoNotifications({bookingTime}));
-    }
-  }, [bookingTime]);
+  // useEffect(() => {
+  //   if (bookingTime) {
+  //     dispatch(setDemoNotifications({bookingTime}));
+  //   }
+  // }, [bookingTime]);
 
   /**
    * @author Shobhit

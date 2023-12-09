@@ -22,7 +22,6 @@ import {
   setIsAttended,
   setShowJoinButton,
   setTeamUrl,
-  setDemoNotifications,
   joinFreeClass,
   setErrorMessage,
   saveRating,
@@ -222,129 +221,130 @@ function* onSetDemoData({payload: {demoData, phone}}) {
  * @since 20/09/2023
  * @description Register Notifications for demo classs
  */
-function* demoNotifications({payload: {bookingTime}}) {
-  const classDate = new Date(bookingTime);
-  const currentTime = Date.now();
+// function* demoNotifications({payload: {bookingTime}}) {
+//   const classDate = new Date(bookingTime);
+//   const currentTime = Date.now();
 
-  // If class passed
-  if (currentTime > classDate) {
-    return;
-  }
+//   // If class passed
+//   if (currentTime > classDate) {
+//     return;
+//   }
 
-  const ONE_HOUR = 60 * 60 * 1000;
-  const TEN_MINUTES = 10 * 60 * 1000;
-  const FIVE_MINUTES = 5 * 60 * 1000;
-  const ONE_DAY = 24 * 60 * 60 * 1000;
+//   const ONE_HOUR = 60 * 60 * 1000;
+//   const TEN_MINUTES = 10 * 60 * 1000;
+//   const FIVE_MINUTES = 5 * 60 * 1000;
+//   const ONE_DAY = 24 * 60 * 60 * 1000;
 
-  const beforeOneHour = classDate.getTime() - ONE_HOUR;
-  const beforeTenMinutes = classDate.getTime() - TEN_MINUTES;
-  const afterFiveMinutes = classDate.getTime() + FIVE_MINUTES;
-  // Set for 11am notification
-  const morningNotification = new Date(bookingTime);
-  morningNotification.setHours(11);
+//   const beforeOneHour = classDate.getTime() - ONE_HOUR;
+//   const beforeTenMinutes = classDate.getTime() - TEN_MINUTES;
+//   const afterFiveMinutes = classDate.getTime() + FIVE_MINUTES;
+//   // Set for 11am notification
+//   const morningNotification = new Date(bookingTime);
+//   morningNotification.setHours(11);
 
-  const hours = classDate.getHours();
-  const body = `Your have a class on ${classDate.toDateString()} at ${
-    hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
-  }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
+//   const hours = classDate.getHours();
+//   const body = `Your have a class on ${classDate.toDateString()} at ${
+//     hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
+//   }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
 
-  const morningNotificationBody = `You have a class at ${
-    hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
-  }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
+//   const morningNotificationBody = `You have a class at ${
+//     hours >= 12 ? (hours === 12 ? hours : hours - 12) : hours
+//   }:00 ${hours >= 12 ? 'pm' : 'am'}.`;
 
-  try {
-    const isNotification = yield AsyncStorage.getItem(
-      LOCAL_KEYS.COUNTDOWN_NOTIFICATION,
-    );
+//   try {
+//     const isNotification = yield AsyncStorage.getItem(
+//       LOCAL_KEYS.COUNTDOWN_NOTIFICATION,
+//     );
 
-    // If already set notifications
-    if (isNotification) return;
+//     // If already set notifications
+//     if (isNotification) return;
 
-    // Check for today
-    if (new Date().getDate() === classDate.getDate()) {
-      console.log('all notifications for today');
-      if (currentTime < classDate) {
-        if (currentTime < beforeTenMinutes) {
-          yield setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            beforeTenMinutes,
-            'Your class is about to start in 10 minutes.',
-          );
-        }
-        if (currentTime < beforeOneHour) {
-          yield setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            beforeOneHour,
-            'Your class starts in 1 hour. Kindly, join on time.',
-          );
-        }
+//     // Check for today
+//     if (new Date().getDate() === classDate.getDate()) {
+//       console.log('all notifications for today');
+//       if (currentTime < classDate) {
+//         if (currentTime < beforeTenMinutes) {
+//           yield setCountdownTriggerNotification(
+//             'countdown',
+//             'countdown',
+//             beforeTenMinutes,
+//             'Your class is about to start in 10 minutes.',
+//           );
+//         }
+//         if (currentTime < beforeOneHour) {
+//           yield setCountdownTriggerNotification(
+//             'countdown',
+//             'countdown',
+//             beforeOneHour,
+//             'Your class starts in 1 hour. Kindly, join on time.',
+//           );
+//         }
 
-        if (new Date().getHours() < 11) {
-          yield setCountdownTriggerNotification(
-            'countdown',
-            'countdown',
-            morningNotification.getTime(),
-            morningNotificationBody,
-          );
-        }
+//         if (new Date().getHours() < 11) {
+//           yield setCountdownTriggerNotification(
+//             'countdown',
+//             'countdown',
+//             morningNotification.getTime(),
+//             morningNotificationBody,
+//           );
+//         }
 
-        yield setCountdownTriggerNotification(
-          'countdown',
-          'countdown',
-          afterFiveMinutes,
-          'Hurry! your class has already started, join now.',
-        );
-      }
-    } else {
-      console.log('set future notifications');
-      // Set notifications for future class
-      yield setCountdownTriggerNotification(
-        'countdown',
-        'countdown',
-        beforeTenMinutes,
-        'Your class is about to start in 10 minutes.',
-      );
-      yield setCountdownTriggerNotification(
-        'countdown',
-        'countdown',
-        beforeOneHour,
-        'Your class starts in 1 hour. Kindly, join on time.',
-      );
-      yield setCountdownTriggerNotification(
-        'countdown',
-        'countdown',
-        afterFiveMinutes,
-        'Hurry! your class has already started, join now.',
-      );
+//         yield setCountdownTriggerNotification(
+//           'countdown',
+//           'countdown',
+//           afterFiveMinutes,
+//           'Hurry! your class has already started, join now.',
+//         );
+//       }
+//     } else {
+//       console.log('set future notifications');
+//       // Set notifications for future class
+//       yield setCountdownTriggerNotification(
+//         'countdown',
+//         'countdown',
+//         beforeTenMinutes,
+//         'Your class is about to start in 10 minutes.',
+//       );
+//       yield setCountdownTriggerNotification(
+//         'countdown',
+//         'countdown',
+//         beforeOneHour,
+//         'Your class starts in 1 hour. Kindly, join on time.',
+//       );
+//       yield setCountdownTriggerNotification(
+//         'countdown',
+//         'countdown',
+//         afterFiveMinutes,
+//         'Hurry! your class has already started, join now.',
+//       );
 
-      yield setCountdownTriggerNotification(
-        'countdown',
-        'countdown',
-        morningNotification.getTime(),
-        morningNotificationBody,
-      );
+//       yield setCountdownTriggerNotification(
+//         'countdown',
+//         'countdown',
+//         morningNotification.getTime(),
+//         morningNotificationBody,
+//       );
 
-      if (new Date().getHours() < 20) {
-        const beforeOneDay = new Date(classDate.getTime() - ONE_DAY);
-        beforeOneDay.setHours(20);
-        yield setCountdownTriggerNotification(
-          'countdown',
-          'countdown',
-          beforeOneDay.getTime(),
-          body,
-        );
-      }
-    }
+//       if (new Date().getHours() < 20) {
+//         const beforeOneDay = new Date(classDate.getTime() - ONE_DAY);
+//         beforeOneDay.setHours(20);
+//         yield setCountdownTriggerNotification(
+//           'countdown',
+//           'countdown',
+//           beforeOneDay.getTime(),
+//           body,
+//         );
+//       }
+//     }
 
-    yield AsyncStorage.setItem(LOCAL_KEYS.COUNTDOWN_NOTIFICATION, 'saved');
-  } catch (error) {
-    console.log('demo notification error', error);
-  }
-}
+//     yield AsyncStorage.setItem(LOCAL_KEYS.COUNTDOWN_NOTIFICATION, 'saved');
+//   } catch (error) {
+//     console.log('demo notification error', error);
+//   }
+// }
 
 // Save acs token in local storage
+
 function* saveAcsTokenInLocalStorage({data}) {
   const expire = data.expireOn;
   if (expire) {
@@ -543,11 +543,6 @@ function* startSetDemoData() {
   yield takeLatest(setDemoData.type, onSetDemoData);
 }
 
-// Set notifications
-function* setNotifications() {
-  yield takeLatest(setDemoNotifications.type, demoNotifications);
-}
-
 // Join free demo class
 function* joinClass() {
   yield takeLatest(joinFreeClass.type, handleJoinClass);
@@ -580,7 +575,6 @@ export function* joinDemoSaga() {
     call(demoBookingDetailsFromId),
     call(startGetPhoneAsync),
     call(startSetDemoData),
-    call(setNotifications),
     call(joinClass),
     call(userRating),
     call(checkRatingAsync),
