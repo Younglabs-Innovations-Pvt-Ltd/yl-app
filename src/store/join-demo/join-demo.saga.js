@@ -8,6 +8,7 @@ import {
   saveFreeClassRating,
   saveNeedMoreInfo,
   fetchBookingDetailsFromPhone,
+  getLeadEmail,
 } from '../../utils/api/yl.api';
 
 import {
@@ -19,7 +20,6 @@ import {
   setDemoData,
   setBookingTime,
   setIsAttended,
-  setIsAttendenceMarked,
   setShowJoinButton,
   setTeamUrl,
   setDemoNotifications,
@@ -33,24 +33,17 @@ import {
   markNMISuccess,
   setLoading,
   joinDemo,
+  setBookingDetailsFailed,
 } from './join-demo.reducer';
 
 import {BASE_URL} from '@env';
-
-import {setCurrentNetworkState} from '../network/reducer';
-
-import {Linking} from 'react-native';
-
 import {setCountdownTriggerNotification} from '../../utils/notifications';
 import {startCallComposite} from '../../natiive-modules/team-module';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
-
-import {getWhatsappRedirectUrl} from '../../utils/redirect-whatsapp';
 import {getCurrentDeviceId} from '../../utils/deviceId';
-import {ERROR_MESSAGES} from '../../utils/constants/errorMsgs';
-import {setAuthToken} from '../auth/reducer';
+import {setEmail} from '../auth/reducer';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -92,9 +85,17 @@ function* fetchDemoDetailsFromPhone({payload}) {
       yield put(setLoading(false));
     }
 
+    // lead email
+    const leadEmailResponse = yield call(getLeadEmail, bookingDetails.leadId);
+    if (leadEmailResponse.status === 200) {
+      const leadEmail = yield leadEmailResponse.json();
+      yield put(setEmail(leadEmail.email));
+    }
+
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
     console.log('error');
+    // yield put(setBookingDetailsFailed("Something went wrong, try again"))
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setLoading(false));
     //   yield put(
@@ -149,14 +150,9 @@ function* fetchDemoDetailsFromBookingId({payload}) {
 function* getPhoneFromStorage() {
   try {
     const phoneFromAsyncStorage = yield AsyncStorage.getItem(LOCAL_KEYS.PHONE);
-    const token = yield AsyncStorage.getItem(LOCAL_KEYS.AUTH_TOKEN);
 
     if (phoneFromAsyncStorage) {
       yield put(setDemoPhone(phoneFromAsyncStorage));
-    }
-
-    if (token) {
-      yield put(setAuthToken(token));
     }
   } catch (error) {
     console.log(TAG, error);

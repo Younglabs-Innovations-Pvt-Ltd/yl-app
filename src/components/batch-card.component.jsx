@@ -1,10 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, Pressable, View, ScrollView} from 'react-native';
+import React, {useEffect} from 'react';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import {COLORS} from '../utils/constants/colors';
 import BatchDateAndTime from './batchDateAndTime.component';
 import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
-import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {courseSelector} from '../store/course/course.selector';
@@ -14,12 +13,10 @@ const BatchCard = ({
   batchOptions,
   level,
   prices,
-  setCurrentSelectedBatch,
+  ipData,
+  currentAgeGroup,
   currentSelectedBatch,
   levelText,
-  setLevelText,
-  setCurrentLevel,
-  ipData,
 }) => {
   const {price, strikeThroughPrice, currentLevel} = useSelector(courseSelector);
 
@@ -124,8 +121,6 @@ const BatchCard = ({
                 <BatchDateAndTime
                   key={index}
                   batch={batch}
-                  setCurrentSelectedBatch={setCurrentSelectedBatch}
-                  currentSelectedBatch={currentSelectedBatch}
                   option={
                     level === 1
                       ? 'Foundation'
@@ -133,10 +128,11 @@ const BatchCard = ({
                       ? 'Advanced'
                       : 'Foundation+Advanced'
                   }
-                  levelText={levelText}
-                  setLevelText={setLevelText}
                   level={level}
-                  setCurrentLevel={setCurrentLevel}
+                  currentAgeGroup={currentAgeGroup}
+                  currentSelectedBatch={currentSelectedBatch}
+                  levelText={levelText}
+                  currentLevel={currentLevel}
                 />
               );
             })}

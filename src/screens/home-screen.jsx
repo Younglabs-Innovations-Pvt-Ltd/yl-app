@@ -56,6 +56,10 @@ import ImprovementIcon from '../assets/icons/improvement.png';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 
+import auth from '@react-native-firebase/auth';
+import {setAuthToken} from '../store/auth/reducer';
+import {authSelector} from '../store/auth/selector';
+
 const INITIAL_TIME = {
   days: 0,
   hours: 0,
@@ -164,6 +168,23 @@ const HomeScreen = ({navigation}) => {
   } = useSelector(networkSelector);
 
   const {ipData} = useSelector(bookDemoSelector);
+  const {email} = useSelector(authSelector);
+
+  async function onAuthStateChanged(user) {
+    if (user) {
+      try {
+        const tokenResult = await auth().currentUser.getIdTokenResult();
+        dispatch(setAuthToken(tokenResult.token));
+      } catch (error) {
+        console.error('Error getting ID token:', error);
+      }
+    }
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
 
   /**
    * @author Shobhit
@@ -201,6 +222,12 @@ const HomeScreen = ({navigation}) => {
       dispatch(startFetchingIpData());
     }
   }, [ipData]);
+
+  // Check if lead converted to customer
+  useEffect(() => {
+    if (email) {
+    }
+  }, [email]);
 
   /**
    * @author Shobhit

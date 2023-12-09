@@ -60,7 +60,4 @@
     +     <data android:mimeType="*/*" />
     +   </intent>
 +   </queries>
-    <queries>
-        <package android:name="com.younglabs" />
-    </queries>
 </manifest>

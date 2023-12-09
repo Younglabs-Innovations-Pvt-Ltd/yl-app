@@ -19,7 +19,7 @@ import {
 } from '../../utils/storage/storage-provider';
 
 import {setCurrentNetworkState} from '../network/reducer';
-import {ERROR_MESSAGES} from '../../utils/constants/errorMsgs';
+import {ERROR_MESSAGES} from '../../utils/constants/messages';
 
 /**
  * @author Shobhit

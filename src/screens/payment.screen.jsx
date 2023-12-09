@@ -1,5 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, TextInput, View, ScrollView, Pressable} from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  ScrollView,
+  Pressable,
+  Dimensions,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {COLORS} from '../utils/constants/colors';
 import TextWrapper from '../components/text-wrapper.component';
@@ -10,12 +17,22 @@ import moment from 'moment';
 import {courseSelector} from '../store/course/course.selector';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {makePayment, setLoading} from '../store/course/course.reducer';
+import {setPayment, startMakePayment} from '../store/payment/reducer';
+import {authSelector} from '../store/auth/selector';
+import {paymentSelector} from '../store/payment/selector';
+import {MESSAGES} from '../utils/constants/messages';
+import ModalComponent from '../components/modal.component';
+import Icon from '../components/icon.component';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {resetCourseDetails} from '../store/course/course.reducer';
+
+const {width: deviceWidth} = Dimensions.get('window');
 
 const Payment = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [emailErr, setEmailErr] = useState('');
   const [dateTime, setDateTime] = useState('');
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (currentSelectedBatch) {
@@ -25,14 +42,6 @@ const Payment = ({navigation}) => {
     }
   }, [currentSelectedBatch]);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      dispatch(setLoading(false));
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
   const {
     currentAgeGroup,
     currentSelectedBatch,
@@ -41,13 +50,24 @@ const Payment = ({navigation}) => {
     price,
     strikeThroughPrice,
     courseDetails,
-    loading,
   } = useSelector(courseSelector);
+
+  const {loading, payment, message} = useSelector(paymentSelector);
+
+  console.log('paymentLoding', loading);
+  console.log('payment', payment);
 
   const {bookingDetails} = useSelector(joinDemoSelector);
   const {ipData} = useSelector(bookDemoSelector);
+  const {token} = useSelector(authSelector);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (payment === MESSAGES.PAYMENT_SUCCESS) {
+      setVisible(true);
+    }
+  }, [payment]);
 
   const handleCheckout = () => {
     if (!email) {
@@ -56,7 +76,7 @@ const Payment = ({navigation}) => {
     }
 
     dispatch(
-      makePayment({
+      startMakePayment({
         price,
         strikeThroughPrice,
         currentSelectedBatch,
@@ -65,10 +85,19 @@ const Payment = ({navigation}) => {
         bookingDetails,
         courseDetails,
         email,
+        token,
       }),
     );
 
     setEmailErr('');
+  };
+
+  const onClose = () => setVisible(false);
+
+  const goToHome = () => {
+    dispatch(resetCourseDetails());
+    dispatch(setPayment(''));
+    navigation.navigate(SCREEN_NAMES.MAIN);
   };
 
   return (
@@ -178,6 +207,41 @@ const Payment = ({navigation}) => {
           </Pressable>
         </View>
       </View>
+      <ModalComponent
+        visible={visible}
+        onRequestClose={onClose}
+        animationType="fade">
+        <View style={styles.modalContainer}>
+          <Pressable style={styles.modalOverlay}></Pressable>
+          <View style={styles.modalContent}>
+            <Pressable style={styles.btnClose} onPress={onClose}>
+              <Icon name="close-outline" size={28} color={COLORS.black} />
+            </Pressable>
+            <MIcon
+              name="check-circle"
+              size={78}
+              color={COLORS.pgreen}
+              style={{alignSelf: 'center'}}
+            />
+            <Spacer space={4} />
+            <TextWrapper fs={20} fw="700" styles={{textAlign: 'center'}}>
+              Payment Successful
+            </TextWrapper>
+            <Spacer space={12} />
+            <Pressable
+              style={({pressed}) => [
+                styles.btnCheckout,
+                {opacity: pressed ? 0.8 : 1, backgroundColor: COLORS.pblue},
+              ]}
+              onPress={goToHome}>
+              <TextWrapper fs={18} color={COLORS.white}>
+                Continue
+              </TextWrapper>
+            </Pressable>
+          </View>
+          <Pressable style={styles.modalOverlay}></Pressable>
+        </View>
+      </ModalComponent>
     </View>
   );
 };
@@ -208,5 +272,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  modalOverlay: {
+    flex: 1,
+  },
+  modalContent: {
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    backgroundColor: COLORS.white,
+    width: deviceWidth * 0.8,
+    maxWidth: 320,
+    minHeight: 160,
+    alignSelf: 'center',
+    position: 'relative',
+  },
+  btnClose: {
+    position: 'absolute',
+    top: 6,
+    right: 12,
   },
 });

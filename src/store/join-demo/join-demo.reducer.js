@@ -32,7 +32,11 @@ const reducer = {
     } = action;
     state.demoData = demoData;
     state.bookingDetails = bookingDetails;
-    // state.loading = false;
+    state.loading = false;
+  },
+  setBookingDetailsFailed(state, action) {
+    state.loading = false;
+    state.message = action.payload;
   },
   setLoading(state, action) {
     state.loading = action.payload;
@@ -132,6 +136,7 @@ export const {
   setLoading,
   joinDemo,
   setNMI,
+  setBookingDetailsFailed,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

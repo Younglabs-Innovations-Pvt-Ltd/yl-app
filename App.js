@@ -47,6 +47,8 @@ import {getCurrentDeviceId} from './src/utils/deviceId';
 import {storeDeviceId} from './src/utils/api/yl.api';
 import {NetworkProvider} from './src/context/network.state';
 
+import auth from '@react-native-firebase/auth';
+
 Sentry.init({
   dsn: SENTRY_DSN,
   enabled: process.env.NODE_ENV === 'production',
@@ -69,6 +71,33 @@ function App() {
     checkForUpdate();
   }, []);
 
+  // Check if user already logged in
+  // then redirect to home screen
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  async function onAuthStateChanged(user) {
+    try {
+      const phone = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
+      // const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
+      let token;
+      if (user) {
+        const tokenResult = await auth().currentUser.getIdTokenResult();
+        token = tokenResult.token;
+      }
+
+      setLoading(false);
+      if (token && phone) {
+        setIsPhone(true);
+      }
+    } catch (error) {
+      console.error('Error getting ID token:', error);
+      setLoading(false);
+    }
+  }
+
   // Handle redirect url (Deep Link)
   useEffect(() => {
     const handleRedirectUrl = url => {
@@ -86,31 +115,6 @@ function App() {
     Linking.getInitialURL()
       .then(handleRedirectUrl)
       .catch(err => console.log(err));
-  }, []);
-
-  // Check if user already logged in
-  // then redirect to home screen
-  useEffect(() => {
-    const isUserAlreadyLoggedIn = async () => {
-      try {
-        setLoading(true);
-        const phone = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
-        const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
-
-        if (phone) {
-          setIsPhone(true);
-        }
-
-        if (bookingId) {
-          setBookingId(bookingId);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.log('CHECK_PHONE_ASYNC_STORAGE_ERROR_APP', error);
-      }
-    };
-
-    isUserAlreadyLoggedIn();
   }, []);
 
   // Save Device id
@@ -243,11 +247,6 @@ function App() {
                 name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
                 component={BookDemoSlotsScreen}
                 options={{title: 'Book Free Handwriting Class'}}
-              />
-              <Stack.Screen
-                name={'home'}
-                component={Home}
-                // options={{title: 'Book Free Handwriting Class'}}
               />
               <Stack.Screen
                 name={SCREEN_NAMES.COURSE_DETAILS}

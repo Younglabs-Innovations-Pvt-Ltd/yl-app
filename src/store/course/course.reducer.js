@@ -8,11 +8,11 @@ const INITIAL_STATE = {
   prices: [],
   loading: false,
   message: '',
-  currentAgeGroup: '',
-  currentSelectedBatch: null,
-  levelText: '',
   price: 0,
   strikeThroughPrice: 0,
+  levelText: '',
+  currentSelectedBatch: null,
+  currentAgeGroup: '',
   currentLevel: 1,
 };
 
@@ -32,29 +32,32 @@ const reducer = {
   fetchCourseFailed(state, action) {
     state.message = action.payload.message;
   },
-  setCurrentAgeGroup(state, action) {
-    state.currentAgeGroup = action.payload;
-  },
-  setCurrentSelectedBatch(state, action) {
-    state.currentSelectedBatch = action.payload;
-  },
-  setLevelText(state, action) {
-    state.levelText = action.payload;
-  },
   setPrice(state, action) {
     state.price = action.payload;
   },
   setStrikeThroughPrice(state, action) {
     state.strikeThroughPrice = action.payload;
   },
+  setLoading(state, action) {
+    state.loading = action.payload;
+  },
+  setLevelText(state, action) {
+    state.levelText = action.payload;
+  },
+  setCurrentSelectedBatch(state, action) {
+    state.currentSelectedBatch = action.payload;
+  },
+  setCurrentAgeGroup(state, action) {
+    state.currentAgeGroup = action.payload;
+  },
   setCurrentLevel(state, action) {
     state.currentLevel = action.payload;
   },
-  makePayment(state) {
-    state.loading = true;
-  },
-  setLoading(state, action) {
-    state.loading = action.payload;
+  resetCourseDetails(state) {
+    state.currentAgeGroup = '';
+    state.currentSelectedBatch = null;
+    state.currentLevel = 1;
+    state.levelText = '';
   },
 };
 
@@ -68,14 +71,14 @@ export const {
   fetchCourseFailed,
   fetchCourseStart,
   fetchCourseSuccess,
-  setCurrentAgeGroup,
-  setCurrentSelectedBatch,
-  setLevelText,
   setPrice,
   setStrikeThroughPrice,
-  setCurrentLevel,
-  makePayment,
   setLoading,
+  setCurrentAgeGroup,
+  setCurrentLevel,
+  setCurrentSelectedBatch,
+  setLevelText,
+  resetCourseDetails,
 } = courseSlice.actions;
 
 export const courseReducer = courseSlice.reducer;

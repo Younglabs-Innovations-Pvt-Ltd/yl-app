@@ -16,7 +16,7 @@ import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makeNewBooking} from '../../utils/api/yl.api';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
-import {ERROR_MESSAGES} from '../../utils/constants/errorMsgs';
+import {ERROR_MESSAGES} from '../../utils/constants/messages';
 import {setCurrentNetworkState} from '../network/reducer';
 
 /**

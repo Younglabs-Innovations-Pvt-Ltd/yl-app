@@ -4,12 +4,12 @@ import {COLORS} from '../utils/constants/colors';
 import TextWrapper from './text-wrapper.component';
 import moment from 'moment';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useDispatch} from 'react-redux';
 import {
   setCurrentLevel,
-  setLevelText,
   setCurrentSelectedBatch,
+  setLevelText,
 } from '../store/course/course.reducer';
+import {useDispatch} from 'react-redux';
 
 const BatchDateAndTime = ({
   batch,
@@ -20,10 +20,10 @@ const BatchDateAndTime = ({
 }) => {
   if (!batch) return null;
 
-  const dispatch = useDispatch();
-
   const date = new Date(batch.startDate._seconds * 1000);
   const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
+
+  const dispatch = useDispatch();
 
   const handleBatch = () => {
     dispatch(setCurrentSelectedBatch(batch));

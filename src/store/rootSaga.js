@@ -6,6 +6,7 @@ import {welcomeScreenSagas} from './welcome-screen/saga';
 import {csaSagas} from './customer-support-action/saga';
 import {authSaga} from './auth/saga';
 import {courseSagas} from './course/course.saga';
+import {paymentSaga} from './payment/saga';
 
 export function* rootSaga() {
   yield all([
@@ -15,5 +16,6 @@ export function* rootSaga() {
     call(csaSagas),
     call(authSaga),
     call(courseSagas),
+    call(paymentSaga),
   ]);
 }

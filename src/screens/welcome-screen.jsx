@@ -39,8 +39,6 @@ import {i18nContext} from '../context/lang.context';
 import {resetCurrentNetworkState} from '../store/network/reducer';
 import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {phoneAuthStart, setAuthToken, verifyCode} from '../store/auth/reducer';
 import {authSelector} from '../store/auth/selector';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
@@ -326,12 +324,7 @@ const DemoClassScreen = ({navigation}) => {
         setVisible(false);
         setLoading(true);
         const tokenResult = await auth().currentUser.getIdTokenResult();
-        const token = await AsyncStorage.getItem(LOCAL_KEYS.AUTH_TOKEN);
-        if (!token) {
-          await AsyncStorage.setItem(LOCAL_KEYS.AUTH_TOKEN, tokenResult.token);
-          dispatch(setAuthToken(tokenResult.token));
-        }
-
+        dispatch(setAuthToken(tokenResult.token));
         setLoading(false);
         navigation.replace(SCREEN_NAMES.MAIN);
       } catch (error) {

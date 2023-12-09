@@ -192,3 +192,23 @@ export const checkBookingStatus = async phone => {
     body: JSON.stringify({phone}),
   });
 };
+
+export const getLeadEmail = async leadId => {
+  return await fetch(`${BASE_URL}/admin/demobook/getLeadEmail`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({leadId}),
+  });
+};
+
+export const savePaymentSource = async ({orderId, source}) => {
+  return await fetch(`${BASE_URL}/shop/orderhandler/addPaymentSource`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({rpOrderId: orderId, source}),
+  });
+};

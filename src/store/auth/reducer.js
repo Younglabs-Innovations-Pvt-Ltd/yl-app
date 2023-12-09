@@ -7,6 +7,7 @@ const INITIAL_STATE = {
   verificationErrorMessage: '',
   message: '',
   confirm: null,
+  email: '',
 };
 
 const reducers = {
@@ -43,6 +44,9 @@ const reducers = {
     state.verificationLoading = false;
     state.verificationErrorMessage = action.payload;
   },
+  setEmail(state, action) {
+    state.email = action.payload;
+  },
 };
 
 const authSlice = createSlice({
@@ -61,6 +65,7 @@ export const {
   setVerificationLoading,
   setAuthToken,
   setFailedVerification,
+  setEmail,
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

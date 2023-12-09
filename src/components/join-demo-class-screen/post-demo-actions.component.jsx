@@ -6,13 +6,11 @@ import {
   Pressable,
   Linking,
   ActivityIndicator,
-  ScrollView,
   Dimensions,
 } from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../utils/constants/colors';
 import Icon from '../icon.component';
-import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Spacer from '../spacer.component';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -26,11 +24,9 @@ import {
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
+import {joinDemoSelector} from '../../store/join-demo/join-demo.selector';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
-
-const IMAGE_URI =
-  'https://live-server-8353.wati.io/api/file/showFile?fileName=data/images/WhatsApp_Image_2022_06_17_at_4.58.13_PM-47559edc-8e40-4c7a-9ce3-db0ac32b085d.jpg&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4YTlhMjgwYi1jNGI5LTQxMDYtOWU0NS04MDY4MGY0OWRiZTYiLCJ1bmlxdWVfbmFtZSI6ImtyaXNobmEua0B5b3VuZ2xhYnMuaW4iLCJuYW1laWQiOiJrcmlzaG5hLmtAeW91bmdsYWJzLmluIiwiZW1haWwiOiJrcmlzaG5hLmtAeW91bmdsYWJzLmluIiwiYXV0aF90aW1lIjoiMTAvMzAvMjAyMyAwNTowODoxMiIsImRiX25hbWUiOiI4MzUzIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQURNSU5JU1RSQVRPUiIsImV4cCI6MjUzNDAyMzAwODAwLCJpc3MiOiJDbGFyZV9BSSIsImF1ZCI6IkNsYXJlX0FJIn0.PYlZDcDz6SezkwsvsCaLHkTA2TNAnsBmUgDtkMOF3F8';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -40,8 +36,15 @@ const PostDemoAction = () => {
   const [attendedLoading, setAttendedLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
-    useSelector(state => state.joinDemo);
+  const {
+    demoData,
+    bookingDetails,
+    isRated,
+    ratingLoading,
+    nmiLoading,
+    isNmi,
+    customerStage,
+  } = useSelector(joinDemoSelector);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
