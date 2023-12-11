@@ -1,328 +1,312 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
+  ActivityIndicator,
   View,
+  Pressable,
   Dimensions,
   ScrollView,
-  Pressable,
+  Text,
 } from 'react-native';
-import TextWrapper from '../components/text-wrapper.component';
-import Spacer from '../components/spacer.component';
+import Video from 'react-native-video';
 import {COLORS} from '../utils/constants/colors';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import Icon from '../components/icon.component';
+import Spacer from '../components/spacer.component';
+import TextWrapper from '../components/text-wrapper.component';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchCourseStart} from '../store/course/course.reducer';
 import {courseSelector} from '../store/course/course.selector';
-import Icon from '../components/icon.component';
-import BatchCard from '../components/batch-card.component';
-import Collapsible from 'react-native-collapsible';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Button from '../components/button.component';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
-import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import Spinner from '../components/spinner.component';
+const videoUri =
+  'https://upload.wikimedia.org/wikipedia/commons/transcoded/4/41/Big_Buck_Bunny_medium.ogv/Big_Buck_Bunny_medium.ogv.480p.vp9.webm';
 
-import {setCurrentAgeGroup} from '../store/course/course.reducer';
+const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
-const {width: deviceWidth} = Dimensions.get('window');
+const levels = ['Foundation', 'Advanced', 'Foundation+Advanced'];
+const AGE_GROUPS = ['5-7', '8-10', '11-14'];
 
-const ITEM_WIDTH = deviceWidth * 0.75;
+const getLevelName = level => {
+  if (level == 1) {
+    return 'Foundation';
+  }
+  if (level == 2) {
+    return 'Advanced';
+  } else {
+    return 'Foundation + Advanced';
+  }
+};
 
 const CourseDetails = ({navigation}) => {
-  const [filteredBatches, setFilteredBatches] = useState([]);
-  const [collapsedButton, setCollapsedButton] = useState(true);
-  const [steps, setSteps] = useState({
-    step1: true,
-    step2: true,
-    step3: true,
-  });
+  const [muted, setMuted] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(false);
+  const [aboutCourseArr, setAboutCourseArr] = useState([]);
+  const [ageGroup, setAgeGroup] = useState('5-7');
+  const [filteredCourse, setFilteredCourse] = useState(null);
+  const [courseLevel, setCourseLevel] = useState('Foundation');
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   const dispatch = useDispatch();
 
-  const {
-    courseDetails,
-    ageGroups,
-    batches,
-    prices,
-    loading,
-    levelText,
-    currentSelectedBatch,
-    currentAgeGroup,
-  } = useSelector(courseSelector);
-  const {ipData} = useSelector(bookDemoSelector);
+  const {courseDetails, ageGroups} = useSelector(courseSelector);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      setCollapsedButton(true);
+    let arr = [];
+    ageGroups?.map(ageGroupItem => {
+      let ageGrp = ageGroupItem.ageGroup;
+      let objArray = ageGroupItem?.levels?.map(level => {
+        let obj = {
+          heading:
+            courseDetails.definedCourseType === 'definedClasses'
+              ? level?.altName || getLevelName(level?.level)
+              : getLevelName(level?.level),
+          level: level?.level,
+          content: [
+            {
+              subHeading: 'Course Goals',
+              points: level?.learning_goals?.split('/n'),
+            },
+            {
+              subHeading: 'Topics Covered',
+              points: level?.details?.split('/n'),
+            },
+            {
+              subHeading: 'Requirements',
+              points: level?.materials?.split('/n'),
+            },
+          ],
+        };
+        return obj;
+      });
+
+      objArray = objArray.sort((a, b) => {
+        return parseInt(a?.level) - parseInt(b?.level);
+      });
+
+      if (
+        courseDetails?.addedLevel3Manually &&
+        courseDetails?.level3CourseDetails &&
+        courseDetails?.ageGroupsToShowLevel3Details?.includes(ageGrp)
+      ) {
+        let body = courseDetails.level3CourseDetails;
+        let level3Obj = {
+          heading: body.heading,
+          content: [
+            {
+              subHeading: 'Course Goals',
+              points: body?.courseGoals?.split('\n'),
+            },
+            {
+              subHeading: 'Topics Covered',
+              points: body?.topicsCovered?.split('\n'),
+            },
+            {
+              subHeading: 'Requirements',
+              points: body?.requirements?.split('\n'),
+            },
+          ],
+        };
+        objArray.push(level3Obj);
+      }
+      console.log('Object array', objArray);
+      arr.push({ageGroup: ageGrp, objArray});
     });
 
-    return unsubscribe;
-  }, [navigation]);
+    console.log('Arr is', arr);
+    setAboutCourseArr(arr);
+  }, [ageGroups, courseDetails]);
+
+  useEffect(() => {
+    if (aboutCourseArr) {
+      const filteredCourseArr = aboutCourseArr.find(
+        item => item.ageGroup === ageGroup,
+      );
+      console.log('iltered course', filteredCourseArr);
+      setFilteredCourse(filteredCourseArr);
+    }
+  }, [ageGroup, aboutCourseArr]);
+
+  useEffect(() => {
+    if (filteredCourse) {
+      let course;
+      if (
+        courseLevel === 'Foundation' ||
+        courseLevel === 'Foundation+Advanced'
+      ) {
+        course = filteredCourse.objArray.find(item => item.level === '1');
+      } else {
+        course = filteredCourse.objArray.find(item => item.level === '2');
+      }
+
+      setSelectedCourse(course);
+    }
+  }, [courseLevel, filteredCourse]);
 
   useEffect(() => {
     dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
   }, []);
 
-  useEffect(() => {
-    let timeout;
-    if (currentAgeGroup) {
-      timeout = setTimeout(() => {
-        setSteps(b => ({...b, step1: true, step2: false}));
-      }, 200);
-    }
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [currentAgeGroup]);
-
-  useEffect(() => {
-    let timeout;
-    if (levelText) {
-      timeout = setTimeout(() => {
-        setSteps(b => ({...b, step2: true}));
-        setCollapsedButton(false);
-      }, 200);
-    }
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [levelText]);
-
-  useEffect(() => {
-    if (currentAgeGroup) {
-      const filteredBatches = batches.filter(
-        item => item.ageGroup === currentAgeGroup,
-      );
-
-      setFilteredBatches(filteredBatches);
-    }
-  }, [currentAgeGroup, batches]);
-
-  const handleCurrentAgeGroup = group => {
-    dispatch(setCurrentAgeGroup(group));
+  const onLoadStart = () => {
+    setVideoLoading(true);
   };
 
-  const SECTIONS = [
-    {
-      title: 'First',
-      content: 'Lorem ipsum...',
-    },
-    {
-      title: 'Second',
-      content: 'Lorem ipsum...',
-    },
-  ];
+  const onReadyForDisplay = () => {
+    setVideoLoading(false);
+    setPaused(true);
+  };
+
+  console.log('course', selectedCourse);
+
+  const onMute = () => setMuted(p => !p);
 
   return (
-    <View style={{flex: 1}}>
-      {loading ? (
-        <Spinner style={{alignSelf: 'center'}} />
-      ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{flex: 1}}
-          contentContainerStyle={{padding: 16}}>
-          {/* Age groups */}
-          <View style={{padding: 12, backgroundColor: '#eee', borderRadius: 4}}>
-            <Pressable
-              onPress={() => setSteps(s => ({...s, step1: !s.step1}))}
+    <View style={styles.container}>
+      <ScrollView
+        style={{flex: 1}}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{paddingBottom: 16}}>
+        <TextWrapper
+          fs={22}
+          color={'gray'}
+          fw="700"
+          styles={{textAlign: 'center'}}>
+          More about course
+        </TextWrapper>
+        <Spacer />
+        <View style={styles.videoContainer}>
+          <Video
+            source={{uri: videoUri}}
+            style={styles.video}
+            muted={muted}
+            paused={paused}
+            resizeMode="cover"
+            onLoadStart={onLoadStart}
+            onReadyForDisplay={onReadyForDisplay}
+          />
+          {videoLoading && (
+            <View style={styles.videoOvarlay}>
+              <ActivityIndicator size={'large'} color={COLORS.white} />
+            </View>
+          )}
+          <View style={styles.overlayButtons}>
+            <Icon
+              name={muted ? 'volume-mute-outline' : 'volume-high-outline'}
+              size={28}
+              color={COLORS.white}
+              onPress={onMute}
+            />
+            <Icon name={'expand-outline'} size={28} color={COLORS.white} />
+          </View>
+        </View>
+        <Spacer />
+        <View>
+          <TextWrapper fs={18} styles={{textAlign: 'center'}}>
+            Age group
+          </TextWrapper>
+          <View style={{alignItems: 'center'}}>
+            {/* <TextWrapper fs={17}>Age group</TextWrapper> */}
+            <Spacer space={8} />
+            <View style={{flexDirection: 'row', gap: 12}}>
+              {AGE_GROUPS.map(group => (
+                <Pressable
+                  key={group}
+                  style={[
+                    styles.ageGroup,
+                    {
+                      backgroundColor:
+                        ageGroup === group ? COLORS.pblue : '#e7f4ff',
+                    },
+                  ]}
+                  onPress={() => setAgeGroup(group)}>
+                  <TextWrapper
+                    fs={17}
+                    fw="700"
+                    color={ageGroup === group ? COLORS.white : '#1b8ff5'}>
+                    {group}
+                  </TextWrapper>
+                </Pressable>
+              ))}
+            </View>
+            <Spacer space={8} />
+            <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                gap: 12,
               }}>
-              <TextWrapper fs={22} fw="700">
-                1. Select age group
-              </TextWrapper>
-              {!currentAgeGroup ? (
-                <Icon
-                  name={`chevron-${!steps.step1 ? 'up' : 'down'}-outline`}
-                  size={24}
-                  color={COLORS.black}
-                />
-              ) : (
-                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
-              )}
-            </Pressable>
-            <Collapsible collapsed={steps.step1} duration={450}>
-              <AgeSelector
-                ageGroups={ageGroups}
-                currentAgeGroup={currentAgeGroup}
-                handleCurrentAgeGroup={handleCurrentAgeGroup}
-                setSteps={setSteps}
-              />
-            </Collapsible>
+              {levels.map(level => (
+                <Pressable
+                  key={level}
+                  style={[
+                    styles.ageGroup,
+                    {
+                      width: 'auto',
+                      paddingHorizontal: 6,
+                      backgroundColor:
+                        courseLevel === level ? COLORS.pblue : '#e7f4ff',
+                    },
+                  ]}
+                  onPress={() => setCourseLevel(level)}>
+                  <TextWrapper
+                    fs={15}
+                    fw="700"
+                    color={courseLevel === level ? COLORS.white : '#1b8ff5'}>
+                    {level}
+                  </TextWrapper>
+                </Pressable>
+              ))}
+            </View>
           </View>
-
-          {/* Batch card */}
-          <View style={{marginTop: 12}}>
-            <Pressable
-              style={{
-                padding: 12,
-                opacity: !currentAgeGroup ? 0.7 : 1,
-                borderRadius: 4,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: '#eee',
-              }}
-              disabled={!currentAgeGroup}
-              onPress={() => setSteps(s => ({...s, step2: !s.step2}))}>
-              <TextWrapper fs={22} fw="700">
-                2. Select a batch
-              </TextWrapper>
-              {!currentSelectedBatch ? (
-                <Icon
-                  name={`chevron-${!steps.step2 ? 'up' : 'down'}-outline`}
-                  size={24}
-                  color={COLORS.black}
-                />
-              ) : (
-                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
-              )}
-            </Pressable>
-            {filteredBatches.length > 0 && (
-              <View style={{paddingTop: 8}}>
-                <Collapsible collapsed={steps.step2} duration={450}>
-                  <BatchCard
-                    ipData={ipData}
-                    ageGroups={ageGroups}
-                    courseDetails={courseDetails}
-                    prices={prices}
-                    level={1}
-                    batchOptions={filteredBatches.filter(
-                      batch => batch.level === 1,
-                    )}
-                    currentAgeGroup={currentAgeGroup}
-                    currentSelectedBatch={currentSelectedBatch}
-                    levelText={levelText}
-                  />
-                  <Spacer space={4} />
-                  <BatchCard
-                    ipData={ipData}
-                    ageGroups={ageGroups}
-                    courseDetails={courseDetails}
-                    prices={prices}
-                    level={2}
-                    batchOptions={filteredBatches.filter(
-                      batch => batch.level === 2,
-                    )}
-                    currentAgeGroup={currentAgeGroup}
-                    currentSelectedBatch={currentSelectedBatch}
-                    levelText={levelText}
-                  />
-                  <Spacer space={4} />
-                  <BatchCard
-                    ipData={ipData}
-                    ageGroups={ageGroups}
-                    courseDetails={courseDetails}
-                    prices={prices}
-                    level={3}
-                    batchOptions={filteredBatches.filter(
-                      batch => batch.level === 1,
-                    )}
-                    currentAgeGroup={currentAgeGroup}
-                    currentSelectedBatch={currentSelectedBatch}
-                    levelText={levelText}
-                  />
-                </Collapsible>
-              </View>
-            )}
-          </View>
-          <View
-            style={{
-              padding: 12,
-              backgroundColor: '#eee',
-              borderRadius: 4,
-              marginTop: 12,
-            }}>
-            <Pressable
-              onPress={() => setCollapsedButton(p => !p)}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                opacity: currentAgeGroup && currentSelectedBatch ? 1 : 0.7,
-              }}
-              disabled={!currentAgeGroup || !currentSelectedBatch}>
-              <TextWrapper fs={22} fw="700">
-                3. Make payment
-              </TextWrapper>
-              {currentSelectedBatch && currentAgeGroup ? (
-                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
-              ) : (
-                <Icon
-                  name={`chevron-${!steps.step3 ? 'up' : 'down'}-outline`}
-                  size={24}
-                  color={COLORS.black}
-                />
-              )}
-            </Pressable>
-            <Collapsible collapsed={collapsedButton}>
-              <Pressable
-                style={({pressed}) => [
-                  styles.payButton,
-                  {
-                    opacity: pressed ? 0.8 : 1,
-                    marginTop: 20,
-                  },
-                ]}
-                onPress={() => navigation.navigate(SCREEN_NAMES.PAYMENT)}>
-                <TextWrapper fs={18} fw="700" color={COLORS.white}>
-                  Pay and Enroll
-                </TextWrapper>
-              </Pressable>
-            </Collapsible>
-          </View>
-        </ScrollView>
-      )}
+        </View>
+        <Spacer />
+        <View>
+          {selectedCourse?.content?.map((course, index) => (
+            <CourseContent course={course} key={index} />
+          ))}
+        </View>
+        <Spacer />
+        <Button
+          onPress={() => {
+            navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
+          }}
+          textSize={18}
+          textColor={COLORS.white}
+          bg={COLORS.pblue}
+          rounded={4}>
+          Batch Detail
+        </Button>
+      </ScrollView>
     </View>
   );
 };
 
-const AgeSelector = ({
-  ageGroups,
-  currentAgeGroup,
-  handleCurrentAgeGroup,
-  setSteps,
-}) => {
-  const selectBatch = item => {
-    handleCurrentAgeGroup(item.ageGroup);
-  };
-
+const CourseContent = ({course}) => {
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        gap: 12,
-        marginTop: 16,
-        alignSelf: 'center',
-      }}>
-      {ageGroups.map(item => (
-        <Pressable
-          key={item.ageGroup}
-          style={{
-            paddingVertical: 16,
-            paddingHorizontal: 24,
-            borderRadius: 8,
-            backgroundColor:
-              currentAgeGroup === item.ageGroup ? COLORS.pblue : 'transparent',
-          }}
-          onPress={() => selectBatch(item)}>
-          <TextWrapper
-            fs={20}
-            fw="700"
-            color={
-              currentAgeGroup === item.ageGroup ? COLORS.white : COLORS.black
-            }>
-            {item.ageGroup}
-          </TextWrapper>
-        </Pressable>
-      ))}
+    <View style={{paddingVertical: 8}}>
+      <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+        <MIcon name="bullseye-arrow" size={28} color={'#0046b2'} />
+        <TextWrapper fs={18} fw="700" color={'#0046b2'}>
+          {course?.subHeading}
+        </TextWrapper>
+      </View>
+      <View style={{paddingHorizontal: 8, paddingTop: 8}}>
+        {course?.points.map((point, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+              marginVertical: 4,
+            }}>
+            <Icon name="checkmark-circle-outline" size={24} color={'#1b8ff5'} />
+            <TextWrapper>{point}</TextWrapper>
+          </View>
+        ))}
+      </View>
     </View>
   );
 };
@@ -330,47 +314,55 @@ const AgeSelector = ({
 export default CourseDetails;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+  },
   videoContainer: {
-    height: 240,
-    paddingVertical: 12,
+    width: '100%',
+    aspectRatio: 16 / 9,
+    overflow: 'hidden',
+    borderRadius: 8,
+    position: 'relative',
+    elevation: 4,
   },
   video: {
     width: '100%',
     height: '100%',
   },
-  reivewItem: {
-    width: ITEM_WIDTH,
-    padding: 16,
-    borderRadius: 6,
-    elevation: 1.25,
+  videoOvarlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: COLORS.black,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  reviewRow: {
+  overlayButtons: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    padding: 12,
     flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
-    paddingVertical: 8,
+    gap: 12,
   },
-  reviewAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-  },
-  reivewContent: {
-    paddingVertical: 8,
-  },
-  btnBooking: {
-    height: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 4,
-    backgroundColor: COLORS.pgreen,
-  },
-  payButton: {
-    width: '100%',
+  ageGroup: {
     paddingVertical: 12,
+    width: 74,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.pgreen,
     borderRadius: 4,
+  },
+  contentCard: {
+    width: '100%',
+    padding: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'gray',
   },
 });

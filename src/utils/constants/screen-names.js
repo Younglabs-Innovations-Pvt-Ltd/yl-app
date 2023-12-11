@@ -6,4 +6,5 @@ export const SCREEN_NAMES = {
   BOOK_DEMO_SLOTS: 'BookDemoSlots',
   COURSE_DETAILS: 'CourseDetails',
   PAYMENT: 'payment',
+  BATCH_FEE_DETAILS: 'BatchFeeDetails',
 };

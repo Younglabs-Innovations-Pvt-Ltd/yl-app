@@ -176,6 +176,10 @@ const PostDemoAction = () => {
     navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
   };
 
+  const batchDetails = () => {
+    navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
+  };
+
   // UI Constants
   const RATING_STARS = useMemo(() => {
     return Array.from({length: 5}, (_, i) => {
@@ -327,7 +331,8 @@ const PostDemoAction = () => {
             style={({pressed}) => [
               styles.ctaButton,
               {flex: 1, opacity: pressed ? 0.8 : 1},
-            ]}>
+            ]}
+            onPress={batchDetails}>
             <TextWrapper>Batch details</TextWrapper>
           </Pressable>
         </View>

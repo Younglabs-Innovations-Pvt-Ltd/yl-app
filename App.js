@@ -36,8 +36,8 @@ import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
 import CourseDetails from './src/screens/course-details.screen';
-import Home from './src/screens/Home.screen';
 import Payment from './src/screens/payment.screen';
+import BatchFeeDetails from './src/screens/batch-fees-details.screen';
 
 import * as Sentry from '@sentry/react-native';
 import {navigationRef} from './src/navigationRef';
@@ -254,6 +254,14 @@ function App() {
                 options={{
                   // headerStyle: {elevation: 0},
                   headerTitle: 'Course Detail',
+                }}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.BATCH_FEE_DETAILS}
+                component={BatchFeeDetails}
+                options={{
+                  // headerStyle: {elevation: 0},
+                  headerTitle: 'Batch Fee Detail',
                 }}
               />
               <Stack.Screen
