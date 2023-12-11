@@ -193,6 +193,7 @@ export const checkBookingStatus = async phone => {
   });
 };
 
+// Get lead email
 export const getLeadEmail = async leadId => {
   return await fetch(`${BASE_URL}/admin/demobook/getLeadEmail`, {
     method: 'POST',
@@ -203,6 +204,7 @@ export const getLeadEmail = async leadId => {
   });
 };
 
+// Save payment source
 export const savePaymentSource = async ({orderId, source}) => {
   return await fetch(`${BASE_URL}/shop/orderhandler/addPaymentSource`, {
     method: 'POST',
@@ -210,5 +212,16 @@ export const savePaymentSource = async ({orderId, source}) => {
       'content-type': 'application/json',
     },
     body: JSON.stringify({rpOrderId: orderId, source}),
+  });
+};
+
+// Mark not interested in
+export const markNotInterest = async ({leadId, comment, name, phone}) => {
+  return await fetch(`${BASE_URL}/admin/demobook/markNotInterested`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({leadId, comment, phone, name}),
   });
 };

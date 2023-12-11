@@ -25,6 +25,8 @@ import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {joinDemoSelector} from '../../store/join-demo/join-demo.selector';
+import ModalComponent from '../modal.component';
+import NotInterested from '../not-interested.component';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
@@ -35,16 +37,10 @@ const PostDemoAction = () => {
   const [attended, setAttended] = useState(false);
   const [attendedLoading, setAttendedLoading] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(false);
 
-  const {
-    demoData,
-    bookingDetails,
-    isRated,
-    ratingLoading,
-    nmiLoading,
-    isNmi,
-    customerStage,
-  } = useSelector(joinDemoSelector);
+  const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
+    useSelector(joinDemoSelector);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -180,6 +176,8 @@ const PostDemoAction = () => {
     navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
   };
 
+  const onClose = () => setVisible(false);
+
   // UI Constants
   const RATING_STARS = useMemo(() => {
     return Array.from({length: 5}, (_, i) => {
@@ -244,9 +242,9 @@ const PostDemoAction = () => {
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
-              onPress={rescheduleFreeClass}>
+              onPress={() => setVisible(true)}>
               <TextWrapper color="rgb(14, 113, 195)" fs={18}>
-                Reschedule
+                Not interested
               </TextWrapper>
             </Pressable>
           </View>
@@ -337,6 +335,12 @@ const PostDemoAction = () => {
           </Pressable>
         </View>
       )}
+      <ModalComponent
+        visible={visible}
+        animationType="slide"
+        onRequestClose={onClose}>
+        <NotInterested onClose={onClose} bookingDetails={bookingDetails} />
+      </ModalComponent>
     </View>
   );
 };
