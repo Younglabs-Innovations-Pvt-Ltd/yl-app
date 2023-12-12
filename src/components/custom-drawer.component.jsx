@@ -27,6 +27,10 @@ import Share from 'react-native-share';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 import {i18nContext} from '../context/lang.context';
+import {authSelector} from '../store/auth/selector';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Snackbar from 'react-native-snackbar';
+import auth from '@react-native-firebase/auth';
 
 const WEBSITE_URL = 'https://www.younglabs.in/';
 
@@ -34,12 +38,14 @@ const CustomDrawerContent = ({navigation, ...props}) => {
   const {localLang} = i18nContext();
   const dispatch = useDispatch();
   const {bookingDetails, demoPhoneNumber} = useSelector(joinDemoSelector);
+  const {user} = useSelector(authSelector);
   const windowDimensions = useWindowDimensions();
 
   if (!bookingDetails) return null;
 
   const handleLogout = async () => {
     try {
+      await auth().signOut();
       await AsyncStorage.removeItem(LOCAL_KEYS.PHONE);
       await AsyncStorage.removeItem(LOCAL_KEYS.COUNTDOWN_NOTIFICATION);
       await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
@@ -47,6 +53,8 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN_EXPIRE);
       await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN);
       await AsyncStorage.removeItem(LOCAL_KEYS.NMI);
+      await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
+      await AsyncStorage.removeItem(LOCAL_KEYS.IS_RATED);
       await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
       await cancleNotifications();
 
@@ -125,6 +133,15 @@ const CustomDrawerContent = ({navigation, ...props}) => {
     }
   };
 
+  const copyCredentials = cred => {
+    Clipboard.setString(cred);
+    Snackbar.show({
+      text: 'Copied.',
+      textColor: COLORS.white,
+      duration: Snackbar.LENGTH_SHORT,
+    });
+  };
+
   return (
     <DrawerContentScrollView {...props}>
       <View
@@ -139,6 +156,43 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             </TextWrapper>
             <TextWrapper>{demoPhoneNumber}</TextWrapper>
           </View>
+          {user && user?.customer === 'yes' && (
+            <View style={{paddingVertical: 8, paddingHorizontal: 8}}>
+              <TextWrapper fs={18.5}>Credentials</TextWrapper>
+              <Spacer space={2} />
+              <View>
+                <TextWrapper fs={17} fw="700">
+                  Email:
+                </TextWrapper>
+                <View
+                  style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+                  <TextWrapper fs={16.5}>{user?.email}</TextWrapper>
+                  <Icon
+                    name="copy-outline"
+                    size={24}
+                    color={'gray'}
+                    onPress={() => copyCredentials(user?.email)}
+                  />
+                </View>
+              </View>
+              <View>
+                <TextWrapper fs={17} fw="700">
+                  Password:
+                </TextWrapper>
+                <View
+                  style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+                  <TextWrapper
+                    fs={16.5}>{`younglabs${user?.leadId}`}</TextWrapper>
+                  <Icon
+                    name="copy-outline"
+                    size={24}
+                    color={'gray'}
+                    onPress={() => copyCredentials(`younglabs${user?.leadId}`)}
+                  />
+                </View>
+              </View>
+            </View>
+          )}
           <View style={{flex: 1, justifyContent: 'center'}}>
             <TextWrapper fs={20} styles={{textAlign: 'center'}}>
               {localLang.drawerWebsiteText}

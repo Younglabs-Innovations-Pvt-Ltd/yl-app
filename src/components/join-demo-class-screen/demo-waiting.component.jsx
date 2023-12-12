@@ -1,11 +1,12 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Dimensions, StyleSheet, View} from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import CountDown from '../countdown.component';
 import Spacer from '../spacer.component';
 import {COLORS} from '../../utils/constants/colors';
 import {useSelector} from 'react-redux';
 import {i18nContext} from '../../context/lang.context';
+import UploadHandwriting from '../upload-handwriting.component';
 
 const months = [
   'Jan',
@@ -21,6 +22,8 @@ const months = [
   'Nov',
   'Dec',
 ];
+
+const {width: deviceWidth} = Dimensions.get('window');
 
 const getClassDate = seconds => {
   const date = new Date(seconds * 1000);
@@ -50,35 +53,26 @@ const DemoWaiting = ({timeLeft}) => {
   return (
     <View
       style={{
-        paddingVertical: 12,
-        backgroundColor: COLORS.pgreen,
-        paddingHorizontal: 8,
-        borderRadius: 4,
-        marginBottom: 12,
+        width: deviceWidth * 0.9,
       }}>
-      <TextWrapper color={COLORS.white}>
-        Your class is on{' '}
-        <TextWrapper color={COLORS.white} fw="bold">
-          {getClassDate(seconds)}
+      <View
+        style={{
+          paddingVertical: 6,
+          backgroundColor: COLORS.pgreen,
+          paddingHorizontal: 8,
+          borderRadius: 4,
+          marginBottom: 12,
+        }}>
+        <TextWrapper color={COLORS.white} fs={14}>
+          Your class is on{' '}
+          <TextWrapper color={COLORS.white} fw="bold">
+            {getClassDate(seconds)}
+          </TextWrapper>
         </TextWrapper>
-      </TextWrapper>
-      <CountDown timeLeft={timeLeft} />
-      {/* <Spacer space={4} />
-      <TextWrapper
-        color={'gray'}
-        fs={
-          15
-        }>{`Once this timer ends Click on ENTER CLASS button (shown after timer ends)`}</TextWrapper>
-      <View>
-        <Spacer space={6} />
-        <TextWrapper
-          fs={20}>{`${localLang.classRequirementHeading}:`}</TextWrapper>
-        <View style={styles.listStyle}>
-          <View style={styles.listItem}>
-            <TextWrapper fs={18}>{localLang.classRequirementText}</TextWrapper>
-          </View>
-        </View>
-      </View> */}
+        <CountDown timeLeft={timeLeft} />
+      </View>
+      {/* <Spacer space={4} /> */}
+      <UploadHandwriting demoData={demoData} />
     </View>
   );
 };

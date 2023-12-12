@@ -226,6 +226,7 @@ export const markNotInterest = async ({leadId, comment, name, phone}) => {
   });
 };
 
+// Get available coupon codes
 export const getOfferCode = async ({token}) => {
   return await fetch(`${BASE_URL}/offers/activeoffers`, {
     method: 'GET',
@@ -233,5 +234,27 @@ export const getOfferCode = async ({token}) => {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + token,
     },
+  });
+};
+
+// Check for customer
+export const getCustomers = async ({leadId}) => {
+  return await fetch(`${BASE_URL}/admin/customers/checkCustomer`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({leadId}),
+  });
+};
+
+// Save handwriting sample
+export const saveHandwritingSample = async ({bookingId, image}) => {
+  return await fetch(`${BASE_URL}/admin/demobook/uploadHandwritigSample`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({bookingId, image}),
   });
 };

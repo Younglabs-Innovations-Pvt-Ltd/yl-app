@@ -82,6 +82,7 @@ function App() {
     try {
       const phone = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
       // const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
+      console.log('phone', phone);
       let token;
       if (user) {
         const tokenResult = await auth().currentUser.getIdTokenResult();
@@ -188,12 +189,16 @@ function App() {
 
   if (loading) return null;
 
+  console.log('isphone', isPhone);
+
   // UI Constants
   let initialRouteName = SCREEN_NAMES.WELCOME;
 
   if (isPhone || bookingId) {
     initialRouteName = SCREEN_NAMES.MAIN;
   }
+
+  console.log('initialRouteName', initialRouteName);
 
   return (
     // Provider for language

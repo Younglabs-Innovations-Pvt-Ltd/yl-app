@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.roboto,
   },
   timeText: {
-    fontSize: 40,
+    fontSize: 32,
     color: COLORS.white,
     fontFamily: FONTS.bigShoulders_semibold,
   },

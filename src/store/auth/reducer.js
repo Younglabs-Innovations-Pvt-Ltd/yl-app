@@ -8,6 +8,7 @@ const INITIAL_STATE = {
   message: '',
   confirm: null,
   email: '',
+  user: null,
 };
 
 const reducers = {
@@ -47,6 +48,10 @@ const reducers = {
   setEmail(state, action) {
     state.email = action.payload;
   },
+  fetchUser(state, action) {},
+  setUser(state, action) {
+    state.user = action.payload;
+  },
 };
 
 const authSlice = createSlice({
@@ -66,6 +71,8 @@ export const {
   setAuthToken,
   setFailedVerification,
   setEmail,
+  fetchUser,
+  setUser,
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

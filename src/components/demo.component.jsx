@@ -168,7 +168,9 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
           style={{
             paddingVertical: 16,
           }}>
-          <TextWrapper fs={20}>{localLang.rescheduleText}</TextWrapper>
+          <TextWrapper color={COLORS.white} fs={20}>
+            {localLang.rescheduleText}
+          </TextWrapper>
           <Spacer />
           <Button
             textColor={COLORS.white}
@@ -183,7 +185,7 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
         // If user attended demo class
         // Demo has ended
         // Show post action after demo class
-        showPostActions && <PostDemoAction />
+        showPostActions && <PostDemoAction rescheduleClass={onOpen} />
       }
 
       <Modal animationType="fade" visible={open} onRequestClose={onClose}>

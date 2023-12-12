@@ -19,8 +19,6 @@ import {
   setPhoneAsync,
   setDemoData,
   setShowJoinButton,
-  setDemoPhone,
-  setBookingDetailSuccess,
 } from '../store/join-demo/join-demo.reducer';
 import {resetCurrentNetworkState} from '../store/network/reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
@@ -58,8 +56,7 @@ import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 
 import auth from '@react-native-firebase/auth';
-import {setAuthToken} from '../store/auth/reducer';
-import {authSelector} from '../store/auth/selector';
+import {fetchUser, setAuthToken} from '../store/auth/reducer';
 
 const INITIAL_TIME = {
   days: 0,
@@ -162,7 +159,6 @@ const HomeScreen = ({navigation}) => {
   } = useSelector(networkSelector);
 
   const {ipData} = useSelector(bookDemoSelector);
-  const {email} = useSelector(authSelector);
 
   async function onAuthStateChanged(user) {
     if (user) {
@@ -175,6 +171,7 @@ const HomeScreen = ({navigation}) => {
     }
   }
 
+  // Auth listener
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber;
@@ -193,6 +190,13 @@ const HomeScreen = ({navigation}) => {
       appState.remove();
     };
   }, []);
+
+  // Check for customer
+  useEffect(() => {
+    if (bookingDetails) {
+      dispatch(fetchUser({leadId: bookingDetails?.leadId}));
+    }
+  }, [bookingDetails]);
 
   /**
    * @author Shobhit
@@ -230,12 +234,6 @@ const HomeScreen = ({navigation}) => {
       dispatch(startFetchingIpData());
     }
   }, [ipData]);
-
-  // Check if lead converted to customer
-  useEffect(() => {
-    if (email) {
-    }
-  }, [email]);
 
   /**
    * @author Shobhit
@@ -415,12 +413,12 @@ const HomeScreen = ({navigation}) => {
   const handleShowDrawer = () => navigation.openDrawer();
 
   // Reschedule a class
-  const rescheduleFreeClass = () => {
-    const {childAge, parentName, phone, childName} = bookingDetails;
-    const formFields = {childAge, parentName, phone, childName};
+  // const rescheduleFreeClass = () => {
+  //   const {childAge, parentName, phone, childName} = bookingDetails;
+  //   const formFields = {childAge, parentName, phone, childName};
 
-    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
-  };
+  //   navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
+  // };
 
   if (!isConnected) {
     Alert.alert(
@@ -710,7 +708,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   header: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

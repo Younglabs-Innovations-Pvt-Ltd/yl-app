@@ -326,6 +326,7 @@ const DemoClassScreen = ({navigation}) => {
         const tokenResult = await auth().currentUser.getIdTokenResult();
         dispatch(setAuthToken(tokenResult.token));
         setLoading(false);
+        setVisible(false);
         navigation.replace(SCREEN_NAMES.MAIN);
       } catch (error) {
         setLoading(false);

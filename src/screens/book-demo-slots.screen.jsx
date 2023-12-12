@@ -356,29 +356,27 @@ export default BookDemoSlots;
 const Popup = ({onHandlePopup, popup}) => {
   return (
     <View style={styles.modal} visible={popup}>
-      <Center>
-        <View style={styles.popup}>
-          <Icon
-            name="checkmark"
-            size={54}
-            color={COLORS.pgreen}
-            style={{alignSelf: 'center'}}
-          />
-          <TextWrapper styles={{textAlign: 'center'}}>
-            Congratulation your free class booking successful
-          </TextWrapper>
-          <Spacer />
-          <View>
-            <Button
-              bg={COLORS.orange}
-              textColor={COLORS.white}
-              rounded={4}
-              onPress={onHandlePopup}>
-              Continue
-            </Button>
-          </View>
+      <View style={styles.popup}>
+        <Icon
+          name="checkmark"
+          size={54}
+          color={COLORS.pgreen}
+          style={{alignSelf: 'center'}}
+        />
+        <TextWrapper styles={{textAlign: 'center'}}>
+          Congratulation your free class booking successful
+        </TextWrapper>
+        <Spacer />
+        <View>
+          <Button
+            bg={COLORS.orange}
+            textColor={COLORS.white}
+            rounded={4}
+            onPress={onHandlePopup}>
+            Continue
+          </Button>
         </View>
-      </Center>
+      </View>
     </View>
   );
 };
@@ -425,7 +423,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.25)',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 30,
+    // justifyContent: 'center',
   },
   btnBookAgain: {
     width: '100%',

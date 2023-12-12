@@ -32,7 +32,7 @@ const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
-const PostDemoAction = () => {
+const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
   const [attended, setAttended] = useState(false);
   const [attendedLoading, setAttendedLoading] = useState(true);
@@ -111,6 +111,7 @@ const PostDemoAction = () => {
         const nmi = await AsyncStorage.getItem(LOCAL_KEYS.NMI);
         console.log('nmi', nmi);
         if (nmi) {
+          console.log('hit NMI');
           dispatch(setNMI(true));
         }
 
@@ -235,7 +236,6 @@ const PostDemoAction = () => {
                 Yes attended
               </TextWrapper>
             </Pressable>
-            <Spacer space={6} />
             <Pressable
               style={({pressed}) => [
                 styles.paButton,
@@ -243,9 +243,9 @@ const PostDemoAction = () => {
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
-              onPress={() => setVisible(true)}>
+              onPress={rescheduleClass}>
               <TextWrapper color="rgb(14, 113, 195)" fs={18}>
-                Not interested
+                Reschedule
               </TextWrapper>
             </Pressable>
           </View>
@@ -278,16 +278,6 @@ const PostDemoAction = () => {
             handwriting?
           </TextWrapper>
           <View style={styles.ctas}>
-            {/* {isAllowToReschedule && (
-              <Pressable
-                style={({pressed}) => [
-                  styles.ctaButton,
-                  {opacity: pressed ? 0.8 : 1},
-                ]}
-                onPress={rescheduleFreeClass}>
-                <TextWrapper>Reschedule a new class</TextWrapper>
-              </Pressable>
-            )} */}
             <Pressable
               style={({pressed}) => [
                 styles.ctaButton,
@@ -298,6 +288,16 @@ const PostDemoAction = () => {
               {/* <MIcon name="whatsapp" size={22} color={COLORS.pgreen} /> */}
               <TextWrapper>Yes, need more info</TextWrapper>
               {NMI_LOADING}
+            </Pressable>
+            <Pressable
+              style={({pressed}) => [
+                styles.paButton,
+                {
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+              onPress={() => setVisible(true)}>
+              <TextWrapper>Yes, need more info</TextWrapper>
             </Pressable>
           </View>
         </View>
@@ -383,8 +383,7 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
   },
   paButtons: {
-    flexDirection: 'row',
-    gap: 8,
+    gap: 12,
   },
   paButton: {
     paddingHorizontal: 22,

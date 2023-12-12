@@ -7,10 +7,13 @@ import {
   setConfirm,
   verifyCode,
   setFailedVerification,
+  fetchUser,
+  setUser,
 } from './reducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/storage/local-storage-keys';
 import {isValidNumber} from '../../utils/isValidNumber';
+import {getCustomers} from '../../utils/api/yl.api';
 
 function* phoneAuthentication({payload: {phone, country}}) {
   try {
@@ -55,6 +58,17 @@ function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
   }
 }
 
+function* fetchUserSaga({payload: {leadId}}) {
+  try {
+    const res = yield getCustomers({leadId});
+    const data = yield res.json();
+    console.log('uesrs', data.data.customer);
+    yield put(setUser(data.data));
+  } catch (error) {
+    console.log('FETCH_USER_ERROR', error.message);
+  }
+}
+
 // listeners
 function* startAuthentication() {
   yield takeLatest(phoneAuthStart.type, phoneAuthentication);
@@ -64,6 +78,14 @@ function* startCodeVerification() {
   yield takeLatest(verifyCode.type, verifyCodeVerification);
 }
 
+function* fetchUserListener() {
+  yield takeLatest(fetchUser.type, fetchUserSaga);
+}
+
 export function* authSaga() {
-  yield all([call(startAuthentication), call(startCodeVerification)]);
+  yield all([
+    call(startAuthentication),
+    call(startCodeVerification),
+    call(fetchUserListener),
+  ]);
 }
