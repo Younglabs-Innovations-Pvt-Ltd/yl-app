@@ -36,7 +36,6 @@ import {
 } from './join-demo.reducer';
 
 import {BASE_URL} from '@env';
-import {setCountdownTriggerNotification} from '../../utils/notifications';
 import {startCallComposite} from '../../natiive-modules/team-module';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';

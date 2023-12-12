@@ -138,14 +138,6 @@ const PostDemoAction = () => {
     handleSaveRating(rate);
   };
 
-  const redirectToWebsiteToBuyCourse = async () => {
-    try {
-      await Linking.openURL(COURSE_URL);
-    } catch (error) {
-      console.log('POST_DEMO_ACTIONS_REDIRECT_ERROR=', error);
-    }
-  };
-
   // Marked need more info
   const markNeedMoreInfo = async () => {
     dispatch(markNMI({bookingId: demoData.bookingId}));
@@ -188,7 +180,13 @@ const PostDemoAction = () => {
               rating ? (i < rating ? 'star' : 'star-outline') : 'star-outline'
             }
             size={32}
-            color={rating ? (i < rating ? COLORS.pgreen : 'gray') : 'gray'}
+            color={
+              rating
+                ? i < rating
+                  ? COLORS.pgreen
+                  : COLORS.white
+                : COLORS.white
+            }
           />
         </Pressable>
       );
@@ -211,7 +209,10 @@ const PostDemoAction = () => {
   if (ratingLoading || attendedLoading || loading) return null;
 
   return (
-    <View style={{width: '100%'}}>
+    <View
+      style={{
+        width: '100%',
+      }}>
       {!attended && (
         <View style={styles.paContainer}>
           <TextWrapper
@@ -253,14 +254,16 @@ const PostDemoAction = () => {
       {!isRated && attended && (
         <View style={styles.ratingContainer}>
           <TextWrapper
-            fs={24}
+            fs={22}
             color={COLORS.pgreen}
             fw="600"
             styles={{textAlign: 'center'}}>
             Congratulations for attending your free class.
           </TextWrapper>
           <View style={styles.ratingWrapper}>
-            <TextWrapper fs={20}>Please rate your class experience</TextWrapper>
+            <TextWrapper fs={18} color={COLORS.white}>
+              Please rate your class experience
+            </TextWrapper>
             <View style={styles.starsContainer}>{RATING_STARS}</View>
           </View>
         </View>
@@ -275,7 +278,7 @@ const PostDemoAction = () => {
             handwriting?
           </TextWrapper>
           <View style={styles.ctas}>
-            {isAllowToReschedule && (
+            {/* {isAllowToReschedule && (
               <Pressable
                 style={({pressed}) => [
                   styles.ctaButton,
@@ -284,7 +287,7 @@ const PostDemoAction = () => {
                 onPress={rescheduleFreeClass}>
                 <TextWrapper>Reschedule a new class</TextWrapper>
               </Pressable>
-            )}
+            )} */}
             <Pressable
               style={({pressed}) => [
                 styles.ctaButton,
@@ -296,15 +299,6 @@ const PostDemoAction = () => {
               <TextWrapper>Yes, need more info</TextWrapper>
               {NMI_LOADING}
             </Pressable>
-            {/* <Pressable
-              style={({pressed}) => [
-                styles.ctaButton,
-                {opacity: pressed ? 0.8 : 1},
-              ]}
-              onPress={redirectToWebsiteToBuyCourse}>
-              <MIcon name="web" size={22} color={COLORS.black} />
-              <TextWrapper>No I don't want</TextWrapper>
-            </Pressable> */}
           </View>
         </View>
       )}
@@ -364,8 +358,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ctasWrapper: {
-    // paddingVertical: 12,
-    paddingBottom: 20,
+    padding: 16,
   },
   ctas: {
     gap: 8,

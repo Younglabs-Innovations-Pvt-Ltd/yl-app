@@ -25,6 +25,7 @@ import ModalComponent from '../components/modal.component';
 import Icon from '../components/icon.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {resetCourseDetails} from '../store/course/course.reducer';
+import {getOfferCode} from '../utils/api/yl.api';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -33,6 +34,12 @@ const Payment = ({navigation}) => {
   const [emailErr, setEmailErr] = useState('');
   const [dateTime, setDateTime] = useState('');
   const [visible, setVisible] = useState(false);
+  const [offerCodes, setOfferCodes] = useState([]);
+  const [couponCode, setCouponCode] = useState('');
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [amount, setAmount] = useState(0);
+  const [couponMsg, setCouponMsg] = useState('');
 
   useEffect(() => {
     if (currentSelectedBatch) {
@@ -54,14 +61,28 @@ const Payment = ({navigation}) => {
 
   const {loading, payment, message} = useSelector(paymentSelector);
 
-  console.log('paymentLoding', loading);
-  console.log('payment', payment);
-
   const {bookingDetails} = useSelector(joinDemoSelector);
   const {ipData} = useSelector(bookDemoSelector);
   const {token} = useSelector(authSelector);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setAmount(price);
+  }, [price]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchOfferCodes = async () => {
+      const response = await getOfferCode({token});
+      const codes = await response.json();
+      console.log('offer codes: ', codes);
+      setOfferCodes(codes?.offerCodes);
+    };
+
+    fetchOfferCodes();
+  }, [token]);
 
   useEffect(() => {
     if (payment === MESSAGES.PAYMENT_SUCCESS) {
@@ -75,22 +96,73 @@ const Payment = ({navigation}) => {
       return;
     }
 
-    dispatch(
-      startMakePayment({
-        price,
-        strikeThroughPrice,
-        currentSelectedBatch,
-        levelText,
-        ipData,
-        bookingDetails,
-        courseDetails,
-        email,
-        token,
-      }),
-    );
+    const body = {
+      price,
+      strikeThroughPrice,
+      currentSelectedBatch,
+      levelText,
+      ipData,
+      bookingDetails,
+      courseDetails,
+      email,
+      token,
+    };
+
+    if (selectedCoupon) {
+      body.offerCode = selectedCoupon.offerCode;
+    }
+
+    if (couponApplied) {
+      body.discountedPrice = amount;
+    }
+
+    dispatch(startMakePayment(body));
 
     setEmailErr('');
   };
+
+  const applyCouponCode = () => {
+    if (!couponCode || couponApplied) {
+      return;
+    }
+    console.log('hit');
+
+    const matchCoupons = offerCodes?.find(item => {
+      return item.offerCode === couponCode;
+    });
+
+    console.log('matchCoupons', matchCoupons);
+
+    if (matchCoupons) {
+      setSelectedCoupon(matchCoupons);
+      console.log('item matched');
+
+      if (matchCoupons?.discountType === 'flat') {
+        console.log('flat coupon');
+        setAmount(price - matchCoupons?.discountValue);
+        setCouponApplied(true);
+      } else if (matchCoupons?.discountType === 'percentage') {
+        console.log('percentage coupon');
+        setAmount(
+          parseInt(price - price * (matchCoupons?.discountValue / 100)),
+        ),
+          setCouponApplied(true);
+      }
+
+      setCouponMsg('');
+    } else {
+      setSelectedCoupon(null);
+      setCouponMsg('Coupon Not Found');
+      console.log('item not found');
+    }
+  };
+
+  const clearAppliedCode = () => {
+    setAmount(price);
+    setCouponApplied(false);
+  };
+
+  // console.log('selectedCoupon', selectedCoupon);
 
   const onClose = () => setVisible(false);
 
@@ -170,6 +242,48 @@ const Payment = ({navigation}) => {
             </TextWrapper>
           )}
         </View>
+        <Spacer space={4} />
+        <View style={styles.card}>
+          {couponApplied && (
+            <TextWrapper fw="700" fs={14} color={COLORS.pgreen}>
+              Applied
+            </TextWrapper>
+          )}
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 8,
+            }}>
+            <TextInput
+              placeholder="Coupon code"
+              style={[styles.emailInput, {flex: 1}]}
+              autoCorrect={false}
+              autoCapitalize="none"
+              keyboardType="default"
+              value={couponCode}
+              onChangeText={e => setCouponCode(e)}
+            />
+            <Pressable
+              style={{
+                padding: 4,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: StyleSheet.hairlineWidth,
+                borderRadius: 4,
+                borderColor: 'gray',
+              }}
+              onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
+              <TextWrapper fs={18}>
+                {couponApplied ? 'Clear' : 'Apply'}
+              </TextWrapper>
+            </Pressable>
+          </View>
+          {couponMsg && (
+            <TextWrapper fs={14} color={COLORS.pred}>
+              {couponMsg}
+            </TextWrapper>
+          )}
+        </View>
       </ScrollView>
       <View style={{padding: 12}}>
         <View style={styles.card}>
@@ -182,7 +296,7 @@ const Payment = ({navigation}) => {
             <TextWrapper fs={18}>Total</TextWrapper>
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
               <TextWrapper
-                fs={20}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
+                fs={20}>{`${ipData?.currency.symbol}${amount}`}</TextWrapper>
               <TextWrapper
                 styles={{textDecorationLine: 'line-through'}}
                 fs={

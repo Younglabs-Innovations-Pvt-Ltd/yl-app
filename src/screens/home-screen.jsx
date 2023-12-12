@@ -9,6 +9,7 @@ import {
   FlatList,
   Dimensions,
   Image,
+  AppState,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -18,6 +19,8 @@ import {
   setPhoneAsync,
   setDemoData,
   setShowJoinButton,
+  setDemoPhone,
+  setBookingDetailSuccess,
 } from '../store/join-demo/join-demo.reducer';
 import {resetCurrentNetworkState} from '../store/network/reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
@@ -82,13 +85,6 @@ const getTimeRemaining = bookingDate => {
 
   return {days, hours, minutes, seconds, remainingTime};
 };
-
-const image1 =
-  'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D';
-const image2 =
-  'https://media.istockphoto.com/id/1410336911/photo/back-view-of-little-girl-attending-a-class-in-elementary-school.webp?b=1&s=170667a&w=0&k=20&c=ZX4SkJF68Ohe3dV2fxZQgKhf8fud1lnpxXWamS1EwFc=';
-const image3 =
-  'https://media.istockphoto.com/id/1402788196/photo/smiling-teacher-and-little-child-talking-and-playing-at-preschool.webp?b=1&s=170667a&w=0&k=20&c=8lvYGQ1mv6p4rfS3uoPkj6O_GDlGeFnhDzYzWe3x6ck=';
 
 const sliderData = [
   {
@@ -182,6 +178,20 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber;
+  }, []);
+
+  useEffect(() => {
+    const handleAppStateChange = nextAppState => {
+      console.log('appState', nextAppState);
+      if (nextAppState === 'active') {
+      }
+    };
+
+    const appState = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      appState.remove();
+    };
   }, []);
 
   /**

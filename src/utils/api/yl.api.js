@@ -225,3 +225,13 @@ export const markNotInterest = async ({leadId, comment, name, phone}) => {
     body: JSON.stringify({leadId, comment, phone, name}),
   });
 };
+
+export const getOfferCode = async ({token}) => {
+  return await fetch(`${BASE_URL}/offers/activeoffers`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token,
+    },
+  });
+};

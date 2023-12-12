@@ -15,7 +15,7 @@ import {setEmail} from '../auth/reducer';
 import {savePaymentSource} from '../../utils/api/yl.api';
 
 const BASE_URL =
-  'https://be15-2401-4900-1c5b-616b-c5ab-803-6889-37e3.ngrok-free.app';
+  'https://b89a-2401-4900-1f39-499e-3453-41c4-85b0-451c.ngrok-free.app';
 
 function* makePaymentSaga({payload}) {
   try {
@@ -72,6 +72,14 @@ function* makePaymentSaga({payload}) {
       timezone,
       countryCode,
     };
+
+    if (payload?.offerCode) {
+      body.offerCode = payload.offerCode;
+    }
+
+    if (payload?.discountedPrice) {
+      body.discountedPrice = payload.discountedPrice;
+    }
 
     const isEmail = yield AsyncStorage.getItem(LOCAL_KEYS.EMAIL);
     if (!isEmail) {
@@ -146,6 +154,7 @@ function* makePaymentSaga({payload}) {
     };
 
     const rzRes = yield RazorpayCheckout.open(options);
+    console.log('rzRes=', rzRes);
     if (rzRes) {
       yield call(savePaymentSource, {
         orderId: rzRes?.razorpay_order_id || order_id,
