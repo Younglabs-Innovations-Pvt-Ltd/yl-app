@@ -24,7 +24,6 @@ import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notifica
 
 import {cancleNotifications} from '../utils/notifications';
 import Share from 'react-native-share';
-import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 import {i18nContext} from '../context/lang.context';
 import {authSelector} from '../store/auth/selector';
@@ -41,22 +40,26 @@ const CustomDrawerContent = ({navigation, ...props}) => {
   const {user} = useSelector(authSelector);
   const windowDimensions = useWindowDimensions();
 
-  if (!bookingDetails) return null;
+  // if (!bookingDetails) return null;
 
   const handleLogout = async () => {
     try {
       await auth().signOut();
-      await AsyncStorage.removeItem(LOCAL_KEYS.PHONE);
-      await AsyncStorage.removeItem(LOCAL_KEYS.COUNTDOWN_NOTIFICATION);
-      await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
-      await AsyncStorage.removeItem(LOCAL_KEYS.CALLING_CODE);
-      await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN_EXPIRE);
-      await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN);
-      await AsyncStorage.removeItem(LOCAL_KEYS.NMI);
-      await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
-      await AsyncStorage.removeItem(LOCAL_KEYS.IS_RATED);
-      await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.PHONE);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.COUNTDOWN_NOTIFICATION);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.CALLING_CODE);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN_EXPIRE);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.NMI);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.IS_RATED);
+      // await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
       await cancleNotifications();
+
+      const keys = await AsyncStorage.getAllKeys();
+      console.log('keys: ', keys);
+      await AsyncStorage.multiRemove(keys);
 
       removeRegisterNotificationTimer();
 
@@ -117,7 +120,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
   const fullName = bookingDetails?.parentName
     ? bookingDetails.parentName.slice(0, 1).toUpperCase() +
       bookingDetails.parentName.slice(1)
-    : null;
+    : '';
 
   const shareApp = async () => {
     const message =

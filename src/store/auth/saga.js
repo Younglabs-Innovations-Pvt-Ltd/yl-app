@@ -36,9 +36,11 @@ function* phoneAuthentication({payload: {phone, country}}) {
   } catch (error) {
     console.log(error);
     if (error.code === 'auth/too-many-requests') {
-      yield put(phoneAuthFailed('Too many attempts, please try again later.'));
+      yield put(
+        phoneAuthFailed('Too many attempts, try again after some time.'),
+      );
     } else {
-      yield put(phoneAuthFailed(error.message));
+      yield put(phoneAuthFailed('Something went wrong, try again later.'));
     }
   }
 }
@@ -53,7 +55,9 @@ function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
     if (error.code === 'auth/invalid-verification-code') {
       yield put(setFailedVerification('Invalid verification code.'));
     } else {
-      yield put(setFailedVerification(error.message));
+      yield put(
+        setFailedVerification('Something went wrong, try again later.'),
+      );
     }
   }
 }
@@ -65,7 +69,7 @@ function* fetchUserSaga({payload: {leadId}}) {
     console.log('uesrs', data.data.customer);
     yield put(setUser(data.data));
   } catch (error) {
-    console.log('FETCH_USER_ERROR', error.message);
+    console.log('FETCH_USER_ERROR', 'Something went wrong, try again later.');
   }
 }
 

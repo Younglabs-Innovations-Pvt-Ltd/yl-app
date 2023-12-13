@@ -13,9 +13,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import {MESSAGES} from '../../utils/constants/messages';
 import {setEmail} from '../auth/reducer';
 import {savePaymentSource} from '../../utils/api/yl.api';
-
-const BASE_URL =
-  'https://b89a-2401-4900-1f39-499e-3453-41c4-85b0-451c.ngrok-free.app';
+import {BASE_URL} from '@env';
 
 function* makePaymentSaga({payload}) {
   try {

@@ -14,6 +14,7 @@ const INITIAL_STATE = {
 const reducers = {
   phoneAuthStart(state) {
     state.loading = true;
+    state.message = '';
   },
   phoneAuthSuccess(state, action) {
     state.loading = false;
@@ -40,6 +41,8 @@ const reducers = {
   },
   setAuthToken(state, action) {
     state.token = action.payload;
+    state.message = '';
+    state.confirm = null;
   },
   setFailedVerification(state, action) {
     state.verificationLoading = false;

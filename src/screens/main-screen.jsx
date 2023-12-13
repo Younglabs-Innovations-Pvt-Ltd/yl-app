@@ -20,6 +20,10 @@ function ContactScreen() {
   return <></>;
 }
 
+function ShareScreen() {
+  return <></>;
+}
+
 const MainScreen = ({route}) => {
   const data = route.params;
   const dispatch = useDispatch();
@@ -63,6 +67,14 @@ const MainScreen = ({route}) => {
         options={{
           headerShown: false,
           tabBarLabel: localLang.tabNavHome,
+        }}
+      />
+      <Tab.Screen
+        name="Share"
+        component={ShareScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: 'Share',
         }}
       />
       <Tab.Screen

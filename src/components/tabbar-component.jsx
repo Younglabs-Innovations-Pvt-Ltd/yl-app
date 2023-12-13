@@ -4,6 +4,8 @@ import TextWrapper from './text-wrapper.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../utils/constants/colors';
 import CustomerSupportActions from './customer-support-actions';
+import Icon from './icon.component';
+import Share from 'react-native-share';
 
 const Icons = (name, focused) => {
   switch (name) {
@@ -24,6 +26,20 @@ const Icons = (name, focused) => {
       );
     default:
       return;
+  }
+};
+
+const shareApp = async () => {
+  const message =
+    'Book a free english handwriting class for your child conducted by experts.';
+  const url = 'https://play.google.com/store/apps/details?id=com.younglabs';
+  try {
+    await Share.open({
+      title: 'Younglabs',
+      message: `${message} \n Download app now: ${url}`,
+    });
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -75,6 +91,32 @@ function Tabbar({state, descriptors, navigation}) {
                   name="headset"
                   size={24}
                   color={isFocused ? COLORS.pgreen : '#222'}
+                />
+                <TextWrapper
+                  fw="600"
+                  fs={14}
+                  color={isFocused ? COLORS.pgreen : '#222'}>
+                  {label}
+                </TextWrapper>
+              </Pressable>
+            );
+          }
+
+          if (route.name === 'Share') {
+            return (
+              <Pressable
+                key={route.key}
+                accessibilityRole="button"
+                accessibilityState={isFocused ? {selected: true} : {}}
+                accessibilityLabel={options.tabBarAccessibilityLabel}
+                testID={options.tabBarTestID}
+                onPress={shareApp}
+                style={{flex: 1, alignItems: 'center'}}>
+                <Icon
+                  key={route.key}
+                  name="share-social-outline"
+                  size={24}
+                  color={COLORS.black}
                 />
                 <TextWrapper
                   fw="600"

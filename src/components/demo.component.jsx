@@ -122,10 +122,10 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   }, [cn, childName, message]);
 
   const NEW_BOOKING = useMemo(() => {
-    if (demoData?.message === 'Booking not found') {
+    if (demoData?.message === 'Booking not found' || !demoData) {
       return (
-        <View>
-          <TextWrapper fs={20}>
+        <View style={{paddingTop: 20}}>
+          <TextWrapper fs={20} color={COLORS.white}>
             Book your first free Handwriting Class.
           </TextWrapper>
           <Spacer />
@@ -142,6 +142,8 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
       return null;
     }
   }, [demoData, onOpenForm]);
+
+  console.log('demoData', demoData);
 
   return (
     <View style={styles.contentWrapper}>

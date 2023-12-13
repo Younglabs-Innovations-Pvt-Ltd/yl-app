@@ -104,7 +104,8 @@ const styles = StyleSheet.create({
     width: ITEM_WIDTH,
     padding: 16,
     borderRadius: 6,
-    elevation: 1.25,
+    borderWidth: 1,
+    borderColor: 'gray',
   },
   reviewRow: {
     flexDirection: 'row',

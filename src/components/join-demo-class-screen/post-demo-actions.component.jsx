@@ -297,7 +297,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 },
               ]}
               onPress={() => setVisible(true)}>
-              <TextWrapper>Yes, need more info</TextWrapper>
+              <TextWrapper>No, I don't want</TextWrapper>
             </Pressable>
           </View>
         </View>

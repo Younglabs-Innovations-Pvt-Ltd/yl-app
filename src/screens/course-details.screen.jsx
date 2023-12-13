@@ -155,7 +155,6 @@ const CourseDetails = ({navigation}) => {
 
   const onReadyForDisplay = () => {
     setVideoLoading(false);
-    setPaused(true);
   };
 
   console.log('course', selectedCourse);
@@ -181,7 +180,7 @@ const CourseDetails = ({navigation}) => {
             source={{uri: videoUri}}
             style={styles.video}
             muted={muted}
-            paused={paused}
+            // paused={paused}
             resizeMode="cover"
             onLoadStart={onLoadStart}
             onReadyForDisplay={onReadyForDisplay}
