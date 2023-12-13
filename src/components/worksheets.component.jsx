@@ -1,4 +1,4 @@
-import React, {useRef, useState, useMemo} from 'react';
+import React, {useRef, useState, useMemo, useEffect} from 'react';
 import {
   StyleSheet,
   Pressable,
@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
-  Dimensions,
   Image,
   ScrollView,
 } from 'react-native';
@@ -21,25 +20,27 @@ import {request, PERMISSIONS} from 'react-native-permissions';
 import FileViewer from 'react-native-file-viewer';
 
 import WorksheetIcon from '../assets/icons/document.png';
-
-const {width: deviceWidth} = Dimensions.get('window');
-
-const worksheets = [
-  {
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/worksheets%2FEnglish%20demo%20worksheets%20for%20app.pdf?alt=media&token=72fb6e92-7271-499f-84d7-8389a01b3eba',
-    name: 'younglab-english-worksheet',
-    title: 'English Cursive',
-  },
-  {
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/worksheets%2FHindi%20demo%20worksheets%20for%20app.pdf?alt=media&token=3c35d502-94a2-4eea-b30e-acf8600fd321',
-    name: 'younglab-hindi-worksheet',
-    title: 'Hindi',
-  },
-];
+import {getAppWorksheets} from '../utils/api/yl.api';
 
 const Worksheets = () => {
   const [openWorksheet, setOpenWorkSheet] = useState(false);
+  const [worksheets, setWorkSheets] = useState([]);
   const currentWorksheet = useRef();
+
+  // App content
+  useEffect(() => {
+    const fetchAppWorksheets = async () => {
+      try {
+        const res = await getAppWorksheets();
+        const {data} = await res.json();
+        setWorkSheets(data);
+      } catch (error) {
+        console.log('FETCH_APP_TESTIMONIALS_ERROR', error.message);
+      }
+    };
+
+    fetchAppWorksheets();
+  }, []);
 
   const onOpenWorksheet = item => {
     currentWorksheet.current = item;
@@ -209,7 +210,9 @@ const WorksheetItem = ({item, index, onOpenWorksheet, downloadWorksheet}) => {
       <View style={{width: 58, height: 58, marginBottom: 4}}>
         <Image style={styles.icon} source={WorksheetIcon} />
       </View>
-      <TextWrapper fs={14}>{item.title}</TextWrapper>
+      <TextWrapper fs={14} styles={{textTransform: 'capitalize'}}>
+        {item.title}
+      </TextWrapper>
       {/* <View style={styles.pdfOverlay}>
         <View
           style={{

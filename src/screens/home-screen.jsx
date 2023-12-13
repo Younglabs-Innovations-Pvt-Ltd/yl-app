@@ -57,6 +57,7 @@ import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 
 import auth from '@react-native-firebase/auth';
 import {fetchUser, setAuthToken} from '../store/auth/reducer';
+import {getAppTestimonials, getAppWorksheets} from '../utils/api/yl.api';
 
 const INITIAL_TIME = {
   days: 0,
@@ -83,56 +84,6 @@ const getTimeRemaining = bookingDate => {
   return {days, hours, minutes, seconds, remainingTime};
 };
 
-const sliderData = [
-  {
-    id: 1,
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/Testimonials%2FVID-20221216-WA0000.mp4?alt=media&token=03d809aa-17db-4fd3-b33f-f0b5a11df334',
-    text: "Aarav's handwriting and writing speed improved significantly with the help of the english handwriting course. The techniques taught were effective and easy to follow.",
-    poster:
-      'https://images.unsplash.com/photo-1700044929627-a3eb69dd72cf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4fHx8ZW58MHx8fHx8',
-  },
-  {
-    id: 2,
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/Testimonials%2FVideo%20from%20Sanjeev%20(3).mp4?alt=media&token=06c62196-e66e-410a-a6f7-0fb4ec23f187',
-    text: "Thanks to Younglabs, my child's confidence in her studies has increased significantly, and it's showing in her exam results. I am grateful for your assistance in her learning journey.",
-    poster:
-      'https://images.unsplash.com/photo-1700044929627-a3eb69dd72cf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4fHx8ZW58MHx8fHx8',
-  },
-  {
-    id: 3,
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/Testimonials%2FVID-20221218-WA0015.mp4?alt=media&token=80938b38-8a24-4109-9055-5d91fc4764d7',
-    text: "Thanks for your help in my child's learning journey. Younglabs is excellent for kids and has helped my child learn and grow. It was a great learning experience, and we appreciate it.",
-    poster:
-      'https://images.unsplash.com/photo-1700044929627-a3eb69dd72cf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4fHx8ZW58MHx8fHx8',
-  },
-];
-
-const improvementsData = [
-  {
-    id: 1,
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fvideos%2FVID-20231110-WA0005_2.mp4?alt=media&token=6cac75ab-72a5-4543-baf4-bdd09166b3c6',
-    poster:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fposters%2F20231117_140520.jpg?alt=media&token=5229a45d-0385-4283-a0a3-97bab115f7ff',
-  },
-  {
-    id: 2,
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fvideos%2FVID-20231116-WA0000_1.mp4?alt=media&token=2d113ed1-be6c-43f2-ac9d-aac43e885f9b',
-    poster:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fposters%2F20231117_140559.jpg?alt=media&token=1bca0085-c534-4ef4-a776-ae78fe14a2b3',
-  },
-];
-
-const tipsAndTricksData = [
-  {
-    id: 1,
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fvideos%2FVID-20231124-WA0005.mp4?alt=media&token=6f9db89f-86b2-4988-be66-3352a6a271df',
-  },
-  {
-    id: 2,
-    uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/app%2Fvideos%2FVID-20231119-WA0023.mp4?alt=media&token=c30092d2-dfc0-4960-a3a9-ec2a1de76fad',
-  },
-];
-
 const {height: deviceHeight} = Dimensions.get('window');
 
 const HomeScreen = ({navigation}) => {
@@ -140,6 +91,9 @@ const HomeScreen = ({navigation}) => {
   const [isTimeover, setIsTimeover] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [improvementsData, setImprovementsData] = useState([]);
+  const [reviewsData, setReviewsData] = useState([]);
+  const [tipsAndTricksData, setTipsandTricksData] = useState([]);
   const dispatch = useDispatch();
 
   const {
@@ -189,6 +143,26 @@ const HomeScreen = ({navigation}) => {
     return () => {
       appState.remove();
     };
+  }, []);
+
+  // App content
+  useEffect(() => {
+    const fetchAppTestimonials = async () => {
+      try {
+        const res = await getAppTestimonials();
+        const {data} = await res.json();
+        const improvements = data.filter(item => item.type === 'improvements');
+        const reviews = data.filter(item => item.type === 'review');
+        const tips = data.filter(item => item.type === 'tips');
+        setImprovementsData(improvements);
+        setReviewsData(reviews);
+        setTipsandTricksData(tips);
+      } catch (error) {
+        console.log('FETCH_APP_TESTIMONIALS_ERROR', error.message);
+      }
+    };
+
+    fetchAppTestimonials();
   }, []);
 
   // Check for customer
@@ -247,21 +221,21 @@ const HomeScreen = ({navigation}) => {
     }
   }, [demoData]);
 
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(async state => {
-      if (state.isConnected && isConnected) {
-        if (demoPhoneNumber) {
-          dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-        } else if (demoBookingId) {
-          dispatch(startFetchBookingDetailsFromId(demoBookingId));
-        }
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = NetInfo.addEventListener(async state => {
+  //     if (state.isConnected && isConnected) {
+  //       if (demoPhoneNumber) {
+  //         dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+  //       } else if (demoBookingId) {
+  //         dispatch(startFetchBookingDetailsFromId(demoBookingId));
+  //       }
+  //     }
+  //   });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [demoPhoneNumber, demoBookingId, dispatch, isConnected]);
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, [demoPhoneNumber, demoBookingId, dispatch, isConnected]);
 
   /**
    * @author Shobhit
@@ -586,7 +560,11 @@ const HomeScreen = ({navigation}) => {
               <View style={{marginHorizontal: 8}} />
             )}
             renderItem={({item}) => (
-              <VideoPlayer key={item.id.toString()} uri={item.uri} />
+              <VideoPlayer
+                key={item.id.toString()}
+                uri={item.uri}
+                poster={item.poster}
+              />
             )}
           />
         </View>
@@ -625,19 +603,15 @@ const HomeScreen = ({navigation}) => {
           </TextWrapper>
           <Spacer />
           <FlatList
-            data={sliderData}
-            keyExtractor={item => item.id.toString()}
+            data={reviewsData}
+            keyExtractor={item => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
             ItemSeparatorComponent={() => (
               <View style={{marginHorizontal: 8}} />
             )}
             renderItem={({item}) => (
-              <VideoPlayer
-                key={item.id.toString()}
-                uri={item.uri}
-                poster={item.poster}
-              />
+              <VideoPlayer key={item.id} uri={item.uri} poster={item.poster} />
             )}
           />
         </View>

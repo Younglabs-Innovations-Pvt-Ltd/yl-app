@@ -258,3 +258,17 @@ export const saveHandwritingSample = async ({bookingId, image}) => {
     body: JSON.stringify({bookingId, image}),
   });
 };
+
+// Get app content
+export const getAppTestimonials = async () => {
+  return await fetch(`${BASE_URL}/app/content/getAppTestimonials`, {
+    method: 'GET',
+  });
+};
+
+// Get app worksheets
+export const getAppWorksheets = async () => {
+  return await fetch(`${BASE_URL}/app/content/getAppWorksheets`, {
+    method: 'GET',
+  });
+};

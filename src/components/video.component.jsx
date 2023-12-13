@@ -18,16 +18,15 @@ import {
 
 const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
-const VideoPlayer = ({uri}) => {
+const VideoPlayer = ({uri, poster}) => {
   const videoRef = useRef();
   const thumbRef = useRef();
   const [visible, setVisible] = useState(false);
   const [muted, setMuted] = useState(false);
   const [loading, setLoding] = useState(false);
   const [isEnded, setIsEnded] = useState(false);
-  const [thumbLoading, setThumbLoading] = useState(true);
+  const [isEnded2, setIsEnded2] = useState(false);
 
-  const navigation = useNavigation();
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -61,14 +60,13 @@ const VideoPlayer = ({uri}) => {
   const onEnd = () => {
     setIsEnded(true);
   };
-
-  const onThumReadyForDisplay = () => {
-    setThumbLoading(false);
+  const onEnd2 = () => {
+    setIsEnded2(true);
   };
 
   return (
     <>
-      <View style={styles.container}>
+      <Pressable style={styles.container} onPress={onOpen}>
         <Video
           ref={thumbRef}
           source={{uri}}
@@ -78,12 +76,14 @@ const VideoPlayer = ({uri}) => {
           }}
           focusable={false}
           muted={true}
-          onReadyForDisplay={onThumReadyForDisplay}
           onEnd={onEnd}
           resizeMode="cover"
           disableFocus={true}
+          poster={poster}
+          posterResizeMode="cover"
+          paused={visible}
         />
-        {thumbLoading && (
+        {/* {thumbLoading && (
           <View
             style={{
               position: 'absolute',
@@ -93,7 +93,7 @@ const VideoPlayer = ({uri}) => {
               bottom: 0,
               backgroundColor: '#eee',
             }}></View>
-        )}
+        )} */}
         {isEnded && (
           <View style={styles.poster}>
             <View
@@ -113,7 +113,7 @@ const VideoPlayer = ({uri}) => {
             </View>
           </View>
         )}
-      </View>
+      </Pressable>
       <Modal visible={visible} transparent={false} onRequestClose={onClose}>
         <View style={styles.modalContainer}>
           {loading && (
@@ -129,6 +129,7 @@ const VideoPlayer = ({uri}) => {
             style={{width: '100%', height: '100%', alignSelf: 'center'}}
             onLoadStart={onLoadStart}
             onReadyForDisplay={onReadyForDisplay}
+            onEnd={onEnd2}
             muted={muted}
             resizeMode="contain"
           />
