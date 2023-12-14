@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   StyleSheet,
   View,
@@ -10,6 +10,7 @@ import {
   Dimensions,
   Image,
   AppState,
+  ActivityIndicator,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -31,14 +32,6 @@ import {COLORS} from '../utils/constants/colors';
 import TextWrapper from '../components/text-wrapper.component';
 
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
-
-import NetInfo from '@react-native-community/netinfo';
-import DocumentPicker, {types} from 'react-native-document-picker';
-
-import Storage from '@react-native-firebase/storage';
-import RNFS from 'react-native-fs';
-
 import Demo from '../components/demo.component';
 
 import * as Sentry from '@sentry/react-native';
@@ -57,7 +50,7 @@ import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 
 import auth from '@react-native-firebase/auth';
 import {fetchUser, setAuthToken} from '../store/auth/reducer';
-import {getAppTestimonials, getAppWorksheets} from '../utils/api/yl.api';
+import {getAppTestimonials} from '../utils/api/yl.api';
 
 const INITIAL_TIME = {
   days: 0,
@@ -86,15 +79,26 @@ const getTimeRemaining = bookingDate => {
 
 const {height: deviceHeight} = Dimensions.get('window');
 
+const sectionOffsets = {
+  tipsAndTricks: 0,
+  worksheets: 0,
+  improvements: 0,
+  reviews: 0,
+};
+
 const HomeScreen = ({navigation}) => {
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [improvementsData, setImprovementsData] = useState([]);
   const [reviewsData, setReviewsData] = useState([]);
   const [tipsAndTricksData, setTipsandTricksData] = useState([]);
+  const [contentData, setContentData] = useState(null);
+  const [contentLoading, setContentLoading] = useState(false);
   const dispatch = useDispatch();
+
+  const scrollViewRef = useRef(null);
+  const [offsets, setOffsets] = useState(sectionOffsets);
 
   const {
     demoData,
@@ -149,16 +153,20 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     const fetchAppTestimonials = async () => {
       try {
+        setContentLoading(true);
         const res = await getAppTestimonials();
-        const {data} = await res.json();
+        const {data, content} = await res.json();
         const improvements = data.filter(item => item.type === 'improvements');
         const reviews = data.filter(item => item.type === 'review');
         const tips = data.filter(item => item.type === 'tips');
         setImprovementsData(improvements);
         setReviewsData(reviews);
         setTipsandTricksData(tips);
+        setContentData(content);
+        setContentLoading(false);
       } catch (error) {
         console.log('FETCH_APP_TESTIMONIALS_ERROR', error.message);
+        setContentLoading(false);
       }
     };
 
@@ -416,53 +424,25 @@ const HomeScreen = ({navigation}) => {
     );
   }
 
-  const pickFile = async () => {
-    await DocumentPicker.pick({
-      type: [types.images],
-    })
-      .then(result => setSelectedImage(result[0]))
-      .catch(err => console.log(err));
-  };
-
-  const closeImage = () => setSelectedImage(null);
-
-  const uploadHandwritingImage = async () => {
-    try {
-      const base64 = await RNFS.readFile(selectedImage.uri, 'base64');
-      const fileUri = `data:${selectedImage.type};base64,${base64}`;
-
-      const storageRef = Storage().ref(
-        '/app/handwritingSamples/' + selectedImage.name,
-      );
-      const task = storageRef.putString(fileUri, 'data_url');
-      //   setFileLoading(true);
-      task.on('state_changed', taskSnapshot => {
-        console.log(
-          `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-        );
+  const scrollToSection = section => {
+    if (scrollViewRef.current && offsets[section] !== undefined) {
+      console.log('hit');
+      scrollViewRef.current.scrollTo({
+        y: offsets[section],
+        animated: true,
       });
-
-      task.then(async () => {
-        const downloadUrl = await storageRef.getDownloadURL();
-        console.log(downloadUrl);
-        // const messageRef = database().ref('/messages/' + Date.now());
-        // await messageRef.set({
-        //   id: Date.now(),
-        //   type: file.type,
-        //   url: downloadUrl,
-        //   username,
-        // });
-        // setFileLoading(false);
-      });
-    } catch (error) {
-      console.log('UPLOAD_HANDWRITING_IMAGE_ERROR=', error);
     }
   };
 
+  const handleSectionLayout = (section, event) => {
+    const {y} = event.nativeEvent.layout;
+    setOffsets(p => ({...p, [section]: y}));
+  };
+
   return (
-    <View style={{flex: 1, backgroundColor: '#04364A'}}>
+    <View style={{flex: 1, backgroundColor: '#76c8f2'}}>
       <View style={styles.topSection}>
-        <StatusBar backgroundColor={'#04364A'} barStyle={'light-content'} />
+        <StatusBar backgroundColor={'#76c8f2'} barStyle={'light-content'} />
         <View style={styles.header}>
           <TextWrapper
             fs={18}
@@ -488,6 +468,7 @@ const HomeScreen = ({navigation}) => {
         )}
       </View>
       <ScrollView
+        ref={scrollViewRef}
         style={[
           styles.container,
           {
@@ -504,121 +485,167 @@ const HomeScreen = ({navigation}) => {
           paddingHorizontal: 16,
           paddingTop: 16,
         }}>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            width: '100%',
-            paddingVertical: 8,
-            rowGap: 16,
-            // columnGap: 4,
-            justifyContent: 'space-between',
-          }}>
-          <View style={[styles.iconRow]}>
-            <View style={styles.iconContainer}>
-              <Image style={styles.icon} source={TipsIcon} />
+        {contentLoading ? (
+          <ActivityIndicator
+            size={'large'}
+            color={COLORS.black}
+            style={{alignSelf: 'center', marginTop: 16}}
+          />
+        ) : (
+          <>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                width: '100%',
+                paddingVertical: 8,
+                rowGap: 16,
+                justifyContent: 'space-between',
+              }}>
+              <Pressable
+                style={[styles.iconRow]}
+                onPress={() => scrollToSection('tipsAndTricks')}>
+                <View style={styles.iconContainer}>
+                  <Image style={styles.icon} source={TipsIcon} />
+                </View>
+                <TextWrapper fw="500" color={'#0352b3'}>
+                  Tips & Tricks
+                </TextWrapper>
+              </Pressable>
+              <Pressable
+                style={styles.iconRow}
+                onPress={() => scrollToSection('worksheets')}>
+                <View style={[styles.iconContainer, {width: 46, height: 46}]}>
+                  <Image style={styles.icon} source={WorksheetIcon} />
+                </View>
+
+                <TextWrapper fw="500" color={'#0352b3'}>
+                  Worksheets
+                </TextWrapper>
+              </Pressable>
+              <Pressable
+                style={[styles.iconRow]}
+                onPress={() => scrollToSection('reviews')}>
+                <View style={styles.iconContainer}>
+                  <Image
+                    style={[styles.icon, {width: 46, height: 46}]}
+                    source={ReviewIcon}
+                  />
+                </View>
+                <TextWrapper fw="500" color={'#0352b3'}>
+                  Reviews
+                </TextWrapper>
+              </Pressable>
+              <Pressable
+                style={styles.iconRow}
+                onPress={() => scrollToSection('improvements')}>
+                <View style={styles.iconContainer}>
+                  <Image style={styles.icon} source={ImprovementIcon} />
+                </View>
+                <TextWrapper fw="500" color={'#0352b3'}>
+                  Before & After
+                </TextWrapper>
+              </Pressable>
             </View>
-            <TextWrapper>Tips & Tricks</TextWrapper>
-          </View>
-          <View style={styles.iconRow}>
-            <View style={[styles.iconContainer, {width: 46, height: 46}]}>
-              <Image style={styles.icon} source={WorksheetIcon} />
-            </View>
-            <TextWrapper>Worksheets</TextWrapper>
-          </View>
-          <View style={[styles.iconRow]}>
-            <View style={styles.iconContainer}>
-              <Image
-                style={[styles.icon, {width: 46, height: 46}]}
-                source={ReviewIcon}
+
+            <Spacer />
+
+            {/* Worksheets */}
+            <Worksheets handleSectionLayout={handleSectionLayout} />
+
+            {/* Video slider */}
+            <View
+              style={{paddingVertical: 16}}
+              onLayout={event => handleSectionLayout('tipsAndTricks', event)}>
+              <TextWrapper fs={19} fw="700" color="#434a52">
+                {contentData?.tips?.heading}
+              </TextWrapper>
+              <TextWrapper color="gray">
+                {contentData?.tips?.subheading}
+              </TextWrapper>
+              <Spacer />
+              <FlatList
+                data={tipsAndTricksData}
+                keyExtractor={item => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                ItemSeparatorComponent={() => (
+                  <View style={{marginHorizontal: 8}} />
+                )}
+                renderItem={({item}) => (
+                  <VideoPlayer
+                    key={item.id.toString()}
+                    uri={item.uri}
+                    poster={item.poster}
+                  />
+                )}
               />
             </View>
-            <TextWrapper>Reviews</TextWrapper>
-          </View>
-          <View style={styles.iconRow}>
-            <View style={styles.iconContainer}>
-              <Image style={styles.icon} source={ImprovementIcon} />
+
+            {/* Video slider */}
+            <View
+              style={{paddingVertical: 16}}
+              onLayout={event => handleSectionLayout('improvements', event)}>
+              <TextWrapper fs={19} fw="700" color="#434a52">
+                {contentData?.improvements?.heading}
+              </TextWrapper>
+              <TextWrapper color="gray">
+                {contentData?.improvements?.subheading}
+              </TextWrapper>
+              <Spacer />
+              <FlatList
+                data={improvementsData}
+                keyExtractor={item => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                ItemSeparatorComponent={() => (
+                  <View style={{marginHorizontal: 8}} />
+                )}
+                renderItem={({item}) => (
+                  <VideoPlayer
+                    key={item.id.toString()}
+                    uri={item.uri}
+                    poster={item.poster}
+                  />
+                )}
+              />
             </View>
-            <TextWrapper>Before & After</TextWrapper>
-          </View>
-        </View>
 
-        {/* Video slider */}
-        <View style={{paddingVertical: 16}}>
-          <TextWrapper fs={20} fw="700">
-            Tips & Tricks
-          </TextWrapper>
-          <TextWrapper>Tips and tricks every week.</TextWrapper>
-          <Spacer />
-          <FlatList
-            data={tipsAndTricksData}
-            keyExtractor={item => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            ItemSeparatorComponent={() => (
-              <View style={{marginHorizontal: 8}} />
-            )}
-            renderItem={({item}) => (
-              <VideoPlayer
-                key={item.id.toString()}
-                uri={item.uri}
-                poster={item.poster}
+            {/* Video slider */}
+            <View
+              style={{paddingVertical: 16}}
+              onLayout={event => handleSectionLayout('reviews', event)}>
+              <TextWrapper fs={19} fw="700" color="#434a52">
+                {contentData?.reviews?.heading}
+              </TextWrapper>
+              <TextWrapper color="gray">
+                {contentData?.reviews?.subheading}
+              </TextWrapper>
+              <Spacer />
+              <FlatList
+                data={reviewsData}
+                keyExtractor={item => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                ItemSeparatorComponent={() => (
+                  <View style={{marginHorizontal: 8}} />
+                )}
+                renderItem={({item}) => (
+                  <VideoPlayer
+                    key={item.id}
+                    uri={item.uri}
+                    poster={item.poster}
+                  />
+                )}
               />
-            )}
-          />
-        </View>
-
-        {/* Worksheets */}
-        <Worksheets />
-
-        {/* Video slider */}
-        <View style={{paddingVertical: 16}}>
-          <TextWrapper fs={20} fw="700">
-            Improvements
-          </TextWrapper>
-          <Spacer />
-          <FlatList
-            data={improvementsData}
-            keyExtractor={item => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            ItemSeparatorComponent={() => (
-              <View style={{marginHorizontal: 8}} />
-            )}
-            renderItem={({item}) => (
-              <VideoPlayer
-                key={item.id.toString()}
-                uri={item.uri}
-                poster={item.poster}
-              />
-            )}
-          />
-        </View>
-
-        {/* Video slider */}
-        <View style={{paddingVertical: 16}}>
-          <TextWrapper fs={20} fw="700">
-            Beautiful Handwriting, Happy Parents
-          </TextWrapper>
-          <Spacer />
-          <FlatList
-            data={reviewsData}
-            keyExtractor={item => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            ItemSeparatorComponent={() => (
-              <View style={{marginHorizontal: 8}} />
-            )}
-            renderItem={({item}) => (
-              <VideoPlayer key={item.id} uri={item.uri} poster={item.poster} />
-            )}
-          />
-        </View>
-        {/* Reviews */}
-        <View style={{paddingVertical: 16}}>
-          <Reviews />
-        </View>
+            </View>
+            {/* Reviews */}
+            <View style={{paddingVertical: 16}}>
+              <Reviews />
+            </View>
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -716,8 +743,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 12,
     gap: 4,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#fff',
     borderRadius: 7,
-    elevation: 1.5,
+    elevation: 4,
   },
 });

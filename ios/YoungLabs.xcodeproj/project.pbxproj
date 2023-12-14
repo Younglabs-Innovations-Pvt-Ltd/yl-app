@@ -16,8 +16,11 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		F0D50548B8DD46CB839EF6A4 /* Roboto Condensed.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 019D94A555B94A2A957C16FF /* Roboto Condensed.ttf */; };
 		73E0C1288A16406F809F893D /* Big Shoulders Display SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A8FB6B33B7E74FE69645E1C3 /* Big Shoulders Display SemiBold.ttf */; };
-		D1B261BD4069443E8A5D2E78 /* Gelasio-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C0F88FE58B424E75A2B610E9 /* Gelasio-Regular.ttf */; };
 		1B82EDD02CF941E58FF4890C /* Gelasio-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2A896288EE234338926D7FB0 /* Gelasio-SemiBold.ttf */; };
+		ACAEAC005A7B45048A78A75F /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B3547BBDDB6A4418A4F50D4F /* Roboto.ttf */; };
+		F90F8CF7423E4743B3239FD5 /* Dancing Script.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F57BDB84123E47BCA10FA166 /* Dancing Script.ttf */; };
+		949DE7D6AA624B1CBB208B29 /* Signika Negative Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A2B5146839EF4760A7D91C6F /* Signika Negative Medium.ttf */; };
+		2C42A34EC6F6431DAE7C0453 /* Signika Negative SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C1FA303E6E2447459205F3E0 /* Signika Negative SemiBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,8 +53,11 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		019D94A555B94A2A957C16FF /* Roboto Condensed.ttf */ = {isa = PBXFileReference; name = "Roboto Condensed.ttf"; path = "../src/assets/fonts/Roboto Condensed.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		A8FB6B33B7E74FE69645E1C3 /* Big Shoulders Display SemiBold.ttf */ = {isa = PBXFileReference; name = "Big Shoulders Display SemiBold.ttf"; path = "../src/assets/fonts/Big Shoulders Display SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		C0F88FE58B424E75A2B610E9 /* Gelasio-Regular.ttf */ = {isa = PBXFileReference; name = "Gelasio-Regular.ttf"; path = "../src/assets/fonts/Gelasio-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		2A896288EE234338926D7FB0 /* Gelasio-SemiBold.ttf */ = {isa = PBXFileReference; name = "Gelasio-SemiBold.ttf"; path = "../src/assets/fonts/Gelasio-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B3547BBDDB6A4418A4F50D4F /* Roboto.ttf */ = {isa = PBXFileReference; name = "Roboto.ttf"; path = "../src/assets/fonts/Roboto.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F57BDB84123E47BCA10FA166 /* Dancing Script.ttf */ = {isa = PBXFileReference; name = "Dancing Script.ttf"; path = "../src/assets/fonts/Dancing Script.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A2B5146839EF4760A7D91C6F /* Signika Negative Medium.ttf */ = {isa = PBXFileReference; name = "Signika Negative Medium.ttf"; path = "../src/assets/fonts/Signika Negative Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C1FA303E6E2447459205F3E0 /* Signika Negative SemiBold.ttf */ = {isa = PBXFileReference; name = "Signika Negative SemiBold.ttf"; path = "../src/assets/fonts/Signika Negative SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,8 +168,11 @@
 			children = (
 				019D94A555B94A2A957C16FF /* Roboto Condensed.ttf */,
 				A8FB6B33B7E74FE69645E1C3 /* Big Shoulders Display SemiBold.ttf */,
-				C0F88FE58B424E75A2B610E9 /* Gelasio-Regular.ttf */,
 				2A896288EE234338926D7FB0 /* Gelasio-SemiBold.ttf */,
+				B3547BBDDB6A4418A4F50D4F /* Roboto.ttf */,
+				F57BDB84123E47BCA10FA166 /* Dancing Script.ttf */,
+				A2B5146839EF4760A7D91C6F /* Signika Negative Medium.ttf */,
+				C1FA303E6E2447459205F3E0 /* Signika Negative SemiBold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -268,8 +277,11 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				F0D50548B8DD46CB839EF6A4 /* Roboto Condensed.ttf in Resources */,
 				73E0C1288A16406F809F893D /* Big Shoulders Display SemiBold.ttf in Resources */,
-				D1B261BD4069443E8A5D2E78 /* Gelasio-Regular.ttf in Resources */,
 				1B82EDD02CF941E58FF4890C /* Gelasio-SemiBold.ttf in Resources */,
+				ACAEAC005A7B45048A78A75F /* Roboto.ttf in Resources */,
+				F90F8CF7423E4743B3239FD5 /* Dancing Script.ttf in Resources */,
+				949DE7D6AA624B1CBB208B29 /* Signika Negative Medium.ttf in Resources */,
+				2C42A34EC6F6431DAE7C0453 /* Signika Negative SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

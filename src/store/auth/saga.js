@@ -64,6 +64,9 @@ function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
 
 function* fetchUserSaga({payload: {leadId}}) {
   try {
+    if (!leadId) {
+      return;
+    }
     const res = yield getCustomers({leadId});
     const data = yield res.json();
     console.log('uesrs', data.data.customer);

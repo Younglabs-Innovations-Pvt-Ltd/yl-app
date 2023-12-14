@@ -5,7 +5,7 @@ import {FONTS} from '../utils/constants/fonts';
 
 const TextWrapper = ({
   fs = 16,
-  ff = FONTS.roboto,
+  ff,
   color = COLORS.black,
   fw = '400',
   children,
@@ -16,7 +16,7 @@ const TextWrapper = ({
     <Text
       style={{
         fontSize: fs,
-        fontFamily: ff,
+        fontFamily: ff || FONTS.roboto,
         color: color,
         fontWeight: fw,
         ...styles,

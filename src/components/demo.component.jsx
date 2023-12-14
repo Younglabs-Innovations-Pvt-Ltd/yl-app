@@ -21,6 +21,8 @@ import {i18nContext} from '../context/lang.context';
 import Modal from './modal.component';
 import BookDemoSlots from '../screens/book-demo-slots.screen';
 import TwoStepForm from './two-step-form.component';
+import {useNavigation} from '@react-navigation/native';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
@@ -130,8 +132,8 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
           </TextWrapper>
           <Spacer />
           <Button
-            textColor={COLORS.white}
-            bg={COLORS.pgreen}
+            textColor={'#434a52'}
+            bg={COLORS.white}
             rounded={6}
             onPress={onOpenForm}>
             Book
@@ -143,7 +145,11 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
     }
   }, [demoData, onOpenForm]);
 
-  console.log('demoData', demoData);
+  const navigation = useNavigation();
+
+  const courseDetails = () => {
+    navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
+  };
 
   return (
     <View style={styles.contentWrapper}>

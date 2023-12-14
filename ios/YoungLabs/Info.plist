@@ -55,8 +55,11 @@
 	<array>
 		<string>Roboto Condensed.ttf</string>
 		<string>Big Shoulders Display SemiBold.ttf</string>
-		<string>Gelasio-Regular.ttf</string>
 		<string>Gelasio-SemiBold.ttf</string>
+		<string>Roboto.ttf</string>
+		<string>Dancing Script.ttf</string>
+		<string>Signika Negative Medium.ttf</string>
+		<string>Signika Negative SemiBold.ttf</string>
 	</array>
 </dict>
 </plist>

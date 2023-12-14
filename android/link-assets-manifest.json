@@ -6,8 +6,8 @@
       "sha1": "ba87c28cfbea5b4da7f506550a9febff5b34223f"
     },
     {
-      "path": "src/assets/fonts/Gelasio-Regular.ttf",
-      "sha1": "9fbbe91882df3ce403acadefe7d9be8637361da4"
+      "path": "src/assets/fonts/Dancing Script.ttf",
+      "sha1": "80f13e7575ec59a51b7fdc42bb0b9d7a34439123"
     },
     {
       "path": "src/assets/fonts/Gelasio-SemiBold.ttf",
@@ -16,6 +16,18 @@
     {
       "path": "src/assets/fonts/Roboto Condensed.ttf",
       "sha1": "e0d7acf2ca3dd0ff68f533797bb94b0580397e95"
+    },
+    {
+      "path": "src/assets/fonts/Roboto.ttf",
+      "sha1": "56c5c0d38bde4c1f1549dda43db37b09c608aad3"
+    },
+    {
+      "path": "src/assets/fonts/Signika Negative Medium.ttf",
+      "sha1": "190398309993c34bfe091f357eed4c0044813394"
+    },
+    {
+      "path": "src/assets/fonts/Signika Negative SemiBold.ttf",
+      "sha1": "27549eaab7bd48d8c6d1a82b8e995c99d32b42c6"
     }
   ]
 }

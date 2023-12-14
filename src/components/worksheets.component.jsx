@@ -6,8 +6,8 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
-  Image,
   ScrollView,
+  Text,
 } from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import Icon from './icon.component';
@@ -18,13 +18,14 @@ import Modal from './modal.component';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import FileViewer from 'react-native-file-viewer';
-
-import WorksheetIcon from '../assets/icons/document.png';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getAppWorksheets} from '../utils/api/yl.api';
+import {FONTS} from '../utils/constants/fonts';
 
-const Worksheets = () => {
+const Worksheets = ({handleSectionLayout}) => {
   const [openWorksheet, setOpenWorkSheet] = useState(false);
   const [worksheets, setWorkSheets] = useState([]);
+  const [worksheetContent, setWorkSheetContent] = useState(null);
   const currentWorksheet = useRef();
 
   // App content
@@ -32,8 +33,9 @@ const Worksheets = () => {
     const fetchAppWorksheets = async () => {
       try {
         const res = await getAppWorksheets();
-        const {data} = await res.json();
+        const {data, content} = await res.json();
         setWorkSheets(data);
+        setWorkSheetContent(content);
       } catch (error) {
         console.log('FETCH_APP_TESTIMONIALS_ERROR', error.message);
       }
@@ -113,7 +115,11 @@ const Worksheets = () => {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{gap: 12}}>
+        contentContainerStyle={{
+          gap: 12,
+          paddingHorizontal: 2,
+          paddingVertical: 8,
+        }}>
         {worksheets.map((item, index) => (
           <WorksheetItem
             key={item.uri.slice(0, Math.random() * item.uri.length)}
@@ -128,9 +134,18 @@ const Worksheets = () => {
   }, [worksheets]);
 
   return (
-    <View style={{paddingBottom: 16}}>
-      <TextWrapper fs={20} fw="700">
-        Start practicing today, download free worksheets
+    <View
+      style={{paddingBottom: 16}}
+      onLayout={event => handleSectionLayout('worksheets', event)}>
+      <TextWrapper fs={21} ff={FONTS.signika_semiBold} color="#434a52" fw="600">
+        {worksheetContent?.heading}
+      </TextWrapper>
+      <TextWrapper
+        fs={20}
+        ff={FONTS.dancing_script}
+        color="#434a52"
+        styles={{lineHeight: 22}}>
+        {worksheetContent?.subheading}
       </TextWrapper>
       <Spacer />
       {WORKSHEET}
@@ -207,12 +222,25 @@ const WorksheetItem = ({item, index, onOpenWorksheet, downloadWorksheet}) => {
         )}
       /> */}
 
-      <View style={{width: 58, height: 58, marginBottom: 4}}>
+      {/* <View style={{width: 58, height: 58, marginBottom: 4}}>
         <Image style={styles.icon} source={WorksheetIcon} />
+      </View> */}
+      <View
+        style={{
+          height: '70%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <MIcon name="file-document-multiple" size={48} color={'#76c8f2'} />
       </View>
-      <TextWrapper fs={14} styles={{textTransform: 'capitalize'}}>
-        {item.title}
-      </TextWrapper>
+      <View style={{height: '30%'}}>
+        <TextWrapper
+          fs={15}
+          styles={{textTransform: 'capitalize', textAlign: 'center'}}>
+          {item.title}
+        </TextWrapper>
+      </View>
+
       {/* <View style={styles.pdfOverlay}>
         <View
           style={{
@@ -250,11 +278,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 8,
-    backgroundColor: '#eaeaea',
-    elevation: 1.25,
+    // padding: 8,
+    backgroundColor: '#fff',
+    elevation: 4,
   },
   pdfOverlay: {
     position: 'absolute',
