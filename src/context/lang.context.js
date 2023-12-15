@@ -1,10 +1,8 @@
 import React, {useState, useEffect, createContext, useContext} from 'react';
 import LocalizedStrings from 'react-native-localization';
 import {localizedStrings} from '../localization';
-import {
-  getCurrentLocalLangAsync,
-  setCurrentLocalLangAsync,
-} from '../utils/storage/storage-provider';
+import {localStorage} from '../utils/storage/storage-provider';
+import {LOCAL_KEYS} from '../utils/storage/local-storage-keys';
 
 const Context = createContext();
 const localLang = new LocalizedStrings(localizedStrings);
@@ -23,7 +21,8 @@ export const I18NProvider = ({children}) => {
 
   const getCurrentLocalLang = async () => {
     try {
-      const lang = await getCurrentLocalLangAsync();
+      // const lang = await getCurrentLocalLangAsync();
+      const lang = localStorage.getString(LOCAL_KEYS.LANGUAGE_KEY);
       if (lang) {
         setCurrentLang(lang);
       }
@@ -36,7 +35,7 @@ export const I18NProvider = ({children}) => {
 
   const setLocalLang = async lang => {
     try {
-      await setCurrentLocalLangAsync(lang);
+      localStorage.set(LOCAL_KEYS.LANGUAGE_KEY, lang);
       setCurrentLang(lang);
     } catch (error) {
       console.log(error);

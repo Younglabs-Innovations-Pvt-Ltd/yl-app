@@ -31,7 +31,7 @@ const Icons = (name, focused) => {
 
 const shareApp = async () => {
   const message =
-    'Book a free english handwriting class for your child conducted by experts.';
+    'I really liked Younglabs handwriting improvement App. You can try it as well.';
   const url = 'https://play.google.com/store/apps/details?id=com.younglabs';
   try {
     await Share.open({

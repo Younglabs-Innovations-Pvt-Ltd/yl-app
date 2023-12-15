@@ -19,7 +19,7 @@ import Icon from '../components/icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {COLORS} from '../utils/constants/colors';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
 
 import {cancleNotifications} from '../utils/notifications';
@@ -30,6 +30,8 @@ import {authSelector} from '../store/auth/selector';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Snackbar from 'react-native-snackbar';
 import auth from '@react-native-firebase/auth';
+import {logout} from '../store/auth/reducer';
+import {localStorage} from '../utils/storage/storage-provider';
 
 const WEBSITE_URL = 'https://www.younglabs.in/';
 
@@ -57,13 +59,15 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       // await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
       await cancleNotifications();
 
-      const keys = await AsyncStorage.getAllKeys();
-      console.log('keys: ', keys);
-      await AsyncStorage.multiRemove(keys);
+      // const keys = await AsyncStorage.getAllKeys();
+      // console.log('keys: ', keys);
+      // await AsyncStorage.multiRemove(keys);
+
+      localStorage.clearAll();
 
       removeRegisterNotificationTimer();
 
-      dispatch(setToInitialState());
+      dispatch(logout());
       const resetAction = CommonActions.reset({
         index: 0,
         routes: [{name: 'Welcome'}],

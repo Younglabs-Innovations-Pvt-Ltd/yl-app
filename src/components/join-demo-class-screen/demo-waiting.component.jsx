@@ -58,14 +58,14 @@ const DemoWaiting = ({timeLeft}) => {
       <View
         style={{
           paddingVertical: 6,
-          backgroundColor: COLORS.pgreen,
+          backgroundColor: COLORS.white,
           paddingHorizontal: 8,
           borderRadius: 4,
           marginBottom: 12,
         }}>
-        <TextWrapper color={COLORS.white} fs={14}>
+        <TextWrapper color={COLORS.black} fs={14}>
           Your class is on{' '}
-          <TextWrapper color={COLORS.white} fw="bold">
+          <TextWrapper color={COLORS.black} fw="bold">
             {getClassDate(seconds)}
           </TextWrapper>
         </TextWrapper>

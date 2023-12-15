@@ -31,19 +31,26 @@
             <category android:name="android.intent.category.LAUNCHER" />
             <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
         </intent-filter>
-        <intent-filter android:autoVerify="true">
+        <!-- <intent-filter android:autoVerify="true">
             <action android:name="android.intent.action.VIEW"/>
             <category android:name="android.intent.category.DEFAULT"/>
             <category android:name="android.intent.category.BROWSABLE"/>
             <data android:scheme="https" />
             <data android:host="www.younglabs.in" />
+        </intent-filter> -->
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW"/>
+            <category android:name="android.intent.category.DEFAULT"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="app" />
+            <data android:host="redirect.com.younglabs.android" />
         </intent-filter>
         <intent-filter android:autoVerify="true">
             <action android:name="android.intent.action.VIEW"/>
             <category android:name="android.intent.category.DEFAULT"/>
             <category android:name="android.intent.category.BROWSABLE"/>
             <data android:scheme="app" />
-            <data android:host="open.com.younglabs.android" />
+            <data android:host="com.younglabs.android" />
         </intent-filter>
       </activity>
         <service android:name=".NotificationTimerService"></service>

@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet, FlatList, View, Dimensions, Image} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import {COLORS} from '../utils/constants/colors';
+import {FONTS} from '../utils/constants/fonts';
 
 const reviewData = [
   {
@@ -82,13 +83,16 @@ const Reviews = () => {
               <Image source={{uri: item.image}} style={styles.reviewAvatar} />
               <TextWrapper
                 fs={18}
-                color={COLORS.black}
+                ff={FONTS.signika_semiBold}
+                color={'#434a52'}
                 styles={{letterSpacing: 0.7}}>
                 {item.name}
               </TextWrapper>
             </View>
             <View style={styles.reivewContent}>
-              <TextWrapper fs={18}>{item.review}</TextWrapper>
+              <TextWrapper ff={FONTS.signika_medium} color="#484848">
+                {item.review}
+              </TextWrapper>
             </View>
           </View>
         );
@@ -102,7 +106,7 @@ export default Reviews;
 const styles = StyleSheet.create({
   reivewItem: {
     width: ITEM_WIDTH,
-    padding: 16,
+    padding: 12,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: 'gray',
@@ -111,7 +115,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingBottom: 8,
   },
   reviewAvatar: {
     width: 48,
@@ -119,6 +123,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   reivewContent: {
-    paddingVertical: 8,
+    // paddingVertical: 8,
   },
 });

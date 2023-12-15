@@ -9,7 +9,7 @@ import {authReducer} from './auth/reducer';
 import {courseReducer} from './course/course.reducer';
 import {paymentReducer} from './payment/reducer';
 
-export const rootReducer = combineReducers({
+const reducer = combineReducers({
   joinDemo: joinDemoReducer,
   bookDemo: bookDemoReducer,
   welcome: welcomeScreenReducer,
@@ -19,3 +19,11 @@ export const rootReducer = combineReducers({
   course: courseReducer,
   payment: paymentReducer,
 });
+
+export const rootReducer = (state, action) => {
+  console.log('root action', action.type);
+  if (action.type === 'auth/logout') {
+    state = undefined;
+  }
+  return reducer(state, action);
+};

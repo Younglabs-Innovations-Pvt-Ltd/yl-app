@@ -7,7 +7,6 @@ import {
   Alert,
   Linking,
   ScrollView,
-  Text,
 } from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import Icon from './icon.component';
@@ -119,12 +118,12 @@ const Worksheets = ({handleSectionLayout}) => {
           gap: 12,
           paddingHorizontal: 2,
           paddingVertical: 8,
+          maxHeight: 120,
         }}>
-        {worksheets.map((item, index) => (
+        {worksheets.reverse().map((item, index) => (
           <WorksheetItem
-            key={item.uri.slice(0, Math.random() * item.uri.length)}
+            key={item.id}
             item={item}
-            index={index}
             onOpenWorksheet={onOpenWorksheet}
             downloadWorksheet={downloadWorksheet}
           />
@@ -204,7 +203,6 @@ const WorksheetItem = ({item, index, onOpenWorksheet, downloadWorksheet}) => {
   return (
     <Pressable
       style={styles.pdfContainer}
-      key={index.toString()}
       onPress={() => onOpenWorksheet(item)}>
       {/* <Pdf
         source={{
@@ -273,7 +271,7 @@ export default Worksheets;
 const styles = StyleSheet.create({
   pdfContainer: {
     width: 110,
-    height: 110,
+    // height: 110,
     // borderWidth: 1,
     borderRadius: 8,
     overflow: 'hidden',

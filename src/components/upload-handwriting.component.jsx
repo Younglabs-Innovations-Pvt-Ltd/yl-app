@@ -24,7 +24,7 @@ import {request, PERMISSIONS} from 'react-native-permissions';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
-const UploadHandwriting = ({demoData}) => {
+const UploadHandwriting = ({demoData, setUploaded}) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,7 @@ const UploadHandwriting = ({demoData}) => {
       if (result === 'denied') {
         Alert.alert(
           'Permission required',
-          'To be able to update for events and offers, please grant permission.',
+          'To be able to upload image, please grant permission.',
           [
             {
               text: 'OK',
@@ -127,11 +127,22 @@ const UploadHandwriting = ({demoData}) => {
         const data = await res.json();
         console.log('data', data);
         setLoading(false);
+        // Alert.alert('Image uploaded successfully', '', [
+        //   {
+        //     text: 'OK',
+        //     onPress: onClose,
+        //   },
+        // ]);
+
         Snackbar.show({
-          text: 'Image uploaded.',
+          text: 'Image uploaded',
           textColor: COLORS.white,
-          duration: Snackbar.LENGTH_SHORT,
+          duration: Snackbar.LENGTH_LONG,
         });
+
+        setTimeout(() => {
+          onClose();
+        }, 1200);
       });
     } catch (error) {
       setLoading(false);
@@ -140,8 +151,8 @@ const UploadHandwriting = ({demoData}) => {
   };
 
   const onClose = () => {
-    setSelectedImage(null);
     setVisible(false);
+    setSelectedImage(null);
   };
 
   const onCloseOptions = () => {

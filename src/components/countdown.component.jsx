@@ -51,13 +51,13 @@ const styles = StyleSheet.create({
   timeLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.white,
+    color: '#434a52',
     // marginTop: 2,
     fontFamily: FONTS.roboto,
   },
   timeText: {
     fontSize: 32,
-    color: COLORS.white,
+    color: '#434a52',
     fontFamily: FONTS.bigShoulders_semibold,
   },
   containerList: {

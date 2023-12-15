@@ -9,8 +9,9 @@ import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch} from 'react-redux';
 import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import {localStorage} from '../utils/storage/storage-provider';
 
 import {i18nContext} from '../context/lang.context';
 
@@ -48,9 +49,9 @@ const MainScreen = ({route}) => {
    * Check is phone number exists in local storage
    * If it does not exist only then set booking id by dispatching an action
    */
-  const checkForPhone = async () => {
+  const checkForPhone = () => {
     try {
-      const isPhoneExists = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
+      const isPhoneExists = localStorage.getNumber(LOCAL_KEYS.PHONE);
       if (!isPhoneExists) {
         dispatch(setDemoBookingId(data.bookingId));
       }

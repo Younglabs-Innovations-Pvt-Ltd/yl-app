@@ -13,11 +13,12 @@ import {
 
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makeNewBooking} from '../../utils/api/yl.api';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {ERROR_MESSAGES} from '../../utils/constants/messages';
 import {setCurrentNetworkState} from '../network/reducer';
+import {localStorage} from '../../utils/storage/storage-provider';
 
 /**
  * @author Shobhit
@@ -84,8 +85,10 @@ function* handleNewBooking({payload: {data, ipData}}) {
     console.log(bookingDetails);
 
     if (response.status === 200) {
-      yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, data.phone.toString());
-      yield AsyncStorage.setItem(LOCAL_KEYS.CALLING_CODE, ipData.calling_code);
+      // yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, data.phone.toString());
+      // yield AsyncStorage.setItem(LOCAL_KEYS.CALLING_CODE, ipData.calling_code);
+      // localStorage.set(LOCAL_KEYS.PHONE, data.phone.toString());
+      // localStorage.set(LOCAL_KEYS.CALLING_CODE, ipData.calling_code);
 
       yield put(setNewBookingSuccess());
     } else if (response.status === 400) {

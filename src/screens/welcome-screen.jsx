@@ -85,17 +85,17 @@ const DemoClassScreen = ({navigation}) => {
    * @description  Checking for internet connected or not
    * If connected and ipData is not null then fetch ipData and update state silently
    */
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
-      if (state.isConnected && !ipData) {
-        dispatch(startFetchingIpData());
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = NetInfo.addEventListener(state => {
+  //     if (state.isConnected && !ipData) {
+  //       dispatch(startFetchingIpData());
+  //     }
+  //   });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [ipData]);
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, [ipData]);
 
   /**
    * @author Shobhit
@@ -287,27 +287,27 @@ const DemoClassScreen = ({navigation}) => {
     {opacity: pressed ? 0.8 : 1},
   ];
 
-  if (!isConnected) {
-    Alert.alert(
-      '',
-      'We cannot continue due to network problem. Please check your network connection.',
-      [
-        {
-          text: 'Refresh',
-          onPress: () => {
-            dispatch(resetCurrentNetworkState());
-            dispatch(alertAction);
-          },
-        },
-        {
-          text: 'CANCEL',
-          onPress: () => {
-            dispatch(resetCurrentNetworkState());
-          },
-        },
-      ],
-    );
-  }
+  // if (!isConnected) {
+  //   Alert.alert(
+  //     '',
+  //     'We cannot continue due to network problem. Please check your network connection.',
+  //     [
+  //       {
+  //         text: 'Refresh',
+  //         onPress: () => {
+  //           dispatch(resetCurrentNetworkState());
+  //           dispatch(alertAction);
+  //         },
+  //       },
+  //       {
+  //         text: 'CANCEL',
+  //         onPress: () => {
+  //           dispatch(resetCurrentNetworkState());
+  //         },
+  //       },
+  //     ],
+  //   );
+  // }
 
   // Handle the button press
   async function signInWithPhoneNumber() {
@@ -455,7 +455,7 @@ const DemoClassScreen = ({navigation}) => {
               </Pressable>
             </View>
             <TextInput
-              placeholder="Enter code"
+              placeholder="Enter otp"
               style={{
                 padding: 8,
                 borderWidth: StyleSheet.hairlineWidth,
@@ -486,7 +486,7 @@ const DemoClassScreen = ({navigation}) => {
               ]}
               disabled={!code}
               onPress={confirmCode}>
-              <TextWrapper fs={18}>Confirm</TextWrapper>
+              <TextWrapper fs={18}>Submit</TextWrapper>
               {verificationLoading && (
                 <ActivityIndicator
                   size={'small'}

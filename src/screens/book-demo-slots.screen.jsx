@@ -28,7 +28,7 @@ import {
   setCurrentNetworkState,
   resetCurrentNetworkState,
 } from '../store/network/reducer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
@@ -66,28 +66,28 @@ const BookDemoSlots = ({route, onClose}) => {
     }
   }, [ipData]);
 
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
-      if (state.isConnected && isConnected) {
-        if (!ipData) {
-          dispatch(startFetchingIpData());
-        } else {
-          const body = {
-            courseId: 'Eng_Hw',
-            childAge: childAge,
-            timeZone: timezone.toString(),
-            type: 'website',
-          };
+  // useEffect(() => {
+  //   const unsubscribe = NetInfo.addEventListener(state => {
+  //     if (state.isConnected && isConnected) {
+  //       if (!ipData) {
+  //         dispatch(startFetchingIpData());
+  //       } else {
+  //         const body = {
+  //           courseId: 'Eng_Hw',
+  //           childAge: childAge,
+  //           timeZone: timezone.toString(),
+  //           type: 'website',
+  //         };
 
-          dispatch(startFetchingBookingSlots(body));
-        }
-      }
-    });
+  //         dispatch(startFetchingBookingSlots(body));
+  //       }
+  //     }
+  //   });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [isConnected, ipData]);
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, [isConnected, ipData]);
 
   // Set timezone
   useEffect(() => {
@@ -172,10 +172,10 @@ const BookDemoSlots = ({route, onClose}) => {
    * @description Show a popup after creating a booking successfully
    */
   const handlePopup = async () => {
-    if (demoBookingId) {
-      await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
-      dispatch(setDemoBookingId(''));
-    }
+    // if (demoBookingId) {
+    //   await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
+    //   dispatch(setDemoBookingId(''));
+    // }
     dispatch(closePopup());
     onClose();
     dispatch(startFetchBookingDetailsFromPhone(phone));
@@ -333,6 +333,7 @@ const BookDemoSlots = ({route, onClose}) => {
       </View>
       <View style={styles.footer}>
         <Button
+          rounded={6}
           bg={COLORS.pgreen}
           onPress={handleBookNow}
           textColor={COLORS.white}>
@@ -406,6 +407,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
   },
   popup: {
     maxWidth: 348,

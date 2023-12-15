@@ -112,17 +112,19 @@ const BookingForm = ({goToNextSlide}) => {
             onLayout={onLayoutChange}
           />
         </View>
-        <Pressable
-          style={btnNextStyle}
-          disabled={!isActive}
-          onPress={handleDemoSlots}>
-          <TextWrapper
-            color={COLORS.white}
-            fw="700"
-            styles={{letterSpacing: 1.1}}>
-            Next
-          </TextWrapper>
-        </Pressable>
+        <View style={{paddingHorizontal: 12}}>
+          <Pressable
+            style={btnNextStyle}
+            disabled={!isActive}
+            onPress={handleDemoSlots}>
+            <TextWrapper
+              color={COLORS.white}
+              fw="700"
+              styles={{letterSpacing: 1.1}}>
+              Next
+            </TextWrapper>
+          </Pressable>
+        </View>
       </View>
 
       {open && (
@@ -174,6 +176,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 6,
   },
   btnCallingCode: {
     display: 'flex',

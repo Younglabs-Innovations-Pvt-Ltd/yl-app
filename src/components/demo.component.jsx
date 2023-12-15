@@ -32,6 +32,7 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   const [visible, setVisible] = useState(false);
   const [params, setParams] = useState(null);
   const [cn, setCn] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
 
   const {localLang} = i18nContext();
   const dispatch = useDispatch();
@@ -181,8 +182,8 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
           </TextWrapper>
           <Spacer />
           <Button
-            textColor={COLORS.white}
-            bg={COLORS.pgreen}
+            textColor={COLORS.black}
+            bg={COLORS.white}
             rounded={6}
             onPress={onOpen}>
             {localLang.rescheduleButtonText}

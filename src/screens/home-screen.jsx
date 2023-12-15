@@ -26,7 +26,6 @@ import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {networkSelector} from '../store/network/selector';
 
 import Spacer from '../components/spacer.component';
-import Spinner from '../components/spinner.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../utils/constants/colors';
 import TextWrapper from '../components/text-wrapper.component';
@@ -51,6 +50,10 @@ import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import auth from '@react-native-firebase/auth';
 import {fetchUser, setAuthToken} from '../store/auth/reducer';
 import {getAppTestimonials} from '../utils/api/yl.api';
+import {FONTS} from '../utils/constants/fonts';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import {localStorage} from '../utils/storage/storage-provider';
 
 const INITIAL_TIME = {
   days: 0,
@@ -136,9 +139,13 @@ const HomeScreen = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    const handleAppStateChange = nextAppState => {
+    const handleAppStateChange = async nextAppState => {
       console.log('appState', nextAppState);
       if (nextAppState === 'active') {
+        console.log('hit active state');
+        const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+        console.log('phone', phone);
+        dispatch(startFetchBookingDetailsFromPhone(phone));
       }
     };
 
@@ -458,7 +465,12 @@ const HomeScreen = ({navigation}) => {
           </View>
         </View>
         {loading ? (
-          <Spinner style={{alignSelf: 'center'}} />
+          // <Spinner style={{alignSelf: 'center'}} />
+          <ActivityIndicator
+            size={'large'}
+            color={COLORS.white}
+            style={{alignSelf: 'center', marginTop: 16}}
+          />
         ) : (
           <Demo
             isTimeover={isTimeover}
@@ -551,6 +563,39 @@ const HomeScreen = ({navigation}) => {
 
             <Spacer />
 
+            {/* Video slider */}
+            <View
+              style={{paddingVertical: 16}}
+              onLayout={event => handleSectionLayout('reviews', event)}>
+              <TextWrapper
+                fs={21}
+                fw="600"
+                color="#434a52"
+                ff={FONTS.signika_medium}>
+                {contentData?.reviews?.heading}
+              </TextWrapper>
+              <TextWrapper color="gray" fs={20} ff={FONTS.dancing_script}>
+                {contentData?.reviews?.subheading}
+              </TextWrapper>
+              <Spacer />
+              <FlatList
+                data={reviewsData}
+                keyExtractor={item => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                ItemSeparatorComponent={() => (
+                  <View style={{marginHorizontal: 8}} />
+                )}
+                renderItem={({item}) => (
+                  <VideoPlayer
+                    key={item.id}
+                    uri={item.uri}
+                    poster={item.poster}
+                  />
+                )}
+              />
+            </View>
+
             {/* Worksheets */}
             <Worksheets handleSectionLayout={handleSectionLayout} />
 
@@ -558,10 +603,14 @@ const HomeScreen = ({navigation}) => {
             <View
               style={{paddingVertical: 16}}
               onLayout={event => handleSectionLayout('tipsAndTricks', event)}>
-              <TextWrapper fs={19} fw="700" color="#434a52">
+              <TextWrapper
+                fs={21}
+                fw="600"
+                color="#434a52"
+                ff={FONTS.signika_semiBold}>
                 {contentData?.tips?.heading}
               </TextWrapper>
-              <TextWrapper color="gray">
+              <TextWrapper fs={20} color="gray" ff={FONTS.dancing_script}>
                 {contentData?.tips?.subheading}
               </TextWrapper>
               <Spacer />
@@ -587,10 +636,14 @@ const HomeScreen = ({navigation}) => {
             <View
               style={{paddingVertical: 16}}
               onLayout={event => handleSectionLayout('improvements', event)}>
-              <TextWrapper fs={19} fw="700" color="#434a52">
+              <TextWrapper
+                fs={21}
+                fw="600"
+                color="#434a52"
+                ff={FONTS.signika_semiBold}>
                 {contentData?.improvements?.heading}
               </TextWrapper>
-              <TextWrapper color="gray">
+              <TextWrapper color="gray" fs={20} ff={FONTS.dancing_script}>
                 {contentData?.improvements?.subheading}
               </TextWrapper>
               <Spacer />
@@ -612,36 +665,19 @@ const HomeScreen = ({navigation}) => {
               />
             </View>
 
-            {/* Video slider */}
-            <View
-              style={{paddingVertical: 16}}
-              onLayout={event => handleSectionLayout('reviews', event)}>
-              <TextWrapper fs={19} fw="700" color="#434a52">
-                {contentData?.reviews?.heading}
-              </TextWrapper>
-              <TextWrapper color="gray">
-                {contentData?.reviews?.subheading}
-              </TextWrapper>
-              <Spacer />
-              <FlatList
-                data={reviewsData}
-                keyExtractor={item => item.id}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ItemSeparatorComponent={() => (
-                  <View style={{marginHorizontal: 8}} />
-                )}
-                renderItem={({item}) => (
-                  <VideoPlayer
-                    key={item.id}
-                    uri={item.uri}
-                    poster={item.poster}
-                  />
-                )}
-              />
-            </View>
             {/* Reviews */}
             <View style={{paddingVertical: 16}}>
+              <TextWrapper
+                fs={21}
+                fw="600"
+                color="#434a52"
+                ff={FONTS.signika_semiBold}>
+                {contentData?.rating?.heading}
+              </TextWrapper>
+              <TextWrapper color="gray" fs={20} ff={FONTS.dancing_script}>
+                {contentData?.rating?.subheading}
+              </TextWrapper>
+              <Spacer />
               <Reviews />
             </View>
           </>

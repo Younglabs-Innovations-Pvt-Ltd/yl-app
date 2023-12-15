@@ -22,11 +22,12 @@ import {
 } from '../../store/join-demo/join-demo.reducer';
 
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {joinDemoSelector} from '../../store/join-demo/join-demo.selector';
 import ModalComponent from '../modal.component';
 import NotInterested from '../not-interested.component';
+import {localStorage} from '../../utils/storage/storage-provider';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
@@ -87,9 +88,7 @@ const PostDemoAction = ({rescheduleClass}) => {
   useEffect(() => {
     const checkAttended = async () => {
       try {
-        const checkAttended = await AsyncStorage.getItem(
-          LOCAL_KEYS.SAVE_ATTENDED,
-        );
+        const checkAttended = localStorage.getString(LOCAL_KEYS.SAVE_ATTENDED);
 
         if (checkAttended) {
           setAttended(true);
@@ -108,8 +107,8 @@ const PostDemoAction = ({rescheduleClass}) => {
   useEffect(() => {
     const checkNMI = async () => {
       try {
-        const nmi = await AsyncStorage.getItem(LOCAL_KEYS.NMI);
-        console.log('nmi', nmi);
+        const nmi = localStorage.getString(LOCAL_KEYS.NMI);
+        console.log('nmiAsync', nmi);
         if (nmi) {
           console.log('hit NMI');
           dispatch(setNMI(true));
@@ -146,7 +145,7 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   const saveAttended = async () => {
     try {
-      await AsyncStorage.setItem(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
+      localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
       setAttended(true);
     } catch (error) {
       console.log('POST_ACTION_SAVE_ATTENDED_ERROR=', error);
@@ -209,6 +208,8 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   if (ratingLoading || attendedLoading || loading) return null;
 
+  console.log('nmi', isNmi);
+
   return (
     <View
       style={{
@@ -255,7 +256,7 @@ const PostDemoAction = ({rescheduleClass}) => {
         <View style={styles.ratingContainer}>
           <TextWrapper
             fs={22}
-            color={COLORS.pgreen}
+            color={COLORS.white}
             fw="600"
             styles={{textAlign: 'center'}}>
             Congratulations for attending your free class.

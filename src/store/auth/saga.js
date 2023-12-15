@@ -10,13 +10,16 @@ import {
   fetchUser,
   setUser,
 } from './reducer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/storage/local-storage-keys';
 import {isValidNumber} from '../../utils/isValidNumber';
 import {getCustomers} from '../../utils/api/yl.api';
+import {localStorage} from '../../utils/storage/storage-provider';
 
 function* phoneAuthentication({payload: {phone, country}}) {
   try {
+    console.log('authPhone', phone);
+    console.log('typeof phone', phone);
     if (!phone) {
       yield put(phoneAuthFailed('Enter phone number'));
       return;
@@ -29,7 +32,8 @@ function* phoneAuthentication({payload: {phone, country}}) {
       return;
     }
 
-    yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
+    // yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
+    localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
     const confirmation = yield auth().signInWithPhoneNumber(`+91${phone}`);
     console.log(confirmation);
     yield put(setConfirm(confirmation));

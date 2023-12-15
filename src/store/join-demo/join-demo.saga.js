@@ -38,10 +38,11 @@ import {
 import {BASE_URL} from '@env';
 import {startCallComposite} from '../../natiive-modules/team-module';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import {setEmail} from '../auth/reducer';
+import {localStorage} from '../../utils/storage/storage-provider';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -56,15 +57,17 @@ const TAG = 'JOIN_DEMO_SAGA_ERROR';
  */
 function* fetchDemoDetailsFromPhone({payload}) {
   try {
-    // Get device id
     const token = yield getCurrentDeviceId();
+
+    console.log('phone payload', payload);
 
     const response = yield call(fetchBookingDetailsFromPhone, payload, token);
     const data = yield response.json();
 
-    let callingCode = yield AsyncStorage.getItem(LOCAL_KEYS.CALLING_CODE);
+    // let callingCode = yield AsyncStorage.getItem(LOCAL_KEYS.CALLING_CODE);
 
-    callingCode = callingCode?.replace('+', '') || '91';
+    // callingCode = callingCode?.replace('+', '') || '91';
+    let callingCode = '91';
 
     const detailsResponse = yield call(fetchBookingDetils, {
       phone: JSON.parse(callingCode.concat(payload)),
@@ -72,12 +75,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
 
     const bookingDetails = yield detailsResponse.json();
 
-    // // set phone to local storage
-    const phoneFromAsync = yield AsyncStorage.getItem(LOCAL_KEYS.PHONE);
-
-    if (!phoneFromAsync) {
-      yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, payload);
-    }
+    console.log('bookingDetails', bookingDetails);
 
     if (response.status === 400) {
       yield put(setLoading(false));
@@ -92,7 +90,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
 
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
-    console.log('error');
+    console.log('error', error);
     // yield put(setBookingDetailsFailed("Something went wrong, try again"))
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setLoading(false));
@@ -123,13 +121,13 @@ function* fetchDemoDetailsFromBookingId({payload}) {
     const bookingDetails = yield detailsResponse.json();
 
     // set id to local storage
-    const bookingIdFromAsync = yield AsyncStorage.getItem(
-      LOCAL_KEYS.BOOKING_ID,
-    );
+    // const bookingIdFromAsync = yield AsyncStorage.getItem(
+    //   LOCAL_KEYS.BOOKING_ID,
+    // );
 
-    if (!bookingIdFromAsync) {
-      yield AsyncStorage.setItem(LOCAL_KEYS.BOOKING_ID, payload);
-    }
+    // if (!bookingIdFromAsync) {
+    //   yield AsyncStorage.setItem(LOCAL_KEYS.BOOKING_ID, payload);
+    // }
 
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
@@ -147,7 +145,7 @@ function* fetchDemoDetailsFromBookingId({payload}) {
 // Phone from local storage
 function* getPhoneFromStorage() {
   try {
-    const phoneFromAsyncStorage = yield AsyncStorage.getItem(LOCAL_KEYS.PHONE);
+    const phoneFromAsyncStorage = localStorage.getNumber(LOCAL_KEYS.PHONE);
 
     if (phoneFromAsyncStorage) {
       yield put(setDemoPhone(phoneFromAsyncStorage));
@@ -347,12 +345,12 @@ function* onSetDemoData({payload: {demoData, phone}}) {
 function* saveAcsTokenInLocalStorage({data}) {
   const expire = data.expireOn;
   if (expire) {
-    yield AsyncStorage.setItem(
+    localStorage.set(
       LOCAL_KEYS.ACS_TOKEN_EXPIRE,
       new Date(expire).getTime().toString(),
     );
   }
-  yield AsyncStorage.setItem(LOCAL_KEYS.ACS_TOKEN, data.token);
+  localStorage.set(LOCAL_KEYS.ACS_TOKEN, data.token);
 
   return data.token;
 }
@@ -374,8 +372,6 @@ function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
     return;
   }
 
-  console.log('hit');
-
   try {
     const notChildName = bookingDetails.childName
       .toLowerCase()
@@ -385,8 +381,8 @@ function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
     }
 
     if (teamUrl) {
-      let token = yield AsyncStorage.getItem(LOCAL_KEYS.ACS_TOKEN);
-      const tokenExpireTime = yield AsyncStorage.getItem(
+      let token = localStorage.getString(LOCAL_KEYS.ACS_TOKEN);
+      const tokenExpireTime = localStorage.getString(
         LOCAL_KEYS.ACS_TOKEN_EXPIRE,
       );
       const currentTime = Date.now();
@@ -430,7 +426,7 @@ function* saveUserRating({payload: {bookingId, rating}}) {
     const response = yield call(saveFreeClassRating, {bookingId, rating});
 
     if (response.status === 200) {
-      yield AsyncStorage.setItem(LOCAL_KEYS.IS_RATED, 'true');
+      localStorage.set(LOCAL_KEYS.IS_RATED, 'true');
       yield put(setIsRated(true));
     }
   } catch (error) {
@@ -441,7 +437,7 @@ function* saveUserRating({payload: {bookingId, rating}}) {
 // Check rating from local storage
 function* checkRatingFromLocalStorage() {
   try {
-    const rating = yield AsyncStorage.getItem(LOCAL_KEYS.IS_RATED);
+    const rating = localStorage.getString(LOCAL_KEYS.IS_RATED);
     if (rating === 'true') {
       yield put(setIsRated(true));
     }
@@ -467,7 +463,7 @@ function* handleNMI({payload: {bookingId}}) {
     console.log(yield response.json());
 
     if (response.status === 200) {
-      yield AsyncStorage.setItem(LOCAL_KEYS.NMI, 'true');
+      localStorage.set(LOCAL_KEYS.NMI, 'true');
       yield put(markNMISuccess());
       // const url = getWhatsappRedirectUrl(text);
       // yield Linking.openURL(url);

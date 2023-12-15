@@ -22,7 +22,8 @@ import {request, PERMISSIONS} from 'react-native-permissions';
 import {checkForUpdate} from './src/natiive-modules/inapp-update';
 // import {getCurrentAppVersion} from './src/natiive-modules/app-version';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import {localStorage} from './src/utils/storage/storage-provider';
 import {FONTS} from './src/utils/constants/fonts';
 import {SCREEN_NAMES} from './src/utils/constants/screen-names';
 
@@ -80,9 +81,10 @@ function App() {
 
   async function onAuthStateChanged(user) {
     try {
-      const phone = await AsyncStorage.getItem(LOCAL_KEYS.PHONE);
+      const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
       // const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
       console.log('phone', phone);
+      console.log('typeof phone', typeof phone);
       let token;
       if (user) {
         const tokenResult = await auth().currentUser.getIdTokenResult();
@@ -127,15 +129,18 @@ function App() {
     try {
       const token = await getCurrentDeviceId();
 
-      const deviceId = await AsyncStorage.getItem(LOCAL_KEYS.DEVICE_ID);
+      const response = await storeDeviceId(token);
+      const data = await response.json();
+      console.log('tokenData', data);
+      // const deviceId = await AsyncStorage.getItem(LOCAL_KEYS.DEVICE_ID);
 
-      if (!deviceId) {
-        const response = await storeDeviceId(token);
+      // if (!deviceId) {
+      //   const response = await storeDeviceId(token);
 
-        if (response.status === 200) {
-          await AsyncStorage.setItem(LOCAL_KEYS.DEVICE_ID, 'true');
-        }
-      }
+      //   if (response.status === 200) {
+      //     await AsyncStorage.setItem(LOCAL_KEYS.DEVICE_ID, 'true');
+      //   }
+      // }
     } catch (error) {
       console.log('DEVICE_ID_ERROR_APP=', error);
     }

@@ -6,7 +6,7 @@ import {
   setLoading,
 } from './reducer';
 import moment from 'moment';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {generateOffering} from '../../utils/offering';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import RazorpayCheckout from 'react-native-razorpay';
@@ -14,6 +14,7 @@ import {MESSAGES} from '../../utils/constants/messages';
 import {setEmail} from '../auth/reducer';
 import {savePaymentSource} from '../../utils/api/yl.api';
 import {BASE_URL} from '@env';
+import {localStorage} from '../../utils/storage/storage-provider';
 
 function* makePaymentSaga({payload}) {
   try {
@@ -79,10 +80,13 @@ function* makePaymentSaga({payload}) {
       body.discountedPrice = payload.discountedPrice;
     }
 
-    const isEmail = yield AsyncStorage.getItem(LOCAL_KEYS.EMAIL);
-    if (!isEmail) {
-      yield AsyncStorage.setItem(LOCAL_KEYS.EMAIL, body.email);
-    }
+    // const isEmail = yield AsyncStorage.getItem(LOCAL_KEYS.EMAIL);
+    // if (!isEmail) {
+    //   yield AsyncStorage.setItem(LOCAL_KEYS.EMAIL, body.email);
+    // }
+
+    // Save email to local storage
+    localStorage.set(LOCAL_KEYS.EMAIL, body.email);
 
     const offeringBody = generateOffering(selectBatch);
 
