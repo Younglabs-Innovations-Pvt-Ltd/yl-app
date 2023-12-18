@@ -11,6 +11,7 @@ import {
   Image,
   AppState,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -54,6 +55,15 @@ import {FONTS} from '../utils/constants/fonts';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {localStorage} from '../utils/storage/storage-provider';
+import {paymentSelector} from '../store/payment/selector';
+import {MESSAGES} from '../utils/constants/messages';
+import ModalComponent from '../components/modal.component';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Snackbar from 'react-native-snackbar';
+import Icon from '../components/icon.component';
+import {authSelector} from '../store/auth/selector';
+import {setPaymentMessage} from '../store/payment/reducer';
+import {saveDeviceId} from '../utils/deviceId';
 
 const INITIAL_TIME = {
   days: 0,
@@ -80,7 +90,7 @@ const getTimeRemaining = bookingDate => {
   return {days, hours, minutes, seconds, remainingTime};
 };
 
-const {height: deviceHeight} = Dimensions.get('window');
+const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
 
 const sectionOffsets = {
   tipsAndTricks: 0,
@@ -98,10 +108,11 @@ const HomeScreen = ({navigation}) => {
   const [tipsAndTricksData, setTipsandTricksData] = useState([]);
   const [contentData, setContentData] = useState(null);
   const [contentLoading, setContentLoading] = useState(false);
-  const dispatch = useDispatch();
-
-  const scrollViewRef = useRef(null);
+  const [visibleCred, setVisibleCred] = useState(false);
   const [offsets, setOffsets] = useState(sectionOffsets);
+
+  const dispatch = useDispatch();
+  const scrollViewRef = useRef(null);
 
   const {
     demoData,
@@ -120,6 +131,8 @@ const HomeScreen = ({navigation}) => {
   } = useSelector(networkSelector);
 
   const {ipData} = useSelector(bookDemoSelector);
+  const {paymentMessage} = useSelector(paymentSelector);
+  const {user} = useSelector(authSelector);
 
   async function onAuthStateChanged(user) {
     if (user) {
@@ -138,19 +151,31 @@ const HomeScreen = ({navigation}) => {
     return subscriber;
   }, []);
 
+  // Save current screen name
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('home focused..');
+      localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'home');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   useEffect(() => {
     const handleAppStateChange = async nextAppState => {
       console.log('appState', nextAppState);
       if (nextAppState === 'active') {
         console.log('hit active state');
-        const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-        console.log('phone', phone);
-        dispatch(startFetchBookingDetailsFromPhone(phone));
+        const currentScreen = localStorage.getString(LOCAL_KEYS.CURRENT_SCREEN);
+        console.log('currentScreen', currentScreen);
+        if (currentScreen === 'home') {
+          const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+          console.log('phone', phone);
+          dispatch(startFetchBookingDetailsFromPhone(phone));
+        }
       }
     };
-
     const appState = AppState.addEventListener('change', handleAppStateChange);
-
     return () => {
       appState.remove();
     };
@@ -159,6 +184,7 @@ const HomeScreen = ({navigation}) => {
   // App content
   useEffect(() => {
     const fetchAppTestimonials = async () => {
+      console.log('hit testimonials');
       try {
         setContentLoading(true);
         const res = await getAppTestimonials();
@@ -198,6 +224,17 @@ const HomeScreen = ({navigation}) => {
 
   /**
    * @author Shobhit
+   * @since 07/08/2023
+   * @description Call api to get booking status from phone number
+   */
+  useEffect(() => {
+    if (demoPhoneNumber) {
+      dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+    }
+  }, [demoPhoneNumber]);
+
+  /**
+   * @author Shobhit
    * @since 22/09/2023
    * @description Set parent name and phone as username to Sentry to specify errors
    */
@@ -208,15 +245,6 @@ const HomeScreen = ({navigation}) => {
       });
     }
   }, [bookingDetails]);
-
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description Set demo phone number from localStorage to redux state
-   */
-  useEffect(() => {
-    dispatch(setPhoneAsync());
-  }, []);
 
   useEffect(() => {
     if (!ipData) {
@@ -236,6 +264,21 @@ const HomeScreen = ({navigation}) => {
     }
   }, [demoData]);
 
+  useEffect(() => {
+    let timeout;
+    if (paymentMessage === MESSAGES.PAYMENT_SUCCESS) {
+      timeout = setTimeout(() => {
+        setVisibleCred(true);
+      }, 1000);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [paymentMessage]);
+
   // useEffect(() => {
   //   const unsubscribe = NetInfo.addEventListener(async state => {
   //     if (state.isConnected && isConnected) {
@@ -251,17 +294,6 @@ const HomeScreen = ({navigation}) => {
   //     unsubscribe();
   //   };
   // }, [demoPhoneNumber, demoBookingId, dispatch, isConnected]);
-
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description Call api to get booking status from phone number
-   */
-  useEffect(() => {
-    if (demoPhoneNumber) {
-      dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-    }
-  }, [demoPhoneNumber, dispatch]);
 
   /**
    * @author Shobhit
@@ -389,6 +421,7 @@ const HomeScreen = ({navigation}) => {
     }
   }, [bookingTime]);
 
+  // Check for demo is over or not
   useEffect(() => {
     if (bookingTime) {
       const timeOver = bookingTime < Date.now();
@@ -397,6 +430,13 @@ const HomeScreen = ({navigation}) => {
       }
     }
   }, [bookingTime]);
+
+  useEffect(() => {
+    console.log('hit demophone');
+    if (demoPhoneNumber) {
+      saveDeviceId({phone: demoPhoneNumber});
+    }
+  }, [demoPhoneNumber]);
 
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
@@ -446,6 +486,29 @@ const HomeScreen = ({navigation}) => {
     setOffsets(p => ({...p, [section]: y}));
   };
 
+  const copyCredentials = cred => {
+    Clipboard.setString(cred);
+    Snackbar.show({
+      text: 'Copied.',
+      textColor: COLORS.white,
+      duration: Snackbar.LENGTH_SHORT,
+    });
+  };
+
+  const closeModal = () => {
+    dispatch(setPaymentMessage(''));
+    setVisibleCred(false);
+  };
+
+  const redirectToWebsite = async () => {
+    try {
+      const WEBSITE_URL = 'https://www.younglabs.in/';
+      await Linking.openURL(WEBSITE_URL);
+    } catch (error) {
+      console.log('OPEN_ABOUT_US_URL_ERROR', error);
+    }
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: '#76c8f2'}}>
       <View style={styles.topSection}>
@@ -464,6 +527,10 @@ const HomeScreen = ({navigation}) => {
             </Pressable>
           </View>
         </View>
+        {/* <Button
+          onPress={() => navigation.navigate(SCREEN_NAMES.COURSE_DETAILS)}>
+          Course
+        </Button> */}
         {loading ? (
           // <Spinner style={{alignSelf: 'center'}} />
           <ActivityIndicator
@@ -591,6 +658,8 @@ const HomeScreen = ({navigation}) => {
                     key={item.id}
                     uri={item.uri}
                     poster={item.poster}
+                    thumbnailText={item?.thumbnailText}
+                    aspectRatio={9 / 16}
                   />
                 )}
               />
@@ -627,6 +696,8 @@ const HomeScreen = ({navigation}) => {
                     key={item.id.toString()}
                     uri={item.uri}
                     poster={item.poster}
+                    thumbnailText={item?.thumbnailText}
+                    aspectRatio={9 / 16}
                   />
                 )}
               />
@@ -660,6 +731,9 @@ const HomeScreen = ({navigation}) => {
                     key={item.id.toString()}
                     uri={item.uri}
                     poster={item.poster}
+                    thumbnailText={item?.thumbnailText}
+                    aspectRatio={16 / 9}
+                    width={deviceWidth - 32}
                   />
                 )}
               />
@@ -683,6 +757,111 @@ const HomeScreen = ({navigation}) => {
           </>
         )}
       </ScrollView>
+      <ModalComponent
+        visible={visibleCred}
+        onRequestClose={() => setVisibleCred(false)}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.2)',
+          }}>
+          <View style={{paddingHorizontal: 16}}>
+            <View
+              style={{
+                padding: 12,
+                backgroundColor: COLORS.white,
+                borderRadius: 12,
+                elevation: 10,
+              }}>
+              <TextWrapper fs={19} ff={FONTS.signika_medium}>
+                Copy credentials and login to our website
+              </TextWrapper>
+              <Spacer space={12} />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingHorizontal: 6,
+                  paddingVertical: 10,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderWidth: 1,
+                  borderColor: 'gray',
+                  position: 'relative',
+                }}>
+                <TextWrapper fs={16.5}>{user?.email}</TextWrapper>
+                <Icon
+                  name="copy-outline"
+                  size={24}
+                  color={'gray'}
+                  onPress={() => copyCredentials(user?.email)}
+                />
+                <TextWrapper
+                  styles={{
+                    position: 'absolute',
+                    top: '-50%',
+                    left: 16,
+                    backgroundColor: COLORS.white,
+                    paddingHorizontal: 2,
+                  }}>
+                  Email
+                </TextWrapper>
+              </View>
+              <Spacer space={12} />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingHorizontal: 6,
+                  paddingVertical: 10,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderWidth: 1,
+                  borderColor: 'gray',
+                  position: 'relative',
+                }}>
+                <TextWrapper
+                  fs={16.5}>{`younglabs${user?.leadId}`}</TextWrapper>
+                <Icon
+                  name="copy-outline"
+                  size={24}
+                  color={'gray'}
+                  onPress={() => copyCredentials(`younglabs${user?.leadId}`)}
+                />
+                <TextWrapper
+                  styles={{
+                    position: 'absolute',
+                    top: '-50%',
+                    left: 16,
+                    backgroundColor: COLORS.white,
+                    paddingHorizontal: 2,
+                  }}>
+                  Password
+                </TextWrapper>
+              </View>
+              <Spacer space={12} />
+              <Pressable
+                style={({pressed}) => [
+                  styles.btnCancel,
+                  {backgroundColor: pressed ? '#f5f5f5' : '#eee'},
+                ]}
+                onPress={redirectToWebsite}>
+                <TextWrapper color={COLORS.black}>Go to website</TextWrapper>
+              </Pressable>
+              <Spacer space={4} />
+              <Pressable
+                style={({pressed}) => [
+                  styles.btnCancel,
+                  {backgroundColor: pressed ? '#f5f5f5' : '#eee'},
+                ]}
+                onPress={closeModal}>
+                <TextWrapper color={COLORS.black}>Cancel</TextWrapper>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </ModalComponent>
     </View>
   );
 };
@@ -782,5 +961,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 7,
     elevation: 4,
+  },
+  btnCancel: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: 48,
+    borderRadius: 24,
   },
 });

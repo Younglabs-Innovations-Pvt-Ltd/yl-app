@@ -59,8 +59,6 @@ function* fetchDemoDetailsFromPhone({payload}) {
   try {
     const token = yield getCurrentDeviceId();
 
-    console.log('phone payload', payload);
-
     const response = yield call(fetchBookingDetailsFromPhone, payload, token);
     const data = yield response.json();
 
@@ -75,10 +73,15 @@ function* fetchDemoDetailsFromPhone({payload}) {
 
     const bookingDetails = yield detailsResponse.json();
 
-    console.log('bookingDetails', bookingDetails);
-
     if (response.status === 400) {
       yield put(setLoading(false));
+    }
+
+    const checkPhone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+    console.log('checkPhone', checkPhone);
+    if (!checkPhone) {
+      console.log('hit checkPhone');
+      localStorage.set(LOCAL_KEYS.PHONE, parseInt(payload));
     }
 
     // lead email
@@ -458,9 +461,10 @@ function* handleNMI({payload: {bookingId}}) {
   try {
     // const isNmi = yield AsyncStorage.getItem(LOCAL_KEYS.NMI);
     // if (!isNmi) {
+
     const response = yield saveNeedMoreInfo({bookingId});
 
-    console.log(yield response.json());
+    // console.log(yield response.json());
 
     if (response.status === 200) {
       localStorage.set(LOCAL_KEYS.NMI, 'true');
@@ -477,7 +481,7 @@ function* handleNMI({payload: {bookingId}}) {
     //   yield Linking.openURL(url);
     // }
   } catch (error) {
-    console.log(error);
+    console.log('saveNMIError', error.message);
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setCurrentNetworkState(markNMI({bookingId})));
     // } else {

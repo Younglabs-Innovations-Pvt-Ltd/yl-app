@@ -28,6 +28,7 @@ import {joinDemoSelector} from '../../store/join-demo/join-demo.selector';
 import ModalComponent from '../modal.component';
 import NotInterested from '../not-interested.component';
 import {localStorage} from '../../utils/storage/storage-provider';
+import {FONTS} from '../../utils/constants/fonts';
 
 const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
 
@@ -153,12 +154,12 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   // Reschedule a free class
-  const rescheduleFreeClass = () => {
-    const {childAge, parentName, phone, childName} = bookingDetails;
-    const formFields = {childAge, parentName, phone, childName};
+  // const rescheduleFreeClass = () => {
+  //   const {childAge, parentName, phone, childName} = bookingDetails;
+  //   const formFields = {childAge, parentName, phone, childName};
 
-    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
-  };
+  //   navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
+  // };
 
   const courseDetails = () => {
     navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
@@ -181,11 +182,7 @@ const PostDemoAction = ({rescheduleClass}) => {
             }
             size={32}
             color={
-              rating
-                ? i < rating
-                  ? COLORS.pgreen
-                  : COLORS.white
-                : COLORS.white
+              rating ? (i < rating ? COLORS.white : COLORS.white) : COLORS.white
             }
           />
         </Pressable>
@@ -208,8 +205,6 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   if (ratingLoading || attendedLoading || loading) return null;
 
-  console.log('nmi', isNmi);
-
   return (
     <View
       style={{
@@ -220,6 +215,7 @@ const PostDemoAction = ({rescheduleClass}) => {
           <TextWrapper
             fs={20}
             color={COLORS.white}
+            ff={FONTS.signika_medium}
             styles={{textAlign: 'center'}}>
             Did you attend your free class?
           </TextWrapper>
@@ -233,7 +229,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 },
               ]}
               onPress={saveAttended}>
-              <TextWrapper color="rgb(14, 113, 195)" fs={18}>
+              <TextWrapper color={'#434a52'} fs={18}>
                 Yes attended
               </TextWrapper>
             </Pressable>
@@ -245,7 +241,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 },
               ]}
               onPress={rescheduleClass}>
-              <TextWrapper color="rgb(14, 113, 195)" fs={18}>
+              <TextWrapper color={'#434a52'} fs={18}>
                 Reschedule
               </TextWrapper>
             </Pressable>
@@ -304,30 +300,35 @@ const PostDemoAction = ({rescheduleClass}) => {
         </View>
       )}
       {isNmi && (
-        <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            gap: 8,
-            // backgroundColor: COLORS.pblue,
-            padding: 16,
-          }}>
-          <Pressable
-            style={({pressed}) => [
-              styles.ctaButton,
-              {flex: 1, opacity: pressed ? 0.8 : 1},
-            ]}
-            onPress={courseDetails}>
-            <TextWrapper>Course details</TextWrapper>
-          </Pressable>
-          <Pressable
-            style={({pressed}) => [
-              styles.ctaButton,
-              {flex: 1, opacity: pressed ? 0.8 : 1},
-            ]}
-            onPress={batchDetails}>
-            <TextWrapper>Batch details</TextWrapper>
-          </Pressable>
+        <View style={{padding: 16, width: '100%'}}>
+          <TextWrapper color={COLORS.white} fs={18}>
+            Give your child a gift of beautiful handwriting today!
+          </TextWrapper>
+          <Spacer space={4} />
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              gap: 8,
+              // backgroundColor: COLORS.pblue,
+            }}>
+            <Pressable
+              style={({pressed}) => [
+                styles.ctaButton,
+                {flex: 1, opacity: pressed ? 0.8 : 1},
+              ]}
+              onPress={courseDetails}>
+              <TextWrapper>Course details</TextWrapper>
+            </Pressable>
+            <Pressable
+              style={({pressed}) => [
+                styles.ctaButton,
+                {flex: 1, opacity: pressed ? 0.8 : 1},
+              ]}
+              onPress={batchDetails}>
+              <TextWrapper>Batch/Fee details</TextWrapper>
+            </Pressable>
+          </View>
         </View>
       )}
       <ModalComponent
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgb(235 237 241)',
+    backgroundColor: COLORS.white,
     borderRadius: 4,
   },
 });

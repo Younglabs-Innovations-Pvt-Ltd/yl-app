@@ -11,7 +11,7 @@ import {CommonActions} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import {setToInitialState} from '../store/join-demo/join-demo.reducer';
+// import {setToInitialState} from '../store/join-demo/join-demo.reducer';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
@@ -23,7 +23,7 @@ import {COLORS} from '../utils/constants/colors';
 import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
 
 import {cancleNotifications} from '../utils/notifications';
-import Share from 'react-native-share';
+// import Share from 'react-native-share';
 
 import {i18nContext} from '../context/lang.context';
 import {authSelector} from '../store/auth/selector';
@@ -32,6 +32,8 @@ import Snackbar from 'react-native-snackbar';
 import auth from '@react-native-firebase/auth';
 import {logout} from '../store/auth/reducer';
 import {localStorage} from '../utils/storage/storage-provider';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {FONTS} from '../utils/constants/fonts';
 
 const WEBSITE_URL = 'https://www.younglabs.in/';
 
@@ -126,19 +128,19 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       bookingDetails.parentName.slice(1)
     : '';
 
-  const shareApp = async () => {
-    const message =
-      'Book a free english handwriting class for your child conducted by experts.';
-    const url = 'https://play.google.com/store/apps/details?id=com.younglabs';
-    try {
-      await Share.open({
-        title: 'Younglabs',
-        message: `${message} \n Download now: ${url}`,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const shareApp = async () => {
+  //   const message =
+  //     'Book a free english handwriting class for your child conducted by experts.';
+  //   const url = 'https://play.google.com/store/apps/details?id=com.younglabs';
+  //   try {
+  //     await Share.open({
+  //       title: 'Younglabs',
+  //       message: `${message} \n Download now: ${url}`,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const copyCredentials = cred => {
     Clipboard.setString(cred);
@@ -146,6 +148,17 @@ const CustomDrawerContent = ({navigation, ...props}) => {
       text: 'Copied.',
       textColor: COLORS.white,
       duration: Snackbar.LENGTH_SHORT,
+    });
+  };
+
+  const rescheduleClass = () => {
+    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {
+      formFields: {
+        childAge: bookingDetails?.childAge,
+        parentName: bookingDetails?.parentName,
+        phone: bookingDetails?.phone,
+        childName: bookingDetails?.childName,
+      },
     });
   };
 
@@ -223,7 +236,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             flex: 0.5,
             justifyContent: 'flex-end',
           }}>
-          <Pressable
+          {/* <Pressable
             style={({pressed}) => [
               styles.btnDrawer,
               {
@@ -239,9 +252,24 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               styles={{marginLeft: 8}}>
               {localLang.shareButtonText}
             </TextWrapper>
+          </Pressable> */}
+          <Pressable
+            style={({pressed}) => [
+              styles.btnDrawer,
+              {
+                backgroundColor: pressed ? '#eaeaea' : 'transparent',
+                justifyContent: 'flex-start',
+              },
+            ]}
+            onPress={rescheduleClass}>
+            <TextWrapper color={COLORS.black} ff={FONTS.signika_medium}>
+              Book free handwriting class
+            </TextWrapper>
           </Pressable>
           <View style={styles.socialContainer}>
-            <TextWrapper>{localLang.socialMediaButtonText}</TextWrapper>
+            <TextWrapper ff={FONTS.signika_medium}>
+              {localLang.socialMediaButtonText}
+            </TextWrapper>
             <View style={styles.socialMediaIconsWrapper}>
               <Pressable style={styles.btnSocialMedia} onPress={openFacebook}>
                 <Icon name="logo-facebook" size={30} color="blue" />
@@ -261,7 +289,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
                 {backgroundColor: pressed ? '#eaeaea' : 'transparent'},
               ]}
               onPress={handleLogout}>
-              <TextWrapper color={COLORS.black} fs={16.5}>
+              <TextWrapper color={COLORS.black} ff={FONTS.signika_medium}>
                 {localLang.logoutButtonText}
               </TextWrapper>
               <Icon name="log-out-outline" size={24} color={COLORS.black} />

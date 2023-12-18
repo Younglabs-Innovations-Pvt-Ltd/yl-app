@@ -75,7 +75,7 @@ const DemoClassScreen = ({navigation}) => {
 
   // Setting background color and style of Statusbar
   useEffect(() => {
-    StatusBar.setBackgroundColor(COLORS.pgreen);
+    StatusBar.setBackgroundColor(COLORS.pblue);
     StatusBar.setBarStyle('light-content');
   }, []);
 
@@ -105,11 +105,11 @@ const DemoClassScreen = ({navigation}) => {
    * Check if ipData is available
    * If not only then fetch (to avoid make api calls on every render)
    */
-  useEffect(() => {
-    if (!ipData) {
-      dispatch(startFetchingIpData());
-    }
-  }, [ipData]);
+  // useEffect(() => {
+  //   if (!ipData) {
+  //     dispatch(startFetchingIpData());
+  //   }
+  // }, [ipData]);
 
   /**
    * @author Shobhit
@@ -118,16 +118,16 @@ const DemoClassScreen = ({navigation}) => {
    * Setting calling code and country code to country state
    * To show default calling code in input
    */
-  useEffect(() => {
-    if (ipData) {
-      dispatch(
-        setCountry({
-          callingCode: ipData.calling_code,
-          countryCode: {cca2: ipData.country_code2},
-        }),
-      );
-    }
-  }, [ipData]);
+  // useEffect(() => {
+  //   if (ipData) {
+  //     dispatch(
+  //       setCountry({
+  //         callingCode: ipData.calling_code,
+  //         countryCode: {cca2: ipData.country_code2},
+  //       }),
+  //     );
+  //   }
+  // }, [ipData]);
 
   useEffect(() => {
     if (confirm) {
@@ -372,8 +372,8 @@ const DemoClassScreen = ({navigation}) => {
         ]}>
         <View style={styles.footerContent}>
           <View style={styles.row}>
-            <Pressable style={styles.btnCountryCode} onPress={showCountryList}>
-              <TextWrapper>{country.callingCode}</TextWrapper>
+            <Pressable style={styles.btnCountryCode}>
+              <TextWrapper>{'+91'}</TextWrapper>
             </Pressable>
             <TextInput
               placeholder="Enter phone number"
@@ -461,6 +461,8 @@ const DemoClassScreen = ({navigation}) => {
                 borderWidth: StyleSheet.hairlineWidth,
                 borderColor: 'gray',
                 borderRadius: 4,
+                color: COLORS.black,
+                fontSize: 18,
               }}
               selectionColor={COLORS.black}
               value={code}
@@ -574,7 +576,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    backgroundColor: COLORS.pgreen,
+    backgroundColor: COLORS.pblue,
     borderRadius: 54,
   },
   animatedImage: {

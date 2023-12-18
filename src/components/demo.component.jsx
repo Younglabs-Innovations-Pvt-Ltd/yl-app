@@ -23,8 +23,9 @@ import BookDemoSlots from '../screens/book-demo-slots.screen';
 import TwoStepForm from './two-step-form.component';
 import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {FONTS} from '../utils/constants/fonts';
 
-const {height: deviceHeight} = Dimensions.get('window');
+const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
 
 const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   const [childName, setChildName] = useState('');
@@ -32,7 +33,6 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   const [visible, setVisible] = useState(false);
   const [params, setParams] = useState(null);
   const [cn, setCn] = useState(false);
-  const [uploaded, setUploaded] = useState(false);
 
   const {localLang} = i18nContext();
   const dispatch = useDispatch();
@@ -118,7 +118,11 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
         )}
       </>
     ) : (
-      <TextWrapper color={COLORS.black} fs={18} styles={{textAlign: 'left'}}>
+      <TextWrapper
+        color={COLORS.white}
+        fs={20}
+        ff={FONTS.signika_semiBold}
+        styles={{marginBottom: 12}}>
         Class is on going, Join now.
       </TextWrapper>
     );
@@ -160,17 +164,16 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
 
       {/* Show join button */}
       {SHOW_JOIN_BUTTON && (
-        <>
+        <View>
           {IS_CHILD_NAME}
-          <Spacer />
           <Button
-            rounded={4}
-            onPress={handleJoinClass}
-            bg={COLORS.pgreen}
-            textColor={COLORS.white}>
-            Enter Class
+            textColor={'#434a52'}
+            bg={COLORS.white}
+            rounded={6}
+            onPress={handleJoinClass}>
+            Enter class
           </Button>
-        </>
+        </View>
       )}
       {isTimeover && !teamUrl && (
         <View
@@ -196,7 +199,6 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
         // Show post action after demo class
         showPostActions && <PostDemoAction rescheduleClass={onOpen} />
       }
-
       <Modal animationType="fade" visible={open} onRequestClose={onClose}>
         <View
           style={{

@@ -1,19 +1,27 @@
 import React, {useRef, useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, TextInput, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import {COLORS} from '../utils/constants/colors';
 import Icon from './icon.component';
 import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
 import Collapsible from 'react-native-collapsible';
 import {FONTS} from '../utils/constants/fonts';
-import Button from './button.component';
 import {markNotInterest} from '../utils/api/yl.api';
 import Snackbar from 'react-native-snackbar';
 
 const faqs = [
-  'Class quality was not good enough',
-  'Teacher was not good',
-  'Unable to join the class',
+  'Did not like class',
+  'Too expensive',
+  'child not free',
+  'Want offline class',
+  'Want in vacations',
 ];
 
 const NotInterested = ({onClose, bookingDetails}) => {
@@ -35,6 +43,9 @@ const NotInterested = ({onClose, bookingDetails}) => {
         setOther('');
       }
     }
+    if (!isCollapsed) {
+      setIsCollapsed(true);
+    }
     setComment(payload);
   };
 
@@ -49,9 +60,7 @@ const NotInterested = ({onClose, bookingDetails}) => {
       }
       const remark = other || comment;
       const res = await markNotInterest({
-        leadId,
-        phone,
-        name: parentName,
+        bookingId: bookingDetails.bookingId,
         comment: remark,
       });
       if (res.status === 200) {
@@ -85,7 +94,7 @@ const NotInterested = ({onClose, bookingDetails}) => {
       <ScrollView
         style={{flex: 1}}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{gap: 6}}>
+        contentContainerStyle={{gap: 6, paddingBottom: 70}}>
         {faqs.map((faq, index) => (
           <Pressable
             key={index}
@@ -105,6 +114,7 @@ const NotInterested = ({onClose, bookingDetails}) => {
             selectionColor={COLORS.black}
             value={other}
             onChangeText={e => setOther(e)}
+            placeholderTextColor={'gray'}
           />
         </Collapsible>
         <Pressable
@@ -117,15 +127,21 @@ const NotInterested = ({onClose, bookingDetails}) => {
         </Pressable>
       </ScrollView>
       <View style={styles.footer}>
-        <Button
-          loading={loading}
+        <Pressable
+          style={styles.button}
           onPress={saveMarkNotInterested}
-          textSize={18}
-          textColor={COLORS.white}
-          bg={COLORS.pgreen}
-          rounded={6}>
-          Submit
-        </Button>
+          disabled={loading}>
+          <TextWrapper fs={18} color={COLORS.white} ff={FONTS.signika_semiBold}>
+            Submit
+          </TextWrapper>
+          {loading && (
+            <ActivityIndicator
+              size={'small'}
+              color={COLORS.white}
+              style={{marginLeft: 4}}
+            />
+          )}
+        </Pressable>
       </View>
     </View>
   );
@@ -153,6 +169,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.pblue,
     fontFamily: FONTS.roboto,
     fontSize: 18,
+    color: COLORS.black,
+    height: 48,
   },
   footer: {
     position: 'absolute',
@@ -169,5 +187,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 6,
     padding: 16,
+  },
+  button: {
+    width: '100%',
+    height: 48,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.pblue,
+    borderRadius: 6,
   },
 });

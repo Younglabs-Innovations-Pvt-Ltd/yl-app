@@ -3,8 +3,11 @@ import {
   fetchCourseFailed,
   fetchCourseStart,
   fetchCourseSuccess,
+  fetchCourseVideos,
+  setCourseVideos,
 } from './course.reducer';
 import {getCourseDetails} from '../../utils/api/course.api';
+import {getCourseVideo} from '../../utils/api/yl.api';
 
 function* courseDetail({payload}) {
   try {
@@ -18,12 +21,26 @@ function* courseDetail({payload}) {
   }
 }
 
+function* fetchCourseVideosSaga() {
+  try {
+    const res = yield getCourseVideo({courseId: 'Eng_Hw'});
+    const videoData = yield res.json();
+    yield put(setCourseVideos(videoData?.data));
+  } catch (error) {
+    console.log('fetchCourseVideosError', error.message);
+  }
+}
+
 // Listeners
 function* startFetchCourse() {
   yield takeLatest(fetchCourseStart.type, courseDetail);
 }
 
+function* fetchCourseListener() {
+  yield takeLatest(fetchCourseVideos.type, fetchCourseVideosSaga);
+}
+
 // Main saga
 export function* courseSagas() {
-  yield all([call(startFetchCourse)]);
+  yield all([call(startFetchCourse), call(fetchCourseListener)]);
 }

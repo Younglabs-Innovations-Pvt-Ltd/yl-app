@@ -6,6 +6,7 @@ import {COLORS} from '../utils/constants/colors';
 import CustomerSupportActions from './customer-support-actions';
 import Icon from './icon.component';
 import Share from 'react-native-share';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 const Icons = (name, focused) => {
   switch (name) {
@@ -21,7 +22,7 @@ const Icons = (name, focused) => {
         <MIcon
           name="account-circle"
           size={28}
-          color={focused ? COLORS.pgreen : '#222'}
+          color={focused ? COLORS.pblue : '#222'}
         />
       );
     default:
@@ -57,6 +58,10 @@ function Tabbar({state, descriptors, navigation}) {
     setActions(true);
   };
 
+  const goOnCourse = () => {
+    navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
+  };
+
   return (
     <>
       <View style={styles.tabbar}>
@@ -77,6 +82,31 @@ function Tabbar({state, descriptors, navigation}) {
             navigation.navigate(name);
           };
 
+          if (route.name === 'Course') {
+            return (
+              <Pressable
+                key={route.key}
+                accessibilityRole="button"
+                accessibilityState={isFocused ? {selected: true} : {}}
+                accessibilityLabel={options.tabBarAccessibilityLabel}
+                testID={options.tabBarTestID}
+                onPress={goOnCourse}
+                style={{flex: 1, alignItems: 'center'}}>
+                <Icon
+                  name="book-outline"
+                  size={24}
+                  color={isFocused ? COLORS.pblue : '#222'}
+                />
+                <TextWrapper
+                  fw="600"
+                  fs={14}
+                  color={isFocused ? COLORS.pblue : '#222'}>
+                  {label}
+                </TextWrapper>
+              </Pressable>
+            );
+          }
+
           if (route.name === 'Contact') {
             return (
               <Pressable
@@ -90,12 +120,12 @@ function Tabbar({state, descriptors, navigation}) {
                 <MIcon
                   name="headset"
                   size={24}
-                  color={isFocused ? COLORS.pgreen : '#222'}
+                  color={isFocused ? COLORS.pblue : '#222'}
                 />
                 <TextWrapper
                   fw="600"
                   fs={14}
-                  color={isFocused ? COLORS.pgreen : '#222'}>
+                  color={isFocused ? COLORS.pblue : '#222'}>
                   {label}
                 </TextWrapper>
               </Pressable>
@@ -121,7 +151,7 @@ function Tabbar({state, descriptors, navigation}) {
                 <TextWrapper
                   fw="600"
                   fs={14}
-                  color={isFocused ? COLORS.pgreen : '#222'}>
+                  color={isFocused ? COLORS.pblue : '#222'}>
                   {label}
                 </TextWrapper>
               </Pressable>
@@ -141,7 +171,7 @@ function Tabbar({state, descriptors, navigation}) {
               <TextWrapper
                 fw="600"
                 fs={14}
-                color={isFocused ? COLORS.pgreen : '#222'}>
+                color={isFocused ? COLORS.pblue : '#222'}>
                 {label}
               </TextWrapper>
             </Pressable>

@@ -118,7 +118,6 @@ const Worksheets = ({handleSectionLayout}) => {
           gap: 12,
           paddingHorizontal: 2,
           paddingVertical: 8,
-          maxHeight: 120,
         }}>
         {worksheets.reverse().map((item, index) => (
           <WorksheetItem
@@ -225,19 +224,21 @@ const WorksheetItem = ({item, index, onOpenWorksheet, downloadWorksheet}) => {
       </View> */}
       <View
         style={{
-          height: '70%',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
         <MIcon name="file-document-multiple" size={48} color={'#76c8f2'} />
       </View>
-      <View style={{height: '30%'}}>
-        <TextWrapper
-          fs={15}
-          styles={{textTransform: 'capitalize', textAlign: 'center'}}>
-          {item.title}
-        </TextWrapper>
-      </View>
+      <TextWrapper
+        fs={16}
+        ff={FONTS.signika_medium}
+        styles={{
+          textTransform: 'capitalize',
+          textAlign: 'center',
+          marginTop: 6,
+        }}>
+        {item.title}
+      </TextWrapper>
 
       {/* <View style={styles.pdfOverlay}>
         <View
@@ -271,14 +272,14 @@ export default Worksheets;
 const styles = StyleSheet.create({
   pdfContainer: {
     width: 110,
-    // height: 110,
-    // borderWidth: 1,
+    minHeight: 110,
     borderRadius: 8,
     overflow: 'hidden',
     position: 'relative',
-    // padding: 8,
+    padding: 8,
     backgroundColor: '#fff',
     elevation: 4,
+    justifyContent: 'center',
   },
   pdfOverlay: {
     position: 'absolute',

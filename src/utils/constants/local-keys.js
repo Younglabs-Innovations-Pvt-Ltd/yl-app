@@ -11,6 +11,7 @@ const localKeys = {
   SAVE_ATTENDED: 'attended',
   PAYMENT: 'success',
   EMAIL: 'email',
+  CURRENT_SCREEN: 'currentScreen',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);

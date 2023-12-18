@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {COLORS} from '../utils/constants/colors';
@@ -17,7 +18,7 @@ import moment from 'moment';
 import {courseSelector} from '../store/course/course.selector';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {setPayment, startMakePayment} from '../store/payment/reducer';
+import {setPaymentMessage, startMakePayment} from '../store/payment/reducer';
 import {authSelector} from '../store/auth/selector';
 import {paymentSelector} from '../store/payment/selector';
 import {MESSAGES} from '../utils/constants/messages';
@@ -26,6 +27,10 @@ import Icon from '../components/icon.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {resetCourseDetails} from '../store/course/course.reducer';
 import {getOfferCode} from '../utils/api/yl.api';
+import {localStorage} from '../utils/storage/storage-provider';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import {FONTS} from '../utils/constants/fonts';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -40,6 +45,8 @@ const Payment = ({navigation}) => {
   const [couponApplied, setCouponApplied] = useState(false);
   const [amount, setAmount] = useState(0);
   const [couponMsg, setCouponMsg] = useState('');
+  const [fadeOut, setFadeOut] = useState(false);
+  const [visibleCongratulations, setVisibleCongratulations] = useState(false);
 
   useEffect(() => {
     if (currentSelectedBatch) {
@@ -60,12 +67,23 @@ const Payment = ({navigation}) => {
   } = useSelector(courseSelector);
 
   const {loading, payment, message} = useSelector(paymentSelector);
+  const confettiRef = useRef();
 
   const {bookingDetails} = useSelector(joinDemoSelector);
   const {ipData} = useSelector(bookDemoSelector);
   const {token} = useSelector(authSelector);
 
   const dispatch = useDispatch();
+
+  // Set current screen name
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('payment focused..');
+      localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'payment');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     setAmount(price);
@@ -77,7 +95,6 @@ const Payment = ({navigation}) => {
     const fetchOfferCodes = async () => {
       const response = await getOfferCode({token});
       const codes = await response.json();
-      console.log('offer codes: ', codes);
       setOfferCodes(codes?.offerCodes);
     };
 
@@ -150,6 +167,11 @@ const Payment = ({navigation}) => {
       }
 
       setCouponMsg('');
+      if (confettiRef.current) {
+        confettiRef.current.start();
+        setFadeOut(true);
+        setVisibleCongratulations(true);
+      }
     } else {
       setSelectedCoupon(null);
       setCouponMsg('Coupon Not Found');
@@ -157,9 +179,26 @@ const Payment = ({navigation}) => {
     }
   };
 
+  useEffect(() => {
+    let timeout;
+    if (visibleCongratulations) {
+      timeout = setTimeout(() => {
+        setVisibleCongratulations(false);
+      }, 1800);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [visibleCongratulations]);
+
   const clearAppliedCode = () => {
     setAmount(price);
     setCouponApplied(false);
+    setSelectedCoupon(null);
+    setCouponCode('');
   };
 
   // console.log('selectedCoupon', selectedCoupon);
@@ -168,8 +207,26 @@ const Payment = ({navigation}) => {
 
   const goToHome = () => {
     dispatch(resetCourseDetails());
-    dispatch(setPayment(''));
+    dispatch(setPaymentMessage(MESSAGES.PAYMENT_SUCCESS));
     navigation.navigate(SCREEN_NAMES.MAIN);
+  };
+
+  const applyDefaultCode = () => {
+    setAmount(parseInt(price - price * (10 / 100)));
+    setCouponApplied(true);
+    setCouponCode('YLAPP10');
+    setSelectedCoupon({
+      discountType: 'percentage',
+      discountValue: 10,
+      offerCode: 'YLAPP10',
+      offerName: 'App Download',
+      validAbove: 1500,
+    });
+    if (confettiRef.current) {
+      confettiRef.current.start();
+      setFadeOut(true);
+      setVisibleCongratulations(true);
+    }
   };
 
   return (
@@ -180,7 +237,7 @@ const Payment = ({navigation}) => {
         contentContainerStyle={{padding: 12}}>
         <View style={styles.card}>
           <TextWrapper fs={18} fw="700" styles={{textTransform: 'capitalize'}}>
-            {bookingDetails.parentName}
+            {bookingDetails?.parentName}
           </TextWrapper>
           <Spacer space={2} />
           <TextWrapper>{bookingDetails?.phone}</TextWrapper>
@@ -235,6 +292,8 @@ const Payment = ({navigation}) => {
             keyboardType="email-address"
             value={email}
             onChangeText={e => setEmail(e)}
+            selectionColor={COLORS.black}
+            placeholderTextColor={'gray'}
           />
           {emailErr && (
             <TextWrapper fs={14} color={COLORS.pred}>
@@ -244,39 +303,69 @@ const Payment = ({navigation}) => {
         </View>
         <Spacer space={4} />
         <View style={styles.card}>
-          {couponApplied && (
-            <TextWrapper fw="700" fs={14} color={COLORS.pgreen}>
-              Applied
-            </TextWrapper>
-          )}
           <View
             style={{
               flexDirection: 'row',
-              gap: 8,
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}>
-            <TextInput
-              placeholder="Coupon code"
-              style={[styles.emailInput, {flex: 1}]}
-              autoCorrect={false}
-              autoCapitalize="none"
-              keyboardType="default"
-              value={couponCode}
-              onChangeText={e => setCouponCode(e)}
-            />
+            <TextWrapper
+              fw="700"
+              fs={14}
+              color={COLORS.pgreen}
+              styles={{textAlign: 'left', opacity: couponApplied ? 1 : 0}}>
+              Applied
+            </TextWrapper>
             <Pressable
               style={{
-                padding: 4,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderWidth: StyleSheet.hairlineWidth,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                alignSelf: 'flex-end',
+                backgroundColor: '#eee',
                 borderRadius: 4,
-                borderColor: 'gray',
+                marginBottom: 8,
               }}
-              onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
-              <TextWrapper fs={18}>
-                {couponApplied ? 'Clear' : 'Apply'}
+              onPress={couponApplied ? clearAppliedCode : applyDefaultCode}>
+              <TextWrapper ff={FONTS.signika_semiBold}>
+                Apply Coupon YLAPP10
               </TextWrapper>
             </Pressable>
+          </View>
+          <View>
+            <TextWrapper styles={{marginBottom: 6}}>
+              Have another code?
+            </TextWrapper>
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 8,
+              }}>
+              <TextInput
+                placeholder="Enter here"
+                style={[styles.emailInput, {flex: 1}]}
+                autoCorrect={false}
+                autoCapitalize="characters"
+                keyboardType="default"
+                value={couponCode}
+                onChangeText={e => setCouponCode(e)}
+                selectionColor={COLORS.black}
+                placeholderTextColor={'gray'}
+              />
+              <Pressable
+                style={{
+                  padding: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderRadius: 4,
+                  borderColor: 'gray',
+                }}
+                onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
+                <TextWrapper fs={18}>
+                  {couponApplied ? 'Clear' : 'Apply'}
+                </TextWrapper>
+              </Pressable>
+            </View>
           </View>
           {couponMsg && (
             <TextWrapper fs={14} color={COLORS.pred}>
@@ -311,16 +400,48 @@ const Payment = ({navigation}) => {
               styles.btnCheckout,
               {
                 opacity: pressed ? 0.8 : 1,
-                backgroundColor: loading ? '#3AAF1E' : COLORS.pgreen,
+                backgroundColor: COLORS.pblue,
               },
             ]}
             disabled={loading}>
             <TextWrapper fs={18} fw="700" color={COLORS.white}>
               Checkout
             </TextWrapper>
+            {loading && (
+              <ActivityIndicator
+                size={'small'}
+                color={COLORS.white}
+                style={{marginLeft: 4}}
+              />
+            )}
           </Pressable>
         </View>
+        <ConfettiCannon
+          ref={confettiRef}
+          count={200}
+          origin={{x: 0, y: 0}}
+          autoStart={false}
+          fadeOut={fadeOut}
+          fallSpeed={1800}
+          explosionSpeed={450}
+        />
       </View>
+      <ModalComponent visible={visibleCongratulations} animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.25)',
+          }}>
+          <TextWrapper
+            fs={36}
+            ff={FONTS.signika_semiBold}
+            color={COLORS.white}
+            styles={{textAlign: 'center'}}>
+            Congratulations
+          </TextWrapper>
+        </View>
+      </ModalComponent>
       <ModalComponent
         visible={visible}
         onRequestClose={onClose}
@@ -380,9 +501,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#eee',
+    color: COLORS.black,
   },
   btnCheckout: {
     padding: 12,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,

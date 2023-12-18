@@ -33,8 +33,10 @@ import Icon from '../components/icon.component';
 import Center from '../components/center.component';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import NetInfo from '@react-native-community/netinfo';
+import {localStorage} from '../utils/storage/storage-provider';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
-const BookDemoSlots = ({route, onClose}) => {
+const BookDemoSlots = ({navigation, route, onClose}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
@@ -177,8 +179,15 @@ const BookDemoSlots = ({route, onClose}) => {
     //   dispatch(setDemoBookingId(''));
     // }
     dispatch(closePopup());
-    onClose();
+    if (onClose) {
+      onClose();
+    }
+    localStorage.clearAll();
+    console.log('phone', phone);
     dispatch(startFetchBookingDetailsFromPhone(phone));
+    if (!onClose) {
+      navigation.replace(SCREEN_NAMES.MAIN);
+    }
   };
 
   /**
@@ -215,7 +224,7 @@ const BookDemoSlots = ({route, onClose}) => {
           style={[
             styles.slotDate,
             currentSlotDate === slot.showDate
-              ? {backgroundColor: COLORS.pgreen}
+              ? {backgroundColor: COLORS.pblue}
               : {borderWidth: 1, borderColor: 'gray'},
           ]}
           key={slot.showDate}
@@ -241,7 +250,7 @@ const BookDemoSlots = ({route, onClose}) => {
           style={[
             styles.slotDate,
             currentSlotTime.showTimings === slotTime.showTimings
-              ? {backgroundColor: COLORS.pgreen}
+              ? {backgroundColor: COLORS.pblue}
               : {borderWidth: 1, borderColor: 'gray'},
           ]}
           key={slotTime.slotId}
@@ -334,14 +343,14 @@ const BookDemoSlots = ({route, onClose}) => {
       <View style={styles.footer}>
         <Button
           rounded={6}
-          bg={COLORS.pgreen}
+          bg={COLORS.pblue}
           onPress={handleBookNow}
           textColor={COLORS.white}>
           Book now
         </Button>
       </View>
       {/* show popup */}
-      {popup && <Popup onHandlePopup={handlePopup} />}
+      {popup && <Popup onHandlePopup={handlePopup} onClose={onClose} />}
       {/* Loading spinner */}
       <Modal visible={bookingLoading}>
         <Center bg="rgba(0,0,0,0.2)">
@@ -354,9 +363,17 @@ const BookDemoSlots = ({route, onClose}) => {
 
 export default BookDemoSlots;
 
-const Popup = ({onHandlePopup, popup}) => {
+const Popup = ({onHandlePopup, popup, onClose}) => {
+  let STYLE = {paddingTop: 30};
+
+  if (!onClose) {
+    console.log('hit onClose');
+    STYLE.paddingTop = 0;
+    STYLE.justifyContent = 'center';
+  }
+
   return (
-    <View style={styles.modal} visible={popup}>
+    <View style={[styles.modal, STYLE]} visible={popup}>
       <View style={styles.popup}>
         <Icon
           name="checkmark"
@@ -426,8 +443,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.25)',
     alignItems: 'center',
-    paddingTop: 30,
-    // justifyContent: 'center',
   },
   btnBookAgain: {
     width: '100%',
@@ -436,7 +451,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.pgreen,
+    backgroundColor: COLORS.pblue,
     flexDirection: 'row',
     borderRadius: 4,
   },

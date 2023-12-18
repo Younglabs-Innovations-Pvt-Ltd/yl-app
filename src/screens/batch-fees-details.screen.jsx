@@ -11,7 +11,10 @@ import Spacer from '../components/spacer.component';
 import {COLORS} from '../utils/constants/colors';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchCourseStart} from '../store/course/course.reducer';
+import {
+  fetchCourseStart,
+  fetchCourseVideos,
+} from '../store/course/course.reducer';
 import {courseSelector} from '../store/course/course.selector';
 import Icon from '../components/icon.component';
 import BatchCard from '../components/batch-card.component';
@@ -21,6 +24,10 @@ import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import Spinner from '../components/spinner.component';
 
 import {setCurrentAgeGroup} from '../store/course/course.reducer';
+import VideoMediaPlayer from '../components/video-player.component';
+import {FONTS} from '../utils/constants/fonts';
+import {localStorage} from '../utils/storage/storage-provider';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -46,8 +53,21 @@ const BatchFeeDetails = ({navigation}) => {
     levelText,
     currentSelectedBatch,
     currentAgeGroup,
+    courseVideos,
   } = useSelector(courseSelector);
   const {ipData} = useSelector(bookDemoSelector);
+
+  // console.log('currentSelectedBatch: ', currentSelectedBatch);
+
+  // Save current screen name
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('batch focused..');
+      localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'batch');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -60,6 +80,12 @@ const BatchFeeDetails = ({navigation}) => {
   useEffect(() => {
     dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
   }, []);
+
+  useEffect(() => {
+    if (!courseVideos) {
+      dispatch(fetchCourseVideos());
+    }
+  }, [courseVideos]);
 
   useEffect(() => {
     let timeout;
@@ -78,7 +104,7 @@ const BatchFeeDetails = ({navigation}) => {
 
   useEffect(() => {
     let timeout;
-    if (levelText) {
+    if (currentSelectedBatch) {
       timeout = setTimeout(() => {
         setSteps(b => ({...b, step2: true}));
         setCollapsedButton(false);
@@ -90,7 +116,7 @@ const BatchFeeDetails = ({navigation}) => {
         clearTimeout(timeout);
       }
     };
-  }, [levelText]);
+  }, [currentSelectedBatch]);
 
   useEffect(() => {
     if (currentAgeGroup) {
@@ -106,26 +132,26 @@ const BatchFeeDetails = ({navigation}) => {
     dispatch(setCurrentAgeGroup(group));
   };
 
-  const SECTIONS = [
-    {
-      title: 'First',
-      content: 'Lorem ipsum...',
-    },
-    {
-      title: 'Second',
-      content: 'Lorem ipsum...',
-    },
-  ];
-
   return (
     <View style={{flex: 1}}>
       {loading ? (
-        <Spinner style={{alignSelf: 'center'}} />
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <Spinner style={{alignSelf: 'center'}} />
+          <TextWrapper
+            ff={FONTS.signika_medium}
+            color="#434a52"
+            styles={{marginTop: 4, textAlign: 'center'}}>
+            Loading...
+          </TextWrapper>
+        </View>
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{flex: 1}}
           contentContainerStyle={{padding: 16}}>
+          <View style={{paddingVertical: 16}}>
+            <VideoMediaPlayer uri={courseVideos?.postDemoVideo} />
+          </View>
           {/* Age groups */}
           <View style={{padding: 12, backgroundColor: '#eee', borderRadius: 4}}>
             <Pressable
@@ -145,7 +171,7 @@ const BatchFeeDetails = ({navigation}) => {
                   color={COLORS.black}
                 />
               ) : (
-                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
+                <Icon name="checkmark-circle" size={32} color={COLORS.pblue} />
               )}
             </Pressable>
             <Collapsible collapsed={steps.step1} duration={450}>
@@ -182,7 +208,7 @@ const BatchFeeDetails = ({navigation}) => {
                   color={COLORS.black}
                 />
               ) : (
-                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
+                <Icon name="checkmark-circle" size={32} color={COLORS.pblue} />
               )}
             </Pressable>
             {filteredBatches.length > 0 && (
@@ -253,7 +279,7 @@ const BatchFeeDetails = ({navigation}) => {
                 3. Make payment
               </TextWrapper>
               {currentSelectedBatch && currentAgeGroup ? (
-                <Icon name="checkmark-circle" size={32} color={COLORS.pgreen} />
+                <Icon name="checkmark-circle" size={32} color={COLORS.pblue} />
               ) : (
                 <Icon
                   name={`chevron-${!steps.step3 ? 'up' : 'down'}-outline`}
@@ -358,19 +384,12 @@ const styles = StyleSheet.create({
   reivewContent: {
     paddingVertical: 8,
   },
-  btnBooking: {
-    height: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 4,
-    backgroundColor: COLORS.pgreen,
-  },
   payButton: {
     width: '100%',
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.pgreen,
+    backgroundColor: COLORS.pblue,
     borderRadius: 4,
   },
 });

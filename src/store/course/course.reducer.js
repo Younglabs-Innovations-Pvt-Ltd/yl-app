@@ -14,6 +14,7 @@ const INITIAL_STATE = {
   currentSelectedBatch: null,
   currentAgeGroup: '',
   currentLevel: 1,
+  courseVideos: null,
 };
 
 const reducer = {
@@ -59,6 +60,10 @@ const reducer = {
     state.currentLevel = 1;
     state.levelText = '';
   },
+  fetchCourseVideos() {},
+  setCourseVideos(state, action) {
+    state.courseVideos = action.payload;
+  },
 };
 
 const courseSlice = createSlice({
@@ -79,6 +84,8 @@ export const {
   setCurrentSelectedBatch,
   setLevelText,
   resetCourseDetails,
+  setCourseVideos,
+  fetchCourseVideos,
 } = courseSlice.actions;
 
 export const courseReducer = courseSlice.reducer;

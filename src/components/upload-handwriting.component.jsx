@@ -21,14 +21,19 @@ import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import {saveHandwritingSample} from '../utils/api/yl.api';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {request, PERMISSIONS} from 'react-native-permissions';
+import {useDispatch, useSelector} from 'react-redux';
+import {uploadSelector} from '../store/upload-handwriting/selector';
+import {setSelectedImage} from '../store/upload-handwriting/reducer';
+import {FONTS} from '../utils/constants/fonts';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
-const UploadHandwriting = ({demoData, setUploaded}) => {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [visible, setVisible] = useState(false);
+const UploadHandwriting = ({demoData}) => {
   const [loading, setLoading] = useState(false);
   const [visibleOptions, setVisibleOptions] = useState(false);
+
+  const {selectedImage, modalVisible} = useSelector(uploadSelector);
+  const dispatch = useDispatch();
 
   const pickFile = async () => {
     try {
@@ -36,7 +41,7 @@ const UploadHandwriting = ({demoData, setUploaded}) => {
         mediaType: 'photo',
         quality: 0.3,
       });
-      setSelectedImage(result.assets[0]);
+      dispatch(setSelectedImage({image: result.assets[0], modal: true}));
     } catch (error) {
       console.log(error);
     }
@@ -86,19 +91,19 @@ const UploadHandwriting = ({demoData, setUploaded}) => {
           quality: 0.15,
           mediaType: 'photo',
         });
-        setSelectedImage(data.assets[0]);
+        dispatch(setSelectedImage({image: data.assets[0], modal: true}));
       }
     } catch (error) {
       console.log('launchCameraError', error.message);
     }
   };
 
-  useEffect(() => {
-    if (selectedImage) {
-      setVisible(true);
-      setVisibleOptions(false);
-    }
-  }, [selectedImage]);
+  // useEffect(() => {
+  //   if (selectedImage) {
+  //     setVisible(true);
+  //     setVisibleOptions(false);
+  //   }
+  // }, [selectedImage]);
 
   const uploadHandwritingImage = async () => {
     try {
@@ -151,8 +156,7 @@ const UploadHandwriting = ({demoData, setUploaded}) => {
   };
 
   const onClose = () => {
-    setVisible(false);
-    setSelectedImage(null);
+    dispatch(setSelectedImage({image: null, modal: false}));
   };
 
   const onCloseOptions = () => {
@@ -234,15 +238,25 @@ const UploadHandwriting = ({demoData, setUploaded}) => {
           </View>
         </View>
       </ModalComponent>
-      <ModalComponent visible={visible} onRequestClose={onClose}>
+      <ModalComponent visible={modalVisible} onRequestClose={onClose}>
         <View style={styles.modalContainer}>
-          <Icon
-            name="close-outline"
-            size={26}
-            color={COLORS.black}
-            style={{alignSelf: 'flex-end'}}
-            onPress={onClose}
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <TextWrapper fs={18} ff={FONTS.signika_medium}>
+              Upload image
+            </TextWrapper>
+            <Icon
+              name="close-outline"
+              size={26}
+              color={COLORS.black}
+              style={{alignSelf: 'flex-end'}}
+              onPress={onClose}
+            />
+          </View>
           <Spacer />
           <View
             style={{
@@ -258,14 +272,16 @@ const UploadHandwriting = ({demoData, setUploaded}) => {
                   borderRadius: 8,
                   overflow: 'hidden',
                 }}>
-                <Image
-                  source={{uri: selectedImage?.uri}}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  resizeMode="cover"
-                />
+                {selectedImage && (
+                  <Image
+                    source={{uri: selectedImage?.uri}}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                    }}
+                    resizeMode="cover"
+                  />
+                )}
               </Pressable>
             </View>
             <Spacer space={16} />

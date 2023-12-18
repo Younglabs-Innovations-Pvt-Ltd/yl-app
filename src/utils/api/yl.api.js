@@ -167,13 +167,13 @@ export const saveNeedMoreInfo = async ({bookingId}) => {
 };
 
 // Store every device id to database
-export const storeDeviceId = async deviceId => {
+export const storeDeviceId = async ({deviceId, phone}) => {
   return fetch(`${BASE_URL}${DEVICE_ID_URL}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({deviceId}),
+    body: JSON.stringify({deviceId, phone}),
   });
 };
 
@@ -204,25 +204,14 @@ export const getLeadEmail = async leadId => {
   });
 };
 
-// Save payment source
-export const savePaymentSource = async ({orderId, source}) => {
-  return await fetch(`${BASE_URL}/shop/orderhandler/addPaymentSource`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({rpOrderId: orderId, source}),
-  });
-};
-
 // Mark not interested in
-export const markNotInterest = async ({leadId, comment, name, phone}) => {
+export const markNotInterest = async ({bookingId, comment}) => {
   return await fetch(`${BASE_URL}/admin/demobook/markNotInterested`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({leadId, comment, phone, name}),
+    body: JSON.stringify({bookingId, comment}),
   });
 };
 
@@ -270,5 +259,16 @@ export const getAppTestimonials = async () => {
 export const getAppWorksheets = async () => {
   return await fetch(`${BASE_URL}/app/content/getAppWorksheets`, {
     method: 'GET',
+  });
+};
+
+// Get course video
+export const getCourseVideo = async ({courseId}) => {
+  return await fetch(`${BASE_URL}/app/content/getCourseResources`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({courseId}),
   });
 };

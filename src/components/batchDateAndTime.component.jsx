@@ -8,6 +8,8 @@ import {
   setCurrentLevel,
   setCurrentSelectedBatch,
   setLevelText,
+  setPrice,
+  setStrikeThroughPrice,
 } from '../store/course/course.reducer';
 import {useDispatch} from 'react-redux';
 
@@ -17,6 +19,8 @@ const BatchDateAndTime = ({
   levelText,
   option,
   level,
+  price,
+  strikeThroughPrice,
 }) => {
   if (!batch) return null;
 
@@ -29,6 +33,8 @@ const BatchDateAndTime = ({
     dispatch(setCurrentSelectedBatch(batch));
     dispatch(setLevelText(option));
     dispatch(setCurrentLevel(level));
+    dispatch(setPrice(price));
+    dispatch(setStrikeThroughPrice(strikeThroughPrice));
   };
 
   const BACKGROUND_COLOR =

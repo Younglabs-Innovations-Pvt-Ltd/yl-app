@@ -25,6 +25,10 @@ function ShareScreen() {
   return <></>;
 }
 
+function CourseScreen() {
+  return <></>;
+}
+
 const MainScreen = ({route}) => {
   const data = route.params;
   const dispatch = useDispatch();
@@ -68,6 +72,14 @@ const MainScreen = ({route}) => {
         options={{
           headerShown: false,
           tabBarLabel: localLang.tabNavHome,
+        }}
+      />
+      <Tab.Screen
+        name="Course"
+        component={CourseScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: 'Course',
         }}
       />
       <Tab.Screen

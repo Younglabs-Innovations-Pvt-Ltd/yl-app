@@ -1,4 +1,4 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -10,15 +10,18 @@ import Video from 'react-native-video';
 import Icon from './icon.component';
 import {COLORS} from '../utils/constants/colors';
 import Modal from './modal.component';
-import {
-  useNavigation,
-  useFocusEffect,
-  useIsFocused,
-} from '@react-navigation/native';
+import TextWrapper from './text-wrapper.component';
+import {FONTS} from '../utils/constants/fonts';
 
 const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
-const VideoPlayer = ({uri, poster}) => {
+const VideoPlayer = ({
+  uri,
+  poster,
+  thumbnailText,
+  width = 135,
+  aspectRatio,
+}) => {
   const videoRef = useRef();
   const thumbRef = useRef();
   const [visible, setVisible] = useState(false);
@@ -26,12 +29,7 @@ const VideoPlayer = ({uri, poster}) => {
   const [loading, setLoding] = useState(false);
   const [isEnded, setIsEnded] = useState(false);
   const [isEnded2, setIsEnded2] = useState(false);
-
-  const isFocused = useIsFocused();
-
-  useEffect(() => {
-    console.log(isFocused);
-  }, [isFocused]);
+  const [thumbLoading, setThumbLoading] = useState(false);
 
   const onLoadStart = () => {
     setLoding(true);
@@ -66,7 +64,9 @@ const VideoPlayer = ({uri, poster}) => {
 
   return (
     <>
-      <Pressable style={styles.container} onPress={onOpen}>
+      <Pressable
+        style={[styles.container, {width: width, aspectRatio}]}
+        onPress={onOpen}>
         <Video
           ref={thumbRef}
           source={{uri}}
@@ -79,11 +79,13 @@ const VideoPlayer = ({uri, poster}) => {
           onEnd={onEnd}
           resizeMode="cover"
           disableFocus={true}
-          poster={poster}
-          posterResizeMode="cover"
+          // poster={poster}
+          // posterResizeMode="cover"
           paused={visible}
+          onLoadStart={() => setThumbLoading(true)}
+          onReadyForDisplay={() => setThumbLoading(false)}
         />
-        {/* {thumbLoading && (
+        {thumbLoading && (
           <View
             style={{
               position: 'absolute',
@@ -93,23 +95,23 @@ const VideoPlayer = ({uri, poster}) => {
               bottom: 0,
               backgroundColor: '#eee',
             }}></View>
-        )} */}
-        {isEnded && (
+        )}
+        {thumbnailText && (
           <View style={styles.poster}>
             <View
               style={{
                 width: '100%',
                 height: '100%',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'flex-end',
+                paddingBottom: 16,
               }}>
-              <Pressable onPress={onOpen}>
-                <Icon
-                  name="play-circle-outline"
-                  size={64}
-                  color={COLORS.white}
-                />
-              </Pressable>
+              <TextWrapper
+                fs={20}
+                ff={FONTS.signika_semiBold}
+                color={COLORS.white}>
+                {thumbnailText}
+              </TextWrapper>
             </View>
           </View>
         )}
@@ -161,12 +163,10 @@ const VideoPlayer = ({uri, poster}) => {
   );
 };
 
-export default VideoPlayer;
+export default React.memo(VideoPlayer);
 
 const styles = StyleSheet.create({
   container: {
-    width: 135,
-    aspectRatio: 9 / 16,
     position: 'relative',
     borderRadius: 8,
     overflow: 'hidden',
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0,0,0,0.15)',
     zIndex: 1,
   },
   modalContainer: {

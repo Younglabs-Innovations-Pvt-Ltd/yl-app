@@ -12,9 +12,11 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import RazorpayCheckout from 'react-native-razorpay';
 import {MESSAGES} from '../../utils/constants/messages';
 import {setEmail} from '../auth/reducer';
-import {savePaymentSource} from '../../utils/api/yl.api';
-import {BASE_URL} from '@env';
+import {BASE_URL, RP_KEY} from '@env';
 import {localStorage} from '../../utils/storage/storage-provider';
+
+// const BASE_URL =
+//   'https://ab9e-2401-4900-1f39-499e-170-a19-6bdb-716d.ngrok-free.app';
 
 function* makePaymentSaga({payload}) {
   try {
@@ -38,7 +40,7 @@ function* makePaymentSaga({payload}) {
     selectBatch.levelText = levelText;
     selectBatch.courseType = courseDetails?.course_type;
 
-    if (levelText === 'Foundation + Advanced') {
+    if (levelText === 'Foundation+Advanced') {
       selectBatch.actualItems = 2;
     } else {
       selectBatch.actualItems = 1;
@@ -70,6 +72,7 @@ function* makePaymentSaga({payload}) {
       childAge: bookingDetails.childAge,
       timezone,
       countryCode,
+      source: 'app',
     };
 
     if (payload?.offerCode) {
@@ -147,21 +150,17 @@ function* makePaymentSaga({payload}) {
     };
 
     const options = {
-      key: 'rzp_test_0cYlLVRMEaCUDx',
+      key: RP_KEY,
       currency,
       amount: amount?.toString(),
       order_id,
-      name: 'Young Labs',
+      name: 'Younglabs',
       description: 'Younglabs Innovations',
     };
 
     const rzRes = yield RazorpayCheckout.open(options);
     console.log('rzRes=', rzRes);
     if (rzRes) {
-      yield call(savePaymentSource, {
-        orderId: rzRes?.razorpay_order_id || order_id,
-        source: 'app',
-      });
       yield put(makePaymentSuccess(MESSAGES.PAYMENT_SUCCESS));
       yield put(setEmail(body.email));
     }

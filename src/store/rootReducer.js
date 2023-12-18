@@ -8,6 +8,7 @@ import {networkReducer} from './network/reducer';
 import {authReducer} from './auth/reducer';
 import {courseReducer} from './course/course.reducer';
 import {paymentReducer} from './payment/reducer';
+import {uploadReducer} from './upload-handwriting/reducer';
 
 const reducer = combineReducers({
   joinDemo: joinDemoReducer,
@@ -18,10 +19,11 @@ const reducer = combineReducers({
   auth: authReducer,
   course: courseReducer,
   payment: paymentReducer,
+  upload: uploadReducer,
 });
 
 export const rootReducer = (state, action) => {
-  console.log('root action', action.type);
+  // console.log('state', action.type);
   if (action.type === 'auth/logout') {
     state = undefined;
   }

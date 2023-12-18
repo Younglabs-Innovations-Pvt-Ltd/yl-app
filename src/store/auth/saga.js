@@ -25,7 +25,7 @@ function* phoneAuthentication({payload: {phone, country}}) {
       return;
     }
 
-    const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
+    const isValidPhone = isValidNumber(phone, 'IN');
 
     if (!isValidPhone) {
       yield put(phoneAuthFailed('Please enter a valid number'));

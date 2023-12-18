@@ -17,9 +17,9 @@ import {
   displayRemarketingNotification,
   displayReminderNotification,
 } from './src/utils/notifications';
+import {BASE_URL} from '@env';
 
-const CAPTURE_NOTIFICATION_URL =
-  'https://7ac0-2401-4900-1c5b-616b-5579-110b-2807-3dcc.ngrok-free.app/admin/messages/captureNotificationClicks';
+const CAPTURE_NOTIFICATION_URL = `${BASE_URL}/admin/messages/captureNotificationClicks`;
 
 notifee.onBackgroundEvent(async ({type, detail}) => {
   try {
@@ -79,7 +79,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
       },
     };
 
-    if (message.image) {
+    if (message?.image) {
       notification.android.style = {
         type: AndroidStyle.BIGPICTURE,
         picture: message.image,
@@ -87,23 +87,23 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
       };
     }
 
-    if (message.largeText) {
+    if (message?.largeText) {
       notification.android.style = {
         type: AndroidStyle.BIGTEXT,
         text: message.largeText,
       };
     }
 
-    if (message.title) {
+    if (message?.title) {
       notification.title = message.title;
       notification.body = message.body;
       notification.data = message;
     }
 
     console.log('payload', notification);
-    if (message.type === 'remarketing') {
+    if (message?.type === 'remarketing') {
       await displayRemarketingNotification(notification);
-    } else if (message.type === 'reminders') {
+    } else if (message?.type === 'reminders') {
       await displayReminderNotification(notification);
     }
   } catch (error) {

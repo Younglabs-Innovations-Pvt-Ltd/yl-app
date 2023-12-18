@@ -1,13 +1,13 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {COLORS} from '../utils/constants/colors';
 import BatchDateAndTime from './batchDateAndTime.component';
 import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {courseSelector} from '../store/course/course.selector';
-import {setPrice, setStrikeThroughPrice} from '../store/course/course.reducer';
+import {FONTS} from '../utils/constants/fonts';
 
 const BatchCard = ({
   batchOptions,
@@ -18,9 +18,9 @@ const BatchCard = ({
   currentSelectedBatch,
   levelText,
 }) => {
-  const {price, strikeThroughPrice, currentLevel} = useSelector(courseSelector);
-
-  const dispatch = useDispatch();
+  const {currentLevel} = useSelector(courseSelector);
+  const [price, setPrice] = useState(0);
+  const [strikeThroughPrice, setStrikeThroughPrice] = useState(0);
 
   useEffect(() => {
     if (prices && ipData) {
@@ -28,20 +28,19 @@ const BatchCard = ({
       const country = batchPrices?.find(
         item => item.countryCode === ipData.country_code2,
       );
-      // const offeringDetails = prices.prices.offeringDetails
 
-      if (currentLevel === 1) {
-        dispatch(setPrice(country?.prices?.level1?.offer));
-        dispatch(setStrikeThroughPrice(country?.prices?.level1?.price));
-      } else if (currentLevel === 2) {
-        dispatch(setPrice(country?.prices?.level2?.offer));
-        dispatch(setStrikeThroughPrice(country?.prices?.level2?.price));
+      if (level === 1) {
+        setPrice(country?.prices?.level1?.offer);
+        setStrikeThroughPrice(country?.prices?.level1?.price);
+      } else if (level === 2) {
+        setPrice(country?.prices?.level2?.offer);
+        setStrikeThroughPrice(country?.prices?.level2?.price);
       } else {
-        dispatch(setPrice(country?.prices?.combo?.offer));
-        dispatch(setStrikeThroughPrice(country?.prices?.combo?.price));
+        setPrice(country?.prices?.combo?.offer);
+        setStrikeThroughPrice(country?.prices?.combo?.price);
       }
     }
-  }, [ipData, prices, currentLevel]);
+  }, [ipData, prices, level]);
 
   return (
     <View
@@ -76,6 +75,9 @@ const BatchCard = ({
                 : level === 2
                 ? 'Advanced'
                 : 'Foundation + Advanced'}
+            </TextWrapper>
+            <TextWrapper fs={16} ff={FONTS.signika_medium} color="#434a52">
+              {level === 1 || level === 2 ? '(12 classes)' : '(24 classes)'}
             </TextWrapper>
           </View>
           <View
@@ -133,6 +135,8 @@ const BatchCard = ({
                   currentSelectedBatch={currentSelectedBatch}
                   levelText={levelText}
                   currentLevel={currentLevel}
+                  price={price}
+                  strikeThroughPrice={strikeThroughPrice}
                 />
               );
             })}

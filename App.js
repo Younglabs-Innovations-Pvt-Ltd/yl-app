@@ -44,11 +44,10 @@ import * as Sentry from '@sentry/react-native';
 import {navigationRef} from './src/navigationRef';
 
 import {COLORS} from './src/utils/constants/colors';
-import {getCurrentDeviceId} from './src/utils/deviceId';
-import {storeDeviceId} from './src/utils/api/yl.api';
 import {NetworkProvider} from './src/context/network.state';
 
 import auth from '@react-native-firebase/auth';
+import Icon from './src/components/icon.component';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -120,32 +119,6 @@ function App() {
       .catch(err => console.log(err));
   }, []);
 
-  // Save Device id
-  useEffect(() => {
-    saveDeviceId();
-  }, []);
-
-  const saveDeviceId = async () => {
-    try {
-      const token = await getCurrentDeviceId();
-
-      const response = await storeDeviceId(token);
-      const data = await response.json();
-      console.log('tokenData', data);
-      // const deviceId = await AsyncStorage.getItem(LOCAL_KEYS.DEVICE_ID);
-
-      // if (!deviceId) {
-      //   const response = await storeDeviceId(token);
-
-      //   if (response.status === 200) {
-      //     await AsyncStorage.setItem(LOCAL_KEYS.DEVICE_ID, 'true');
-      //   }
-      // }
-    } catch (error) {
-      console.log('DEVICE_ID_ERROR_APP=', error);
-    }
-  };
-
   // Request for Notification permission
   useEffect(() => {
     requestPermissions();
@@ -194,8 +167,6 @@ function App() {
 
   if (loading) return null;
 
-  console.log('isphone', isPhone);
-
   // UI Constants
   let initialRouteName = SCREEN_NAMES.WELCOME;
 
@@ -203,7 +174,17 @@ function App() {
     initialRouteName = SCREEN_NAMES.MAIN;
   }
 
-  console.log('initialRouteName', initialRouteName);
+  const CustomBackButton = ({navigation}) => {
+    return (
+      <Icon
+        name="arrow-back-outline"
+        size={24}
+        color={COLORS.black}
+        style={{marginLeft: 4}}
+        onPress={() => navigation.goBack()}
+      />
+    );
+  };
 
   return (
     // Provider for language
@@ -214,7 +195,7 @@ function App() {
         <Provider store={store}>
           <NavigationContainer ref={navigationRef}>
             <Stack.Navigator
-              screenOptions={{
+              screenOptions={({navigation}) => ({
                 // headerShown: false,
                 headerStyle: {
                   elevation: 0,
@@ -227,9 +208,10 @@ function App() {
                   fontFamily: FONTS.gelasio_semibold,
                   fontWeight: '700',
                 },
+                headerLeft: () => <CustomBackButton navigation={navigation} />,
                 cardStyle: {backgroundColor: '#fff'},
                 cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              }}
+              })}
               initialRouteName={initialRouteName}>
               <Stack.Screen
                 name={SCREEN_NAMES.WELCOME}
@@ -262,8 +244,7 @@ function App() {
                 name={SCREEN_NAMES.COURSE_DETAILS}
                 component={CourseDetails}
                 options={{
-                  // headerStyle: {elevation: 0},
-                  headerTitle: 'Course Detail',
+                  headerTitle: 'Course Details',
                 }}
               />
               <Stack.Screen
@@ -271,7 +252,7 @@ function App() {
                 component={BatchFeeDetails}
                 options={{
                   // headerStyle: {elevation: 0},
-                  headerTitle: 'Batch Fee Detail',
+                  headerTitle: 'Batch/Fee Details',
                 }}
               />
               <Stack.Screen

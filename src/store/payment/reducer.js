@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   loading: false,
   message: '',
   payment: '',
+  paymentMessage: '',
 };
 
 const reducers = {
@@ -24,6 +25,10 @@ const reducers = {
   setPayment(state, action) {
     state.payment = action.payload;
   },
+  setPaymentMessage(state, action) {
+    state.paymentMessage = action.payload;
+    state.payment = '';
+  },
 };
 
 const paymentSlice = createSlice({
@@ -38,6 +43,7 @@ export const {
   makePaymentSuccess,
   setLoading,
   setPayment,
+  setPaymentMessage,
 } = paymentSlice.actions;
 
 export const paymentReducer = paymentSlice.reducer;

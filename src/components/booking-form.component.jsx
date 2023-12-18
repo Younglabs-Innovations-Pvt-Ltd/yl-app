@@ -69,7 +69,7 @@ const BookingForm = ({goToNextSlide}) => {
     styles.btnNext,
     {
       opacity: pressed ? 0.8 : 1,
-      backgroundColor: !isActive ? '#eaeaea' : COLORS.pgreen,
+      backgroundColor: !isActive ? '#eaeaea' : COLORS.pblue,
     },
   ];
   return (
