@@ -30,6 +30,7 @@
     "react-native-blob-util": "^0.19.2",
     "react-native-collapsible": "^1.6.1",
     "react-native-confetti-cannon": "^1.5.2",
+    "react-native-device-info": "^10.12.0",
     "react-native-document-picker": "^9.0.1",
     "react-native-element-dropdown": "^2.10.0",
     "react-native-file-viewer": "^2.1.5",

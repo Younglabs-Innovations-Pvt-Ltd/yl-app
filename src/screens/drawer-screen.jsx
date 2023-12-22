@@ -10,7 +10,9 @@ import {COLORS} from '../utils/constants/colors';
 
 const Drawer = createDrawerNavigator();
 
-const DrawerScreen = () => {
+const DrawerScreen = ({route}) => {
+  const data = route.params;
+  console.log('drawerData', data);
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -23,6 +25,7 @@ const DrawerScreen = () => {
         name="Home"
         component={HomeScreen}
         options={{sceneContainerStyle: {backgroundColor: COLORS.white}}}
+        initialParams={{data: data.data}}
       />
     </Drawer.Navigator>
   );

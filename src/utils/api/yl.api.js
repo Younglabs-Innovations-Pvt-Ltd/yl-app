@@ -167,14 +167,17 @@ export const saveNeedMoreInfo = async ({bookingId}) => {
 };
 
 // Store every device id to database
-export const storeDeviceId = async ({deviceId, phone}) => {
-  return fetch(`${BASE_URL}${DEVICE_ID_URL}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
+export const storeDeviceId = async ({deviceId, phone, deviceUID}) => {
+  return fetch(
+    `https://09d7-2401-4900-1c5d-8461-8865-a8db-e43a-f89e.ngrok-free.app${DEVICE_ID_URL}`,
+    {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({deviceId, phone, deviceUID}),
     },
-    body: JSON.stringify({deviceId, phone}),
-  });
+  );
 };
 
 /**

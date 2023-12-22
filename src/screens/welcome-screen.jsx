@@ -52,7 +52,7 @@ const IMAGE_HEIGHT = deviceWidth * 0.7;
 const DemoClassScreen = ({navigation}) => {
   const {localLang, currentLang} = i18nContext();
 
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('7668983758');
   const [code, setCode] = useState(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -403,7 +403,7 @@ const DemoClassScreen = ({navigation}) => {
           <Pressable
             style={btnContinueStyle}
             disabled={authLoading}
-            onPress={signInWithPhoneNumber}>
+            onPress={handleBookingStatus}>
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
               Continue
             </TextWrapper>

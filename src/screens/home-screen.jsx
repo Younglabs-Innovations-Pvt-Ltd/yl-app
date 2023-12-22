@@ -50,7 +50,6 @@ import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 
 import auth from '@react-native-firebase/auth';
 import {fetchUser, setAuthToken} from '../store/auth/reducer';
-import {getAppTestimonials} from '../utils/api/yl.api';
 import {FONTS} from '../utils/constants/fonts';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
@@ -64,6 +63,9 @@ import Icon from '../components/icon.component';
 import {authSelector} from '../store/auth/selector';
 import {setPaymentMessage} from '../store/payment/reducer';
 import {saveDeviceId} from '../utils/deviceId';
+import RatingPopup from '../components/popups/rating';
+import {fetchContentDataStart} from '../store/content/reducer';
+import {contentSelector} from '../store/content/selector';
 
 const INITIAL_TIME = {
   days: 0,
@@ -99,17 +101,15 @@ const sectionOffsets = {
   reviews: 0,
 };
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation, route}) => {
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isTimeover, setIsTimeover] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
-  const [improvementsData, setImprovementsData] = useState([]);
-  const [reviewsData, setReviewsData] = useState([]);
-  const [tipsAndTricksData, setTipsandTricksData] = useState([]);
-  const [contentData, setContentData] = useState(null);
-  const [contentLoading, setContentLoading] = useState(false);
   const [visibleCred, setVisibleCred] = useState(false);
   const [offsets, setOffsets] = useState(sectionOffsets);
+  const [ratingModal, setRatingModal] = useState(false);
+
+  const routeData = route.params;
 
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
@@ -133,6 +133,7 @@ const HomeScreen = ({navigation}) => {
   const {ipData} = useSelector(bookDemoSelector);
   const {paymentMessage} = useSelector(paymentSelector);
   const {user} = useSelector(authSelector);
+  const {contentData, contentLoading} = useSelector(contentSelector);
 
   async function onAuthStateChanged(user) {
     if (user) {
@@ -144,6 +145,16 @@ const HomeScreen = ({navigation}) => {
       }
     }
   }
+
+  useEffect(() => {
+    const {data} = routeData;
+    console.log('routeData', data);
+    if (data?.redirectTo) {
+      navigation.navigate(data.redirectTo);
+    } else if (data?.rating) {
+      setRatingModal(true);
+    }
+  }, [routeData]);
 
   // Auth listener
   useEffect(() => {
@@ -181,29 +192,8 @@ const HomeScreen = ({navigation}) => {
     };
   }, []);
 
-  // App content
   useEffect(() => {
-    const fetchAppTestimonials = async () => {
-      console.log('hit testimonials');
-      try {
-        setContentLoading(true);
-        const res = await getAppTestimonials();
-        const {data, content} = await res.json();
-        const improvements = data.filter(item => item.type === 'improvements');
-        const reviews = data.filter(item => item.type === 'review');
-        const tips = data.filter(item => item.type === 'tips');
-        setImprovementsData(improvements);
-        setReviewsData(reviews);
-        setTipsandTricksData(tips);
-        setContentData(content);
-        setContentLoading(false);
-      } catch (error) {
-        console.log('FETCH_APP_TESTIMONIALS_ERROR', error.message);
-        setContentLoading(false);
-      }
-    };
-
-    fetchAppTestimonials();
+    dispatch(fetchContentDataStart());
   }, []);
 
   // Check for customer
@@ -434,7 +424,7 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     console.log('hit demophone');
     if (demoPhoneNumber) {
-      saveDeviceId({phone: demoPhoneNumber});
+      saveDeviceId({phone: demoPhoneNumber, deviceUID: ''});
     }
   }, [demoPhoneNumber]);
 
@@ -639,14 +629,14 @@ const HomeScreen = ({navigation}) => {
                 fw="600"
                 color="#434a52"
                 ff={FONTS.signika_medium}>
-                {contentData?.reviews?.heading}
+                {contentData?.content?.reviews?.heading}
               </TextWrapper>
               <TextWrapper color="gray" fs={20} ff={FONTS.dancing_script}>
-                {contentData?.reviews?.subheading}
+                {contentData?.content?.reviews?.subheading}
               </TextWrapper>
               <Spacer />
               <FlatList
-                data={reviewsData}
+                data={contentData?.reviews}
                 keyExtractor={item => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -677,14 +667,14 @@ const HomeScreen = ({navigation}) => {
                 fw="600"
                 color="#434a52"
                 ff={FONTS.signika_semiBold}>
-                {contentData?.tips?.heading}
+                {contentData?.content?.tips?.heading}
               </TextWrapper>
               <TextWrapper fs={20} color="gray" ff={FONTS.dancing_script}>
-                {contentData?.tips?.subheading}
+                {contentData?.content?.tips?.subheading}
               </TextWrapper>
               <Spacer />
               <FlatList
-                data={tipsAndTricksData}
+                data={contentData?.tips}
                 keyExtractor={item => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -712,14 +702,14 @@ const HomeScreen = ({navigation}) => {
                 fw="600"
                 color="#434a52"
                 ff={FONTS.signika_semiBold}>
-                {contentData?.improvements?.heading}
+                {contentData?.content?.improvements?.heading}
               </TextWrapper>
               <TextWrapper color="gray" fs={20} ff={FONTS.dancing_script}>
-                {contentData?.improvements?.subheading}
+                {contentData?.content?.improvements?.subheading}
               </TextWrapper>
               <Spacer />
               <FlatList
-                data={improvementsData}
+                data={contentData?.improvements}
                 keyExtractor={item => item.id.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -746,10 +736,10 @@ const HomeScreen = ({navigation}) => {
                 fw="600"
                 color="#434a52"
                 ff={FONTS.signika_semiBold}>
-                {contentData?.rating?.heading}
+                {contentData?.content?.rating?.heading}
               </TextWrapper>
               <TextWrapper color="gray" fs={20} ff={FONTS.dancing_script}>
-                {contentData?.rating?.subheading}
+                {contentData?.content?.rating?.subheading}
               </TextWrapper>
               <Spacer />
               <Reviews />
@@ -862,6 +852,10 @@ const HomeScreen = ({navigation}) => {
           </View>
         </View>
       </ModalComponent>
+      <RatingPopup
+        visible={ratingModal}
+        onClose={() => setRatingModal(false)}
+      />
     </View>
   );
 };
@@ -871,7 +865,6 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   topSection: {
     height: deviceHeight * 0.35,
-    minHeight: 160,
   },
   container: {
     flex: 1,

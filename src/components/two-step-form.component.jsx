@@ -4,6 +4,8 @@ import BookingForm from './booking-form.component';
 import Icon from './icon.component';
 import {COLORS} from '../utils/constants/colors';
 import BookDemoSlots from '../screens/book-demo-slots.screen';
+import TextWrapper from './text-wrapper.component';
+import {FONTS} from '../utils/constants/fonts';
 
 const {height: deviceHeight, width} = Dimensions.get('window');
 
@@ -31,30 +33,37 @@ const TwoStepForm = ({closeModal}) => {
   };
 
   return (
-    <View style={{height: deviceHeight * 0.8}}>
+    <View style={styles.container}>
+      <TextWrapper
+        fs={18}
+        ff={FONTS.signika_medium}
+        styles={{marginHorizontal: 16, marginTop: 8}}>
+        Book Handwriting Class
+      </TextWrapper>
       <ScrollView
         ref={scrollViewRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        scrollEnabled={false}>
-        <BookingForm goToNextSlide={goToNextSlide} />
+        scrollEnabled={false}
+        contentContainerStyle={{paddingBottom: 40}}>
         <View style={{width}}>
-          <View style={{flex: 1}}>
-            <Icon
-              name={'arrow-back-outline'}
-              size={28}
-              color={COLORS.black}
-              style={{marginTop: 16, marginLeft: 16}}
-              onPress={goToPreviousSlide}
+          <BookingForm goToNextSlide={goToNextSlide} />
+        </View>
+        <View style={{width}}>
+          <Icon
+            name={'arrow-back-outline'}
+            size={28}
+            color={COLORS.black}
+            style={{marginTop: 16, marginLeft: 16}}
+            onPress={goToPreviousSlide}
+          />
+          {formFields && (
+            <BookDemoSlots
+              route={{params: {formFields}}}
+              onClose={closeModal}
             />
-            {formFields && (
-              <BookDemoSlots
-                route={{params: {formFields}}}
-                onClose={closeModal}
-              />
-            )}
-          </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -63,4 +72,9 @@ const TwoStepForm = ({closeModal}) => {
 
 export default TwoStepForm;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    height: deviceHeight * 0.65,
+    backgroundColor: COLORS.white,
+  },
+});

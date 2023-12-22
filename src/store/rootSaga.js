@@ -7,6 +7,7 @@ import {csaSagas} from './customer-support-action/saga';
 import {authSaga} from './auth/saga';
 import {courseSagas} from './course/course.saga';
 import {paymentSaga} from './payment/saga';
+import {contentSaga} from './content/saga';
 
 export function* rootSaga() {
   yield all([
@@ -17,5 +18,6 @@ export function* rootSaga() {
     call(authSaga),
     call(courseSagas),
     call(paymentSaga),
+    call(contentSaga),
   ]);
 }

@@ -1,16 +1,8 @@
 import React, {useEffect, useState, useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  Linking,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
+import {StyleSheet, View, Pressable, ActivityIndicator} from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../utils/constants/colors';
-import Icon from '../icon.component';
 import Spacer from '../spacer.component';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -29,10 +21,7 @@ import ModalComponent from '../modal.component';
 import NotInterested from '../not-interested.component';
 import {localStorage} from '../../utils/storage/storage-provider';
 import {FONTS} from '../../utils/constants/fonts';
-
-const COURSE_URL = 'https://www.younglabs.in/course/Eng_Hw';
-
-const {width: deviceWidth} = Dimensions.get('window');
+import RatingStars from '../rating-stars';
 
 const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
@@ -46,38 +35,6 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
-  // Show reschedule button
-  // After 10 days when user join free class
-  const isAllowToReschedule = useMemo(() => {
-    if (demoData) {
-      const {
-        demoDate: {_seconds},
-      } = demoData;
-      const currentTime = Date.now();
-      const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24 * 10;
-
-      if (currentTime > afterTenDays) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }, [demoData]);
-
-  const demoTime = useMemo(() => {
-    if (demoData) {
-      const time = new Date(demoData.demoDate._seconds * 1000);
-      const demoHours = time.getHours();
-      const demoMinutes = time.getMinutes();
-
-      return demoHours >= 12
-        ? `${demoHours === 12 ? demoHours : `0${demoHours - 12}`}:${
-            demoMinutes > 0 ? demoMinutes : '00'
-          } PM`
-        : `${demoHours}:${demoMinutes > 0 ? demoMinutes : '00'} AM`;
-    }
-  }, [demoData]);
 
   // Check for rating from local storage
   // If rating then show post demos ctas
@@ -153,14 +110,6 @@ const PostDemoAction = ({rescheduleClass}) => {
     }
   };
 
-  // Reschedule a free class
-  // const rescheduleFreeClass = () => {
-  //   const {childAge, parentName, phone, childName} = bookingDetails;
-  //   const formFields = {childAge, parentName, phone, childName};
-
-  //   navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
-  // };
-
   const courseDetails = () => {
     navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
   };
@@ -170,25 +119,6 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   const onClose = () => setVisible(false);
-
-  // UI Constants
-  const RATING_STARS = useMemo(() => {
-    return Array.from({length: 5}, (_, i) => {
-      return (
-        <Pressable key={i} onPress={() => onChangeRating(i + 1)}>
-          <Icon
-            name={
-              rating ? (i < rating ? 'star' : 'star-outline') : 'star-outline'
-            }
-            size={32}
-            color={
-              rating ? (i < rating ? COLORS.white : COLORS.white) : COLORS.white
-            }
-          />
-        </Pressable>
-      );
-    });
-  }, [rating]);
 
   // Loading indicator while mark nmi
   const NMI_LOADING = useMemo(() => {
@@ -261,7 +191,13 @@ const PostDemoAction = ({rescheduleClass}) => {
             <TextWrapper fs={18} color={COLORS.white}>
               Please rate your class experience
             </TextWrapper>
-            <View style={styles.starsContainer}>{RATING_STARS}</View>
+            <View style={styles.starsContainer}>
+              <RatingStars
+                rating={rating}
+                onChangeRating={onChangeRating}
+                color={COLORS.white}
+              />
+            </View>
           </View>
         </View>
       )}

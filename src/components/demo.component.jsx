@@ -131,7 +131,10 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   const NEW_BOOKING = useMemo(() => {
     if (demoData?.message === 'Booking not found' || !demoData) {
       return (
-        <View style={{paddingTop: 20}}>
+        <View style={{paddingTop: 12}}>
+          <TextWrapper fs={24} ff={FONTS.signika_semiBold} color={COLORS.white}>
+            Improve your child's handwriting
+          </TextWrapper>
           <TextWrapper fs={20} color={COLORS.white}>
             Book your first free Handwriting Class.
           </TextWrapper>
@@ -141,7 +144,7 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
             bg={COLORS.white}
             rounded={6}
             onPress={onOpenForm}>
-            Book
+            Book Now
           </Button>
         </View>
       );
@@ -232,18 +235,11 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
         <View style={{flex: 1}}>
           <Pressable
             style={{
-              height: deviceHeight * 0.2,
+              height: deviceHeight * 0.35,
               backgroundColor: 'rgba(0,0,0,0.25)',
             }}
             onPress={onCloseForm}></Pressable>
-          <ScrollView
-            style={{
-              flex: 1,
-              backgroundColor: COLORS.white,
-            }}
-            showsVerticalScrollIndicator={false}>
-            <TwoStepForm closeModal={onCloseForm} />
-          </ScrollView>
+          <TwoStepForm closeModal={onCloseForm} />
         </View>
       </Modal>
     </View>

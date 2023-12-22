@@ -1,5 +1,5 @@
 import React, {useState, useMemo} from 'react';
-import {StyleSheet, Pressable, View, Dimensions} from 'react-native';
+import {StyleSheet, Pressable, View, ScrollView} from 'react-native';
 import {useSelector} from 'react-redux';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
@@ -16,8 +16,6 @@ const INITIAL_sTATE = {
   parentName: '',
   childName: '',
 };
-
-const {width: deviceWidth} = Dimensions.get('window');
 
 const BookingForm = ({goToNextSlide}) => {
   const [gutter, setGutter] = useState(0);
@@ -68,14 +66,16 @@ const BookingForm = ({goToNextSlide}) => {
   const btnNextStyle = ({pressed}) => [
     styles.btnNext,
     {
-      opacity: pressed ? 0.8 : 1,
+      opacity: pressed ? 0.9 : 1,
       backgroundColor: !isActive ? '#eaeaea' : COLORS.pblue,
     },
   ];
   return (
-    <View style={{flex: 1, width: deviceWidth}}>
-      <View style={styles.container}>
-        <View style={{height: '90%'}}>
+    <>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{paddingHorizontal: 16, paddingTop: 12}}>
+        <View style={{flex: 1}}>
           <View style={styles.row}>
             <View style={styles.phoneBox}>
               <TextWrapper
@@ -112,20 +112,19 @@ const BookingForm = ({goToNextSlide}) => {
             onLayout={onLayoutChange}
           />
         </View>
-        <View style={{paddingHorizontal: 12}}>
-          <Pressable
-            style={btnNextStyle}
-            disabled={!isActive}
-            onPress={handleDemoSlots}>
-            <TextWrapper
-              color={COLORS.white}
-              fw="700"
-              styles={{letterSpacing: 1.1}}>
-              Next
-            </TextWrapper>
-          </Pressable>
-        </View>
-      </View>
+
+        <Pressable
+          style={btnNextStyle}
+          disabled={!isActive}
+          onPress={handleDemoSlots}>
+          <TextWrapper
+            color={isActive ? COLORS.white : '#434a52'}
+            fw="700"
+            styles={{letterSpacing: 1.1}}>
+            Continue
+          </TextWrapper>
+        </Pressable>
+      </ScrollView>
 
       {open && (
         <DropdownList
@@ -136,7 +135,7 @@ const BookingForm = ({goToNextSlide}) => {
           onChange={handleChildAge}
         />
       )}
-    </View>
+    </>
   );
 };
 
@@ -145,13 +144,6 @@ export default BookingForm;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 18,
-  },
-  footer: {
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
   },
   row: {
     display: 'flex',

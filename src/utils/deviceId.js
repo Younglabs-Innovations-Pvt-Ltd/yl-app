@@ -7,11 +7,14 @@ export const getCurrentDeviceId = async () => {
   return await messaging().getToken();
 };
 
-export const saveDeviceId = async ({phone}) => {
+export const saveDeviceId = async ({phone, deviceUID}) => {
   try {
     const token = await getCurrentDeviceId();
 
-    const response = await storeDeviceId({deviceId: token, phone});
+    console.log('token', token);
+
+    return;
+    const response = await storeDeviceId({deviceId: token, phone, deviceUID});
     const data = await response.json();
     console.log('tokenData mobile', data);
   } catch (error) {

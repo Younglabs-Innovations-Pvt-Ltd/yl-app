@@ -36,15 +36,15 @@ const MainScreen = ({route}) => {
 
   useEffect(() => {
     StatusBar.setHidden(false);
-    StatusBar.setBackgroundColor(COLORS.pgreen);
+    StatusBar.setBackgroundColor(COLORS.pblue);
     StatusBar.setBarStyle('light-content');
   }, []);
 
-  useEffect(() => {
-    if (!data) return;
+  // useEffect(() => {
+  //   if (!data) return;
 
-    checkForPhone();
-  }, []);
+  //   checkForPhone();
+  // }, []);
 
   /**
    * @author Shobhit
@@ -53,16 +53,16 @@ const MainScreen = ({route}) => {
    * Check is phone number exists in local storage
    * If it does not exist only then set booking id by dispatching an action
    */
-  const checkForPhone = () => {
-    try {
-      const isPhoneExists = localStorage.getNumber(LOCAL_KEYS.PHONE);
-      if (!isPhoneExists) {
-        dispatch(setDemoBookingId(data.bookingId));
-      }
-    } catch (error) {
-      console.log('CHECK_FOR_PHONE_MAIN_SCREEN', error);
-    }
-  };
+  // const checkForPhone = () => {
+  //   try {
+  //     const isPhoneExists = localStorage.getNumber(LOCAL_KEYS.PHONE);
+  //     if (!isPhoneExists) {
+  //       dispatch(setDemoBookingId(data.bookingId));
+  //     }
+  //   } catch (error) {
+  //     console.log('CHECK_FOR_PHONE_MAIN_SCREEN', error);
+  //   }
+  // };
 
   return (
     <Tab.Navigator tabBar={props => <Tabbar {...props} />}>
@@ -73,6 +73,7 @@ const MainScreen = ({route}) => {
           headerShown: false,
           tabBarLabel: localLang.tabNavHome,
         }}
+        initialParams={{data: data.data}}
       />
       <Tab.Screen
         name="Course"

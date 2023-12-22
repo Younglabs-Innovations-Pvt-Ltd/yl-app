@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Linking, Alert} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
@@ -20,9 +20,6 @@ import {request, PERMISSIONS} from 'react-native-permissions';
 
 // Native mmodules
 import {checkForUpdate} from './src/natiive-modules/inapp-update';
-// import {getCurrentAppVersion} from './src/natiive-modules/app-version';
-
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {localStorage} from './src/utils/storage/storage-provider';
 import {FONTS} from './src/utils/constants/fonts';
 import {SCREEN_NAMES} from './src/utils/constants/screen-names';
@@ -48,6 +45,9 @@ import {NetworkProvider} from './src/context/network.state';
 
 import auth from '@react-native-firebase/auth';
 import Icon from './src/components/icon.component';
+import DeviceInfo from 'react-native-device-info';
+import {getCurrentDeviceId, saveDeviceId} from './src/utils/deviceId';
+import notifee from '@notifee/react-native';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -60,6 +60,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isPhone, setIsPhone] = useState(false);
   const [bookingId, setBookingId] = useState('');
+
+  const notificationRef = useRef({});
 
   // Splash Screen
   useEffect(() => {
@@ -78,6 +80,46 @@ function App() {
     return subscriber;
   }, []);
 
+  useEffect(() => {
+    const storeDeviceId = async () => {
+      try {
+        const uid = await DeviceInfo.getAndroidId();
+        console.log('uid', uid);
+        await saveDeviceId({phone: '', deviceUID: uid});
+      } catch (error) {
+        console.log('storeDeviceIdError', error.message);
+      }
+    };
+
+    storeDeviceId();
+  }, []);
+
+  async function checkNotifications() {
+    const initialNotification = await notifee.getInitialNotification();
+
+    if (initialNotification) {
+      const data = initialNotification.notification.data;
+      console.log('data', data);
+
+      if (data?.rating) {
+        notificationRef.current.rating = data.rating;
+      }
+
+      if (data?.screen) {
+        notificationRef.current.redirectTo = data.screen;
+      }
+    }
+  }
+
+  // Check for notifications
+  useEffect(() => {
+    checkNotifications()
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(error => console.log('checkNotificationsError', error.message));
+  }, []);
+
   async function onAuthStateChanged(user) {
     try {
       const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
@@ -89,14 +131,11 @@ function App() {
         const tokenResult = await auth().currentUser.getIdTokenResult();
         token = tokenResult.token;
       }
-
-      setLoading(false);
       if (token && phone) {
         setIsPhone(true);
       }
     } catch (error) {
       console.error('Error getting ID token:', error);
-      setLoading(false);
     }
   }
 
@@ -171,6 +210,7 @@ function App() {
   let initialRouteName = SCREEN_NAMES.WELCOME;
 
   if (isPhone || bookingId) {
+    console.log('bookingId', bookingId);
     initialRouteName = SCREEN_NAMES.MAIN;
   }
 
@@ -185,6 +225,8 @@ function App() {
       />
     );
   };
+
+  console.log('redirectRef', notificationRef);
 
   return (
     // Provider for language
@@ -222,7 +264,7 @@ function App() {
                 name={SCREEN_NAMES.MAIN}
                 component={MainScreen}
                 options={{headerShown: false}}
-                initialParams={{bookingId}}
+                initialParams={{data: notificationRef.current}}
               />
               <Stack.Screen
                 name={SCREEN_NAMES.ON_BOARDING}

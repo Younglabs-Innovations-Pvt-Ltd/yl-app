@@ -382,7 +382,7 @@ const Popup = ({onHandlePopup, popup, onClose}) => {
           style={{alignSelf: 'center'}}
         />
         <TextWrapper styles={{textAlign: 'center'}}>
-          Congratulation your free class booking successful
+          Congratulations your free class booking successful
         </TextWrapper>
         <Spacer />
         <View>
@@ -401,6 +401,7 @@ const Popup = ({onHandlePopup, popup, onClose}) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingHorizontal: 8,
     paddingVertical: 18,
   },

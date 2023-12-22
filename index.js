@@ -41,19 +41,17 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
 
           console.log('response=', await res.json());
         } else if (notification.data.type === 'remarketing') {
-          console.log(notification.data.notificationId);
-          const res = await fetch(CAPTURE_NOTIFICATION_URL, {
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify({
-              notificationId: notification.data.notificationId,
-              type: 'remarketing',
-            }),
-          });
-
-          console.log(await res.json());
+          // const res = await fetch(CAPTURE_NOTIFICATION_URL, {
+          //   method: 'POST',
+          //   headers: {
+          //     'content-type': 'application/json',
+          //   },
+          //   body: JSON.stringify({
+          //     notificationId: notification.data.notificationId,
+          //     type: 'remarketing',
+          //   }),
+          // });
+          // console.log(await res.json());
         }
       }
       notifee.cancelNotification(notification.id);
@@ -64,6 +62,7 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
 });
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('remoteMessage: ', remoteMessage);
   try {
     const message = remoteMessage.data;
     const notification = {
@@ -77,6 +76,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
           launchActivity: 'default',
         },
       },
+      data: message,
     };
 
     if (message?.image) {
@@ -94,14 +94,16 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
       };
     }
 
+    if (message?.body) {
+      notification.body = message.body;
+    }
+
     if (message?.title) {
       notification.title = message.title;
-      notification.body = message.body;
-      notification.data = message;
     }
 
     console.log('payload', notification);
-    if (message?.type === 'remarketing') {
+    if (message?.type === 'remarketing' || message?.type === 'rating') {
       await displayRemarketingNotification(notification);
     } else if (message?.type === 'reminders') {
       await displayReminderNotification(notification);

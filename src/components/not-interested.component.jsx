@@ -19,7 +19,7 @@ import Snackbar from 'react-native-snackbar';
 const faqs = [
   'Did not like class',
   'Too expensive',
-  'child not free',
+  'Child not free',
   'Want offline class',
   'Want in vacations',
 ];

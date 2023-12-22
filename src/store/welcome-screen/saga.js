@@ -13,10 +13,7 @@ import {isValidNumber} from '../../utils/isValidNumber';
 import {navigate, replace} from '../../navigationRef';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
-import {
-  setCountryCallingCodeAsync,
-  setLocalPhoneAsync,
-} from '../../utils/storage/storage-provider';
+import {setCountryCallingCodeAsync} from '../../utils/storage/storage-provider';
 
 import {setCurrentNetworkState} from '../network/reducer';
 import {ERROR_MESSAGES} from '../../utils/constants/messages';
@@ -40,7 +37,7 @@ function* handleBookingStatus({payload: {phone, country}}) {
   try {
     // Check for length of a phone number according to country
     // Return true or false
-    const isValidPhone = isValidNumber(phone, country.countryCode.cca2);
+    const isValidPhone = isValidNumber(phone, 'IN');
 
     if (!isValidPhone) {
       yield put(setErrorMessage('Please enter a valid number'));
@@ -58,8 +55,7 @@ function* handleBookingStatus({payload: {phone, country}}) {
     // }
 
     // if (response.status === 200) {
-    yield setLocalPhoneAsync(phone);
-    yield setCountryCallingCodeAsync(country.callingCode);
+    // yield setCountryCallingCodeAsync(country.callingCode);
     yield put(fetchBookingStatusSuccess(''));
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
     // }
