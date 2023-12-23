@@ -53,7 +53,8 @@ const DemoWaiting = ({timeLeft}) => {
   return (
     <View
       style={{
-        width: deviceWidth * 0.9,
+        // width: deviceWidth * 0.9,
+        paddingHorizontal: 16,
       }}>
       <View
         style={{

@@ -1,6 +1,13 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useState, useMemo, useRef} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {StyleSheet, View, Pressable, ActivityIndicator} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  ActivityIndicator,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import {COLORS} from '../../utils/constants/colors';
 import Spacer from '../spacer.component';
@@ -23,6 +30,8 @@ import {localStorage} from '../../utils/storage/storage-provider';
 import {FONTS} from '../../utils/constants/fonts';
 import RatingStars from '../rating-stars';
 
+const {width: deviceWidth} = Dimensions.get('window');
+
 const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
   const [attended, setAttended] = useState(false);
@@ -30,8 +39,13 @@ const PostDemoAction = ({rescheduleClass}) => {
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
 
+  const sliderRef = useRef();
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
   const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
     useSelector(joinDemoSelector);
+
+  console.log('demoData', demoData);
 
   console.log('isRated', isRated);
   console.log('isNmi', isNmi);
@@ -84,13 +98,38 @@ const PostDemoAction = ({rescheduleClass}) => {
     checkNMI();
   }, []);
 
+  const scrollSlider = scrollToX => {
+    sliderRef.current &&
+      sliderRef.current &&
+      sliderRef.current.scrollTo({
+        x: scrollToX,
+        animated: true,
+      });
+    setCurrentSlideIndex(scrollToX / deviceWidth);
+  };
+
+  console.log('currentSlideIndex', currentSlideIndex);
+
+  useEffect(() => {
+    if (!isRated && attended) {
+      console.log('slided');
+      scrollSlider(deviceWidth);
+    } else if (isRated && !isNmi) {
+      scrollSlider(deviceWidth * 2);
+    } else if (isNmi) {
+      scrollSlider(deviceWidth * 3);
+    }
+  }, [attended, isRated, isNmi]);
+
   // Save rating of user
   // Dispatch an action to reducer
   // That join saga is listening
   const handleSaveRating = async rate => {
     const rated = rate * 2;
 
-    dispatch(saveRating({bookingId: demoData.bookingId, rating: rated}));
+    if (demoData) {
+      dispatch(saveRating({bookingId: demoData.bookingId, rating: rated}));
+    }
   };
 
   // On change rating state
@@ -108,6 +147,11 @@ const PostDemoAction = ({rescheduleClass}) => {
     try {
       localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
       setAttended(true);
+      // sliderRef.current &&
+      //   sliderRef.current.scrollTo({
+      //     x: deviceWidth,
+      //     animated: true,
+      //   });
     } catch (error) {
       console.log('POST_ACTION_SAVE_ATTENDED_ERROR=', error);
     }
@@ -136,15 +180,21 @@ const PostDemoAction = ({rescheduleClass}) => {
     );
   }, [nmiLoading]);
 
-  if (ratingLoading || attendedLoading || loading) return null;
+  // if (ratingLoading || attendedLoading || loading) return null;
 
   return (
-    <View
-      style={{
-        width: '100%',
-      }}>
-      {!attended && !isRated && (
-        <View style={styles.paContainer}>
+    <React.Fragment>
+      <ScrollView
+        ref={sliderRef}
+        style={{
+          alignSelf: 'center',
+        }}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        scrollEnabled={false}
+        pagingEnabled>
+        {/* {!attended && !isRated && ( */}
+        <View style={styles.container}>
           <TextWrapper
             fs={20}
             color={COLORS.white}
@@ -180,9 +230,9 @@ const PostDemoAction = ({rescheduleClass}) => {
             </Pressable>
           </View>
         </View>
-      )}
-      {!isRated && attended && (
-        <View style={styles.ratingContainer}>
+        {/* )} */}
+        {/* {!isRated && attended && ( */}
+        <View style={styles.container}>
           <TextWrapper
             fs={22}
             color={COLORS.white}
@@ -203,9 +253,9 @@ const PostDemoAction = ({rescheduleClass}) => {
             </View>
           </View>
         </View>
-      )}
-      {isRated && !isNmi && (
-        <View style={styles.ctasWrapper}>
+        {/* )} */}
+        {/* {isRated && !isNmi && ( */}
+        <View style={styles.container}>
           <TextWrapper
             fs={17.5}
             color={COLORS.white}
@@ -237,9 +287,9 @@ const PostDemoAction = ({rescheduleClass}) => {
             </Pressable>
           </View>
         </View>
-      )}
-      {isNmi && (
-        <View style={{padding: 16, width: '100%'}}>
+        {/* )} */}
+        {/* {isNmi && ( */}
+        <View style={styles.container}>
           <TextWrapper color={COLORS.white} fs={18}>
             Give your child a gift of beautiful handwriting today!
           </TextWrapper>
@@ -269,14 +319,36 @@ const PostDemoAction = ({rescheduleClass}) => {
             </Pressable>
           </View>
         </View>
-      )}
-      <ModalComponent
-        visible={visible}
-        animationType="slide"
-        onRequestClose={onClose}>
-        <NotInterested onClose={onClose} bookingDetails={bookingDetails} />
-      </ModalComponent>
-    </View>
+        {/* )} */}
+        <ModalComponent
+          visible={visible}
+          animationType="slide"
+          onRequestClose={onClose}>
+          <NotInterested onClose={onClose} bookingDetails={bookingDetails} />
+        </ModalComponent>
+      </ScrollView>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          paddingVertical: 4,
+          gap: 12,
+        }}>
+        {Array.from({length: 4}, (_, i) => {
+          return (
+            <View
+              style={[
+                styles.dotIndicator,
+                {
+                  backgroundColor:
+                    currentSlideIndex === i ? COLORS.white : '#434a52',
+                },
+              ]}
+              key={i}></View>
+          );
+        })}
+      </View>
+    </React.Fragment>
   );
 };
 
@@ -284,7 +356,9 @@ export default PostDemoAction;
 
 const styles = StyleSheet.create({
   container: {
-    // paddingTop: 12,
+    width: deviceWidth,
+    borderWidth: 1,
+    paddingHorizontal: 16,
   },
   ratingContainer: {
     width: '100%',
@@ -297,9 +371,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 12,
     gap: 8,
-  },
-  ctasWrapper: {
-    padding: 16,
   },
   ctas: {
     gap: 8,
@@ -333,5 +404,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.white,
     borderRadius: 4,
+  },
+  dotIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 8,
   },
 });

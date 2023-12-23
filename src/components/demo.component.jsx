@@ -6,6 +6,7 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from 'react-native';
 import DemoWaiting from './join-demo-class-screen/demo-waiting.component';
 import Button from './button.component';
@@ -29,7 +30,7 @@ import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 
-const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
+const {height: deviceHeight} = Dimensions.get('window');
 
 const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
   const [childName, setChildName] = useState('');
@@ -185,11 +186,10 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
     navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
   };
 
-  console.log('joinClassLoading', joinClassLoading);
-  console.log('joinClassErrorMsg', joinClassErrorMsg);
-
   return (
-    <View style={styles.contentWrapper}>
+    <ScrollView
+      style={styles.contentWrapper}
+      showsVerticalScrollIndicator={false}>
       {NEW_BOOKING}
       {/* Timer */}
       {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
@@ -286,7 +286,7 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
           <TwoStepForm closeModal={onCloseForm} />
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -295,7 +295,8 @@ export default Demo;
 const styles = StyleSheet.create({
   contentWrapper: {
     maxWidth: 428,
-    alignSelf: 'center',
+    // borderWidth: 2,
+    // alignSelf: 'center',
   },
   rightNavButtons: {
     flexDirection: 'row',

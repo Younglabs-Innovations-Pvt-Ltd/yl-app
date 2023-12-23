@@ -163,11 +163,12 @@ const UploadHandwriting = ({demoData}) => {
     setVisibleOptions(false);
   };
   const onOpenOptions = () => {
+    console.log('clicked..');
     setVisibleOptions(true);
   };
 
   return (
-    <View>
+    <View style={{paddingBottom: 20}}>
       <TextWrapper color={COLORS.white}>
         Upload your child's handwriting image
       </TextWrapper>

@@ -174,7 +174,7 @@ const CustomDrawerContent = ({navigation, ...props}) => {
             <TextWrapper fs={28} numberOfLines={1}>
               {fullName || 'Guest'}
             </TextWrapper>
-            <TextWrapper>{demoPhoneNumber}</TextWrapper>
+            <TextWrapper>{user?.phone}</TextWrapper>
           </View>
           {user && user?.customer === 'yes' && (
             <View style={{paddingVertical: 8, paddingHorizontal: 8}}>
