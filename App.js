@@ -46,7 +46,7 @@ import {NetworkProvider} from './src/context/network.state';
 import auth from '@react-native-firebase/auth';
 import Icon from './src/components/icon.component';
 import DeviceInfo from 'react-native-device-info';
-import {getCurrentDeviceId, saveDeviceId} from './src/utils/deviceId';
+import {saveDeviceId} from './src/utils/deviceId';
 import notifee from '@notifee/react-native';
 
 Sentry.init({

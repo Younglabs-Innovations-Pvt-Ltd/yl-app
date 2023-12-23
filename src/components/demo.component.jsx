@@ -4,7 +4,8 @@ import {
   View,
   Dimensions,
   Pressable,
-  ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import DemoWaiting from './join-demo-class-screen/demo-waiting.component';
 import Button from './button.component';
@@ -15,7 +16,10 @@ import Input from './input.component';
 import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {joinFreeClass} from '../store/join-demo/join-demo.reducer';
+import {
+  joinFreeClass,
+  setJoinClassErrorMsg,
+} from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {i18nContext} from '../context/lang.context';
 import Modal from './modal.component';
@@ -27,7 +31,7 @@ import {FONTS} from '../utils/constants/fonts';
 
 const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
 
-const Demo = ({isTimeover, timeLeft, showPostActions}) => {
+const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
   const [childName, setChildName] = useState('');
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -41,9 +45,11 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
     demoData,
     bookingDetails,
     bookingTime,
-    showJoinButton,
-    teamUrl,
     message,
+    demoFlag,
+    isAttended,
+    joinClassLoading,
+    joinClassErrorMsg,
   } = useSelector(joinDemoSelector);
 
   /**
@@ -71,6 +77,24 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
     }
   }, [bookingDetails]);
 
+  useEffect(() => {
+    if (joinClassErrorMsg) {
+      Alert.alert('Something went wrong', 'Can not join class', [
+        {
+          text: 'Retry',
+          onPress: () => {
+            dispatch(setJoinClassErrorMsg(''));
+            handleJoinClass();
+          },
+        },
+        {
+          text: 'Cancel',
+          onPress: () => dispatch(setJoinClassErrorMsg('')),
+        },
+      ]);
+    }
+  }, [joinClassErrorMsg]);
+
   // on change for child name
   const onChangeChildName = e => {
     setChildName(e);
@@ -84,7 +108,9 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
 
   // Join Class
   const handleJoinClass = async () => {
-    dispatch(joinFreeClass({bookingDetails, childName, teamUrl}));
+    dispatch(
+      joinFreeClass({bookingDetails, childName, demoData, loading: true}),
+    );
   };
 
   //   UI Constants
@@ -96,9 +122,9 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   }, [bookingTime]);
 
   // show join button to join class
-  const SHOW_JOIN_BUTTON = useMemo(() => {
-    return isTimeover && showJoinButton;
-  }, [isTimeover, showJoinButton]);
+  // const SHOW_JOIN_BUTTON = useMemo(() => {
+  //   return isClassOngoing;
+  // }, [isClassOngoing]);
 
   // If there is no child name in booking details
   // then show input field for childname
@@ -159,6 +185,9 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
     navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
   };
 
+  console.log('joinClassLoading', joinClassLoading);
+  console.log('joinClassErrorMsg', joinClassErrorMsg);
+
   return (
     <View style={styles.contentWrapper}>
       {NEW_BOOKING}
@@ -166,19 +195,34 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
       {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
 
       {/* Show join button */}
-      {SHOW_JOIN_BUTTON && (
+      {isClassOngoing && (
         <View>
           {IS_CHILD_NAME}
-          <Button
+          <Pressable
+            style={styles.btnClass}
+            onPress={handleJoinClass}
+            disabled={joinClassLoading}>
+            <TextWrapper fs={18} color="#434a52">
+              Enter class
+            </TextWrapper>
+            {joinClassLoading && (
+              <ActivityIndicator
+                size={'small'}
+                color={COLORS.black}
+                style={{marginLeft: 4}}
+              />
+            )}
+          </Pressable>
+          {/* <Button
             textColor={'#434a52'}
             bg={COLORS.white}
             rounded={6}
             onPress={handleJoinClass}>
             Enter class
-          </Button>
+          </Button> */}
         </View>
       )}
-      {isTimeover && !teamUrl && (
+      {/* {isClassOngoing && !teamUrl && (
         <View
           style={{
             paddingVertical: 16,
@@ -195,7 +239,7 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
             {localLang.rescheduleButtonText}
           </Button>
         </View>
-      )}
+      )} */}
       {
         // If user attended demo class
         // Demo has ended
@@ -257,5 +301,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  btnClass: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+    paddingVertical: 16,
+    borderRadius: 6,
   },
 });

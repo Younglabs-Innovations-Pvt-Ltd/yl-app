@@ -12,6 +12,8 @@ const localKeys = {
   PAYMENT: 'success',
   EMAIL: 'email',
   CURRENT_SCREEN: 'currentScreen',
+  JOIN_CLASS: 'joinClass',
+  DEMO_TIME: 'demoTime',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);

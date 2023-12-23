@@ -8,6 +8,8 @@ import Icon from '../icon.component';
 import RatingStars from '../rating-stars';
 import {useDispatch} from 'react-redux';
 import {saveRating} from '../../store/join-demo/join-demo.reducer';
+import {localStorage} from '../../utils/storage/storage-provider';
+import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
 const RatingPopup = ({visible, onClose, bookingId}) => {
   const [rating, setRating] = useState(0);
@@ -18,10 +20,12 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
   const onChangeRating = rate => {
     setRating(rate);
     if (bookingId) {
-      console.log('bookingId', bookingId);
+      localStorage.delete(LOCAL_KEYS.JOIN_CLASS);
       dispatch(saveRating({bookingId, rating: rate * 2}));
     }
-    // onClose();
+    setTimeout(() => {
+      onClose();
+    }, 350);
   };
 
   return (
@@ -57,7 +61,8 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
             <RatingStars
               rating={rating}
               onChangeRating={onChangeRating}
-              color="#434a52"
+              // color="#434a52"
+              color={COLORS.pblue}
             />
           </View>
         </View>

@@ -8,7 +8,6 @@ import {
   saveFreeClassRating,
   saveNeedMoreInfo,
   fetchBookingDetailsFromPhone,
-  getLeadEmail,
 } from '../../utils/api/yl.api';
 
 import {
@@ -33,6 +32,10 @@ import {
   setLoading,
   joinDemo,
   setBookingDetailsFailed,
+  setClassOngoing,
+  setDemoFlag,
+  setJoinClassLoading,
+  setJoinClassErrorMsg,
 } from './join-demo.reducer';
 
 import {BASE_URL} from '@env';
@@ -43,6 +46,7 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import {setEmail} from '../auth/reducer';
 import {localStorage} from '../../utils/storage/storage-provider';
+import moment from 'moment';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -55,11 +59,12 @@ const TAG = 'JOIN_DEMO_SAGA_ERROR';
  * Also fetch booking details
  * Save phone number to local storage
  */
-function* fetchDemoDetailsFromPhone({payload}) {
+function* fetchDemoDetailsFromPhone() {
   try {
     const token = yield getCurrentDeviceId();
+    const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
 
-    const response = yield call(fetchBookingDetailsFromPhone, payload, token);
+    const response = yield call(fetchBookingDetailsFromPhone, phone, token);
     const data = yield response.json();
 
     // let callingCode = yield AsyncStorage.getItem(LOCAL_KEYS.CALLING_CODE);
@@ -68,7 +73,7 @@ function* fetchDemoDetailsFromPhone({payload}) {
     let callingCode = '91';
 
     const detailsResponse = yield call(fetchBookingDetils, {
-      phone: JSON.parse(callingCode.concat(payload)),
+      phone: JSON.parse(callingCode.concat(phone)),
     });
 
     const bookingDetails = yield detailsResponse.json();
@@ -77,20 +82,14 @@ function* fetchDemoDetailsFromPhone({payload}) {
       yield put(setLoading(false));
     }
 
-    const checkPhone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-    console.log('checkPhone', checkPhone);
-    if (!checkPhone) {
-      console.log('hit checkPhone');
-      localStorage.set(LOCAL_KEYS.PHONE, parseInt(payload));
-    }
-
     // lead email
-    const leadEmailResponse = yield call(getLeadEmail, bookingDetails.leadId);
-    if (leadEmailResponse.status === 200) {
-      const leadEmail = yield leadEmailResponse.json();
-      yield put(setEmail(leadEmail.email));
-    }
+    // const leadEmailResponse = yield call(getLeadEmail, bookingDetails.leadId);
+    // if (leadEmailResponse.status === 200) {
+    //   const leadEmail = yield leadEmailResponse.json();
+    //   yield put(setEmail(leadEmail.email));
+    // }
 
+    yield call(onSetDemoData, {demoData: data, phone});
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
     console.log('error', error);
@@ -164,51 +163,72 @@ function* getPhoneFromStorage() {
  * @param {object} payload demoData
  * @description Set demo data to states
  */
-function* onSetDemoData({payload: {demoData, phone}}) {
-  // If user put wrong number
-  if (demoData.hasOwnProperty('message')) {
-    return;
-  }
-
+function* onSetDemoData({demoData, phone}) {
   try {
-    const {
-      demoDate: {_seconds},
-      attendedOrNot,
-      bookingId,
-      teamUrl: meetingLink,
-    } = demoData;
+    // const {
+    //   demoDate: {_seconds},
+    //   attendedOrNot,
+    //   bookingId,
+    //   teamUrl: meetingLink,
+    // } = demoData;
 
-    const demoTime = _seconds * 1000;
+    // const demoTime = _seconds * 1000;
 
-    const demodate = new Date(demoTime);
-    const today = new Date().getDate();
+    // const demodate = new Date(demoTime);
+    // const today = new Date().getDate();
 
-    // Mark attendence
-    if (demodate.getDate() === today) {
-      if (!attendedOrNot) {
-        const markAttendenceResponse = yield call(markAttendance, {bookingId});
+    // // Mark attendence
+    // // if (demodate.getDate() === today) {
+    // //   if (!attendedOrNot) {
+    // //     const markAttendenceResponse = yield call(markAttendance, {bookingId});
 
-        if (markAttendenceResponse.status === 200) {
-          console.log('attendance marked.');
-        }
-      }
+    // //     if (markAttendenceResponse.status === 200) {
+    // //       console.log('attendance marked.');
+    // //     }
+    // //   }
+    // // }
+
+    // const timeover = demoTime < Date.now();
+    // const afterOneHour = demoTime + 1000 * 60 * 60 > Date.now();
+
+    // // if (timeover && afterOneHour) {
+    // //   yield put(joinDemo({bookingId, phone}));
+    // // }
+
+    // if (meetingLink) {
+    //   yield put(setTeamUrl(meetingLink));
+    //   yield put(setShowJoinButton(true));
+    //   yield put(setIsAttended(attendedOrNot));
+    // }
+
+    // // Set booking time for timer
+    // if (_seconds) yield put(setBookingTime(demoTime + 1000 * 60));
+
+    const demoTime = demoData?.demoDate._seconds * 1000;
+
+    localStorage.set(LOCAL_KEYS.DEMO_TIME, parseInt(demoTime));
+
+    const isClassOngoing = moment(demoTime).add(1, 'hours').isAfter(moment());
+
+    if (isClassOngoing) {
+      yield put(setClassOngoing(true));
     }
 
-    const timeover = demoTime < Date.now();
-    const afterOneHour = demoTime + 1000 * 60 * 60 > Date.now();
-
-    if (timeover && afterOneHour) {
-      yield put(joinDemo({bookingId, phone}));
+    if (demoData.teamUrl) {
+      yield put(setTeamUrl(demoData?.teamUrl));
     }
 
-    if (meetingLink) {
-      yield put(setTeamUrl(meetingLink));
-      yield put(setShowJoinButton(true));
-      yield put(setIsAttended(attendedOrNot));
+    if (demoData.attendedOrNot) {
+      console.log('demoData.attendedOrNot', demoData.attendedOrNot);
+      yield put(setIsAttended(demoData.attendedOrNot));
     }
 
-    // Set booking time for timer
-    if (_seconds) yield put(setBookingTime(demoTime + 1000 * 60));
+    if (demoData.demoFlag) {
+      console.log('demoFag', demoData.demoFlag);
+      yield put(setDemoFlag(demoData.demoFlag));
+    }
+
+    yield put(setBookingTime(demoTime));
 
     yield put(setLoading(false));
   } catch (error) {
@@ -368,14 +388,14 @@ function* saveAcsTokenInLocalStorage({data}) {
  * Join Demo Class
  * Save acs token to local storage using saveAcsTokenInLocalStorage function
  */
-function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
-  console.log(childName, teamUrl, bookingDetails);
+function* handleJoinClass({payload: {bookingDetails, childName, demoData}}) {
   if (!childName) {
     yield put(setErrorMessage('Please enter child name'));
     return;
   }
 
   try {
+    yield put(setJoinClassLoading(true));
     const notChildName = bookingDetails.childName
       .toLowerCase()
       .includes('your child');
@@ -383,7 +403,30 @@ function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
       yield call(updateChildName, {bookingDetails, childName});
     }
 
-    if (teamUrl) {
+    if (!demoData?.attendedOrNot) {
+      console.log('markAttendance');
+      yield call(markAttendance, {
+        bookingId: bookingDetails.bookingId,
+      });
+    }
+
+    if (!demoData?.demoFlag) {
+      console.log('demoflag');
+      yield call(handleJoinDemo, {
+        payload: {bookingId: bookingDetails.bookingId},
+      });
+    }
+
+    const token = yield getCurrentDeviceId();
+
+    const response = yield call(
+      fetchBookingDetailsFromPhone,
+      bookingDetails.phone,
+      token || '',
+    );
+    const data = yield response.json();
+
+    if (data.teamUrl) {
       let token = localStorage.getString(LOCAL_KEYS.ACS_TOKEN);
       const tokenExpireTime = localStorage.getString(
         LOCAL_KEYS.ACS_TOKEN_EXPIRE,
@@ -410,10 +453,18 @@ function* handleJoinClass({payload: {bookingDetails, childName, teamUrl}}) {
       }
 
       yield put(setErrorMessage(''));
-      startCallComposite(childName, teamUrl, token);
+      yield put(setJoinClassErrorMsg(''));
+      yield put(setJoinClassLoading(false));
+      localStorage.set(LOCAL_KEYS.JOIN_CLASS, 'true');
+      startCallComposite(childName, data.teamUrl, token);
+    } else {
+      yield put(setJoinClassErrorMsg('Something went wrong'));
+      yield put(setJoinClassLoading(false));
     }
   } catch (error) {
     console.log('JOIN_CLASS_ERROR_JOIN_DEMO_SAGA', error);
+    yield put(setJoinClassErrorMsg('Something went wrong'));
+    yield put(setJoinClassLoading(false));
   }
 }
 
@@ -492,7 +543,7 @@ function* handleNMI({payload: {bookingId}}) {
   }
 }
 
-function* handleJoinDemo({payload: {bookingId, phone}}) {
+function* handleJoinDemo({payload: {bookingId}}) {
   try {
     const API_URL = `${BASE_URL}/admin/demoallocation/joindemo`;
     const response = yield fetch(API_URL, {
@@ -502,11 +553,11 @@ function* handleJoinDemo({payload: {bookingId, phone}}) {
       },
       body: JSON.stringify({bookingId}),
     });
-    const res = yield response.json();
-    console.log('joinDemoRes=', res);
-    if (response.status === 200) {
-      yield call(fetchDemoDetailsFromPhone, {payload: phone});
-    }
+    const resData = yield response.json();
+    console.log('joinDemoResData', resData);
+    // if (response.status === 200) {
+    //   yield call(fetchDemoDetailsFromPhone);
+    // }
   } catch (error) {
     console.log('joinDemoError=', error);
   }

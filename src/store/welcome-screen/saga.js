@@ -13,10 +13,14 @@ import {isValidNumber} from '../../utils/isValidNumber';
 import {navigate, replace} from '../../navigationRef';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
-import {setCountryCallingCodeAsync} from '../../utils/storage/storage-provider';
+import {
+  localStorage,
+  setCountryCallingCodeAsync,
+} from '../../utils/storage/storage-provider';
 
 import {setCurrentNetworkState} from '../network/reducer';
 import {ERROR_MESSAGES} from '../../utils/constants/messages';
+import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
 /**
  * @author Shobhit
@@ -34,6 +38,8 @@ function* handleBookingStatus({payload: {phone, country}}) {
     return;
   }
 
+  console.log(phone);
+
   try {
     // Check for length of a phone number according to country
     // Return true or false
@@ -46,6 +52,8 @@ function* handleBookingStatus({payload: {phone, country}}) {
 
     // Get booking data
     const response = yield fetchBookingDetailsFromPhone(phone);
+
+    localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
 
     // if (response.status === 400) {
     //   // Booking not found

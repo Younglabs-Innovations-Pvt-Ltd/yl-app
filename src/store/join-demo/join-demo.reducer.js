@@ -15,7 +15,11 @@ const INITIAL_STATE = {
   ratingLoading: true,
   nmiLoading: false,
   isNmi: false,
+  isClassOngoing: false,
+  demoFlag: false,
   message: '',
+  joinClassLoading: false,
+  joinClassErrorMsg: '',
 };
 
 // reducer
@@ -92,10 +96,24 @@ const reducer = {
     state.message = action.payload;
     state.nmiLoading = false;
   },
+  setClassOngoing(state, action) {
+    state.isClassOngoing = action.payload;
+  },
+  setDemoFlag(state, action) {
+    state.demoFlag = action.payload;
+  },
+  joinFreeClass(state) {
+    state.joinClassLoading = true;
+  },
+  setJoinClassLoading(state, action) {
+    state.joinClassLoading = action.payload;
+  },
+  setJoinClassErrorMsg(state, action) {
+    state.joinClassErrorMsg = action.payload;
+  },
   setPhoneAsync() {},
   setDemoData() {},
   setDemoNotifications() {},
-  joinFreeClass() {},
   saveRating() {},
   checkForRating() {},
   joinDemo() {},
@@ -136,7 +154,11 @@ export const {
   setLoading,
   joinDemo,
   setNMI,
+  setClassOngoing,
+  setDemoFlag,
   setBookingDetailsFailed,
+  setJoinClassLoading,
+  setJoinClassErrorMsg,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

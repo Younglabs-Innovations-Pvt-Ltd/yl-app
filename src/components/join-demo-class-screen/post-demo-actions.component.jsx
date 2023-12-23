@@ -33,6 +33,9 @@ const PostDemoAction = ({rescheduleClass}) => {
   const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
     useSelector(joinDemoSelector);
 
+  console.log('isRated', isRated);
+  console.log('isNmi', isNmi);
+
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -140,7 +143,7 @@ const PostDemoAction = ({rescheduleClass}) => {
       style={{
         width: '100%',
       }}>
-      {!attended && (
+      {!attended && !isRated && (
         <View style={styles.paContainer}>
           <TextWrapper
             fs={20}
@@ -149,7 +152,7 @@ const PostDemoAction = ({rescheduleClass}) => {
             styles={{textAlign: 'center'}}>
             Did you attend your free class?
           </TextWrapper>
-          <Spacer />
+          <Spacer space={4} />
           <View style={styles.paButtons}>
             <Pressable
               style={({pressed}) => [

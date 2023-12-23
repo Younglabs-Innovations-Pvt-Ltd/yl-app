@@ -184,7 +184,8 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
     }
     localStorage.clearAll();
     console.log('phone', phone);
-    dispatch(startFetchBookingDetailsFromPhone(phone));
+    localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
+    dispatch(startFetchBookingDetailsFromPhone());
     if (!onClose) {
       navigation.replace(SCREEN_NAMES.MAIN);
     }

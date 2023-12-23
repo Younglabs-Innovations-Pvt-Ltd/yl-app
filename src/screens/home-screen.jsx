@@ -17,10 +17,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {
   startFetchBookingDetailsFromPhone,
-  startFetchBookingDetailsFromId,
-  setPhoneAsync,
-  setDemoData,
   setShowJoinButton,
+  joinDemo,
 } from '../store/join-demo/join-demo.reducer';
 import {resetCurrentNetworkState} from '../store/network/reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
@@ -66,6 +64,7 @@ import {saveDeviceId} from '../utils/deviceId';
 import RatingPopup from '../components/popups/rating';
 import {fetchContentDataStart} from '../store/content/reducer';
 import {contentSelector} from '../store/content/selector';
+import moment from 'moment';
 
 const INITIAL_TIME = {
   days: 0,
@@ -103,7 +102,7 @@ const sectionOffsets = {
 
 const HomeScreen = ({navigation, route}) => {
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
-  const [isTimeover, setIsTimeover] = useState(false);
+  // const [isTimeover, setIsTimeover] = useState(false);
   const [showPostActions, setShowPostActions] = useState(false);
   const [visibleCred, setVisibleCred] = useState(false);
   const [offsets, setOffsets] = useState(sectionOffsets);
@@ -119,11 +118,10 @@ const HomeScreen = ({navigation, route}) => {
     loading,
     demoPhoneNumber,
     bookingDetails,
-    demoBookingId,
-    teamUrl,
     isAttended,
-    isAttendenceMarked,
     bookingTime,
+    isClassOngoing,
+    demoFlag,
   } = useSelector(joinDemoSelector);
 
   const {
@@ -177,12 +175,31 @@ const HomeScreen = ({navigation, route}) => {
       console.log('appState', nextAppState);
       if (nextAppState === 'active') {
         console.log('hit active state');
-        const currentScreen = localStorage.getString(LOCAL_KEYS.CURRENT_SCREEN);
-        console.log('currentScreen', currentScreen);
-        if (currentScreen === 'home') {
-          const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-          console.log('phone', phone);
-          dispatch(startFetchBookingDetailsFromPhone(phone));
+        // const currentScreen = localStorage.getString(LOCAL_KEYS.CURRENT_SCREEN);
+        // console.log('currentScreen', currentScreen);
+        // if (currentScreen === 'home') {
+        //   const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+        //   console.log('phone', phone);
+        //   dispatch(startFetchBookingDetailsFromPhone(phone));
+        // }
+        const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+        console.log('isClassJoined', isClassJoined);
+        if (isClassJoined) {
+          setRatingModal(true);
+        }
+
+        const demoTime = localStorage.getNumber(LOCAL_KEYS.DEMO_TIME);
+        console.log(moment(demoTime).add(1, 'hours').isAfter(moment()));
+        if (demoTime) {
+          console.log('demoTime', typeof demoTime);
+          const demoNotOver = moment(demoTime)
+            .add(1, 'hours')
+            .isAfter(moment());
+          if (demoNotOver) {
+            const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+            console.log('phone', phone);
+            dispatch(startFetchBookingDetailsFromPhone(phone));
+          }
         }
       }
     };
@@ -196,7 +213,7 @@ const HomeScreen = ({navigation, route}) => {
     dispatch(fetchContentDataStart());
   }, []);
 
-  // Check for customer
+  // fetch user data
   useEffect(() => {
     if (bookingDetails) {
       dispatch(fetchUser({leadId: bookingDetails?.leadId}));
@@ -208,9 +225,9 @@ const HomeScreen = ({navigation, route}) => {
    * @since 07/08/2023
    * @description Set demo phone number from localStorage to redux state
    */
-  useEffect(() => {
-    dispatch(setPhoneAsync());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(setPhoneAsync());
+  // }, []);
 
   /**
    * @author Shobhit
@@ -218,10 +235,8 @@ const HomeScreen = ({navigation, route}) => {
    * @description Call api to get booking status from phone number
    */
   useEffect(() => {
-    if (demoPhoneNumber) {
-      dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-    }
-  }, [demoPhoneNumber]);
+    dispatch(startFetchBookingDetailsFromPhone());
+  }, []);
 
   /**
    * @author Shobhit
@@ -248,11 +263,11 @@ const HomeScreen = ({navigation, route}) => {
    * @description
    * set demo data
    */
-  useEffect(() => {
-    if (demoData) {
-      dispatch(setDemoData({demoData, phone: demoPhoneNumber}));
-    }
-  }, [demoData]);
+  // useEffect(() => {
+  //   if (demoData) {
+  //     dispatch(setDemoData({demoData, phone: demoPhoneNumber}));
+  //   }
+  // }, [demoData]);
 
   useEffect(() => {
     let timeout;
@@ -288,36 +303,6 @@ const HomeScreen = ({navigation, route}) => {
   /**
    * @author Shobhit
    * @since 07/08/2023
-   * @description Call api to get booking status from booking id
-   */
-  useEffect(() => {
-    if (demoBookingId) {
-      dispatch(startFetchBookingDetailsFromId(demoBookingId));
-    }
-  }, [demoBookingId, dispatch]);
-
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description
-   * Get demo data
-   * If a user came after start class
-   */
-  useEffect(() => {
-    if (isAttendenceMarked) {
-      if (demoPhoneNumber) {
-        dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-      }
-
-      if (demoBookingId) {
-        dispatch(startFetchBookingDetailsFromId(JSON.parse(demoBookingId)));
-      }
-    }
-  }, [isAttendenceMarked]);
-
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
    * @description Countdown Timer
    */
   useEffect(() => {
@@ -327,13 +312,12 @@ const HomeScreen = ({navigation, route}) => {
       timer = setInterval(() => {
         const remaining = getTimeRemaining(bookingTime);
         if (remaining.remainingTime <= 0) {
-          setIsTimeover(true);
           clearInterval(timer);
           return;
         }
 
         if (new Date(bookingTime).getTime() - 1000 <= new Date().getTime()) {
-          dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
+          dispatch(startFetchBookingDetailsFromPhone());
         }
 
         // set time to show
@@ -383,18 +367,35 @@ const HomeScreen = ({navigation, route}) => {
   useEffect(() => {
     if (!bookingTime) return;
 
-    const isDemoOver =
-      new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
+    // const isDemoOver =
+    //   new Date(bookingTime).getTime() + 1000 * 60 * 60 * 4 <= Date.now();
+    const isDemoOver = moment(bookingTime).add(1, 'hours').isBefore(moment());
 
     console.log('isDemoOver', isDemoOver);
 
-    if (isDemoOver && isAttended && teamUrl) {
+    if (isDemoOver && isAttended) {
       console.log('post action true');
       setShowPostActions(true);
     } else {
       setShowPostActions(false);
     }
-  }, [bookingTime, isAttended, teamUrl]);
+  }, [bookingTime, isAttended]);
+
+  useEffect(() => {
+    console.log('demoFlag', demoFlag);
+    if (demoData) {
+      if (
+        moment().isBefore(moment(bookingTime).add(1, 'hours')) &&
+        moment().isAfter(moment(bookingTime))
+      ) {
+        if (!demoFlag) {
+          console.log('caling join demo...');
+          Alert.alert('', 'caling join demo...');
+          dispatch(joinDemo({bookingId: demoData.bookingId}));
+        }
+      }
+    }
+  }, [bookingTime, demoData, demoFlag]);
 
   /**
    * @author Shobhit
@@ -407,16 +408,6 @@ const HomeScreen = ({navigation, route}) => {
 
       if (bookingTime > currentTime) {
         registerNotificationTimer(bookingTime);
-      }
-    }
-  }, [bookingTime]);
-
-  // Check for demo is over or not
-  useEffect(() => {
-    if (bookingTime) {
-      const timeOver = bookingTime < Date.now();
-      if (!timeOver) {
-        setIsTimeover(false);
       }
     }
   }, [bookingTime]);
@@ -452,7 +443,7 @@ const HomeScreen = ({navigation, route}) => {
           },
         },
         {
-          text: 'CANCEL',
+          text: 'Cancel',
           onPress: () => {
             dispatch(resetCurrentNetworkState());
           },
@@ -530,7 +521,7 @@ const HomeScreen = ({navigation, route}) => {
           />
         ) : (
           <Demo
-            isTimeover={isTimeover}
+            isClassOngoing={isClassOngoing}
             timeLeft={timeLeft}
             showPostActions={showPostActions}
           />
@@ -855,6 +846,7 @@ const HomeScreen = ({navigation, route}) => {
       <RatingPopup
         visible={ratingModal}
         onClose={() => setRatingModal(false)}
+        bookingId={demoData?.bookingId}
       />
     </View>
   );

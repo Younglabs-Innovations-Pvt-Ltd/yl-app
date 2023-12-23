@@ -7,7 +7,6 @@ import {
   Animated,
   TextInput,
   StatusBar,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import Spacer from '../components/spacer.component';
@@ -23,7 +22,6 @@ import Spinner from '../components/spinner.component';
 import CountryList from '../components/country-list.component';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import {
   setCountry,
   setModalVisible,
@@ -36,8 +34,6 @@ import {networkSelector} from '../store/network/selector';
 
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
-import {resetCurrentNetworkState} from '../store/network/reducer';
-import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
 import {phoneAuthStart, setAuthToken, verifyCode} from '../store/auth/reducer';
 import {authSelector} from '../store/auth/selector';
@@ -78,56 +74,6 @@ const DemoClassScreen = ({navigation}) => {
     StatusBar.setBackgroundColor(COLORS.pblue);
     StatusBar.setBarStyle('light-content');
   }, []);
-
-  /**
-   * @author Shobhit
-   * @since 03/10/2023
-   * @description  Checking for internet connected or not
-   * If connected and ipData is not null then fetch ipData and update state silently
-   */
-  // useEffect(() => {
-  //   const unsubscribe = NetInfo.addEventListener(state => {
-  //     if (state.isConnected && !ipData) {
-  //       dispatch(startFetchingIpData());
-  //     }
-  //   });
-
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, [ipData]);
-
-  /**
-   * @author Shobhit
-   * @since 20/09/2023
-   * @description
-   * Calling ip geolocation api to fetch ip data(like country calling code, country code and timezone)
-   * Check if ipData is available
-   * If not only then fetch (to avoid make api calls on every render)
-   */
-  // useEffect(() => {
-  //   if (!ipData) {
-  //     dispatch(startFetchingIpData());
-  //   }
-  // }, [ipData]);
-
-  /**
-   * @author Shobhit
-   * @since 20/09/2023
-   * @description
-   * Setting calling code and country code to country state
-   * To show default calling code in input
-   */
-  // useEffect(() => {
-  //   if (ipData) {
-  //     dispatch(
-  //       setCountry({
-  //         callingCode: ipData.calling_code,
-  //         countryCode: {cca2: ipData.country_code2},
-  //       }),
-  //     );
-  //   }
-  // }, [ipData]);
 
   useEffect(() => {
     if (confirm) {
@@ -287,28 +233,6 @@ const DemoClassScreen = ({navigation}) => {
     {opacity: pressed ? 0.8 : 1},
   ];
 
-  // if (!isConnected) {
-  //   Alert.alert(
-  //     '',
-  //     'We cannot continue due to network problem. Please check your network connection.',
-  //     [
-  //       {
-  //         text: 'Refresh',
-  //         onPress: () => {
-  //           dispatch(resetCurrentNetworkState());
-  //           dispatch(alertAction);
-  //         },
-  //       },
-  //       {
-  //         text: 'CANCEL',
-  //         onPress: () => {
-  //           dispatch(resetCurrentNetworkState());
-  //         },
-  //       },
-  //     ],
-  //   );
-  // }
-
   // Handle the button press
   async function signInWithPhoneNumber() {
     dispatch(phoneAuthStart({phone, country}));
@@ -403,7 +327,7 @@ const DemoClassScreen = ({navigation}) => {
           <Pressable
             style={btnContinueStyle}
             disabled={authLoading}
-            onPress={handleBookingStatus}>
+            onPress={signInWithPhoneNumber}>
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
               Continue
             </TextWrapper>
