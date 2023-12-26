@@ -25,7 +25,7 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
     }
     setTimeout(() => {
       onClose();
-    }, 350);
+    }, 300);
   };
 
   return (

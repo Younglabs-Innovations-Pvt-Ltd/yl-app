@@ -28,6 +28,7 @@ import VideoMediaPlayer from '../components/video-player.component';
 import {FONTS} from '../utils/constants/fonts';
 import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -60,14 +61,20 @@ const BatchFeeDetails = ({navigation}) => {
   // console.log('currentSelectedBatch: ', currentSelectedBatch);
 
   // Save current screen name
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log('batch focused..');
-      localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'batch');
-    });
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     console.log('batch focused..');
+  //     localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'batch');
+  //   });
 
-    return unsubscribe;
-  }, [navigation]);
+  //   return unsubscribe;
+  // }, [navigation]);
+
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -150,7 +157,10 @@ const BatchFeeDetails = ({navigation}) => {
           style={{flex: 1}}
           contentContainerStyle={{padding: 16}}>
           <View style={{paddingVertical: 16}}>
-            <VideoMediaPlayer uri={courseVideos?.postDemoVideo} />
+            <VideoMediaPlayer
+              uri={courseVideos?.postDemoVideo}
+              poster={courseVideos?.demoPoster}
+            />
           </View>
           {/* Age groups */}
           <View style={{padding: 12, backgroundColor: '#eee', borderRadius: 4}}>

@@ -7,7 +7,7 @@ import {
   setLoading,
 } from './reducer';
 
-import {fetchBookingDetailsFromPhone} from '../../utils/api/yl.api';
+import {createLead, fetchBookingDetailsFromPhone} from '../../utils/api/yl.api';
 import {isValidNumber} from '../../utils/isValidNumber';
 
 import {navigate, replace} from '../../navigationRef';
@@ -21,6 +21,9 @@ import {
 import {setCurrentNetworkState} from '../network/reducer';
 import {ERROR_MESSAGES} from '../../utils/constants/messages';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
+import {getCurrentDeviceId} from '../../utils/deviceId';
+import DeviceInfo from 'react-native-device-info';
+import {setBookingDetailSuccess} from '../join-demo/join-demo.reducer';
 
 /**
  * @author Shobhit
@@ -32,7 +35,7 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
  * If booking then redirect to home screen
  * If not redirect to create new booking screen
  */
-function* handleBookingStatus({payload: {phone, country}}) {
+function* handleBookingStatus({payload: {phone}}) {
   if (!phone) {
     yield put(setErrorMessage('Enter phone number'));
     return;
@@ -45,6 +48,8 @@ function* handleBookingStatus({payload: {phone, country}}) {
     // Return true or false
     const isValidPhone = isValidNumber(phone, 'IN');
 
+    console.log('isValidPhone', isValidPhone);
+
     if (!isValidPhone) {
       yield put(setErrorMessage('Please enter a valid number'));
       return;
@@ -53,17 +58,30 @@ function* handleBookingStatus({payload: {phone, country}}) {
     // Get booking data
     const response = yield fetchBookingDetailsFromPhone(phone);
 
+    const data = yield response.json();
+    console.log('booking Data', data);
+
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
 
-    // if (response.status === 400) {
-    //   // Booking not found
-    //   navigate(SCREEN_NAMES.BOOK_DEMO_FORM, {phone, country}); //Redirect to BookDemoForm Screen
-    //   yield put(setErrorMessage(''));
-    //   return;
-    // }
+    if (response.status === 400) {
+      console.log('booking not found');
+      const deviceId = yield getCurrentDeviceId();
+      const deviceUID = yield DeviceInfo.getAndroidId();
+      const countryCode = 91;
+      const courseId = 'Eng_Hw';
 
-    // if (response.status === 200) {
-    // yield setCountryCallingCodeAsync(country.callingCode);
+      const leadRes = yield createLead({
+        phone,
+        countryCode,
+        courseId,
+        deviceId,
+        deviceUID,
+      });
+      const leadData = yield leadRes.json();
+      console.log('leadData', leadData);
+    }
+
+    yield put(setBookingDetailSuccess({demoData: data, bookingDetails: null}));
     yield put(fetchBookingStatusSuccess(''));
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
     // }

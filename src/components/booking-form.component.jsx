@@ -1,14 +1,13 @@
 import React, {useState, useMemo} from 'react';
 import {StyleSheet, Pressable, View, ScrollView} from 'react-native';
-import {useSelector} from 'react-redux';
-import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 
 import TextWrapper from './text-wrapper.component';
 import Spacer from './spacer.component';
 import Input from './input.component';
 import {Dropdown, DropdownList} from './dropdown.component';
 import {COLORS} from '../utils/constants/colors';
+import {localStorage} from '../utils/storage/storage-provider';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -23,8 +22,7 @@ const BookingForm = ({goToNextSlide}) => {
   const [childAge, setChildAge] = useState(null);
   const [fields, setFields] = useState(INITIAL_sTATE);
 
-  const {demoPhoneNumber} = useSelector(joinDemoSelector);
-  const {country} = useSelector(bookDemoSelector);
+  const PHONE = localStorage.getNumber(LOCAL_KEYS.PHONE);
 
   /**
    * Check if any field is not empty
@@ -52,7 +50,7 @@ const BookingForm = ({goToNextSlide}) => {
   const handleOnClose = () => setOpen(false);
 
   const handleDemoSlots = async () => {
-    const formFields = {...fields, phone: demoPhoneNumber, childAge};
+    const formFields = {...fields, phone: PHONE, childAge};
 
     goToNextSlide(formFields);
   };
@@ -70,11 +68,12 @@ const BookingForm = ({goToNextSlide}) => {
       backgroundColor: !isActive ? '#eaeaea' : COLORS.pblue,
     },
   ];
+
   return (
-    <>
+    <React.Fragment>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{paddingHorizontal: 16, paddingTop: 12}}>
+        contentContainerStyle={{paddingHorizontal: 8, paddingTop: 8}}>
         <View style={{flex: 1}}>
           <View style={styles.row}>
             <View style={styles.phoneBox}>
@@ -82,9 +81,7 @@ const BookingForm = ({goToNextSlide}) => {
                 fs={18}
                 styles={{letterSpacing: 1}}
                 fw="bold"
-                color={
-                  'gray'
-                }>{`${country.callingCode} ${demoPhoneNumber}`}</TextWrapper>
+                color={'gray'}>{`+91 ${PHONE}`}</TextWrapper>
             </View>
           </View>
           <Spacer />
@@ -112,7 +109,9 @@ const BookingForm = ({goToNextSlide}) => {
             onLayout={onLayoutChange}
           />
         </View>
+      </ScrollView>
 
+      <View style={{padding: 8}}>
         <Pressable
           style={btnNextStyle}
           disabled={!isActive}
@@ -124,7 +123,7 @@ const BookingForm = ({goToNextSlide}) => {
             Continue
           </TextWrapper>
         </Pressable>
-      </ScrollView>
+      </View>
 
       {open && (
         <DropdownList
@@ -135,7 +134,7 @@ const BookingForm = ({goToNextSlide}) => {
           onChange={handleChildAge}
         />
       )}
-    </>
+    </React.Fragment>
   );
 };
 
@@ -165,13 +164,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 48,
     paddingVertical: 6,
-    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 6,
   },
   btnCallingCode: {
-    display: 'flex',
     justifyContent: 'center',
     paddingHorizontal: 8,
     borderBottomWidth: 1,

@@ -22,24 +22,14 @@ const VideoPlayer = ({
   width = 135,
   aspectRatio,
 }) => {
-  const videoRef = useRef();
-  const thumbRef = useRef();
+  const currentVideo = useRef();
   const [visible, setVisible] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [loading, setLoding] = useState(false);
-  const [isEnded, setIsEnded] = useState(false);
-  const [isEnded2, setIsEnded2] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [thumbLoading, setThumbLoading] = useState(false);
 
-  const onLoadStart = () => {
-    setLoding(true);
-  };
-
-  const onReadyForDisplay = () => {
-    setLoding(false);
-  };
-
   const onOpen = () => {
+    currentVideo.current = uri;
     setVisible(true);
   };
 
@@ -55,11 +45,12 @@ const VideoPlayer = ({
     setVisible(false);
   };
 
-  const onEnd = () => {
-    setIsEnded(true);
+  const onThumbnailLoadStart = () => {
+    setLoading(true);
   };
-  const onEnd2 = () => {
-    setIsEnded2(true);
+
+  const onThumbnailReadyForDisplay = () => {
+    setLoading(false);
   };
 
   return (
@@ -68,7 +59,6 @@ const VideoPlayer = ({
         style={[styles.container, {width: width, aspectRatio}]}
         onPress={onOpen}>
         <Video
-          ref={thumbRef}
           source={{uri}}
           style={{
             width: '100%',
@@ -76,16 +66,13 @@ const VideoPlayer = ({
           }}
           focusable={false}
           muted={true}
-          onEnd={onEnd}
           resizeMode="cover"
           disableFocus={true}
-          // poster={poster}
-          // posterResizeMode="cover"
-          paused={visible}
-          onLoadStart={() => setThumbLoading(true)}
-          onReadyForDisplay={() => setThumbLoading(false)}
+          poster={poster}
+          posterResizeMode="cover"
+          paused={true}
         />
-        {thumbLoading && (
+        {/* {thumbLoading && (
           <View
             style={{
               position: 'absolute',
@@ -95,7 +82,7 @@ const VideoPlayer = ({
               bottom: 0,
               backgroundColor: '#eee',
             }}></View>
-        )}
+        )} */}
         {thumbnailText && (
           <View style={styles.poster}>
             <View
@@ -125,16 +112,16 @@ const VideoPlayer = ({
               style={styles.activityIndicator}
             />
           )}
-          <Video
-            ref={videoRef}
-            source={{uri}}
-            style={{width: '100%', height: '100%', alignSelf: 'center'}}
-            onLoadStart={onLoadStart}
-            onReadyForDisplay={onReadyForDisplay}
-            onEnd={onEnd2}
-            muted={muted}
-            resizeMode="contain"
-          />
+          {currentVideo.current && (
+            <Video
+              source={{uri: currentVideo.current}}
+              style={{width: '100%', height: '100%', alignSelf: 'center'}}
+              muted={muted}
+              resizeMode="contain"
+              onLoadStart={onThumbnailLoadStart}
+              onReadyForDisplay={onThumbnailReadyForDisplay}
+            />
+          )}
           <View style={styles.videoOverlay}>
             <View
               style={{

@@ -7,9 +7,7 @@ import {
   Animated,
   TextInput,
   StatusBar,
-  ActivityIndicator,
 } from 'react-native';
-import Spacer from '../components/spacer.component';
 
 import {FONTS} from '../utils/constants/fonts';
 import {COLORS} from '../utils/constants/colors';
@@ -34,11 +32,6 @@ import {networkSelector} from '../store/network/selector';
 
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
-import auth from '@react-native-firebase/auth';
-import {phoneAuthStart, setAuthToken, verifyCode} from '../store/auth/reducer';
-import {authSelector} from '../store/auth/selector';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
-import Icon from '../components/icon.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -49,37 +42,22 @@ const DemoClassScreen = ({navigation}) => {
   const {localLang, currentLang} = i18nContext();
 
   const [phone, setPhone] = useState('7983068672');
-  const [code, setCode] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
-
-  const {
-    confirm,
-    message: authMsg,
-    loading: authLoading,
-    verificationErrorMessage,
-    verificationLoading,
-  } = useSelector(authSelector);
 
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
   const {ipData} = useSelector(bookDemoSelector);
-  const {country, modalVisible} = useSelector(welcomeScreenSelector);
+  const {country, modalVisible, loading, message} = useSelector(
+    welcomeScreenSelector,
+  );
 
   // Setting background color and style of Statusbar
   useEffect(() => {
     StatusBar.setBackgroundColor(COLORS.pblue);
     StatusBar.setBarStyle('light-content');
   }, []);
-
-  useEffect(() => {
-    if (confirm) {
-      setVisible(true);
-    }
-  }, [confirm]);
 
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
@@ -97,7 +75,7 @@ const DemoClassScreen = ({navigation}) => {
    * Takes two parameter phone number and country({callingCode, countryCode})
    */
   const handleBookingStatus = async () => {
-    dispatch(fetchBookingStatusStart({phone, country}));
+    dispatch(fetchBookingStatusStart({phone}));
   };
 
   // Select different countries
@@ -233,36 +211,6 @@ const DemoClassScreen = ({navigation}) => {
     {opacity: pressed ? 0.8 : 1},
   ];
 
-  // Handle the button press
-  async function signInWithPhoneNumber() {
-    dispatch(phoneAuthStart({phone, country}));
-  }
-
-  function confirmCode() {
-    dispatch(verifyCode({confirm, verificationCode: code}));
-  }
-
-  async function onAuthStateChanged(user) {
-    if (user) {
-      try {
-        setVisible(false);
-        setLoading(true);
-        const tokenResult = await auth().currentUser.getIdTokenResult();
-        dispatch(setAuthToken(tokenResult.token));
-        setLoading(false);
-        navigation.replace(SCREEN_NAMES.MAIN);
-      } catch (error) {
-        setLoading(false);
-        console.error('Error getting ID token:', error);
-      }
-    }
-  }
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
   return (
     <View style={styles.wrapper}>
       {/* <LanguageSelection /> */}
@@ -310,34 +258,18 @@ const DemoClassScreen = ({navigation}) => {
               maxLength={maxPhoneLength}
             />
           </View>
-          {/* {message && (
+          {message && (
             <TextWrapper fs={14} color={COLORS.pred}>
               {message}
-            </TextWrapper>
-          )} */}
-          {!authMsg && <Spacer space={6} />}
-          {authMsg && (
-            <TextWrapper
-              fs={14}
-              color={COLORS.pred}
-              styles={{marginVertical: 4, marginLeft: 8}}>
-              {authMsg}
             </TextWrapper>
           )}
           <Pressable
             style={btnContinueStyle}
-            disabled={authLoading}
+            disabled={loading}
             onPress={handleBookingStatus}>
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
               Continue
             </TextWrapper>
-            {authLoading && (
-              <ActivityIndicator
-                size={'small'}
-                color={COLORS.white}
-                style={{marginLeft: 4}}
-              />
-            )}
           </Pressable>
         </View>
       </Animated.View>
@@ -351,7 +283,7 @@ const DemoClassScreen = ({navigation}) => {
         onClose={onCloseBottomSheet}
         onSelect={handleSelectCountry}
       />
-      <ModalComponent
+      {/* <ModalComponent
         visible={visible}
         onRequestClose={() => setVisible(false)}>
         <View
@@ -423,7 +355,7 @@ const DemoClassScreen = ({navigation}) => {
             </Pressable>
           </View>
         </View>
-      </ModalComponent>
+      </ModalComponent> */}
     </View>
   );
 };
@@ -502,6 +434,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: COLORS.pblue,
     borderRadius: 54,
+    marginTop: 8,
   },
   animatedImage: {
     alignSelf: 'center',

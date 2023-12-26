@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import {
   StyleSheet,
@@ -11,7 +11,6 @@ import {CommonActions} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-// import {setToInitialState} from '../store/join-demo/join-demo.reducer';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
@@ -19,28 +18,24 @@ import Icon from '../components/icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {COLORS} from '../utils/constants/colors';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
-
-import {cancleNotifications} from '../utils/notifications';
-// import Share from 'react-native-share';
 
 import {i18nContext} from '../context/lang.context';
 import {authSelector} from '../store/auth/selector';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Snackbar from 'react-native-snackbar';
-import auth from '@react-native-firebase/auth';
 import {logout} from '../store/auth/reducer';
 import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
 const WEBSITE_URL = 'https://www.younglabs.in/';
 
 const CustomDrawerContent = ({navigation, ...props}) => {
   const {localLang} = i18nContext();
   const dispatch = useDispatch();
-  const {bookingDetails, demoPhoneNumber} = useSelector(joinDemoSelector);
+  const {bookingDetails} = useSelector(joinDemoSelector);
   const {user} = useSelector(authSelector);
   const windowDimensions = useWindowDimensions();
 
@@ -48,23 +43,6 @@ const CustomDrawerContent = ({navigation, ...props}) => {
 
   const handleLogout = async () => {
     try {
-      await auth().signOut();
-      // await AsyncStorage.removeItem(LOCAL_KEYS.PHONE);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.COUNTDOWN_NOTIFICATION);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.CALLING_CODE);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN_EXPIRE);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.ACS_TOKEN);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.NMI);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.IS_RATED);
-      // await AsyncStorage.removeItem(LOCAL_KEYS.SAVE_ATTENDED);
-      await cancleNotifications();
-
-      // const keys = await AsyncStorage.getAllKeys();
-      // console.log('keys: ', keys);
-      // await AsyncStorage.multiRemove(keys);
-
       localStorage.clearAll();
 
       removeRegisterNotificationTimer();
@@ -123,25 +101,6 @@ const CustomDrawerContent = ({navigation, ...props}) => {
     }
   };
 
-  const fullName = bookingDetails?.parentName
-    ? bookingDetails.parentName.slice(0, 1).toUpperCase() +
-      bookingDetails.parentName.slice(1)
-    : '';
-
-  // const shareApp = async () => {
-  //   const message =
-  //     'Book a free english handwriting class for your child conducted by experts.';
-  //   const url = 'https://play.google.com/store/apps/details?id=com.younglabs';
-  //   try {
-  //     await Share.open({
-  //       title: 'Younglabs',
-  //       message: `${message} \n Download now: ${url}`,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   const copyCredentials = cred => {
     Clipboard.setString(cred);
     Snackbar.show({
@@ -162,6 +121,17 @@ const CustomDrawerContent = ({navigation, ...props}) => {
     });
   };
 
+  const PHONE = useMemo(() => {
+    return localStorage.getNumber(LOCAL_KEYS.PHONE);
+  }, []);
+
+  const FULLNAME = useMemo(() => {
+    return bookingDetails?.parentName
+      ? bookingDetails.parentName.slice(0, 1).toUpperCase() +
+          bookingDetails.parentName.slice(1)
+      : '';
+  }, [bookingDetails]);
+
   return (
     <DrawerContentScrollView {...props}>
       <View
@@ -172,9 +142,9 @@ const CustomDrawerContent = ({navigation, ...props}) => {
         <View style={{flex: 2}}>
           <View style={styles.drawerHeader}>
             <TextWrapper fs={28} numberOfLines={1}>
-              {fullName || 'Guest'}
+              {FULLNAME || 'Guest'}
             </TextWrapper>
-            <TextWrapper>{user?.phone}</TextWrapper>
+            <TextWrapper>{PHONE}</TextWrapper>
           </View>
           {user && user?.customer === 'yes' && (
             <View style={{paddingVertical: 8, paddingHorizontal: 8}}>

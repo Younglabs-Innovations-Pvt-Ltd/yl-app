@@ -48,6 +48,15 @@ import Icon from './src/components/icon.component';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
 import notifee from '@notifee/react-native';
+import RNUxcam from 'react-native-ux-cam';
+
+RNUxcam.optIntoSchematicRecordings(); // Add this line to enable iOS screen recordings
+const configuration = {
+  userAppKey: '3tu10kdj4d7xaxh',
+  enableAutomaticScreenNameTagging: false,
+  enableImprovedScreenCapture: true, // for improved screen capture on Android
+};
+RNUxcam.startWithConfiguration(configuration);
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -71,13 +80,6 @@ function App() {
   // Check for app update
   useEffect(() => {
     checkForUpdate();
-  }, []);
-
-  // Check if user already logged in
-  // then redirect to home screen
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
   }, []);
 
   useEffect(() => {
@@ -115,29 +117,27 @@ function App() {
   useEffect(() => {
     checkNotifications()
       .then(() => {
-        setLoading(false);
+        console.log('notification');
       })
-      .catch(error => console.log('checkNotificationsError', error.message));
+      .catch(error => {
+        console.log('checkNotificationsError', error.message);
+      });
   }, []);
 
-  async function onAuthStateChanged(user) {
-    try {
+  // Check for authentication
+  useEffect(() => {
+    const checkForAuth = () => {
       const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-      // const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
-      console.log('phone', phone);
-      console.log('typeof phone', typeof phone);
-      let token;
-      if (user) {
-        const tokenResult = await auth().currentUser.getIdTokenResult();
-        token = tokenResult.token;
-      }
-      if (token && phone) {
+      console.log('checkForAuth', phone);
+      if (phone) {
         setIsPhone(true);
       }
-    } catch (error) {
-      console.error('Error getting ID token:', error);
-    }
-  }
+
+      setLoading(false);
+    };
+
+    checkForAuth();
+  }, []);
 
   // Handle redirect url (Deep Link)
   useEffect(() => {
@@ -226,7 +226,7 @@ function App() {
     );
   };
 
-  console.log('redirectRef', notificationRef);
+  console.log('notificationRef', notificationRef.current);
 
   return (
     // Provider for language

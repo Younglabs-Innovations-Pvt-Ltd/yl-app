@@ -13,13 +13,14 @@ import {
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/storage/local-storage-keys';
 import {isValidNumber} from '../../utils/isValidNumber';
-import {getCustomers} from '../../utils/api/yl.api';
+import {createLead, getCustomers} from '../../utils/api/yl.api';
 import {localStorage} from '../../utils/storage/storage-provider';
+import DeviceInfo from 'react-native-device-info';
+import {getCurrentDeviceId} from '../../utils/deviceId';
 
-function* phoneAuthentication({payload: {phone, country}}) {
+function* phoneAuthentication({payload: {phone}}) {
   try {
     console.log('authPhone', phone);
-    console.log('typeof phone', phone);
     if (!phone) {
       yield put(phoneAuthFailed('Enter phone number'));
       return;
@@ -34,6 +35,7 @@ function* phoneAuthentication({payload: {phone, country}}) {
 
     // yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, phone);
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
+    localStorage.set(LOCAL_KEYS.CALLING_CODE, '+91');
     const confirmation = yield auth().signInWithPhoneNumber(`+91${phone}`);
     console.log(confirmation);
     yield put(setConfirm(confirmation));
@@ -52,6 +54,14 @@ function* phoneAuthentication({payload: {phone, country}}) {
 function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
   try {
     yield confirm.confirm(verificationCode);
+
+    const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+    const countryCode = 91;
+    const courseType = 'Eng_Hw';
+    const deviceUID = yield DeviceInfo.getAndroidId();
+    const deviceId = yield getCurrentDeviceId();
+
+    // yield createLead({phone, countryCode, courseType, deviceUID, deviceId});
     yield put(setVerificationLoading(false));
   } catch (error) {
     console.log(error);

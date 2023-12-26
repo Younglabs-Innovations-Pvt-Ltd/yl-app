@@ -65,7 +65,7 @@ function* fetchDemoDetailsFromPhone() {
     const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
 
     const response = yield call(fetchBookingDetailsFromPhone, phone, token);
-    const data = yield response.json();
+    let data = yield response.json();
 
     // let callingCode = yield AsyncStorage.getItem(LOCAL_KEYS.CALLING_CODE);
 
@@ -79,7 +79,7 @@ function* fetchDemoDetailsFromPhone() {
     const bookingDetails = yield detailsResponse.json();
 
     if (response.status === 400) {
-      yield put(setLoading(false));
+      data = null;
     }
 
     // lead email
@@ -89,10 +89,13 @@ function* fetchDemoDetailsFromPhone() {
     //   yield put(setEmail(leadEmail.email));
     // }
 
-    yield call(onSetDemoData, {demoData: data, phone});
+    // if (response.status === 200) {
+    //   console.log('booking found');
+    //   yield call(onSetDemoData, {demoData: data, phone});
+    // }
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
-    console.log('error', error);
+    console.log('fetchDemoDetailsFromPhoneError', error);
     // yield put(setBookingDetailsFailed("Something went wrong, try again"))
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setLoading(false));
@@ -163,7 +166,7 @@ function* getPhoneFromStorage() {
  * @param {object} payload demoData
  * @description Set demo data to states
  */
-function* onSetDemoData({demoData, phone}) {
+function* onSetDemoData({payload: {demoData}}) {
   try {
     // const {
     //   demoDate: {_seconds},
@@ -204,22 +207,26 @@ function* onSetDemoData({demoData, phone}) {
     // // Set booking time for timer
     // if (_seconds) yield put(setBookingTime(demoTime + 1000 * 60));
 
-    const demoTime = demoData?.demoDate._seconds * 1000;
+    const demoTime = demoData?.demoDate?._seconds * 1000;
 
-    localStorage.set(LOCAL_KEYS.DEMO_TIME, parseInt(demoTime));
+    if (demoTime) {
+      localStorage.set(LOCAL_KEYS.DEMO_TIME, parseInt(demoTime));
 
-    const isClassOngoing =
-      moment().isAfter(moment(demoTime)) &&
-      moment().isBefore(moment(demoTime).add(1, 'hours'));
+      const isClassOngoing =
+        moment().isAfter(moment(demoTime)) &&
+        moment().isBefore(moment(demoTime).add(1, 'hours'));
 
-    console.log('isClassOngoing', isClassOngoing);
+      console.log('isClassOngoing'), isClassOngoing;
 
-    if (isClassOngoing) {
-      yield put(setClassOngoing(true));
+      if (isClassOngoing) {
+        yield put(setClassOngoing(true));
+      } else {
+        yield put(setClassOngoing(false));
+      }
     }
 
     if (demoData.teamUrl) {
-      yield put(setTeamUrl(demoData?.teamUrl));
+      yield put(setTeamUrl(demoData.teamUrl));
     }
 
     if (demoData.attendedOrNot) {
@@ -409,9 +416,11 @@ function* handleJoinClass({payload: {bookingDetails, childName, demoData}}) {
 
     if (!demoData?.attendedOrNot) {
       console.log('markAttendance');
-      yield call(markAttendance, {
+      const atRes = yield call(markAttendance, {
         bookingId: bookingDetails.bookingId,
       });
+
+      console.log('markAttendanceRes', yield atRes.json());
     }
 
     if (!demoData?.demoFlag) {
@@ -419,6 +428,7 @@ function* handleJoinClass({payload: {bookingDetails, childName, demoData}}) {
       yield call(handleJoinDemo, {
         payload: {bookingId: bookingDetails.bookingId},
       });
+      // console.log('demoflagRes', yield demmoRes.json());
     }
 
     const token = yield getCurrentDeviceId();
@@ -426,7 +436,7 @@ function* handleJoinClass({payload: {bookingDetails, childName, demoData}}) {
     const response = yield call(
       fetchBookingDetailsFromPhone,
       bookingDetails.phone,
-      token || '',
+      token,
     );
     const data = yield response.json();
 

@@ -10,7 +10,6 @@ import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {networkSelector} from '../store/network/selector';
 import {
   startFetchingBookingSlots,
@@ -20,19 +19,13 @@ import {
   closePopup,
   startFetchingIpData,
 } from '../store/book-demo/book-demo.reducer';
-import {
-  setDemoBookingId,
-  startFetchBookingDetailsFromPhone,
-} from '../store/join-demo/join-demo.reducer';
-import {
-  setCurrentNetworkState,
-  resetCurrentNetworkState,
-} from '../store/network/reducer';
+import {startFetchBookingDetailsFromPhone} from '../store/join-demo/join-demo.reducer';
+import {logout} from '../store/auth/reducer';
+import {resetCurrentNetworkState} from '../store/network/reducer';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
 import Center from '../components/center.component';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
-import NetInfo from '@react-native-community/netinfo';
 import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
@@ -53,10 +46,9 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
     ipData,
     isBookingLimitExceeded,
     popup,
-    loading: {bookingSlotsLoading, bookingLoading},
+    loading: {bookingLoading},
   } = useSelector(bookDemoSelector);
 
-  const {demoBookingId} = useSelector(joinDemoSelector);
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
@@ -174,10 +166,6 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
    * @description Show a popup after creating a booking successfully
    */
   const handlePopup = async () => {
-    // if (demoBookingId) {
-    //   await AsyncStorage.removeItem(LOCAL_KEYS.BOOKING_ID);
-    //   dispatch(setDemoBookingId(''));
-    // }
     dispatch(closePopup());
     if (onClose) {
       onClose();
@@ -185,7 +173,7 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
     localStorage.clearAll();
     console.log('phone', phone);
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
-    dispatch(startFetchBookingDetailsFromPhone());
+    dispatch(logout());
     if (!onClose) {
       navigation.replace(SCREEN_NAMES.MAIN);
     }
@@ -291,8 +279,10 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
     );
   }
 
-  return bookingSlotsLoading ? (
-    <Spinner style={{alignSelf: 'center'}} />
+  return !slotsTime ? (
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <Spinner />
+    </View>
   ) : (
     <>
       <View style={styles.container}>

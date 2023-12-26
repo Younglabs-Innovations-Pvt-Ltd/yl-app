@@ -42,6 +42,9 @@ const BatchCard = ({
     }
   }, [ipData, prices, level]);
 
+  console.log('price', price);
+  console.log('strikeThroughPrice', strikeThroughPrice);
+
   return (
     <View
       style={{

@@ -29,10 +29,11 @@ import TwoStepForm from './two-step-form.component';
 import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
+import moment from 'moment';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
-const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
+const Demo = ({timeLeft, openBottomSheet}) => {
   const [childName, setChildName] = useState('');
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -49,6 +50,7 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
     message,
     demoFlag,
     isAttended,
+    isClassOngoing,
     joinClassLoading,
     joinClassErrorMsg,
   } = useSelector(joinDemoSelector);
@@ -158,11 +160,14 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
   const NEW_BOOKING = useMemo(() => {
     if (demoData?.message === 'Booking not found' || !demoData) {
       return (
-        <View style={{paddingTop: 12}}>
-          <TextWrapper fs={24} ff={FONTS.signika_semiBold} color={COLORS.white}>
+        <View style={{paddingTop: 10, paddingHorizontal: 16}}>
+          <TextWrapper
+            fs={22.5}
+            ff={FONTS.signika_semiBold}
+            color={COLORS.white}>
             Improve your child's handwriting
           </TextWrapper>
-          <TextWrapper fs={20} color={COLORS.white}>
+          <TextWrapper fs={19} color={COLORS.white}>
             Book your first free Handwriting Class.
           </TextWrapper>
           <Spacer />
@@ -170,7 +175,7 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
             textColor={'#434a52'}
             bg={COLORS.white}
             rounded={6}
-            onPress={onOpenForm}>
+            onPress={openBottomSheet}>
             Book Now
           </Button>
         </View>
@@ -179,6 +184,15 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
       return null;
     }
   }, [demoData, onOpenForm]);
+
+  // post actions
+  const POST_ACTIONS = useMemo(() => {
+    if (!bookingTime) return null;
+
+    return moment().isAfter(moment(bookingTime).add(1, 'hours')) ? (
+      <PostDemoAction rescheduleClass={onOpen} />
+    ) : null;
+  }, [bookingTime, onOpen]);
 
   const navigation = useNavigation();
 
@@ -196,7 +210,7 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
 
       {/* Show join button */}
       {isClassOngoing && (
-        <View>
+        <View style={{paddingHorizontal: 16, paddingTop: 12}}>
           {IS_CHILD_NAME}
           <Pressable
             style={styles.btnClass}
@@ -240,12 +254,7 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
           </Button>
         </View>
       )} */}
-      {
-        // If user attended demo class
-        // Demo has ended
-        // Show post action after demo class
-        showPostActions && <PostDemoAction rescheduleClass={onOpen} />
-      }
+      {POST_ACTIONS}
       <Modal animationType="fade" visible={open} onRequestClose={onClose}>
         <View
           style={{
@@ -271,21 +280,6 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
           </View>
         </View>
       </Modal>
-
-      <Modal
-        animationType="fade"
-        visible={visible}
-        onRequestClose={onCloseForm}>
-        <View style={{flex: 1}}>
-          <Pressable
-            style={{
-              height: deviceHeight * 0.35,
-              backgroundColor: 'rgba(0,0,0,0.25)',
-            }}
-            onPress={onCloseForm}></Pressable>
-          <TwoStepForm closeModal={onCloseForm} />
-        </View>
-      </Modal>
     </ScrollView>
   );
 };
@@ -295,7 +289,6 @@ export default Demo;
 const styles = StyleSheet.create({
   contentWrapper: {
     maxWidth: 428,
-    // borderWidth: 2,
     // alignSelf: 'center',
   },
   rightNavButtons: {

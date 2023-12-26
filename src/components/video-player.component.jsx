@@ -45,21 +45,22 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
           ref={videoRef}
           source={{uri: uri}}
           style={styles.video}
-          paused={paused}
+          posterResizeMode="cover"
           resizeMode="cover"
           onLoadStart={onLoadStart}
           onReadyForDisplay={onReadyForDisplay}
           disableFullscreen={true}
+          paused={true}
           disableTimer={true}
           disableBack={true}
           {...otherProps}
         />
       )}
-      {videoLoading && uri && (
+      {/* {videoLoading && uri && (
         <View style={styles.videoOvarlay}>
           <ActivityIndicator size={'large'} color={COLORS.black} />
         </View>
-      )}
+      )} */}
     </View>
   );
 };

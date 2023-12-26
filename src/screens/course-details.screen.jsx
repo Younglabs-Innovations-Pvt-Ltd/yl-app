@@ -57,14 +57,18 @@ const CourseDetails = ({navigation}) => {
     useSelector(courseSelector);
 
   // Save current screen name
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log('course focused..');
-      localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'course');
-    });
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     console.log('course focused..');
+  //     localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'course');
+  //   });
 
-    return unsubscribe;
-  }, [navigation]);
+  //   return unsubscribe;
+  // }, [navigation]);
+
+  useEffect(() => {
+    dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
+  }, []);
 
   useEffect(() => {
     if (!courseVideos) {
@@ -161,10 +165,6 @@ const CourseDetails = ({navigation}) => {
     }
   }, [courseLevel, filteredCourse]);
 
-  useEffect(() => {
-    dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
-  }, []);
-
   return (
     <View style={styles.container}>
       <ScrollView
@@ -179,7 +179,10 @@ const CourseDetails = ({navigation}) => {
           More about course
         </TextWrapper>
         <Spacer />
-        <VideoPlayer uri={courseVideos?.videoUri} />
+        <VideoPlayer
+          uri={courseVideos?.videoUri}
+          poster={courseVideos?.coursePoster}
+        />
         <Spacer />
         {loading ? (
           <ActivityIndicator

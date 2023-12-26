@@ -30,7 +30,7 @@ import {localStorage} from '../../utils/storage/storage-provider';
 import {FONTS} from '../../utils/constants/fonts';
 import RatingStars from '../rating-stars';
 
-const {width: deviceWidth} = Dimensions.get('window');
+const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
 const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
@@ -44,11 +44,6 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
     useSelector(joinDemoSelector);
-
-  console.log('demoData', demoData);
-
-  console.log('isRated', isRated);
-  console.log('isNmi', isNmi);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -108,10 +103,8 @@ const PostDemoAction = ({rescheduleClass}) => {
     setCurrentSlideIndex(scrollToX / deviceWidth);
   };
 
-  console.log('currentSlideIndex', currentSlideIndex);
-
   useEffect(() => {
-    if (!isRated && attended) {
+    if (attended && !isRated) {
       console.log('slided');
       scrollSlider(deviceWidth);
     } else if (isRated && !isNmi) {
@@ -129,6 +122,11 @@ const PostDemoAction = ({rescheduleClass}) => {
 
     if (demoData) {
       dispatch(saveRating({bookingId: demoData.bookingId, rating: rated}));
+    }
+
+    const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+    if (isClassJoined) {
+      localStorage.delete(LOCAL_KEYS.JOIN_CLASS);
     }
   };
 
@@ -187,6 +185,7 @@ const PostDemoAction = ({rescheduleClass}) => {
       <ScrollView
         ref={sliderRef}
         style={{
+          flex: 1,
           alignSelf: 'center',
         }}
         horizontal
@@ -329,24 +328,30 @@ const PostDemoAction = ({rescheduleClass}) => {
       </ScrollView>
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          paddingVertical: 4,
-          gap: 12,
+          justifyContent: 'flex-end',
         }}>
-        {Array.from({length: 4}, (_, i) => {
-          return (
-            <View
-              style={[
-                styles.dotIndicator,
-                {
-                  backgroundColor:
-                    currentSlideIndex === i ? COLORS.white : '#434a52',
-                },
-              ]}
-              key={i}></View>
-          );
-        })}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 8,
+            gap: 8,
+          }}>
+          {Array.from({length: 4}, (_, i) => {
+            return (
+              <View
+                style={[
+                  styles.dotIndicator,
+                  {
+                    backgroundColor:
+                      currentSlideIndex === i ? COLORS.white : '#434a52',
+                  },
+                ]}
+                key={i}></View>
+            );
+          })}
+        </View>
       </View>
     </React.Fragment>
   );
@@ -357,7 +362,6 @@ export default PostDemoAction;
 const styles = StyleSheet.create({
   container: {
     width: deviceWidth,
-    borderWidth: 1,
     paddingHorizontal: 16,
   },
   ratingContainer: {

@@ -19,7 +19,6 @@ import {courseSelector} from '../store/course/course.selector';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {setPaymentMessage, startMakePayment} from '../store/payment/reducer';
-import {authSelector} from '../store/auth/selector';
 import {paymentSelector} from '../store/payment/selector';
 import {MESSAGES} from '../utils/constants/messages';
 import ModalComponent from '../components/modal.component';
@@ -31,6 +30,7 @@ import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {FONTS} from '../utils/constants/fonts';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import auth from '@react-native-firebase/auth';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -68,10 +68,10 @@ const Payment = ({navigation}) => {
 
   const {loading, payment, message} = useSelector(paymentSelector);
   const confettiRef = useRef();
+  const cannonWrapperRef = useRef();
 
   const {bookingDetails} = useSelector(joinDemoSelector);
   const {ipData} = useSelector(bookDemoSelector);
-  const {token} = useSelector(authSelector);
 
   const dispatch = useDispatch();
 
@@ -90,16 +90,15 @@ const Payment = ({navigation}) => {
   }, [price]);
 
   useEffect(() => {
-    if (!token) return;
-
     const fetchOfferCodes = async () => {
+      const token = await auth().currentUser.getIdToken();
       const response = await getOfferCode({token});
       const codes = await response.json();
       setOfferCodes(codes?.offerCodes);
     };
 
     fetchOfferCodes();
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (payment === MESSAGES.PAYMENT_SUCCESS) {
@@ -122,7 +121,6 @@ const Payment = ({navigation}) => {
       bookingDetails,
       courseDetails,
       email,
-      token,
     };
 
     if (selectedCoupon) {
@@ -212,6 +210,14 @@ const Payment = ({navigation}) => {
   };
 
   const applyDefaultCode = () => {
+    if (cannonWrapperRef.current) {
+      // console.log('cannonWrapperRef.current', cannonWrapperRef.current);
+      cannonWrapperRef.current.setNativeProps({
+        style: {
+          opacity: 1,
+        },
+      });
+    }
     setAmount(parseInt(price - price * (10 / 100)));
     setCouponApplied(true);
     setCouponCode('YLAPP10');
@@ -416,15 +422,25 @@ const Payment = ({navigation}) => {
             )}
           </Pressable>
         </View>
-        <ConfettiCannon
-          ref={confettiRef}
-          count={200}
-          origin={{x: 0, y: 0}}
-          autoStart={false}
-          fadeOut={fadeOut}
-          fallSpeed={1800}
-          explosionSpeed={450}
-        />
+        <View
+          style={{
+            borderWidth: 2,
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            opacity: 0,
+          }}
+          ref={cannonWrapperRef}>
+          <ConfettiCannon
+            ref={confettiRef}
+            count={200}
+            origin={{x: 0, y: 0}}
+            autoStart={false}
+            fadeOut={fadeOut}
+            fallSpeed={1800}
+            explosionSpeed={450}
+          />
+        </View>
       </View>
       <ModalComponent visible={visibleCongratulations} animationType="fade">
         <View
