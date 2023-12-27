@@ -3,6 +3,7 @@ import {StyleSheet, ActivityIndicator, View} from 'react-native';
 import VideoPlayer from 'react-native-video-controls';
 import {COLORS} from '../utils/constants/colors';
 import {useNavigation} from '@react-navigation/native';
+import convertToProxyURL from 'react-native-video-cache';
 
 const VideoMediaPlayer = ({uri, ...otherProps}) => {
   const [videoLoading, setVideoLoading] = useState(false);
@@ -43,7 +44,7 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
       {uri && (
         <VideoPlayer
           ref={videoRef}
-          source={{uri: uri}}
+          source={{uri: convertToProxyURL(uri)}}
           style={styles.video}
           posterResizeMode="cover"
           resizeMode="cover"

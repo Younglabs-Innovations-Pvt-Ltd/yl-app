@@ -31,6 +31,12 @@ import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {FONTS} from '../utils/constants/fonts';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import auth from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure({
+  webClientId:
+    '54129267828-73o9bu1af3djrmh0e9krbk59s1g47rsp.apps.googleusercontent.com',
+});
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -47,6 +53,7 @@ const Payment = ({navigation}) => {
   const [couponMsg, setCouponMsg] = useState('');
   const [fadeOut, setFadeOut] = useState(false);
   const [visibleCongratulations, setVisibleCongratulations] = useState(false);
+  const [authVisible, setAuthVisible] = useState(false);
 
   useEffect(() => {
     if (currentSelectedBatch) {
@@ -76,14 +83,6 @@ const Payment = ({navigation}) => {
   const dispatch = useDispatch();
 
   // Set current screen name
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log('payment focused..');
-      localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'payment');
-    });
-
-    return unsubscribe;
-  }, [navigation]);
 
   useEffect(() => {
     setAmount(price);
@@ -91,14 +90,15 @@ const Payment = ({navigation}) => {
 
   useEffect(() => {
     const fetchOfferCodes = async () => {
-      const token = await auth().currentUser.getIdToken();
-      const response = await getOfferCode({token});
-      const codes = await response.json();
-      setOfferCodes(codes?.offerCodes);
+      if (bookingDetails) {
+        const response = await getOfferCode({phone: bookingDetails.phone});
+        const codes = await response.json();
+        setOfferCodes(codes?.offerCodes);
+      }
     };
 
     fetchOfferCodes();
-  }, []);
+  }, [bookingDetails]);
 
   useEffect(() => {
     if (payment === MESSAGES.PAYMENT_SUCCESS) {
@@ -106,9 +106,16 @@ const Payment = ({navigation}) => {
     }
   }, [payment]);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!email) {
       setEmailErr('Enter your email address.');
+      return;
+    }
+
+    const currentUser = auth().currentUser;
+
+    if (!currentUser) {
+      setAuthVisible(true);
       return;
     }
 
@@ -165,11 +172,11 @@ const Payment = ({navigation}) => {
       }
 
       setCouponMsg('');
-      if (confettiRef.current) {
-        confettiRef.current.start();
-        setFadeOut(true);
-        setVisibleCongratulations(true);
-      }
+      // if (confettiRef.current) {
+      //   confettiRef.current.start();
+      //   setFadeOut(true);
+      //   setVisibleCongratulations(true);
+      // }
     } else {
       setSelectedCoupon(null);
       setCouponMsg('Coupon Not Found');
@@ -210,14 +217,14 @@ const Payment = ({navigation}) => {
   };
 
   const applyDefaultCode = () => {
-    if (cannonWrapperRef.current) {
-      // console.log('cannonWrapperRef.current', cannonWrapperRef.current);
-      cannonWrapperRef.current.setNativeProps({
-        style: {
-          opacity: 1,
-        },
-      });
-    }
+    // if (cannonWrapperRef.current) {
+    //   // console.log('cannonWrapperRef.current', cannonWrapperRef.current);
+    //   cannonWrapperRef.current.setNativeProps({
+    //     style: {
+    //       opacity: 1,
+    //     },
+    //   });
+    // }
     setAmount(parseInt(price - price * (10 / 100)));
     setCouponApplied(true);
     setCouponCode('YLAPP10');
@@ -228,12 +235,29 @@ const Payment = ({navigation}) => {
       offerName: 'App Download',
       validAbove: 1500,
     });
-    if (confettiRef.current) {
-      confettiRef.current.start();
-      setFadeOut(true);
-      setVisibleCongratulations(true);
-    }
+    // if (confettiRef.current) {
+    //   confettiRef.current.start();
+    //   setFadeOut(true);
+    //   setVisibleCongratulations(true);
+    // }
   };
+
+  async function onGoogleButtonPress() {
+    try {
+      // Check if your device supports Google Play
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      // Get the users ID token
+      const {idToken} = await GoogleSignin.signIn();
+
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+      // Sign-in the user with the credential
+      auth().signInWithCredential(googleCredential);
+    } catch (error) {
+      console.log('GoogleAuthenticationError', error);
+    }
+  }
 
   return (
     <View style={{flex: 1, backgroundColor: '#f4f4f4'}}>
@@ -493,6 +517,56 @@ const Payment = ({navigation}) => {
           <Pressable style={styles.modalOverlay}></Pressable>
         </View>
       </ModalComponent>
+      <ModalComponent visible={authVisible}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.15)',
+            justifyContent: 'center',
+          }}>
+          <View style={{alignItems: 'center', paddingHorizontal: 16}}>
+            <View
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 24,
+                backgroundColor: COLORS.white,
+                borderRadius: 8,
+                elevation: 4,
+                width: 300,
+              }}>
+              <Icon
+                name="close-outline"
+                color="#434a52"
+                size={28}
+                style={{
+                  alignSelf: 'flex-end',
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                }}
+                onPress={() => setAuthVisible(false)}
+              />
+              <TextWrapper
+                fs={22}
+                ff={FONTS.signika_semiBold}
+                styles={{textAlign: 'center', marginTop: 6}}>
+                Please login to continue
+              </TextWrapper>
+              <Spacer space={10} />
+              <Pressable style={styles.btnLogin} onPress={onGoogleButtonPress}>
+                <Icon name="logo-google" size={24} color="#434a52" />
+                <TextWrapper
+                  ff={FONTS.signika_semiBold}
+                  fs={18}
+                  color="#434a52"
+                  styles={{marginLeft: 4}}>
+                  Login with Google
+                </TextWrapper>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </ModalComponent>
     </View>
   );
 };
@@ -548,5 +622,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 12,
+  },
+  btnLogin: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#eee',
+    paddingVertical: 12,
+    borderRadius: 6,
   },
 });

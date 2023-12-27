@@ -10,7 +10,6 @@ const INITIAL_STATE = {
   showJoinButton: false,
   isAttended: false,
   bookingTime: null,
-  isAttendenceMarked: false,
   isRated: false,
   ratingLoading: true,
   nmiLoading: false,
@@ -20,6 +19,7 @@ const INITIAL_STATE = {
   message: '',
   joinClassLoading: false,
   joinClassErrorMsg: '',
+  attendanceLoading: false,
 };
 
 // reducer
@@ -59,19 +59,16 @@ const reducer = {
     state.showJoinButton = false;
     state.isAttended = false;
     state.bookingTime = null;
-    state.isAttendenceMarked = false;
-  },
-  setIsAttendenceMarked(state, action) {
-    state.isAttendenceMarked = action.payload;
   },
   setTeamUrl(state, action) {
     state.teamUrl = action.payload;
   },
-  setShowJoinButton(state, action) {
-    state.showJoinButton = action.payload;
-  },
   setIsAttended(state, action) {
+    state.attendanceLoading = false;
     state.isAttended = action.payload;
+  },
+  startMarkAttendace(state) {
+    state.attendanceLoading = true;
   },
   setIsRated(state, action) {
     state.isRated = action.payload;
@@ -138,7 +135,6 @@ export const {
   setDemoData,
   setBookingTime,
   setIsAttended,
-  setIsAttendenceMarked,
   setShowJoinButton,
   setTeamUrl,
   setDemoNotifications,
@@ -159,6 +155,7 @@ export const {
   setBookingDetailsFailed,
   setJoinClassLoading,
   setJoinClassErrorMsg,
+  startMarkAttendace,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

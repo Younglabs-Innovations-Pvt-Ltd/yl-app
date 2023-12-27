@@ -67,8 +67,10 @@ const CourseDetails = ({navigation}) => {
   // }, [navigation]);
 
   useEffect(() => {
-    dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
-  }, []);
+    if (!courseDetails) {
+      dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
+    }
+  }, [courseDetails]);
 
   useEffect(() => {
     if (!courseVideos) {

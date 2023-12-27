@@ -48,8 +48,6 @@ const Demo = ({timeLeft, openBottomSheet}) => {
     bookingDetails,
     bookingTime,
     message,
-    demoFlag,
-    isAttended,
     isClassOngoing,
     joinClassLoading,
     joinClassErrorMsg,
@@ -207,7 +205,6 @@ const Demo = ({timeLeft, openBottomSheet}) => {
       {NEW_BOOKING}
       {/* Timer */}
       {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
-
       {/* Show join button */}
       {isClassOngoing && (
         <View style={{paddingHorizontal: 16, paddingTop: 12}}>

@@ -29,6 +29,7 @@ import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import auth from '@react-native-firebase/auth';
 
 const WEBSITE_URL = 'https://www.younglabs.in/';
 
@@ -43,6 +44,10 @@ const CustomDrawerContent = ({navigation, ...props}) => {
 
   const handleLogout = async () => {
     try {
+      const currentUser = auth().currentUser;
+      if (currentUser) {
+        await auth().signOut();
+      }
       localStorage.clearAll();
 
       removeRegisterNotificationTimer();

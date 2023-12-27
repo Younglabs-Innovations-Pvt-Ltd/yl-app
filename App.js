@@ -43,11 +43,10 @@ import {navigationRef} from './src/navigationRef';
 import {COLORS} from './src/utils/constants/colors';
 import {NetworkProvider} from './src/context/network.state';
 
-import auth from '@react-native-firebase/auth';
 import Icon from './src/components/icon.component';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
-import notifee from '@notifee/react-native';
+
 import RNUxcam from 'react-native-ux-cam';
 
 RNUxcam.optIntoSchematicRecordings(); // Add this line to enable iOS screen recordings
@@ -68,7 +67,6 @@ const Stack = createStackNavigator();
 function App() {
   const [loading, setLoading] = useState(true);
   const [isPhone, setIsPhone] = useState(false);
-  const [bookingId, setBookingId] = useState('');
 
   const notificationRef = useRef({});
 
@@ -96,67 +94,37 @@ function App() {
     storeDeviceId();
   }, []);
 
-  async function checkNotifications() {
-    const initialNotification = await notifee.getInitialNotification();
-
-    if (initialNotification) {
-      const data = initialNotification.notification.data;
-      console.log('data', data);
-
-      if (data?.rating) {
-        notificationRef.current.rating = data.rating;
-      }
-
-      if (data?.screen) {
-        notificationRef.current.redirectTo = data.screen;
-      }
-    }
-  }
-
-  // Check for notifications
+  // check for authentication
   useEffect(() => {
-    checkNotifications()
-      .then(() => {
-        console.log('notification');
-      })
-      .catch(error => {
-        console.log('checkNotificationsError', error.message);
-      });
-  }, []);
-
-  // Check for authentication
-  useEffect(() => {
-    const checkForAuth = () => {
+    const checkAuth = () => {
       const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-      console.log('checkForAuth', phone);
       if (phone) {
         setIsPhone(true);
       }
-
       setLoading(false);
     };
 
-    checkForAuth();
+    checkAuth();
   }, []);
 
   // Handle redirect url (Deep Link)
-  useEffect(() => {
-    const handleRedirectUrl = url => {
-      if (!url) {
-        return;
-      }
+  // useEffect(() => {
+  //   const handleRedirectUrl = url => {
+  //     if (!url) {
+  //       return;
+  //     }
 
-      const parseUrl = url.split('?')[1];
-      const parseBookingId = parseUrl.split('=')[1];
-      const bookingId = parseBookingId.replace(/#/g, '');
+  //     const parseUrl = url.split('?')[1];
+  //     const parseBookingId = parseUrl.split('=')[1];
+  //     const bookingId = parseBookingId.replace(/#/g, '');
 
-      setBookingId(bookingId);
-    };
+  //     setBookingId(bookingId);
+  //   };
 
-    Linking.getInitialURL()
-      .then(handleRedirectUrl)
-      .catch(err => console.log(err));
-  }, []);
+  //   Linking.getInitialURL()
+  //     .then(handleRedirectUrl)
+  //     .catch(err => console.log(err));
+  // }, []);
 
   // Request for Notification permission
   useEffect(() => {
@@ -209,8 +177,7 @@ function App() {
   // UI Constants
   let initialRouteName = SCREEN_NAMES.WELCOME;
 
-  if (isPhone || bookingId) {
-    console.log('bookingId', bookingId);
+  if (isPhone) {
     initialRouteName = SCREEN_NAMES.MAIN;
   }
 

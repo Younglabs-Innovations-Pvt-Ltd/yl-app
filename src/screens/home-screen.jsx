@@ -67,6 +67,8 @@ import {contentSelector} from '../store/content/selector';
 import BottomSheet from '@gorhom/bottom-sheet';
 import moment from 'moment';
 import TwoStepForm from '../components/two-step-form.component';
+import {setModalVisible} from '../store/welcome-screen/reducer';
+import notifee from '@notifee/react-native';
 
 const INITIAL_TIME = {
   days: 0,
@@ -104,8 +106,6 @@ const sectionOffsets = {
 
 const HomeScreen = ({navigation, route}) => {
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
-  // const [isTimeover, setIsTimeover] = useState(false);
-  const [showPostActions, setShowPostActions] = useState(false);
   const [visibleCred, setVisibleCred] = useState(false);
   const [offsets, setOffsets] = useState(sectionOffsets);
   const [ratingModal, setRatingModal] = useState(false);
@@ -116,78 +116,78 @@ const HomeScreen = ({navigation, route}) => {
   const scrollViewRef = useRef(null);
   const bottomSheetRef = useRef();
 
-  const {
-    demoData,
-    loading,
-    demoPhoneNumber,
-    bookingDetails,
-    isAttended,
-    bookingTime,
-    isClassOngoing,
-    demoFlag,
-  } = useSelector(joinDemoSelector);
+  const {demoData, loading, bookingTime, bookingDetails} =
+    useSelector(joinDemoSelector);
 
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
 
-  const {ipData} = useSelector(bookDemoSelector);
   const {paymentMessage} = useSelector(paymentSelector);
   const {user} = useSelector(authSelector);
   const {contentData, contentLoading} = useSelector(contentSelector);
 
-  useEffect(() => {
-    const {data} = routeData;
-    console.log('routeData', data);
-    if (data?.redirectTo) {
-      navigation.navigate(data.redirectTo);
-    } else if (data?.rating) {
-      setRatingModal(true);
+  async function checkNotifications() {
+    const initialNotification = await notifee.getInitialNotification();
+
+    if (initialNotification) {
+      const data = initialNotification.notification.data;
+      console.log('data', data);
+
+      if (data?.rating) {
+        setRatingModal(true);
+      }
+
+      if (data?.screen) {
+        // notificationRef.current.redirectTo = data.screen;
+        navigation.navigate(data.screen);
+      }
     }
-  }, [routeData]);
+  }
 
-  // Save current screen name
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     console.log('home focused..');
-  //     localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'home');
-  //   });
+  // Check for notifications
+  useEffect(() => {
+    checkNotifications()
+      .then(() => {
+        console.log('notification');
+      })
+      .catch(error => {
+        console.log('checkNotificationsError', error.message);
+      });
+  }, []);
 
-  //   return unsubscribe;
-  // }, [navigation]);
+  useEffect(() => {
+    let timeout;
+    const handleAppStateChange = async nextAppState => {
+      try {
+        console.log('appState', nextAppState);
+        if (nextAppState === 'active') {
+          console.log('hit active state');
+          // const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+          const demoTime = localStorage.getNumber(LOCAL_KEYS.DEMO_TIME);
+          console.log('demoTime', demoTime);
 
-  // useEffect(() => {
-  //   let timeout;
-  //   const handleAppStateChange = async nextAppState => {
-  //     try {
-  //       console.log('appState', nextAppState);
-  //       if (nextAppState === 'active') {
-  //         console.log('hit active state');
-  //         // const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
-  //         const demoTime = localStorage.getNumber(LOCAL_KEYS.DEMO_TIME);
-  //         console.log('demoTime', demoTime);
+          if (demoTime) {
+            const time =
+              moment().isAfter(moment(demoTime)) &&
+              moment().isBefore(moment(demoTime).add(2, 'hours'));
 
-  //         if (demoTime) {
-  //           const time =
-  //             moment().isAfter(moment(demoTime)) &&
-  //             moment().isBefore(moment(demoTime).add(2, 'hours'));
-
-  //           if (time) {
-  //             console.log('fetching...');
-  //             dispatch(startFetchBookingDetailsFromPhone());
-  //           }
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.log('APPSTATEERROR', error);
-  //     }
-  //   };
-  //   const appState = AppState.addEventListener('change', handleAppStateChange);
-  //   return () => {
-  //     appState.remove();
-  //     if (timeout) clearTimeout(timeout);
-  //   };
-  // }, []);
+            if (time) {
+              console.log('fetching...');
+              dispatch(startFetchBookingDetailsFromPhone());
+            }
+          }
+        }
+      } catch (error) {
+        console.log('APPSTATEERROR', error);
+      }
+    };
+    const appState = AppState.addEventListener('change', handleAppStateChange);
+    return () => {
+      appState.remove();
+      if (timeout) clearTimeout(timeout);
+    };
+  }, []);
 
   /**
    * @author Shobhit
@@ -313,14 +313,6 @@ const HomeScreen = ({navigation, route}) => {
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
 
-  // Reschedule a class
-  // const rescheduleFreeClass = () => {
-  //   const {childAge, parentName, phone, childName} = bookingDetails;
-  //   const formFields = {childAge, parentName, phone, childName};
-
-  //   navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
-  // };
-
   if (!isConnected) {
     Alert.alert(
       '',
@@ -396,6 +388,7 @@ const HomeScreen = ({navigation, route}) => {
   // console.log('demoData', demoData);
   // console.log('isClassOnging', isClassOngoing);
   // console.log('timeLeft', timeLeft);
+  console.log('bookingDetails', bookingDetails);
 
   return (
     <View style={{flex: 1, backgroundColor: '#76c8f2'}}>

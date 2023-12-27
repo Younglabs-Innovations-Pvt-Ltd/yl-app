@@ -36,6 +36,8 @@ import {
   setDemoFlag,
   setJoinClassLoading,
   setJoinClassErrorMsg,
+  setMarkAttendance,
+  startMarkAttendace,
 } from './join-demo.reducer';
 
 import {BASE_URL} from '@env';
@@ -416,11 +418,9 @@ function* handleJoinClass({payload: {bookingDetails, childName, demoData}}) {
 
     if (!demoData?.attendedOrNot) {
       console.log('markAttendance');
-      const atRes = yield call(markAttendance, {
+      yield call(markAttendance, {
         bookingId: bookingDetails.bookingId,
       });
-
-      console.log('markAttendanceRes', yield atRes.json());
     }
 
     if (!demoData?.demoFlag) {
@@ -512,6 +512,21 @@ function* checkRatingFromLocalStorage() {
     yield put(setRatingLoading(false));
   } catch (error) {
     console.log('async rated error', error);
+  }
+}
+
+// Mark Attendace
+function* markAttendaceSaga({payload: {bookingId}}) {
+  try {
+    const attendanceRes = yield call(markAttendance, {bookingId});
+
+    if (attendanceRes.status === 200) {
+      localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
+    }
+    console.log('markAttendance', yield attendanceRes.json());
+    yield put(setIsAttended(true));
+  } catch (error) {
+    console.log('markAttendaceSaga error', error);
   }
 }
 
@@ -632,6 +647,11 @@ function* joinDemoStart() {
   yield takeLatest(joinDemo.type, handleJoinDemo);
 }
 
+// Mark Attendance
+function* markAttendanceListener() {
+  yield takeLatest(startMarkAttendace.type, markAttendaceSaga);
+}
+
 // main saga
 export function* joinDemoSaga() {
   yield all([
@@ -644,5 +664,6 @@ export function* joinDemoSaga() {
     call(checkRatingAsync),
     call(markNeedMoreInfo),
     call(joinDemoStart),
+    call(markAttendanceListener),
   ]);
 }

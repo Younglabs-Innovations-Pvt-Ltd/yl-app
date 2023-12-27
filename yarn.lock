@@ -1779,6 +1779,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-firebase/storage/-/storage-18.6.1.tgz#2a63f77ab2201012df29d23aaea4cb8a9945be60"
   integrity sha512-/MWn8EZ0OBqlE+B6XiwUdZYMCoPuh7oWxvw9GStBB4d5FUNt9jAkqSYDsfEGUjGSLjJ9iLBTyjK1PfXcH7EdZw==
 
+"@react-native-google-signin/google-signin@^11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-google-signin/google-signin/-/google-signin-11.0.0.tgz#b1732cf61758f8c6554adefd8cdc9a9f640df9b1"
+  integrity sha512-J8BFFGr5HcEWE2gRaVSJ0rQN8ztxYIr2wdWMG4PS1vhQZJqUzmRr6vpu12O1GppItq8ai7AA0rl/ja7hSytSXA==
+
 "@react-native/assets-registry@^0.72.0":
   version "0.72.0"
   resolved "https://registry.npmjs.org/@react-native/assets-registry/-/assets-registry-0.72.0.tgz"
@@ -6339,6 +6344,11 @@ react-native-vector-icons@^10.0.0:
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"
+
+react-native-video-cache@^2.7.4:
+  version "2.7.4"
+  resolved "https://registry.yarnpkg.com/react-native-video-cache/-/react-native-video-cache-2.7.4.tgz#d81b66faa58c315d33a23051f2864145e3f4b82d"
+  integrity sha512-0bSJowf9jZaPX+OohjNH6DFPf0/UDgX1foWJAS5Uyv7tuByj9sD9UNbVreEGFjNNya/xVhZffmDaLWMTrx7VBg==
 
 react-native-video-controls@^2.8.1:
   version "2.8.1"

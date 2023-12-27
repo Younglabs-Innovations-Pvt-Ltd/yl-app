@@ -103,7 +103,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
     }
 
     console.log('payload', notification);
-    if (message?.type === 'remarketing' || message?.type === 'rating') {
+    if (message?.type === 'remarketing') {
       await displayRemarketingNotification(notification);
     } else if (message?.type === 'reminders') {
       await displayReminderNotification(notification);

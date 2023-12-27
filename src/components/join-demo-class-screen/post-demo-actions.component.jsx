@@ -18,6 +18,8 @@ import {
   saveRating,
   checkForRating,
   setNMI,
+  setIsAttended,
+  startMarkAttendace,
 } from '../../store/join-demo/join-demo.reducer';
 
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
@@ -34,16 +36,20 @@ const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
 const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
-  const [attended, setAttended] = useState(false);
-  const [attendedLoading, setAttendedLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
 
   const sliderRef = useRef();
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
-  const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
-    useSelector(joinDemoSelector);
+  const {
+    demoData,
+    bookingDetails,
+    isRated,
+    isAttended,
+    nmiLoading,
+    isNmi,
+    attendanceLoading,
+  } = useSelector(joinDemoSelector);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -61,10 +67,8 @@ const PostDemoAction = ({rescheduleClass}) => {
         const checkAttended = localStorage.getString(LOCAL_KEYS.SAVE_ATTENDED);
 
         if (checkAttended) {
-          setAttended(true);
+          dispatch(setIsAttended(true));
         }
-
-        setAttendedLoading(false);
       } catch (error) {
         console.log('POST_ACTION_CHECK_ATTENDED_ERROR=', error);
       }
@@ -83,8 +87,6 @@ const PostDemoAction = ({rescheduleClass}) => {
           console.log('hit NMI');
           dispatch(setNMI(true));
         }
-
-        setLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -104,7 +106,7 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   useEffect(() => {
-    if (attended && !isRated) {
+    if (isAttended && !isRated) {
       console.log('slided');
       scrollSlider(deviceWidth);
     } else if (isRated && !isNmi) {
@@ -112,7 +114,7 @@ const PostDemoAction = ({rescheduleClass}) => {
     } else if (isNmi) {
       scrollSlider(deviceWidth * 3);
     }
-  }, [attended, isRated, isNmi]);
+  }, [isAttended, isRated, isNmi]);
 
   // Save rating of user
   // Dispatch an action to reducer
@@ -142,17 +144,7 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   const saveAttended = async () => {
-    try {
-      localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
-      setAttended(true);
-      // sliderRef.current &&
-      //   sliderRef.current.scrollTo({
-      //     x: deviceWidth,
-      //     animated: true,
-      //   });
-    } catch (error) {
-      console.log('POST_ACTION_SAVE_ATTENDED_ERROR=', error);
-    }
+    dispatch(startMarkAttendace({bookingId: demoData.bookingId}));
   };
 
   const courseDetails = () => {
@@ -172,11 +164,18 @@ const PostDemoAction = ({rescheduleClass}) => {
     return (
       <ActivityIndicator
         color={COLORS.black}
-        size={'large'}
+        size={'small'}
         style={{alignSelf: 'flex-end'}}
       />
     );
   }, [nmiLoading]);
+
+  const onMomentumScrollEnd = event => {
+    const scrollToOffsetX = event.nativeEvent.contentOffset.x / deviceWidth;
+    setCurrentSlideIndex(scrollToOffsetX);
+  };
+
+  console.log('isAttended', isAttended);
 
   // if (ratingLoading || attendedLoading || loading) return null;
 
@@ -190,8 +189,10 @@ const PostDemoAction = ({rescheduleClass}) => {
         }}
         horizontal
         showsHorizontalScrollIndicator={false}
-        scrollEnabled={false}
-        pagingEnabled>
+        onMomentumScrollEnd={onMomentumScrollEnd}
+        // scrollEnabled={false}
+        pagingEnabled
+        scrollEnabled={isAttended}>
         {/* {!attended && !isRated && ( */}
         <View style={styles.container}>
           <TextWrapper
@@ -208,12 +209,20 @@ const PostDemoAction = ({rescheduleClass}) => {
                 styles.paButton,
                 {
                   opacity: pressed ? 0.7 : 1,
+                  flexDirection: 'row',
                 },
               ]}
               onPress={saveAttended}>
               <TextWrapper color={'#434a52'} fs={18}>
                 Yes attended
               </TextWrapper>
+              {attendanceLoading && (
+                <ActivityIndicator
+                  size={'small'}
+                  color={COLORS.black}
+                  style={{marginLeft: 4}}
+                />
+              )}
             </Pressable>
             <Pressable
               style={({pressed}) => [

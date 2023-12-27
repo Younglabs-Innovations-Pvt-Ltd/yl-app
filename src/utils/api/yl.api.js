@@ -219,13 +219,13 @@ export const markNotInterest = async ({bookingId, comment}) => {
 };
 
 // Get available coupon codes
-export const getOfferCode = async ({token}) => {
-  return await fetch(`${BASE_URL}/offers/activeoffers`, {
-    method: 'GET',
+export const getOfferCode = async ({phone}) => {
+  return await fetch(`${BASE_URL}/offers/activeAppOffers`, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token,
     },
+    body: JSON.stringify({phone}),
   });
 };
 
@@ -284,7 +284,9 @@ export const createLead = async ({
   deviceUID,
   deviceId,
 }) => {
-  return fetch(`${BASE_URL}${CREATE_LEAD}`, {
+  const url =
+    'https://cb63-2401-4900-1f38-712e-b1ad-7b98-391d-d813.ngrok-free.app';
+  return fetch(`${url}${CREATE_LEAD}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
