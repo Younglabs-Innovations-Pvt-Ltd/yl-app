@@ -203,25 +203,6 @@ const WorksheetItem = ({item, index, onOpenWorksheet, downloadWorksheet}) => {
     <Pressable
       style={styles.pdfContainer}
       onPress={() => onOpenWorksheet(item)}>
-      {/* <Pdf
-        source={{
-          uri: item.uri,
-          cache: true,
-        }}
-        style={{width: '100%', height: '100%'}}
-        onError={err => console.log(err)}
-        trustAllCerts={false}
-        maxScale={1}
-        page={1}
-        scale={1}
-        renderActivityIndicator={() => (
-          <ActivityIndicator color={COLORS.black} size={'small'} />
-        )}
-      /> */}
-
-      {/* <View style={{width: 58, height: 58, marginBottom: 4}}>
-        <Image style={styles.icon} source={WorksheetIcon} />
-      </View> */}
       <View
         style={{
           alignItems: 'center',
@@ -239,30 +220,6 @@ const WorksheetItem = ({item, index, onOpenWorksheet, downloadWorksheet}) => {
         }}>
         {item.title}
       </TextWrapper>
-
-      {/* <View style={styles.pdfOverlay}>
-        <View
-          style={{
-            height: '100%',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-          }}>
-          <Pressable
-            style={({pressed}) => [{opacity: pressed ? 0.8 : 1, padding: 4}]}
-            onPress={() => downloadWorksheet(item)}>
-            <Icon
-              name="cloud-download-outline"
-              size={28}
-              color={COLORS.white}
-            />
-          </Pressable>
-          <Pressable
-            style={({pressed}) => [{opacity: pressed ? 0.8 : 1, padding: 4}]}
-            onPress={() => onOpenWorksheet(item)}>
-            <Icon name="open-outline" size={28} color={COLORS.white} />
-          </Pressable>
-        </View>
-      </View> */}
     </Pressable>
   );
 };

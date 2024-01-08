@@ -13,7 +13,11 @@ import {FONTS} from '../../utils/constants/fonts';
 import Icon from '../icon.component';
 import RatingStars from '../rating-stars';
 import {useDispatch, useSelector} from 'react-redux';
-import {markNMI, saveRating} from '../../store/join-demo/join-demo.reducer';
+import {
+  markNMI,
+  saveRating,
+  setNotInterestedPopup,
+} from '../../store/join-demo/join-demo.reducer';
 import {localStorage} from '../../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {joinDemoSelector} from '../../store/join-demo/join-demo.selector';
@@ -22,8 +26,6 @@ const CARD_WIDTH = 296;
 
 const RatingPopup = ({visible, onClose, bookingId}) => {
   const [rating, setRating] = useState(0);
-
-  console.log('bookingId', bookingId);
 
   const scrollViewRef = useRef();
 
@@ -57,6 +59,10 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
     return <ActivityIndicator color={COLORS.white} size={'small'} />;
   }, [nmiLoading]);
 
+  const onOpenNotInterested = () => {
+    dispatch(setNotInterestedPopup(true));
+  };
+
   return (
     <ModalComponent visible={visible}>
       <View
@@ -81,7 +87,11 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
               pagingEnabled
               ref={scrollViewRef}
               scrollEnabled={false}>
-              <View style={{width: CARD_WIDTH}}>
+              <View
+                style={{
+                  width: CARD_WIDTH,
+                  justifyContent: 'center',
+                }}>
                 <TextWrapper
                   fs={24}
                   ff={FONTS.signika_medium}
@@ -105,10 +115,11 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
               </View>
               <View style={{width: CARD_WIDTH}}>
                 <TextWrapper
-                  fs={24}
+                  fs={22}
                   ff={FONTS.signika_medium}
                   styles={{textAlign: 'center', marginBottom: 16}}>
-                  Want to know more about our course?
+                  Would you like to continue with the complete course and
+                  improve your child's handwriting?
                 </TextWrapper>
                 <Pressable
                   style={({pressed}) => [
@@ -118,9 +129,20 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
                   disabled={nmiLoading}
                   onPress={markNeedMoreInfo}>
                   <TextWrapper fs={18} color={COLORS.white}>
-                    Yes, need more info
+                    Yes, Need more info
                   </TextWrapper>
                   {NMI_LOADING}
+                </Pressable>
+                <Pressable
+                  style={({pressed}) => [
+                    styles.ctaButton,
+                    {opacity: pressed ? 0.8 : 1, marginTop: 8},
+                  ]}
+                  disabled={nmiLoading}
+                  onPress={onOpenNotInterested}>
+                  <TextWrapper fs={18} color={COLORS.white}>
+                    No, I don't want
+                  </TextWrapper>
                 </Pressable>
               </View>
             </ScrollView>
@@ -136,6 +158,7 @@ export default RatingPopup;
 const styles = StyleSheet.create({
   ratingContainer: {
     width: 328,
+    minHeight: 200,
     backgroundColor: COLORS.white,
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -156,8 +179,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 1.85,
-    borderRadius: 4,
+    borderRadius: 8,
     gap: 8,
     backgroundColor: COLORS.pblue,
   },

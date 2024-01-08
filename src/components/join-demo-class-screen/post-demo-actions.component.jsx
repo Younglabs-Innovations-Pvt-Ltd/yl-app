@@ -20,6 +20,7 @@ import {
   setNMI,
   setIsAttended,
   startMarkAttendace,
+  setNotInterestedPopup,
 } from '../../store/join-demo/join-demo.reducer';
 
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
@@ -144,7 +145,10 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   const saveAttended = async () => {
-    dispatch(startMarkAttendace({bookingId: demoData.bookingId}));
+    // dispatch(startMarkAttendace({bookingId: demoData.bookingId}));
+    localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
+    dispatch(setIsAttended(true));
+    scrollSlider(deviceWidth);
   };
 
   const courseDetails = () => {
@@ -155,7 +159,10 @@ const PostDemoAction = ({rescheduleClass}) => {
     navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
   };
 
-  const onClose = () => setVisible(false);
+  const onMomentumScrollEnd = event => {
+    const scrollToOffsetX = event.nativeEvent.contentOffset.x / deviceWidth;
+    setCurrentSlideIndex(scrollToOffsetX);
+  };
 
   // Loading indicator while mark nmi
   const NMI_LOADING = useMemo(() => {
@@ -170,9 +177,48 @@ const PostDemoAction = ({rescheduleClass}) => {
     );
   }, [nmiLoading]);
 
-  const onMomentumScrollEnd = event => {
-    const scrollToOffsetX = event.nativeEvent.contentOffset.x / deviceWidth;
-    setCurrentSlideIndex(scrollToOffsetX);
+  const IS_ATTENDED = useMemo(() => {
+    return isAttended ? (
+      <Pressable
+        style={({pressed}) => [
+          styles.paButton,
+          {
+            opacity: pressed ? 0.7 : 1,
+            flexDirection: 'row',
+          },
+        ]}
+        onPress={saveAttended}>
+        <TextWrapper color={'#434a52'} fs={18}>
+          Yes attended
+        </TextWrapper>
+      </Pressable>
+    ) : null;
+  }, [isAttended, saveAttended]);
+
+  const ATTENDED_TEXT = useMemo(() => {
+    return isAttended ? (
+      <TextWrapper
+        fs={20}
+        color={COLORS.white}
+        ff={FONTS.signika_medium}
+        styles={{textAlign: 'center'}}>
+        Did you attend your free class?
+      </TextWrapper>
+    ) : (
+      <View style={{paddingTop: 16}}>
+        <TextWrapper
+          fs={24}
+          color={COLORS.white}
+          ff={FONTS.signika_medium}
+          styles={{textAlign: 'center'}}>
+          You missed your class
+        </TextWrapper>
+      </View>
+    );
+  }, [isAttended]);
+
+  const onOpenNotInterested = () => {
+    dispatch(setNotInterestedPopup(true));
   };
 
   console.log('isAttended', isAttended);
@@ -190,40 +236,14 @@ const PostDemoAction = ({rescheduleClass}) => {
         horizontal
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={onMomentumScrollEnd}
-        // scrollEnabled={false}
-        pagingEnabled
-        scrollEnabled={isAttended}>
+        scrollEnabled={false}
+        pagingEnabled>
         {/* {!attended && !isRated && ( */}
         <View style={styles.container}>
-          <TextWrapper
-            fs={20}
-            color={COLORS.white}
-            ff={FONTS.signika_medium}
-            styles={{textAlign: 'center'}}>
-            Did you attend your free class?
-          </TextWrapper>
+          {ATTENDED_TEXT}
           <Spacer space={4} />
           <View style={styles.paButtons}>
-            <Pressable
-              style={({pressed}) => [
-                styles.paButton,
-                {
-                  opacity: pressed ? 0.7 : 1,
-                  flexDirection: 'row',
-                },
-              ]}
-              onPress={saveAttended}>
-              <TextWrapper color={'#434a52'} fs={18}>
-                Yes attended
-              </TextWrapper>
-              {attendanceLoading && (
-                <ActivityIndicator
-                  size={'small'}
-                  color={COLORS.black}
-                  style={{marginLeft: 4}}
-                />
-              )}
-            </Pressable>
+            {IS_ATTENDED}
             <Pressable
               style={({pressed}) => [
                 styles.paButton,
@@ -280,7 +300,7 @@ const PostDemoAction = ({rescheduleClass}) => {
               disabled={nmiLoading}
               onPress={markNeedMoreInfo}>
               {/* <MIcon name="whatsapp" size={22} color={COLORS.pgreen} /> */}
-              <TextWrapper>Yes, need more info</TextWrapper>
+              <TextWrapper>Yes, Need more info</TextWrapper>
               {NMI_LOADING}
             </Pressable>
             <Pressable
@@ -290,7 +310,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
-              onPress={() => setVisible(true)}>
+              onPress={onOpenNotInterested}>
               <TextWrapper>No, I don't want</TextWrapper>
             </Pressable>
           </View>
@@ -328,12 +348,6 @@ const PostDemoAction = ({rescheduleClass}) => {
           </View>
         </View>
         {/* )} */}
-        <ModalComponent
-          visible={visible}
-          animationType="slide"
-          onRequestClose={onClose}>
-          <NotInterested onClose={onClose} bookingDetails={bookingDetails} />
-        </ModalComponent>
       </ScrollView>
       <View
         style={{

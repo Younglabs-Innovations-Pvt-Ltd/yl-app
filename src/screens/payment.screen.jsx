@@ -254,6 +254,7 @@ const Payment = ({navigation}) => {
 
       // Sign-in the user with the credential
       auth().signInWithCredential(googleCredential);
+      setAuthVisible(false);
     } catch (error) {
       console.log('GoogleAuthenticationError', error);
     }

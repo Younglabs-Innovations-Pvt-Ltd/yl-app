@@ -28,6 +28,8 @@ import Center from '../components/center.component';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
+import {fetchDemoDetailsFromPhone} from '../store/join-demo/join-demo.saga';
 
 const BookDemoSlots = ({navigation, route, onClose}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
@@ -167,15 +169,15 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
    */
   const handlePopup = async () => {
     dispatch(closePopup());
-    if (onClose) {
-      onClose();
-    }
     localStorage.clearAll();
+    removeRegisterNotificationTimer();
     console.log('phone', phone);
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
     dispatch(logout());
     if (!onClose) {
       navigation.replace(SCREEN_NAMES.MAIN);
+    } else {
+      onClose();
     }
   };
 
@@ -336,6 +338,7 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
           rounded={6}
           bg={COLORS.pblue}
           onPress={handleBookNow}
+          textSize={18}
           textColor={COLORS.white}>
           Book now
         </Button>

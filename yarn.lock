@@ -6199,6 +6199,11 @@ react-native-blob-util@^0.19.2:
     base-64 "0.1.0"
     glob "^7.2.3"
 
+react-native-clarity@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-clarity/-/react-native-clarity-2.1.0.tgz#87af4a124f2d86fd605e0bec26054335e7b7020c"
+  integrity sha512-3lBp59K12x2/eLw+oxZlDs1Vs3dvAbiiywwIt5w+oI0l+i/JHJuL2R7co2DH0Ft4zwJ9ijRmB4W6e426vFz90Q==
+
 react-native-collapsible@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/react-native-collapsible/-/react-native-collapsible-1.6.1.tgz#27e289831a6955aebde98abff2424a7710f36f02"
@@ -6228,10 +6233,10 @@ react-native-dotenv@^3.4.9:
   dependencies:
     dotenv "^16.3.1"
 
-react-native-element-dropdown@^2.10.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/react-native-element-dropdown/-/react-native-element-dropdown-2.10.0.tgz#f4ec2310b37ff3ba64927286ab775c0ed28b681e"
-  integrity sha512-aFjw0JbUIKGkqklHxDm8aDCZW6Q1GICP7pIHc0sllvpWpEamItzOwAMV4G1mBIKxED77Mp+nkq9p0Dhsr/faVw==
+react-native-element-dropdown@^2.10.1:
+  version "2.10.1"
+  resolved "https://registry.yarnpkg.com/react-native-element-dropdown/-/react-native-element-dropdown-2.10.1.tgz#3b6fa81c60b703fa65a077a606a78cc328c50cf8"
+  integrity sha512-7J3K6T1LZo5H2rsEdAPpYDwhgog4UvatFq8bsW3dCrd2oyXiftn83gcQP1NKRYl4QMyb4WCMXIf+FqmZzS4o/Q==
   dependencies:
     lodash "^4.17.21"
 
@@ -6332,11 +6337,6 @@ react-native-splash-screen@^3.3.0:
   resolved "https://registry.npmjs.org/react-native-splash-screen/-/react-native-splash-screen-3.3.0.tgz"
   integrity sha512-rGjt6HkoSXxMqH4SQUJ1gnPQlPJV8+J47+4yhgTIan4bVvAwJhEeJH7wWt9hXSdH4+VfwTS0GTaflj1Tw83IhA==
 
-react-native-ux-cam@^5.4.13:
-  version "5.4.13"
-  resolved "https://registry.yarnpkg.com/react-native-ux-cam/-/react-native-ux-cam-5.4.13.tgz#34dc4202ad3951ccf8051ae7e86827214543fa55"
-  integrity sha512-G4W8MhRFZ6anU8OmVKzg8LAZa/ATjSXtNOYgivkDK41IZff+DKALHY0idifQIu+cHABzz76VyehnNLq/yromLg==
-
 react-native-vector-icons@^10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-10.0.0.tgz#0f031f7717f76f0a397f725de9b5a47ec87862e9"
@@ -6344,11 +6344,6 @@ react-native-vector-icons@^10.0.0:
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"
-
-react-native-video-cache@^2.7.4:
-  version "2.7.4"
-  resolved "https://registry.yarnpkg.com/react-native-video-cache/-/react-native-video-cache-2.7.4.tgz#d81b66faa58c315d33a23051f2864145e3f4b82d"
-  integrity sha512-0bSJowf9jZaPX+OohjNH6DFPf0/UDgX1foWJAS5Uyv7tuByj9sD9UNbVreEGFjNNya/xVhZffmDaLWMTrx7VBg==
 
 react-native-video-controls@^2.8.1:
   version "2.8.1"

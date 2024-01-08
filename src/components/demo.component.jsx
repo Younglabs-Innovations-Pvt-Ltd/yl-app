@@ -172,9 +172,10 @@ const Demo = ({timeLeft, openBottomSheet}) => {
           <Button
             textColor={'#434a52'}
             bg={COLORS.white}
+            textSize={18}
             rounded={6}
             onPress={openBottomSheet}>
-            Book Now
+            Book Free Class
           </Button>
         </View>
       );

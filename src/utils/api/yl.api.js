@@ -14,8 +14,6 @@ import {
 
 const SOURCE = 'app';
 
-console.log(BASE_URL);
-
 /**
  * @author Shobhit
  * @since 20/09/2023
@@ -284,9 +282,7 @@ export const createLead = async ({
   deviceUID,
   deviceId,
 }) => {
-  const url =
-    'https://cb63-2401-4900-1f38-712e-b1ad-7b98-391d-d813.ngrok-free.app';
-  return fetch(`${url}${CREATE_LEAD}`, {
+  return fetch(`${BASE_URL}${CREATE_LEAD}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

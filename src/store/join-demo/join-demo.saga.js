@@ -8,6 +8,7 @@ import {
   saveFreeClassRating,
   saveNeedMoreInfo,
   fetchBookingDetailsFromPhone,
+  getAppTestimonials,
 } from '../../utils/api/yl.api';
 
 import {
@@ -49,6 +50,7 @@ import {getCurrentDeviceId} from '../../utils/deviceId';
 import {setEmail} from '../auth/reducer';
 import {localStorage} from '../../utils/storage/storage-provider';
 import moment from 'moment';
+import {setContentData} from '../content/reducer';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -61,10 +63,16 @@ const TAG = 'JOIN_DEMO_SAGA_ERROR';
  * Also fetch booking details
  * Save phone number to local storage
  */
-function* fetchDemoDetailsFromPhone() {
+export function* fetchDemoDetailsFromPhone() {
   try {
     const token = yield getCurrentDeviceId();
     const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+
+    if (!phone) {
+      yield put(setLoading(false));
+      console.log('phone does not exist');
+      return;
+    }
 
     const response = yield call(fetchBookingDetailsFromPhone, phone, token);
     let data = yield response.json();
@@ -78,11 +86,21 @@ function* fetchDemoDetailsFromPhone() {
       phone: JSON.parse(callingCode.concat(phone)),
     });
 
-    const bookingDetails = yield detailsResponse.json();
+    let bookingDetails = yield detailsResponse.json();
 
     if (response.status === 400) {
       data = null;
     }
+
+    if (bookingDetails?.message === 'notFound') {
+      bookingDetails = null;
+    }
+
+    const contentRes = yield call(getAppTestimonials);
+    const {data: cData, content} = yield contentRes.json();
+    const improvements = cData.filter(item => item.type === 'improvements');
+    const reviews = cData.filter(item => item.type === 'review');
+    const tips = cData.filter(item => item.type === 'tips');
 
     // lead email
     // const leadEmailResponse = yield call(getLeadEmail, bookingDetails.leadId);
@@ -96,6 +114,7 @@ function* fetchDemoDetailsFromPhone() {
     //   yield call(onSetDemoData, {demoData: data, phone});
     // }
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
+    yield put(setContentData({improvements, reviews, tips, content}));
   } catch (error) {
     console.log('fetchDemoDetailsFromPhoneError', error);
     // yield put(setBookingDetailsFailed("Something went wrong, try again"))

@@ -51,7 +51,7 @@ const TwoStepForm = ({closeModal}) => {
           fs={20}
           ff={FONTS.signika_medium}
           styles={{marginHorizontal: 16}}>
-          Book Handwriting Class
+          Book Free Handwriting Class
         </TextWrapper>
       </View>
 

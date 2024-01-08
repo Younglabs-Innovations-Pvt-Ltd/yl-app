@@ -39,7 +39,6 @@ const CustomDrawerContent = ({navigation, ...props}) => {
   const {bookingDetails} = useSelector(joinDemoSelector);
   const {user} = useSelector(authSelector);
   const windowDimensions = useWindowDimensions();
-
   // if (!bookingDetails) return null;
 
   const handleLogout = async () => {
@@ -52,13 +51,13 @@ const CustomDrawerContent = ({navigation, ...props}) => {
 
       removeRegisterNotificationTimer();
 
-      dispatch(logout());
       const resetAction = CommonActions.reset({
         index: 0,
         routes: [{name: 'Welcome'}],
       });
 
       navigation.dispatch(resetAction);
+      dispatch(logout());
     } catch (error) {
       console.log('CHANGE_NUMBER_ERROR', error);
     }
@@ -228,19 +227,22 @@ const CustomDrawerContent = ({navigation, ...props}) => {
               {localLang.shareButtonText}
             </TextWrapper>
           </Pressable> */}
-          <Pressable
-            style={({pressed}) => [
-              styles.btnDrawer,
-              {
-                backgroundColor: pressed ? '#eaeaea' : 'transparent',
-                justifyContent: 'flex-start',
-              },
-            ]}
-            onPress={rescheduleClass}>
-            <TextWrapper color={COLORS.black} ff={FONTS.signika_medium}>
-              Book free handwriting class
-            </TextWrapper>
-          </Pressable>
+          {bookingDetails && (
+            <Pressable
+              style={({pressed}) => [
+                styles.btnDrawer,
+                {
+                  opacity: pressed ? 0.8 : 1,
+                  backgroundColor: COLORS.pblue,
+                  justifyContent: 'flex-start',
+                },
+              ]}
+              onPress={rescheduleClass}>
+              <TextWrapper color={COLORS.white} ff={FONTS.signika_medium}>
+                Book free handwriting class
+              </TextWrapper>
+            </Pressable>
+          )}
           <View style={styles.socialContainer}>
             <TextWrapper ff={FONTS.signika_medium}>
               {localLang.socialMediaButtonText}

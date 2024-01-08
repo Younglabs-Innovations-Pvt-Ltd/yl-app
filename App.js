@@ -46,16 +46,9 @@ import {NetworkProvider} from './src/context/network.state';
 import Icon from './src/components/icon.component';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
+import {initialize} from 'react-native-clarity';
 
-import RNUxcam from 'react-native-ux-cam';
-
-RNUxcam.optIntoSchematicRecordings(); // Add this line to enable iOS screen recordings
-const configuration = {
-  userAppKey: '3tu10kdj4d7xaxh',
-  enableAutomaticScreenNameTagging: false,
-  enableImprovedScreenCapture: true, // for improved screen capture on Android
-};
-RNUxcam.startWithConfiguration(configuration);
+initialize('kdg30i0fnc');
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -139,7 +132,7 @@ function App() {
       if (result === 'denied') {
         Alert.alert(
           'Permission required',
-          'To be able to update for events and offers, please grant permission.',
+          'Request permission to share timely notifications regarding your classes.',
           [
             {
               text: 'OK',

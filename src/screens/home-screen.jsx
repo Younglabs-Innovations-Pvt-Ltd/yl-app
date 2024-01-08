@@ -19,6 +19,7 @@ import {
   startFetchBookingDetailsFromPhone,
   joinDemo,
   setDemoData,
+  setNotInterestedPopup,
 } from '../store/join-demo/join-demo.reducer';
 import {resetCurrentNetworkState} from '../store/network/reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
@@ -31,11 +32,7 @@ import TextWrapper from '../components/text-wrapper.component';
 
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 import Demo from '../components/demo.component';
-
-import * as Sentry from '@sentry/react-native';
 import Reviews from '../components/reviews.component';
-
-import Worksheets from '../components/worksheets.component';
 import VideoPlayer from '../components/video.component';
 
 // Icons
@@ -43,11 +40,7 @@ import TipsIcon from '../assets/icons/tipsandtricks.png';
 import WorksheetIcon from '../assets/icons/document.png';
 import ReviewIcon from '../assets/icons/reviews.png';
 import ImprovementIcon from '../assets/icons/improvement.png';
-import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
-
-import auth from '@react-native-firebase/auth';
-import {fetchUser, setAuthToken} from '../store/auth/reducer';
+import {fetchUser} from '../store/auth/reducer';
 import {FONTS} from '../utils/constants/fonts';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
@@ -60,15 +53,16 @@ import Snackbar from 'react-native-snackbar';
 import Icon from '../components/icon.component';
 import {authSelector} from '../store/auth/selector';
 import {setPaymentMessage} from '../store/payment/reducer';
-import {saveDeviceId} from '../utils/deviceId';
 import RatingPopup from '../components/popups/rating';
 import {fetchContentDataStart} from '../store/content/reducer';
 import {contentSelector} from '../store/content/selector';
 import BottomSheet from '@gorhom/bottom-sheet';
 import moment from 'moment';
 import TwoStepForm from '../components/two-step-form.component';
-import {setModalVisible} from '../store/welcome-screen/reducer';
 import notifee from '@notifee/react-native';
+import NotInterested from '../components/not-interested.component';
+import {addEventListener} from '@react-native-community/netinfo';
+import Worksheets from '../components/worksheets.component';
 
 const INITIAL_TIME = {
   days: 0,
@@ -116,7 +110,7 @@ const HomeScreen = ({navigation, route}) => {
   const scrollViewRef = useRef(null);
   const bottomSheetRef = useRef();
 
-  const {demoData, loading, bookingTime, bookingDetails} =
+  const {demoData, loading, bookingTime, bookingDetails, notInterestedPopup} =
     useSelector(joinDemoSelector);
 
   const {
@@ -132,10 +126,10 @@ const HomeScreen = ({navigation, route}) => {
 
     if (initialNotification) {
       const data = initialNotification.notification.data;
-      console.log('data', data);
-
       if (data?.rating) {
-        setRatingModal(true);
+        setTimeout(() => {
+          setRatingModal(true);
+        }, 1000);
       }
 
       if (data?.screen) {
@@ -154,6 +148,18 @@ const HomeScreen = ({navigation, route}) => {
       .catch(error => {
         console.log('checkNotificationsError', error.message);
       });
+  }, []);
+
+  useEffect(() => {
+    // Subscribe
+    const unsubscribe = addEventListener(state => {
+      if (state.isConnected) {
+        dispatch(startFetchBookingDetailsFromPhone());
+      }
+    });
+
+    // Unsubscribe
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -195,7 +201,6 @@ const HomeScreen = ({navigation, route}) => {
    * @description Call api to get booking status from phone number
    */
   useEffect(() => {
-    console.log('hit demoData');
     if (!demoData) {
       dispatch(startFetchBookingDetailsFromPhone());
       console.log('startFetchBookingDetailsFromPhone');
@@ -210,27 +215,18 @@ const HomeScreen = ({navigation, route}) => {
    */
   useEffect(() => {
     if (demoData) {
+      console.log('demoData', demoData);
       dispatch(setDemoData({demoData}));
+      // dispatch(fetchContentDataStart());
     }
   }, [demoData]);
-
-  useEffect(() => {
-    dispatch(fetchContentDataStart());
-  }, []);
 
   // fetch user data
   useEffect(() => {
-    if (demoData) {
-      dispatch(fetchUser({leadId: demoData?.leadId}));
+    if (bookingDetails && bookingDetails?.leadId) {
+      dispatch(fetchUser({leadId: bookingDetails.leadId}));
     }
-  }, [demoData]);
-
-  // Show default booking bottom sheet
-  useEffect(() => {
-    if (!demoData) {
-      bottomSheetRef.current && bottomSheetRef.current.collapse();
-    }
-  }, [demoData]);
+  }, [bookingDetails]);
 
   useEffect(() => {
     let timeout;
@@ -277,6 +273,21 @@ const HomeScreen = ({navigation, route}) => {
     };
   }, [bookingTime, dispatch]);
 
+  // Rating after 45 minutes of class
+  useEffect(() => {
+    if (bookingTime) {
+      const isClassOver = moment().isAfter(
+        moment(bookingTime).add(45, 'minutes'),
+      );
+
+      const isJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+
+      if (isJoined && isClassOver) {
+        setRatingModal(true);
+      }
+    }
+  }, [bookingTime, demoData]);
+
   useEffect(() => {
     if (demoData) {
       console.log('demoFlag', demoData.demoFlag);
@@ -288,7 +299,7 @@ const HomeScreen = ({navigation, route}) => {
       ) {
         if (!demoData.demoFlag) {
           console.log('caling join demo...');
-          Alert.alert('', 'caling join demo...');
+          // Alert.alert('', 'caling join demo...');
           dispatch(joinDemo({bookingId: demoData.bookingId}));
         }
       }
@@ -300,15 +311,21 @@ const HomeScreen = ({navigation, route}) => {
    * @since 07/08/2023
    * @description show notification timer on notification panel
    */
-  // useEffect(() => {
-  //   if (bookingTime) {
-  //     const currentTime = Date.now();
+  useEffect(() => {
+    if (bookingTime) {
+      const currentTime = Date.now();
 
-  //     if (bookingTime > currentTime) {
-  //       registerNotificationTimer(bookingTime);
-  //     }
+      if (bookingTime > currentTime) {
+        registerNotificationTimer(bookingTime);
+      }
+    }
+  }, [bookingTime]);
+
+  // useEffect(() => {
+  //   if (!demoData) {
+  //     bottomSheetRef.current && bottomSheetRef.current.expand();
   //   }
-  // }, [bookingTime]);
+  // }, [demoData, bottomSheetRef.current]);
 
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
@@ -378,17 +395,21 @@ const HomeScreen = ({navigation, route}) => {
   )}%`;
 
   const openBottomSheet = () => {
-    bottomSheetRef.current && bottomSheetRef.current.collapse();
+    bottomSheetRef.current && bottomSheetRef.current.expand();
   };
 
   const closeBottomSheet = () => {
     bottomSheetRef.current && bottomSheetRef.current.close();
+    dispatch(startFetchBookingDetailsFromPhone());
   };
 
+  const onCloseNotInterested = () => {
+    dispatch(setNotInterestedPopup(false));
+  };
   // console.log('demoData', demoData);
   // console.log('isClassOnging', isClassOngoing);
   // console.log('timeLeft', timeLeft);
-  console.log('bookingDetails', bookingDetails);
+  // console.log('bookingDetails', bookingDetails);
 
   return (
     <View style={{flex: 1, backgroundColor: '#76c8f2'}}>
@@ -548,7 +569,7 @@ const HomeScreen = ({navigation, route}) => {
             </View>
 
             {/* Worksheets */}
-            {/* <Worksheets handleSectionLayout={handleSectionLayout} /> */}
+            <Worksheets handleSectionLayout={handleSectionLayout} />
 
             {/* Video slider */}
             <View
@@ -754,6 +775,7 @@ const HomeScreen = ({navigation, route}) => {
         snapPoints={[bottomSheetSnappoint, '90%']}
         ref={bottomSheetRef}
         enablePanDownToClose={true}
+        onChange={e => console.log('e', e)}
         style={{
           borderTopLeftRadius: 12,
           borderTopRightRadius: 12,
@@ -761,6 +783,17 @@ const HomeScreen = ({navigation, route}) => {
         }}>
         <TwoStepForm closeModal={closeBottomSheet} />
       </BottomSheet>
+      <ModalComponent
+        visible={notInterestedPopup}
+        animationType="slide"
+        onRequestClose={onCloseNotInterested}>
+        {bookingDetails && (
+          <NotInterested
+            onClose={onCloseNotInterested}
+            bookingDetails={bookingDetails}
+          />
+        )}
+      </ModalComponent>
     </View>
   );
 };

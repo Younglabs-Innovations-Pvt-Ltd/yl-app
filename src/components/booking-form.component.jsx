@@ -4,12 +4,56 @@ import {StyleSheet, Pressable, View, ScrollView} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import Spacer from './spacer.component';
 import Input from './input.component';
-import {Dropdown, DropdownList} from './dropdown.component';
+// import {Dropdown, DropdownList} from './dropdown.component';
 import {COLORS} from '../utils/constants/colors';
 import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import {Dropdown} from 'react-native-element-dropdown';
+import Icon from './icon.component';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const ageData = [
+  {
+    label: '5',
+    value: '5',
+  },
+  {
+    label: '6',
+    value: '6',
+  },
+  {
+    label: '7',
+    value: '7',
+  },
+  {
+    label: '8',
+    value: '8',
+  },
+  {
+    label: '9',
+    value: '9',
+  },
+  {
+    label: '10',
+    value: '10',
+  },
+  {
+    label: '11',
+    value: '11',
+  },
+  {
+    label: '12',
+    value: '12',
+  },
+  {
+    label: '13',
+    value: '13',
+  },
+  {
+    label: '14',
+    value: '14',
+  },
+];
 
 const INITIAL_sTATE = {
   parentName: '',
@@ -17,7 +61,6 @@ const INITIAL_sTATE = {
 };
 
 const BookingForm = ({goToNextSlide}) => {
-  const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
   const [childAge, setChildAge] = useState(null);
   const [fields, setFields] = useState(INITIAL_sTATE);
@@ -35,10 +78,6 @@ const BookingForm = ({goToNextSlide}) => {
     return true;
   }, [fields.childName, fields.parentName, childAge]);
 
-  const onLayoutChange = event => {
-    setGutter(event.nativeEvent.layout.y + event.nativeEvent.layout.height);
-  };
-
   const handleChangeValue = e => {
     const {name, value} = e;
     const regex = /^[A-Za-z\s]*$/;
@@ -47,19 +86,15 @@ const BookingForm = ({goToNextSlide}) => {
     }
   };
 
-  const handleOnClose = () => setOpen(false);
-
   const handleDemoSlots = async () => {
-    const formFields = {...fields, phone: PHONE, childAge};
+    const formFields = {...fields, phone: PHONE, childAge: parseInt(childAge)};
 
     goToNextSlide(formFields);
   };
 
-  const handleChildAge = ({childAge}) => {
-    setChildAge(childAge);
+  const onChange = ({value}) => {
+    setChildAge(value);
   };
-
-  const onChangeOpen = () => setOpen(true);
 
   const btnNextStyle = ({pressed}) => [
     styles.btnNext,
@@ -68,6 +103,9 @@ const BookingForm = ({goToNextSlide}) => {
       backgroundColor: !isActive ? '#eaeaea' : COLORS.pblue,
     },
   ];
+
+  const onFocus = () => setOpen(true);
+  const onBlur = () => setOpen(false);
 
   return (
     <React.Fragment>
@@ -100,17 +138,38 @@ const BookingForm = ({goToNextSlide}) => {
             value={fields.childName}
             onChangeText={e => handleChangeValue({name: 'childName', value: e})}
           />
-          <Spacer />
           <Dropdown
-            defaultValue="Select child age"
+            data={ageData}
+            style={{
+              height: 58,
+              marginTop: 16,
+              borderWidth: 1,
+              borderColor: 'gray',
+              borderRadius: 6,
+              paddingHorizontal: 12,
+            }}
+            renderRightIcon={() => (
+              <Icon
+                name={open ? 'chevron-up-outline' : 'chevron-down-outline'}
+                size={18}
+              />
+            )}
+            containerStyle={{borderRadius: 6}}
+            itemTextStyle={{color: COLORS.black}}
+            minHeight={160}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            onChange={onChange}
             value={childAge}
-            onPress={onChangeOpen}
-            open={open}
-            onLayout={onLayoutChange}
+            placeholder="Select child age"
+            placeholderStyle={{color: 'gray'}}
+            selectedTextStyle={{color: COLORS.black}}
+            onBlur={onBlur}
+            onFocus={onFocus}
           />
         </View>
       </ScrollView>
-
       <View style={{padding: 8}}>
         <Pressable
           style={btnNextStyle}
@@ -119,21 +178,12 @@ const BookingForm = ({goToNextSlide}) => {
           <TextWrapper
             color={isActive ? COLORS.white : '#434a52'}
             fw="700"
+            fs={18}
             styles={{letterSpacing: 1.1}}>
             Continue
           </TextWrapper>
         </Pressable>
       </View>
-
-      {open && (
-        <DropdownList
-          data={ageList}
-          gutter={gutter}
-          currentValue={childAge}
-          onClose={handleOnClose}
-          onChange={handleChildAge}
-        />
-      )}
     </React.Fragment>
   );
 };

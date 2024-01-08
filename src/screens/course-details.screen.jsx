@@ -183,7 +183,7 @@ const CourseDetails = ({navigation}) => {
         <Spacer />
         <VideoPlayer
           uri={courseVideos?.videoUri}
-          poster={courseVideos?.coursePoster}
+          // poster={courseVideos?.coursePoster}
         />
         <Spacer />
         {loading ? (

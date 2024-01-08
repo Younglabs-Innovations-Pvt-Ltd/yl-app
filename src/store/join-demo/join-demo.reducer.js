@@ -20,6 +20,7 @@ const INITIAL_STATE = {
   joinClassLoading: false,
   joinClassErrorMsg: '',
   attendanceLoading: false,
+  notInterestedPopup: false,
 };
 
 // reducer
@@ -108,6 +109,9 @@ const reducer = {
   setJoinClassErrorMsg(state, action) {
     state.joinClassErrorMsg = action.payload;
   },
+  setNotInterestedPopup(state, action) {
+    state.notInterestedPopup = action.payload;
+  },
   setPhoneAsync() {},
   setDemoData() {},
   setDemoNotifications() {},
@@ -156,6 +160,7 @@ export const {
   setJoinClassLoading,
   setJoinClassErrorMsg,
   startMarkAttendace,
+  setNotInterestedPopup,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

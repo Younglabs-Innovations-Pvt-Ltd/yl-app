@@ -24,6 +24,7 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import DeviceInfo from 'react-native-device-info';
 import {setBookingDetailSuccess} from '../join-demo/join-demo.reducer';
+import {fetchDemoDetailsFromPhone} from '../join-demo/join-demo.saga';
 
 /**
  * @author Shobhit
@@ -48,8 +49,6 @@ function* handleBookingStatus({payload: {phone}}) {
     // Return true or false
     const isValidPhone = isValidNumber(phone, 'IN');
 
-    console.log('isValidPhone', isValidPhone);
-
     if (!isValidPhone) {
       yield put(setErrorMessage('Please enter a valid number'));
       return;
@@ -59,7 +58,6 @@ function* handleBookingStatus({payload: {phone}}) {
     const response = yield fetchBookingDetailsFromPhone(phone);
 
     const data = yield response.json();
-    console.log('booking Data', data);
 
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
 
@@ -81,7 +79,7 @@ function* handleBookingStatus({payload: {phone}}) {
       console.log('leadData', leadData);
     }
 
-    yield put(setBookingDetailSuccess({demoData: data, bookingDetails: null}));
+    yield call(fetchDemoDetailsFromPhone);
     yield put(fetchBookingStatusSuccess(''));
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
     // }
