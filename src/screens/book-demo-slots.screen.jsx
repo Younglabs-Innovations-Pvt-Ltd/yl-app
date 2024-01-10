@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {StyleSheet, Pressable, View, Linking, Alert} from 'react-native';
+import {StyleSheet, Pressable, View, Linking, Alert, Text} from 'react-native';
 
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
 import Spinner from '../components/spinner.component';
-import Button from '../components/button.component';
+// import Button from '../components/button.component';
 import Modal from '../components/modal.component';
 import {COLORS} from '../utils/constants/colors';
 
@@ -19,6 +19,7 @@ import {
   setIsBookingLimitExceeded,
   closePopup,
   startFetchingIpData,
+  setSelectedSlot,
 } from '../store/book-demo/book-demo.reducer';
 import {
   setDemoBookingId,
@@ -35,16 +36,15 @@ import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import NetInfo from '@react-native-community/netinfo';
 import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const BookDemoSlots = ({navigation, route, onClose}) => {
+
+const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
-
-  const {
-    formFields: {childAge, parentName: name, phone, childName},
-  } = route.params;
-
+  const {textColors} = useSelector(state => state.appTheme);
+  const {childAge, parentName: name, phone, childName} = formData;
   const dispatch = useDispatch();
 
   const {
@@ -54,8 +54,11 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
     isBookingLimitExceeded,
     popup,
     loading: {bookingSlotsLoading, bookingLoading},
+    bookingCreatedSuccessfully,
+    childData
   } = useSelector(bookDemoSelector);
 
+  // console.log('Booking Slots are', bookingSlots);
   const {demoBookingId} = useSelector(joinDemoSelector);
   const {
     networkState: {isConnected, alertAction},
@@ -67,29 +70,6 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
       dispatch(startFetchingIpData());
     }
   }, [ipData]);
-
-  // useEffect(() => {
-  //   const unsubscribe = NetInfo.addEventListener(state => {
-  //     if (state.isConnected && isConnected) {
-  //       if (!ipData) {
-  //         dispatch(startFetchingIpData());
-  //       } else {
-  //         const body = {
-  //           courseId: 'Eng_Hw',
-  //           childAge: childAge,
-  //           timeZone: timezone.toString(),
-  //           type: 'website',
-  //         };
-
-  //         dispatch(startFetchingBookingSlots(body));
-  //       }
-  //     }
-  //   });
-
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, [isConnected, ipData]);
 
   // Set timezone
   useEffect(() => {
@@ -103,13 +83,15 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
   useEffect(() => {
     if (!timezone) return;
     const body = {
-      courseId: 'Eng_Hw',
+      courseId: courseId || 'Eng_Hw',
       childAge: childAge,
       timeZone: timezone.toString(),
       type: 'website',
     };
 
-    dispatch(startFetchingBookingSlots(body));
+    if(bookingSlots){
+      dispatch(startFetchingBookingSlots(body));
+    }
   }, [timezone]);
 
   // set booking slot date and time
@@ -141,32 +123,15 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
   // Set current slots time
   const handleCurrentSlotTime = slotTime => setCurrentSlotTime(slotTime);
 
+  useEffect(() => {
+    dispatch(setSelectedSlot(currentSlotTime));
+  }, [currentSlotTime]);
+
   /**
    * @author Shobhit
    * @since 07/08/2023
    * @description Book a new demo class
-   */
-  const handleBookNow = async () => {
-    const bodyData = {
-      name,
-      childAge,
-      phone,
-      childName,
-      timeZone: timezone,
-      demoDate: currentSlotTime.demoDate,
-      bookingType: 'direct',
-      source: 'app',
-      course: 'Eng_Hw',
-      digits: 'na',
-      slotId: currentSlotTime.slotId,
-      country: ipData.country_name.toUpperCase(),
-      countryCode: ipData.calling_code,
-    };
-
-    console.log('currentSlotId=', currentSlotTime.slotId);
-
-    dispatch(setNewBookingStart({data: bodyData, ipData}));
-  };
+  
 
   /**
    * @author Shobhit
@@ -195,6 +160,7 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
    * @since 07/08/2023
    * @description Contact us, Redirect to Whatsapp
    */
+
   const handleContactUs = async () => {
     const phoneNumber = '+919289029696';
     let url = '';
@@ -292,21 +258,23 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
 
   return bookingSlotsLoading ? (
     <Spinner style={{alignSelf: 'center'}} />
-  ) : (
+  ) : bookingSlots && bookingSlots.length > 0 ? (
     <>
-      <View style={styles.container}>
+      <View style={[{}]} className="flex-1 w-full px-2 mt-5">
+        <View className="p-1 bg-gray-300 rounded-md my-3">
+          <Text className="text-gray-700 ml-3">Booking Free class for <Text className="font-semibold">{childData?.childName}</Text></Text>
+        </View>
         <View style={styles.slotsWrapper}>
-          <TextWrapper fs={20} color={COLORS.black} fw="bold">
+          <TextWrapper fs={20} color={textColors.textPrimary} fw="bold">
             Select date:
           </TextWrapper>
-          {/* Slot dates */}
           <View style={styles.slotDateList}>{SLOT_DATES}</View>
         </View>
 
         <Spacer />
 
         <View style={styles.slotsWrapper}>
-          <TextWrapper fs={20} color={COLORS.black} fw="bold">
+          <TextWrapper fs={20} color={textColors.textPrimary} fw="bold">
             Select time:
           </TextWrapper>
           {/* Slot times */}
@@ -340,15 +308,7 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
           </View>
         </Modal>
       </View>
-      <View style={styles.footer}>
-        <Button
-          rounded={6}
-          bg={COLORS.pblue}
-          onPress={handleBookNow}
-          textColor={COLORS.white}>
-          Book now
-        </Button>
-      </View>
+      <View style={styles.footer}></View>
       {/* show popup */}
       {popup && <Popup onHandlePopup={handlePopup} onClose={onClose} />}
       {/* Loading spinner */}
@@ -358,6 +318,8 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
         </Center>
       </Modal>
     </>
+  ) : (
+    <NoDemoSlotsScreen />
   );
 };
 
@@ -386,15 +348,42 @@ const Popup = ({onHandlePopup, popup, onClose}) => {
         </TextWrapper>
         <Spacer />
         <View>
-          <Button
+          {/* <Button
             bg={COLORS.orange}
             textColor={COLORS.white}
             rounded={4}
             onPress={onHandlePopup}>
             Continue
-          </Button>
+          </Button> */}
         </View>
       </View>
+    </View>
+  );
+};
+
+const NoDemoSlotsScreen = () => {
+  const {textColors} = useSelector(state => state.appTheme);
+
+  return (
+    <View className="w-full mt-4 items-center">
+      <View className="items-center w-[95%]">
+        <Text
+          className="text-center w-full text-2xl font-bold"
+          style={{color: textColors.textPrimary}}>
+          No Demo Slots Created
+        </Text>
+        <Text
+          className="text-center w-full text-base"
+          style={{color: textColors.textSecondary}}>
+          Contact with us on Whatsapp to book your free class.
+        </Text>
+      </View>
+      <View className="flex-row justify-around">
+          <Pressable className="flex-row w-[90%] rounded py-2 justify-center items-center mt-3" style={{backgroundColor:textColors.textYlGreen}}>
+            <MIcon name="whatsapp" size={30} color="white"/>
+            <Text className="text-white text-base">Whatsapp us</Text>
+          </Pressable>
+        </View>
     </View>
   );
 };
@@ -414,9 +403,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   slotDate: {
-    paddingVertical: 12,
+    paddingVertical: 6,
     paddingHorizontal: 16,
-    borderRadius: 4,
+    borderRadius: 50,
   },
   footer: {
     width: '100%',

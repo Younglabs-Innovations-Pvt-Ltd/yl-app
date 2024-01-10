@@ -48,6 +48,11 @@ import {NetworkProvider} from './src/context/network.state';
 
 import auth from '@react-native-firebase/auth';
 import Icon from './src/components/icon.component';
+import MainWelcomeScreen from './src/screens/MainWelcomeScreen';
+import CourseDetailsScreen from './src/screens/CourseDetailScreen';
+import ViewAllCourses from './src/screens/ViewAllCourses';
+import UserProfile from './src/screens/UserProfile';
+import ScrollingAnimation from './src/screens/ScrollingAnimation';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -83,7 +88,7 @@ function App() {
       const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
       // const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
       console.log('phone', phone);
-      console.log('typeof phone', typeof phone);
+      // console.log('typeof phone', typeof phone);
       let token;
       if (user) {
         const tokenResult = await auth().currentUser.getIdTokenResult();
@@ -91,7 +96,7 @@ function App() {
       }
 
       setLoading(false);
-      if (token && phone) {
+      if (phone) {
         setIsPhone(true);
       }
     } catch (error) {
@@ -202,6 +207,8 @@ function App() {
                   shadowOpacity: 0,
                   borderBottomWidth: 1,
                   borderBottomColor: '#eaeaea',
+                  backgroundColor: '#fff',
+                  headerTintColor: '#000',
                 },
                 headerTitleStyle: {
                   fontSize: 18,
@@ -212,12 +219,14 @@ function App() {
                 cardStyle: {backgroundColor: '#fff'},
                 cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
               })}
-              initialRouteName={initialRouteName}>
+              initialRouteName={SCREEN_NAMES.WELCOME}>
+
               <Stack.Screen
                 name={SCREEN_NAMES.WELCOME}
                 component={WelcomeScreen}
                 options={{headerShown: false}}
               />
+
               <Stack.Screen
                 name={SCREEN_NAMES.MAIN}
                 component={MainScreen}

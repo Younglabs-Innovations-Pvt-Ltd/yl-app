@@ -9,6 +9,7 @@ import {authReducer} from './auth/reducer';
 import {courseReducer} from './course/course.reducer';
 import {paymentReducer} from './payment/reducer';
 import {uploadReducer} from './upload-handwriting/reducer';
+import { appThemeReducer } from './app-theme/appThemeReducer';
 
 const reducer = combineReducers({
   joinDemo: joinDemoReducer,
@@ -20,6 +21,7 @@ const reducer = combineReducers({
   course: courseReducer,
   payment: paymentReducer,
   upload: uploadReducer,
+  appTheme: appThemeReducer
 });
 
 export const rootReducer = (state, action) => {

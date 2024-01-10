@@ -209,7 +209,9 @@ const PostDemoAction = ({rescheduleClass}) => {
     <View
       style={{
         width: '100%',
-      }}>
+      }}
+      className="p-1"
+      >
       {!attended && (
         <View style={styles.paContainer}>
           <TextWrapper
@@ -366,13 +368,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ctaButton: {
-    height: 48,
-    paddingVertical: 6,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 1.85,
-    borderRadius: 4,
+    borderRadius: 50,
     gap: 8,
     backgroundColor: COLORS.white,
   },
@@ -389,10 +390,10 @@ const styles = StyleSheet.create({
   },
   paButton: {
     paddingHorizontal: 22,
-    paddingVertical: 12,
+    paddingVertical: 8,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    borderRadius: 4,
+    borderRadius: 50,
   },
 });

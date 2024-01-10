@@ -4,7 +4,7 @@ import TextWrapper from './text-wrapper.component';
 import Spacer from './spacer.component';
 import Input from './input.component';
 import Icon from './icon.component';
-import Button from './button.component';
+// import Button from './button.component';
 import {COLORS} from '../utils/constants/colors';
 
 import {BASE_URL, SEND_CLASS_LINK_URL} from '@env';
@@ -106,11 +106,11 @@ const Features = ({demoData}) => {
               </TextWrapper>
             )}
             <Spacer />
-            <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
+            {/* <Button bg={COLORS.pgreen} rounded={4} onPress={handleSendLink}>
               <TextWrapper fs={17} fw="700" color={COLORS.white}>
                 {localLang.sendEmailButtonText}
               </TextWrapper>
-            </Button>
+            </Button> */}
           </View>
         ) : (
           <View style={styles.btnSendLink}>

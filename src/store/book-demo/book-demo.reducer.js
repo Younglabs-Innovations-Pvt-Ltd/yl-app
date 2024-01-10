@@ -13,6 +13,9 @@ const INITIAL_STATE = {
     bookingSlotsLoading: false,
     bookingLoading: false,
   },
+  selectedSlot:null,
+  childData:null,
+  bookingCreatedSuccessfully: false,
 };
 
 // reducer
@@ -37,7 +40,8 @@ const reducer = {
   setIpDataLoadingState(state, action) {
     state.ipDataLoading = action.payload;
   },
-  setNewBookingStart(state) {
+  setNewBookingStart(state , action) {
+    // console.log("in reducer", action.payload)
     state.loading.bookingLoading = true;
   },
   setNewBookingSuccess(state) {
@@ -61,6 +65,15 @@ const reducer = {
     state.loading.bookingSlotsLoading = false;
     state.bookingLoading = false;
   },
+  setSelectedSlot(state , action){
+    state.selectedSlot = action.payload;
+  },
+  setChildData(state , action){
+    state.childData = action.payload;
+  },
+  changebookingCreatedSuccessfully(state, action){
+    state.bookingCreatedSuccessfully = action.payload;
+  }
 };
 
 // slice
@@ -84,6 +97,9 @@ export const {
   setIsBookingLimitExceeded,
   closePopup,
   stopLoading,
+  setSelectedSlot,
+  setChildData,
+  changebookingCreatedSuccessfully
 } = bookDemoSlice.actions;
 
 // reducer

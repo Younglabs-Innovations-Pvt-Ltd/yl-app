@@ -8,6 +8,7 @@ import {
   View,
   Alert,
   Linking,
+  Text
 } from 'react-native';
 import Storage from '@react-native-firebase/storage';
 import RNFS from 'react-native-fs';
@@ -31,8 +32,8 @@ const {width: deviceWidth} = Dimensions.get('window');
 const UploadHandwriting = ({demoData}) => {
   const [loading, setLoading] = useState(false);
   const [visibleOptions, setVisibleOptions] = useState(false);
-
   const {selectedImage, modalVisible} = useSelector(uploadSelector);
+  const {darkMode, bgColor, textColors , colorYlMain} = useSelector(state => state.appTheme);
   const dispatch = useDispatch();
 
   const pickFile = async () => {
@@ -167,19 +168,16 @@ const UploadHandwriting = ({demoData}) => {
   };
 
   return (
-    <View>
-      <TextWrapper color={COLORS.white}>
-        Upload your child's handwriting image
-      </TextWrapper>
-      <Spacer space={4} />
+    <View className="justify-center w-full items-center ">
       <Pressable
         onPress={onOpenOptions}
-        style={({pressed}) => [styles.btnUpload, {opacity: pressed ? 0.9 : 1}]}>
-        <Icon name="camera" size={24} color={COLORS.black} />
-        <TextWrapper color={COLORS.black} fs={18}>
-          Select image
-        </TextWrapper>
+        style={({pressed}) => [{opacity: pressed ? 0.9 : 1}]}
+        className="items-center justify-center"
+        >
+        <Icon name="camera" size={30} color={"white"} />
+        <Text className="text-center text-white text-[10px]">Upload your handwriting</Text>
       </Pressable>
+
       <ModalComponent
         visible={visibleOptions}
         onRequestClose={onCloseOptions}
@@ -321,8 +319,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
+    borderRadius: 50,
   },
   modalContainer: {
     flex: 1,

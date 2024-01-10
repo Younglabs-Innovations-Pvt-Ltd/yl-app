@@ -403,7 +403,7 @@ const DemoClassScreen = ({navigation}) => {
           <Pressable
             style={btnContinueStyle}
             disabled={authLoading}
-            onPress={signInWithPhoneNumber}>
+            onPress={handleBookingStatus}>
             <TextWrapper fs={18} fw="800" color={COLORS.white}>
               Continue
             </TextWrapper>

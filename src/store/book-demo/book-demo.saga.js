@@ -9,6 +9,7 @@ import {
   setNewBookingSuccess,
   setIsBookingLimitExceeded,
   stopLoading,
+  changebookingCreatedSuccessfully,
 } from './book-demo.reducer';
 
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
@@ -47,6 +48,7 @@ function* fetchIpData() {
  * @description Fetch booking slots calling from BookDemoSlots Screen
  */
 function* fetchBookingSlots({payload}) {
+  console.log('Fetch booking slots', payload.courseId);
   try {
     const response = yield fetch(`${BASE_URL}${GET_SLOTS_API}`, {
       method: 'POST',
@@ -60,10 +62,6 @@ function* fetchBookingSlots({payload}) {
     yield put(fetchBookingSlotsSuccess(slotsData));
   } catch (error) {
     console.log('Slots error', error);
-    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
-    //   yield put(stopLoading());
-    //   yield put(setCurrentNetworkState(startFetchingBookingSlots(payload)));
-    // }
   }
 }
 
@@ -78,6 +76,7 @@ function* fetchBookingSlots({payload}) {
  */
 function* handleNewBooking({payload: {data, ipData}}) {
   try {
+    console.log('Making Booking', data);
     const response = yield makeNewBooking(data);
 
     const bookingDetails = yield response.json();
@@ -91,6 +90,7 @@ function* handleNewBooking({payload: {data, ipData}}) {
       // localStorage.set(LOCAL_KEYS.CALLING_CODE, ipData.calling_code);
 
       yield put(setNewBookingSuccess());
+      yield put(changebookingCreatedSuccessfully(true));
     } else if (response.status === 400) {
       yield put(setIsBookingLimitExceeded(true));
     }

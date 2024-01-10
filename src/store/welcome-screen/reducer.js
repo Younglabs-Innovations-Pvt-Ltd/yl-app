@@ -19,6 +19,7 @@ const reducer = {
     state.modalVisible = action.payload;
   },
   fetchBookingStatusStart(state) {
+    console.log("i am here")
     state.loading = true;
   },
   setLoading(state, action) {

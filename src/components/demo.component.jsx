@@ -5,9 +5,10 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
+  Text,
 } from 'react-native';
 import DemoWaiting from './join-demo-class-screen/demo-waiting.component';
-import Button from './button.component';
+// import Button from './button.component';
 import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
 import PostDemoAction from './join-demo-class-screen/post-demo-actions.component';
@@ -24,6 +25,7 @@ import TwoStepForm from './two-step-form.component';
 import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
+import {TextInput} from 'react-native-gesture-handler';
 
 const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
 
@@ -84,6 +86,7 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
 
   // Join Class
   const handleJoinClass = async () => {
+    // console.log("first");
     dispatch(joinFreeClass({bookingDetails, childName, teamUrl}));
   };
 
@@ -97,7 +100,7 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
 
   // show join button to join class
   const SHOW_JOIN_BUTTON = useMemo(() => {
-    return isTimeover && showJoinButton;
+    return !isTimeover && showJoinButton;
   }, [isTimeover, showJoinButton]);
 
   // If there is no child name in booking details
@@ -106,10 +109,11 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   const IS_CHILD_NAME = useMemo(() => {
     return !cn ? (
       <>
-        <Input
+        <TextInput
           placeholder="Child Name"
           value={childName}
           onChangeText={onChangeChildName}
+          className="text-white border-b border-white p-1 text-base"
         />
         {message && (
           <TextWrapper fs={14} color={COLORS.pred}>
@@ -118,14 +122,15 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
         )}
       </>
     ) : (
-      <TextWrapper
-        color={COLORS.white}
-        fs={20}
-        ff={FONTS.signika_semiBold}
-        styles={{marginBottom: 12}}>
-        Class is on going, Join now.
-      </TextWrapper>
+      ''
     );
+    // <TextWrapper
+    //   color={COLORS.white}
+    //   fs={20}
+    //   ff={FONTS.signika_semiBold}
+    //   styles={{marginBottom: 12}}>
+    //   Class is on going, Join now.
+    // </TextWrapper>
   }, [cn, childName, message]);
 
   const NEW_BOOKING = useMemo(() => {
@@ -136,13 +141,13 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
             Book your first free Handwriting Class.
           </TextWrapper>
           <Spacer />
-          <Button
+          {/* <Button
             textColor={'#434a52'}
             bg={COLORS.white}
             rounded={6}
             onPress={onOpenForm}>
             Book
-          </Button>
+          </Button> */}
         </View>
       );
     } else {
@@ -157,48 +162,47 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   };
 
   return (
-    <View style={styles.contentWrapper}>
+    <View style={[styles.contentWrapper]} className="w-full">
       {NEW_BOOKING}
       {/* Timer */}
       {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
 
       {/* Show join button */}
       {SHOW_JOIN_BUTTON && (
-        <View>
+        <View className="w-full p-1">
           {IS_CHILD_NAME}
-          <Button
+          {/* <Button
             textColor={'#434a52'}
             bg={COLORS.white}
             rounded={6}
             onPress={handleJoinClass}>
             Enter class
-          </Button>
+          </Button> */}
+
+          <View className="w-full p-1 px-3">
+            <Text className="text-white font-semibold text-base ml-3 ">
+              Your free handwriting class is going on
+            </Text>
+            <View className="w-full">
+              <Pressable
+                className="p-2 w-full rounded-full bg-white mt-2"
+                onPress={handleJoinClass}>
+                <Text className="text-base font-semibold text-gray-700 text-center">
+                  Enter Class
+                </Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
       )}
-      {isTimeover && !teamUrl && (
-        <View
-          style={{
-            paddingVertical: 16,
-          }}>
-          <TextWrapper color={COLORS.white} fs={20}>
-            {localLang.rescheduleText}
-          </TextWrapper>
-          <Spacer />
-          <Button
-            textColor={COLORS.black}
-            bg={COLORS.white}
-            rounded={6}
-            onPress={onOpen}>
-            {localLang.rescheduleButtonText}
-          </Button>
-        </View>
-      )}
+
       {
         // If user attended demo class
         // Demo has ended
         // Show post action after demo class
         showPostActions && <PostDemoAction rescheduleClass={onOpen} />
       }
+
       <Modal animationType="fade" visible={open} onRequestClose={onClose}>
         <View
           style={{

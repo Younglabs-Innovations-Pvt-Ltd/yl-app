@@ -34,11 +34,11 @@ const MainScreen = ({route}) => {
   const dispatch = useDispatch();
   const {localLang} = i18nContext();
 
-  useEffect(() => {
-    StatusBar.setHidden(false);
-    StatusBar.setBackgroundColor(COLORS.pgreen);
-    StatusBar.setBarStyle('light-content');
-  }, []);
+  // useEffect(() => {
+  //   StatusBar.setHidden(false);
+  //   StatusBar.setBackgroundColor(COLORS.pgreen);
+  //   StatusBar.setBarStyle('light-content');
+  // }, []);
 
   useEffect(() => {
     if (!data) return;

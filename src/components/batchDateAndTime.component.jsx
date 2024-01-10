@@ -11,7 +11,7 @@ import {
   setPrice,
   setStrikeThroughPrice,
 } from '../store/course/course.reducer';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 const BatchDateAndTime = ({
   batch,
@@ -26,6 +26,8 @@ const BatchDateAndTime = ({
 
   const date = new Date(batch.startDate._seconds * 1000);
   const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
+  const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
+
 
   const dispatch = useDispatch();
 
@@ -55,10 +57,11 @@ const BatchDateAndTime = ({
         borderRadius: 6,
         backgroundColor: BACKGROUND_COLOR,
       }}
+      className="w-full"
       onPress={handleBatch}>
       <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-        <MIcon name="calendar-month" size={24} color={COLORS.black} />
-        <TextWrapper fs={17}>{dateAndTime}</TextWrapper>
+        <MIcon name="calendar-month" size={24} color={textColors.textSecondary} />
+        <TextWrapper fs={17} color={textColors.textSecondary}>{dateAndTime}</TextWrapper>
       </View>
       <View
         style={{
@@ -68,7 +71,7 @@ const BatchDateAndTime = ({
           marginTop: 8,
         }}>
         {batch.daysArr.split(',').map((item, index) => (
-          <TextWrapper key={index} color={COLORS.black}>
+          <TextWrapper key={index} color={textColors.textSecondary}>
             {item}
           </TextWrapper>
         ))}

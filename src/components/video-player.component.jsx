@@ -6,7 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 
 const VideoMediaPlayer = ({uri, ...otherProps}) => {
   const [videoLoading, setVideoLoading] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(true);
   const videoRef = useRef(null);
 
   const navigation = useNavigation();
@@ -45,7 +45,7 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
           ref={videoRef}
           source={{uri: uri}}
           style={styles.video}
-          paused={paused}
+          paused={true}
           resizeMode="cover"
           onLoadStart={onLoadStart}
           onReadyForDisplay={onReadyForDisplay}

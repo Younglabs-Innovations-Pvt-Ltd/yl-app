@@ -1,5 +1,5 @@
 import React from 'react';
-import {Dimensions, StyleSheet, View} from 'react-native';
+import {Dimensions, StyleSheet, View, Text} from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import CountDown from '../countdown.component';
 import Spacer from '../spacer.component';
@@ -24,6 +24,8 @@ const months = [
 ];
 
 const {width: deviceWidth} = Dimensions.get('window');
+
+const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 
 const getClassDate = seconds => {
   const date = new Date(seconds * 1000);
@@ -51,33 +53,60 @@ const DemoWaiting = ({timeLeft}) => {
   const {demoDate} = demoData;
   const seconds = demoDate._seconds;
   return (
-    <View
-      style={{
-        width: deviceWidth * 0.9,
-      }}>
-      <View
-        style={{
-          paddingVertical: 6,
-          backgroundColor: COLORS.white,
-          paddingHorizontal: 8,
-          borderRadius: 4,
-          marginBottom: 12,
-        }}>
-        <TextWrapper color={COLORS.black} fs={14}>
+    <View className="flex-row items-center p-1">
+      {/* <TextWrapper fs={14} className="text-white">
           Your class is on{' '}
-          <TextWrapper color={COLORS.black} fw="bold">
+
+          <TextWrapper className="text-white font-bold" fw="bold">
             {getClassDate(seconds)}
           </TextWrapper>
-        </TextWrapper>
-        <CountDown timeLeft={timeLeft} />
+
+        </TextWrapper> */}
+
+      {/* <CountDown timeLeft={timeLeft} /> */}
+
+      <View className="flex-col w-[75%]">
+        <Text className="text-xs text-white">
+          Your First free handwriting class starts in
+        </Text>
+        <View className="flex-row mt-1">
+          <CountDownTimer timeLeft={timeLeft} />
+        </View>
       </View>
-      {/* <Spacer space={4} /> */}
-      <UploadHandwriting demoData={demoData} />
+
+      <View className="w-[25%]">
+        <UploadHandwriting demoData={demoData} />
+      </View>
     </View>
   );
 };
 
 export default DemoWaiting;
+
+const CountDownTimer = ({timeLeft}) => {
+  const {darkMode, bgColor, textColors, colorYlMain} = useSelector(
+    state => state.appTheme,
+  );
+  return Object.entries(timeLeft)
+    .filter(entry => entry[0] !== 'remainingTime')
+    .map(time => {
+      const label = time[0];
+      const value = time[1];
+      const updatedLabel = label.slice(0, 1).toUpperCase() + label.slice(1);
+
+      return (
+        <View
+          key={label}
+          style={[]}
+          className="flex-col rounded-md bg-white mr-1 w-[60px] items-center justify-center">
+          <Text className="text-gray-700 font-semibold text-[18px] text-center">
+            {zeroPrefix(value)}
+          </Text>
+          <Text className="text-center text-[12px]">{updatedLabel}</Text>
+        </View>
+      );
+    });
+};
 
 const styles = StyleSheet.create({
   listStyle: {
