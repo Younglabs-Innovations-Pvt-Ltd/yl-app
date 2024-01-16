@@ -13,9 +13,9 @@ const NoBatchesModule = ({courseData}) => {
     <View className="flex-1 px-2">
       <View style={{paddingVertical: 16}} className="w-full">
         <Image
-          source={{uri: courseData.thumbnailUrl}}
+          source={require('../assets/images/contactUs.jpg')}
           resizeMode="cover"
-          className="w-full h-[200px] rounded"
+          className="w-full h-[250px] rounded"
         />
       </View>
       <Text

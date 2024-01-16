@@ -4,8 +4,14 @@ import {useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Input from '../CustomInputComponent';
 import {TextInput} from 'react-native-gesture-handler';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { Showtoast } from '../../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
+
+
 
 const RedeemPointsView = () => {
+  const toast = useToast()
   const {bgColor, textColors, colorYlMain, darkMode} = useSelector(
     state => state.appTheme,
   );
@@ -30,6 +36,11 @@ const RedeemPointsView = () => {
       color: '#9f109f',
     },
   ];
+
+  const copyToClipBoard = (string)=>{
+    Clipboard.setString(string);
+    Showtoast({text:"Referrel Code Copied Successfully", toast})
+  }
   return (
     <View className="flex-1 px-3 w-full pb-6">
       <Text
@@ -103,6 +114,7 @@ const RedeemPointsView = () => {
             name="content-copy"
             color={textColors.textSecondary}
             size={25}
+            onPress={()=>copyToClipBoard("this is Text")}
           />
         </View>
       </View>

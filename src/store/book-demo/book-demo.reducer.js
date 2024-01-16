@@ -13,9 +13,11 @@ const INITIAL_STATE = {
     bookingSlotsLoading: false,
     bookingLoading: false,
   },
-  selectedSlot:null,
-  childData:null,
+  selectedSlot: null,
+  childData: null,
   bookingCreatedSuccessfully: false,
+  selectedOneToOneDemoTime: '',
+  bookingFailReason: '',
 };
 
 // reducer
@@ -40,7 +42,7 @@ const reducer = {
   setIpDataLoadingState(state, action) {
     state.ipDataLoading = action.payload;
   },
-  setNewBookingStart(state , action) {
+  setNewBookingStart(state, action) {
     // console.log("in reducer", action.payload)
     state.loading.bookingLoading = true;
   },
@@ -65,15 +67,36 @@ const reducer = {
     state.loading.bookingSlotsLoading = false;
     state.bookingLoading = false;
   },
-  setSelectedSlot(state , action){
+  setSelectedSlot(state, action) {
     state.selectedSlot = action.payload;
   },
-  setChildData(state , action){
+  setChildData(state, action) {
     state.childData = action.payload;
   },
-  changebookingCreatedSuccessfully(state, action){
+  changebookingCreatedSuccessfully(state, action) {
     state.bookingCreatedSuccessfully = action.payload;
-  }
+  },
+  setSelectedOneToOneDemoTime(state, action) {
+    console.log('setting date in reducer', action.payload);
+    if (action.payload !== null) {
+      state.selectedOneToOneDemoTime = action.payload;
+    } else {
+      state.selectedOneToOneDemoTime = false;
+    }
+  },
+
+  setNewOneToOneBookingStart(state, action) {
+    state.loading.bookingLoading = true;
+  },
+  setOneToOneBookingSuccess(state, action) {
+    state.loading.bookingLoading = false;
+    state.bookingCreatedSuccessfully = true;
+  },
+  setOneToOneBookingFailed(state, action) {
+    state.loading.bookingLoading = false;
+    state.bookingCreatedSuccessfully = false;
+    state.bookingFailReason = action.payload;
+  },
 };
 
 // slice
@@ -99,7 +122,11 @@ export const {
   stopLoading,
   setSelectedSlot,
   setChildData,
-  changebookingCreatedSuccessfully
+  changebookingCreatedSuccessfully,
+  setSelectedOneToOneDemoTime,
+  setNewOneToOneBookingStart,
+  setOneToOneBookingSuccess,
+  setOneToOneBookingFailed,
 } = bookDemoSlice.actions;
 
 // reducer

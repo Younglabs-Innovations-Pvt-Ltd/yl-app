@@ -5,6 +5,9 @@ const INITIAL_STATE = {
   country: {callingCode: ''},
   modalVisible: false,
   message: '',
+  courses:[],
+  coursesLoading:false,
+  coursesLoadingFailed:false,
 };
 
 const reducer = {
@@ -34,6 +37,23 @@ const reducer = {
     state.loading = false;
     state.message = action.payload;
   },
+
+  getCoursesForWelcomeScreen(state , action) {
+    console.log("payload in reducer", action.payload);
+    state.coursesLoading = true;
+    state.coursesLoadingFailed = false;
+  },
+
+  getCoursesForWelcomeScreenFailed(state){
+    state.coursesLoading = false;
+    state.coursesLoadingFailed = true;
+  },
+  
+  getCoursesForWelcomeScreenSuccess(state , action){
+    state.courses = action.payload;
+    state.coursesLoading = false;
+  }
+
 };
 
 const slice = createSlice({
@@ -52,6 +72,9 @@ export const {
   fetchBookingStatusStart,
   fetchBookingStatusFailed,
   fetchBookingStatusSuccess,
+  getCoursesForWelcomeScreen,
+  getCoursesForWelcomeScreenFailed,
+  getCoursesForWelcomeScreenSuccess
 } = slice.actions;
 
 export const welcomeScreenReducer = slice.reducer;

@@ -10,6 +10,9 @@ import {
   setIsBookingLimitExceeded,
   stopLoading,
   changebookingCreatedSuccessfully,
+  setNewOneToOneBookingStart,
+  setOneToOneBookingSuccess,
+  setOneToOneBookingFailed,
 } from './book-demo.reducer';
 
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
@@ -118,11 +121,22 @@ function* startFetchingSlots() {
 function* startHandleNewBooking() {
   yield takeLatest(setNewBookingStart.type, handleNewBooking);
 }
+
+// Handle OneToOne Booking
+function* handleNewOneToOneBooking({payload}) {
+  console.log('payload is', payload);
+  yield put(setOneToOneBookingSuccess());
+}
+
+function* startHandleOneToOneBooking() {
+  yield takeLatest(setNewOneToOneBookingStart.type, handleNewOneToOneBooking);
+}
 // main saga
 export function* bookDemoSaga() {
   yield all([
     call(startFetchIpData),
     call(startFetchingSlots),
     call(startHandleNewBooking),
+    call(startHandleOneToOneBooking),
   ]);
 }

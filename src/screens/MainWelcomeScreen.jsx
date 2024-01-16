@@ -6,7 +6,6 @@ import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import Spacer from '../components/spacer.component';
 import MainSwiper from '../components/MainScreenComponents/MainSwiper';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
-import {FONTS} from '../utils/constants/fonts';
 import {COLORS} from '../utils/constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
@@ -17,7 +16,6 @@ import Animated, {
   withDelay,
 } from 'react-native-reanimated';
 import HeaderComponent from '../components/HeaderComponent';
-import {useNavigation} from '@react-navigation/native';
 import {
   setDemoData,
   startFetchBookingDetailsFromPhone,
@@ -28,9 +26,18 @@ import Demo from '../components/demo.component';
 import TapeTimer from '../components/TapeTimer';
 import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
 import BottomSheetComponent from '../components/BottomSheetComponent';
-import {AddChildModule} from '../components/HeaderComponent';
+import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
+import {welcomeScreenSelector} from '../store/welcome-screen/selector';
+import {getCoursesForWelcomeScreen} from '../store/welcome-screen/reducer';
+import {Button} from 'react-native-share';
+import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
+import RecordingCourseBanner from '../components/MainScreenComponents/RecordingCourseBanner';
+import SwiperSlide from '../components/MainScreenComponents/SwiperSlide';
+import {authSelector} from '../store/auth/selector';
 
 const {width, height} = Dimensions.get('window');
+
 const handwritingCourses = [
   {
     name: 'English Cursive',
@@ -71,55 +78,42 @@ const handwritingCourses = [
   },
 ];
 
-const englishLearningCourses = [
-  {
-    name: '12 Classes',
-    icon: 'google-classroom',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEng_Tuitions_5-14%2FthimbnailUrl.jpeg?alt=media&token=be2b7b32-311d-4951-8e47-61ab5fbfc529',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-  },
-  {
-    name: '36 Classes',
-    icon: 'google-classroom',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/course%20cover%20pictures%2Fmental.jpg?alt=media&token=856e6e8b-10c5-4cab-924b-a10e762c9c70',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-  },
-  {
-    name: '72 Classes',
-    icon: 'google-classroom',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-  },
-];
-
 const courseListHeadingStyle = 'text-[23px] capitalize font-bold';
 
 const swiperData = [
   {
     name: 'Banner 1',
-    courseName: 'English Handwriting',
-    description:
-      'Handwriting improvement tutoring and fine motor skills practice for children who face problems with handwriting',
-    bg: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
+    coverImage:
+      'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
     type: 'course',
     screenRedirectButton: '',
+    age_max: 14,
+    age_min: 5,
+    alternativeNameOnApp: 'English Handwriting',
+    courseAvailable: true,
+    courseAvailableType: 'both',
+    coverPicture:
+      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
+    demoAvailable: true,
+    demoAvailableType: 'both',
+    duration_minutes: 60,
+    id: 'Eng_Hw',
+    live_classes: 24,
+    subheading:
+      'Handwriting improvement tutoring and fine motor skills practice for children who face problems with handwriting.',
+    title: 'English Cursive Handwriting Course',
   },
 ];
 
 const phoneNum = 7668983758;
 
 const MainWelcomeScreen = ({navigation}) => {
+  const {customer} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimeover, setIsTimeover] = useState(false);
   const [showAddChildView, setShowAddChildView] = useState(false);
-
+  const [refreshCourses, setRefreshCourses] = useState({});
   const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
     useSelector(state => state.appTheme);
   const dispatch = useDispatch();
@@ -134,6 +128,26 @@ const MainWelcomeScreen = ({navigation}) => {
     isAttendenceMarked,
     bookingTime,
   } = useSelector(joinDemoSelector);
+
+  const {ipData} = useSelector(bookDemoSelector);
+
+  const {courses, coursesLoading, coursesLoadingFailed} = useSelector(
+    welcomeScreenSelector,
+  );
+
+  // console.log('course are ', courses[0]);
+
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData]);
+
+  useEffect(() => {
+    dispatch(
+      getCoursesForWelcomeScreen({country: ipData?.country_name || 'behrin'}),
+    );
+  }, [refreshCourses, ipData]);
 
   useEffect(() => {
     console.log('Getting booking Details');
@@ -177,7 +191,6 @@ const MainWelcomeScreen = ({navigation}) => {
     console.log('isDemoOver', isDemoOver);
 
     if (isDemoOver && isAttended && teamUrl) {
-      console.log('post action true');
       setShowPostActions(true);
     } else {
       setShowPostActions(false);
@@ -217,21 +230,24 @@ const MainWelcomeScreen = ({navigation}) => {
       />
 
       <ScrollView
-        className="px-2"
+        className="px-2 py-1"
         style={{
           flex: 1,
           width: width,
         }}
         contentContainerStyle={{alignItems: 'center'}}>
-        {!showPostActions && <View
-          className="rounded-md w-full my-1"
-          style={{backgroundColor: colorYlMain}}>
-          <Demo
-            timeLeft={timeLeft}
-            isTimeover={isTimeover}
-            showPostActions={showPostActions}
-          />
-        </View>}
+        {!showPostActions && (timeLeft || isTimeover) && (
+          <View
+            className="rounded-md w-full my-1"
+            style={{backgroundColor: colorYlMain}}>
+            <Demo
+              timeLeft={timeLeft}
+              isTimeover={isTimeover}
+              showPostActions={showPostActions}
+            />
+          </View>
+        )}
+
         {/* <TapeTimer timeLeft={timeLeft} isTimeover={isTimeover} /> */}
 
         <SwiperFlatList
@@ -256,7 +272,9 @@ const MainWelcomeScreen = ({navigation}) => {
             },
           ]}
           contentContainerStyle={{overflow: 'hidden'}}
-          renderItem={item => <SwiperSlide item={item.item} />}
+          renderItem={item => (
+            <SwiperSlide item={item.item} navigation={navigation} />
+          )}
         />
 
         {/* Post demo Actions here */}
@@ -285,6 +303,7 @@ const MainWelcomeScreen = ({navigation}) => {
               onPress={() => {
                 navigation.navigate('AllCoursesScreen', {
                   courses: handwritingCourses,
+                  heading: 'Handwriting Improvement',
                 });
               }}>
               <Text className="font-semibold" style={{color: COLORS.pblue}}>
@@ -295,7 +314,7 @@ const MainWelcomeScreen = ({navigation}) => {
           </View>
 
           <FlatList
-            data={handwritingCourses}
+            data={courses}
             keyExtractor={item => item.name}
             renderItem={item => {
               return (
@@ -313,7 +332,7 @@ const MainWelcomeScreen = ({navigation}) => {
         </View>
 
         {/* English Learning courses here */}
-        <Spacer space={0} />
+        {/* <Spacer space={0} />
         <View style={tw`gap-[0px]  w-full py-1`}>
           <View style={tw`gap-1 pl-2 pr-3 flex-row items-center`}>
             <Text
@@ -349,14 +368,14 @@ const MainWelcomeScreen = ({navigation}) => {
             style={tw`pt-1 `}
             className="h-[auto]"
           />
-        </View>
+        </View> */}
 
         <Spacer space={8} />
         <View
           style={[
             tw`w-[100%] flex-row gap-2 items-center rounded-lg justify-center items-center`,
           ]}>
-          <RecordingCourseBanner />
+          <RecordingCourseBanner navigation={navigation} />
         </View>
 
         <Spacer space={16} />
@@ -366,7 +385,7 @@ const MainWelcomeScreen = ({navigation}) => {
         isOpen={showAddChildView}
         onClose={() => setShowAddChildView(false)}
         Children={AddChildModule}
-        snapPoint={['30%' , '50%']}
+        snapPoint={customer == 'yes' ? ['25%', '50%'] : ['50%', '90%']}
       />
     </View>
   );
@@ -389,7 +408,7 @@ const CourseItemRender = ({data, navigation}) => {
           <ImageBackground
             source={{
               uri:
-                data.thumbnailUrl ||
+                data.coverPicture ||
                 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEng_Tuitions_5-14%2FthimbnailUrl.jpeg?alt=media&token=be2b7b32-311d-4951-8e47-61ab5fbfc529',
             }}
             style={[
@@ -404,7 +423,7 @@ const CourseItemRender = ({data, navigation}) => {
             >
               <View style={tw`h-[20%] justify-center items-center`}></View>
               <View style={tw`h-[80%] items-start justify-end p-1 `}>
-                {data.name.split(' ').map((item, index) => {
+                {data?.alternativeNameOnApp?.split(' ').map((item, index) => {
                   return (
                     <Text
                       key={index}
@@ -419,166 +438,6 @@ const CourseItemRender = ({data, navigation}) => {
           </ImageBackground>
         </View>
       </Pressable>
-    </>
-  );
-};
-
-const SwiperSlide = ({item}) => {
-  const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
-    state => state.appTheme,
-  );
-  const marginBottom = useSharedValue(0);
-  const opacity = useSharedValue(0);
-
-  const animate = () => {
-    marginBottom.value = withDelay(500, withSpring(20));
-    opacity.value = withDelay(500, withSpring(1));
-  };
-  animate();
-
-  return (
-    <View
-      style={[tw`h-full flex justify-center  items-center`, {width: width}]}>
-      <View style={[tw`rounded-md h-[100%] w-[95%]`, , {overflow: 'hidden'}]}>
-        <ImageBackground
-          source={{
-            uri: item.bg,
-          }}
-          style={[
-            tw`w-[100%] rounded h-full justify-center items-center`,
-            {flex: 1},
-          ]}
-          resizeMode="cover">
-          <LinearGradient
-            colors={['#00000014', '#000000db']}
-            className="w-full"
-            start={{x: 0.5, y: 0.1}}>
-            <View
-              style={[
-                tw`w-full h-full justify-end items-start p-2
-            `,
-              ]}>
-              <Animated.View
-                style={{marginBottom: marginBottom, opacity: opacity}}>
-                <Text className="text-[32px] text-white font-[500]">
-                  {item.courseName}
-                </Text>
-                <Text className="text-[16px] text-gray-300">
-                  {item.description}
-                </Text>
-                <View className="flex-row gap-2 mt-1 justify-center">
-                  <Pressable
-                    className="flex-row rounded-full py-2 px-3 justify-center items-center mt-3 border"
-                    style={{borderColor: textColors.textYlMain}}>
-                    {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-                    <Text
-                      className="text-base font-semibold"
-                      style={{color: textColors.textYlMain}}>
-                      Talk with us
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    className="flex-row rounded-full py-2 px-3 justify-center items-center mt-3 border"
-                    style={{borderColor: textColors.textYlMain}}>
-                    {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-                    <Text
-                      className="text-base font-semibold"
-                      style={{color: textColors.textYlMain}}>
-                      Buy Course
-                    </Text>
-                  </Pressable>
-                </View>
-              </Animated.View>
-            </View>
-          </LinearGradient>
-        </ImageBackground>
-      </View>
-    </View>
-  );
-};
-
-const RecordingCourseBanner = () => {
-  const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
-  const courseFeatures = [
-    {
-      label: 'Total 12 High quality Recorded Lectures',
-    },
-    {
-      label: 'Submit and get Review for daily Homework',
-    },
-    {
-      label: 'Get Worksheet to solve after every classs',
-    },
-    {
-      label: 'Download and watch Lectures offline anywhere anytime',
-    },
-  ];
-  return (
-    <>
-      <View
-        style={[
-          tw`flex-col items-center w-[100%] rounded h-[98%]`,
-          {overflow: 'hidden', backgroundColor: textColors.textYlBlue},
-        ]}>
-        <View
-          style={[
-            tw`flex-row justify-between w-[100%] items-center rounded-md p-1 py-3 pb-5`,
-            ,
-          ]}>
-          <View style={[tw`w-[80%]  pl-2`]}>
-            <Text style={tw`font-bold text-[22px] text-white`}>
-              Learn at your pace with our personalized recorded course
-            </Text>
-            <Text
-              style={[
-                tw`text-[20px] text-white w-full justify-center items-center`,
-                {flexWrap: 'wrap', fontFamily: FONTS.dancing_script},
-              ]}>
-              Buy now at just{' '}
-              <Text
-                style={tw`text-[#F35C19] text-[18px] font-bold transform:rotate(15deg)`}>
-                ₹499
-              </Text>
-            </Text>
-          </View>
-
-          <View className="justify-center items-center w-[20%]">
-            <MIcon name="video-vintage" size={50} color="white" />
-          </View>
-          {/* <Image
-            source={require('../assets/images/bg-removebg-preview.png')}
-            style={[tw`h-[120px] w-[35%]`, {resizeMode: 'cover'}]}
-          /> */}
-        </View>
-
-        {/* <View style={tw`w-full flex-col px-4 mt-4`}>
-          <Text style={[tw`text-[24px] font-bold text-gray-600 text-center`,{fontFamily:FONTS.gelasio_semibold}]}>
-            Course Features
-          </Text>
-          <View style={tw`flex-col gap-1 items-start mt-2`}>
-            {courseFeatures?.map(item => {
-              return (
-                <View
-                  key={item.label}
-                  style={tw`flex-row items-center justify-start w-full wrap mt-1`}>
-                  <MIcon
-                    name="check-underline"
-                    size={20}
-                    style={tw`w-[10%] items-center text-gray-700`}
-                  />
-                  <Text style={[tw`text-gray-500 text-[14px] flex flex-wrap`]}>{item.label}</Text>
-                </View>
-              );
-            })}
-
-            <View style={tw`flex-row justify-center items-center w-full mt-3`}>
-                <TouchableHighlight style={tw`bg-blue-500 w-full items-center rounded py-3 px-3`}> 
-                  <Text style={tw`text-white font-base font-semibold`}>Checkout Course</Text>
-                </TouchableHighlight>
-            </View>
-          </View>
-        </View> */}
-      </View>
     </>
   );
 };

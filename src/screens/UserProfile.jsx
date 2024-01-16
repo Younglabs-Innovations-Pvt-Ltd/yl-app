@@ -19,6 +19,7 @@ import Animated, {
 import LinearGradient from 'react-native-linear-gradient';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import RedeemPointsView from '../components/UserProfileComponents/RedeemPointsView';
+import MyTicketsView from './MyTicketsView';
 
 const {width, height} = Dimensions.get('window');
 
@@ -222,15 +223,7 @@ const MyTransactionsView = () => {
   );
 };
 
-const MyTicketsView = () => {
-  return (
-    <>
-      <View className="flex-1 items-center">
-        <Text>MyTicketsView</Text>
-      </View>
-    </>
-  );
-};
+
 
 const CourseItemShow = ({data, navigation}) => {
   //   console.log('we have data', data);

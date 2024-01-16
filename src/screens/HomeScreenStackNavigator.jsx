@@ -9,12 +9,28 @@ import MainWelcomeScreen from './MainWelcomeScreen';
 import CourseDetailsScreen from './CourseDetailScreen';
 import ViewAllCourses from './ViewAllCourses';
 import UserProfile from './UserProfile';
+import {useSelector} from 'react-redux';
 
 const Stack = createStackNavigator();
 const HomeScreenStackNavigator = () => {
+  const {bgColor, textColors} = useSelector(state => state.appTheme);
   return (
     <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="MainWelcomeScreen">
+      <Stack.Navigator
+        initialRouteName="MainWelcomeScreen"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: bgColor,
+            borderBottomWidth:1,
+            borderColor:textColors.textSecondary,
+            elevation:1.12,          
+          },
+          headerTintColor: textColors.textSecondary,
+          headerTitleStyle: {
+            fontWeight: '500',
+            fontSize:18
+          },
+        }}>
         <Stack.Screen
           name="MainWelcomeScreen"
           component={MainWelcomeScreen}
@@ -28,7 +44,9 @@ const HomeScreenStackNavigator = () => {
         <Stack.Screen
           name="AllCoursesScreen"
           component={ViewAllCourses}
-          options={{headerShown: false}}
+          options={({route}) => ({
+            title: route.params.heading || 'All Courses',
+          })}
         />
         <Stack.Screen
           name="UserProfileScreen"

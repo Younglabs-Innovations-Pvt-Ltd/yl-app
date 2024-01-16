@@ -8,13 +8,13 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import {COLORS} from '../utils/constants/colors';
-
+import CheckBox from '@react-native-community/checkbox';
 import Input from '../components/CustomInputComponent';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
-
 import {Dropdown, DropdownList} from '../components/dropdown.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {useDispatch, useSelector} from 'react-redux';
@@ -26,9 +26,13 @@ import {
   changebookingCreatedSuccessfully,
   setChildData,
   setNewBookingStart,
+  setNewOneToOneBookingStart,
 } from '../store/book-demo/book-demo.reducer';
 import {current} from '@reduxjs/toolkit';
 import DropdownComponent from '../components/DropdownComponent';
+import OneToOneDemoBook from '../components/demoComponents/OneToOneDemoBook';
+import {Showtoast} from '../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -52,7 +56,14 @@ const bookingSteps = [
   },
 ];
 
-const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
+const BookDemoScreen = ({
+  data,
+  navigation,
+  courseId,
+  setSelectedTab,
+  demoAvailableType,
+}) => {
+  const toast = useToast();
   const {phone, country} = data;
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
@@ -60,10 +71,10 @@ const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
   const [fields, setFields] = useState(INITIAL_sTATE);
   const [currentStep, setCurrentStep] = useState(1);
   const [isCurrentStepDataFilled, setIsCurrentStepDataFilled] = useState(false);
+  const [selectedDemoType, setSelectedDemoType] = useState('solo');
   const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
     state => state.appTheme,
   );
-  console.log('chlild age is', childAge);
   const {
     timezone,
     selectedSlot,
@@ -71,35 +82,62 @@ const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
     childData,
     bookingCreatedSuccessfully,
     loading,
+    selectedOneToOneDemoTime,
+    place,
   } = useSelector(bookDemoSelector);
 
   // console.log("ChildData is", childData)
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (fields.childName && fields.parentName) {
-      console.log('Changing 2');
-      setCurrentStep(2);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (fields.childName && fields.parentName) {
+  //     console.log('Changing 2');
+  //     setCurrentStep(2);
+  //   }
+  // }, []);
 
   useEffect(() => {
     setIsCurrentStepDataFilled(false);
   }, [currentStep]);
 
-  useEffect(() => {
-    if (currentStep === 1) {
-      if (fields.childName && fields.parentName) {
-        setIsCurrentStepDataFilled(true);
-      }
-    } else if (currentStep === 2) {
-      if (selectedSlot) {
-        setIsCurrentStepDataFilled(true);
-      }
-    }
-  }, [fields, selectedSlot]);
+  // useEffect(() => {
+  //   console.log('running useEffect');
+  //   if (currentStep === 1) {
+  //     if (fields.childName.length > 2 && fields.parentName.length > 2) {
+  //       setIsCurrentStepDataFilled(true);
+  //     } else {
+  //       setIsCurrentStepDataFilled(false);
+  //     }
+  //   } else if (currentStep === 2) {
+  //     if (selectedDemoType === 'solo') {
+  //       if (
+  //         selectedOneToOneDemoTime &&
+  //         selectedOneToOneDemoTime !== '' &&
+  //         selectedOneToOneDemoTime !== undefined &&
+  //         selectedOneToOneDemoTime !== 'undefined'
+  //       ) {
+  //         console.log('condition running', selectedOneToOneDemoTime);
+  //         setIsCurrentStepDataFilled(true);
+  //         return;
+  //       } else {
+  //         setIsCurrentStepDataFilled(false);
+  //       }
+  //     }
 
-  console.log('Current Step is', currentStep);
+  //     if (selectedDemoType === 'group' && selectedSlot) {
+  //       setIsCurrentStepDataFilled(true);
+  //     }
+  //   }
+  // }, [
+  //   fields,
+  //   selectedSlot,
+  //   selectedDemoType,
+  //   selectedOneToOneDemoTime,
+  //   currentStep,
+  //   dispatch,
+  // ]);
+
+  // console.log('Current Step is', currentStep);
   /**
    * Check if any field is not empty
    */
@@ -144,9 +182,55 @@ const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
     },
   ];
 
+  const checkFirstStepData = () => {
+    console.log(
+      'childName: ' + fields.childName,
+      'parentname',
+      fields.parentName,
+      ' childAge',
+      childAge,
+    );
+    if (!fields?.childName?.length || fields?.childName?.length < 3) {
+      Showtoast({text: 'Enter Valid Child name', toast});
+      return false;
+    } else if (!fields?.parentName?.length || fields?.parentName?.length < 3) {
+      Showtoast({text: 'Enter Valid Parent name', toast});
+      return false;
+    } else if (!childAge) {
+      Showtoast({text: 'Please Select Child age', toast});
+      console.log('childAge: ', childAge);
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const checkSecondStepData = () => {
+    if (selectedDemoType === 'solo') {
+      if (
+        selectedOneToOneDemoTime &&
+        selectedOneToOneDemoTime !== '' &&
+        selectedOneToOneDemoTime !== undefined &&
+        selectedOneToOneDemoTime !== 'undefined'
+      ) {
+        console.log('condition running', selectedOneToOneDemoTime);
+        return true;
+      } else {
+        Showtoast({text: 'Please Select Date', toast});
+        return false;
+      }
+    }
+
+    if (selectedDemoType === 'group' && selectedSlot) {
+      return true;
+    }
+  };
+
   const handleNextBtnClick = () => {
     if (currentStep === 1) {
-      console.log('Changing 3');
+      if (!checkFirstStepData()) {
+        return;
+      }
       setCurrentStep(currentStep + 1);
       dispatch(
         setChildData({
@@ -156,6 +240,13 @@ const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
         }),
       );
     } else if (currentStep === 2) {
+      if (!checkSecondStepData()) {
+        return;
+      }
+      if (selectedDemoType === 'solo') {
+        handleBookOneToOneDemo();
+        return;
+      }
       // dispatch(changebookingCreatedSuccessfully(true));
       handleBookNow();
     } else {
@@ -207,49 +298,148 @@ const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
     dispatch(setNewBookingStart({data: bodyData}));
   };
 
+  const handleBookOneToOneDemo = () => {
+    let body = {
+      name: fields.parentName,
+      childAge,
+      phone,
+      childName: fields.childName,
+      timeZone: timezone,
+      demoDate: selectedOneToOneDemoTime,
+      bookingType: 'direct',
+      source: 'app',
+      course: courseId,
+      digits: 'na',
+      country: ipData.country_name.toUpperCase(),
+      countryCode: ipData.calling_code,
+    };
+
+    dispatch(setNewOneToOneBookingStart(body));
+  };
+
+  // console.log('selectedOneToOneDemoTime in form is', selectedOneToOneDemoTime);
+
+  const stepPress = step => {
+    console.log('step pressed', step);
+
+    if (currentStep == 2) {
+      if (step?.step == 1) {
+        setCurrentStep(1);
+      }
+    }
+    return;
+  };
+
+  const resetForm = () => {
+    setCurrentStep(1);
+    dispatch(setChildData(null));
+  };
+
+  const {width, height} = Dimensions.get('window');
+
   return (
-    <View className="flex-1 items-center justify-center">
+    <View
+      className="flex-1 items-center justify-center w-full h-full"
+      style={{height: height-190}}>
       <View
-        className="w-full flex-1 rounded-lg items-center overflow-hidden"
+        className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]"
         // style={{backgroundColor: darkMode ? bgSecondaryColor : '#b0b6ef30'}}
       >
         <Text
-          className={`text-2xl font-bold text-center w-full mt-3 p-2 justify-center`}
-          style={{backgroundColor: textColors.textYlMain, color: 'white'}}>
+          className={`text-2xl font-bold text-center w-full p-2 justify-center`}
+          // style={{backgroundColor: textColors.textYlMain, color: 'white'}}
+          style={{color: textColors.textYlMain}}>
           Book free Handwriting Class
         </Text>
 
-        {/* <ScrollView
-          className="flex-1"
-          contentContainerStyle={{alignItems: 'center', paddingVertical: 10}}> */}
-        <View className="flex-row py-2 gap-2 w-[100%] justify-around ">
-          {bookingSteps?.map((step, i) => {
-            return (
-              <View
-                className="flex gap-1 flex-row items-center w-[30%]"
-                key={i}>
-                <View
-                  className="h-5 w-5 items-center justify-center"
-                  style={[
-                    {borderRadius: 50},
-                    currentStep === step.step
-                      ? {backgroundColor: textColors.textYlMain}
-                      : {backgroundColor: 'gray'},
-                  ]}>
-                  <Text className="text-white">{step?.step}</Text>
-                </View>
-                <Text
-                  className="flex-wrap w-[80%] font-semibold text-[12px]"
-                  style={
-                    currentStep === step.step
-                      ? {color: textColors.textYlMain}
-                      : {color: textColors.textSecondary}
-                  }>
-                  {step.label}
-                </Text>
-              </View>
-            );
-          })}
+        <View
+          className="p-2 my-2 w-full items-start rounded-md"
+          style={{backgroundColor: bgSecondaryColor}}>
+          <View className="flex-row items-center">
+            <CheckBox
+              disabled={false}
+              value={selectedDemoType === 'group'}
+              tintColors={{
+                true: textColors.textYlMain,
+                false: textColors.textSecondary,
+              }}
+              onValueChange={() => setSelectedDemoType('group')}
+            />
+            <View className="flex-row flex-1 flex-wrap items-center ">
+              <Text
+                className={`font-semibold text-[12px]`}
+                style={{color: textColors.textSecondary}}>
+                Group Demo:
+              </Text>
+              <Text
+                className="text-[12px] "
+                style={{color: textColors.textSecondary}}>
+                Demo conducted with a group of 5-10 Students
+              </Text>
+            </View>
+          </View>
+          <View className="flex-row items-center">
+            <CheckBox
+              disabled={false}
+              value={selectedDemoType === 'solo'}
+              tintColors={{
+                true: textColors.textYlMain,
+                false: textColors.textSecondary,
+              }}
+              onValueChange={() => setSelectedDemoType('solo')}
+            />
+            <View className="flex-row flex-1 flex-wrap items-center ">
+              <Text
+                className={`font-semibold text-[12px]`}
+                style={{color: textColors.textSecondary}}>
+                One To One Demo:
+              </Text>
+              <Text
+                className="text-[12px] "
+                style={{color: textColors.textSecondary}}>
+                Demo conducted 1-1 only
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="w-full py-2 items-center">
+          <Text className="text-[17px] font-semibold text-start w-full">
+            Steps To Book
+          </Text>
+          <View className="flex-row py-2  w-[100%] justify-between ">
+            {bookingSteps?.map((step, i) => {
+              return (
+                <Pressable className="flex flex-row items-center w-[32%]">
+                  <View
+                    className="flex flex-row items-center gap-1 w-full"
+                    key={i}>
+                    <View
+                      className="h-6 w-6 items-center justify-center"
+                      style={[
+                        {borderRadius: 50},
+                        currentStep === step.step
+                          ? {backgroundColor: textColors.textYlMain}
+                          : {backgroundColor: 'gray'},
+                      ]}>
+                      <Text className="text-white text-center w-full">
+                        {step?.step}
+                      </Text>
+                    </View>
+                    <Text
+                      className="flex-wrap w-[80%] font-semibold text-[12px]"
+                      style={
+                        currentStep === step.step
+                          ? {color: textColors.textYlMain}
+                          : {color: textColors.textSecondary}
+                      }>
+                      {step.label}
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
 
         <View className="w-[95%] items-center">
@@ -262,11 +452,21 @@ const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
               handleChildAge={handleChildAge}
             />
           ) : currentStep === 2 ? (
-            <BookDemoSlots
-              navigation={navigation}
-              formData={{...fields, phone, childAge: 7}}
-              courseId={courseId}
-            />
+            selectedDemoType === 'solo' ? (
+              <OneToOneDemoBook
+                navigation={navigation}
+                formData={{...fields, phone, childAge}}
+                courseId={courseId}
+                selectedDemoType={selectedDemoType}
+              />
+            ) : (
+              <BookDemoSlots
+                navigation={navigation}
+                formData={{...fields, phone, childAge}}
+                courseId={courseId}
+                selectedDemoType={selectedDemoType}
+              />
+            )
           ) : currentStep === 3 ? (
             <ThirdStpDetails
               navigation={navigation}
@@ -279,24 +479,27 @@ const BookDemoScreen = ({data, navigation, courseId, setSelectedTab}) => {
         </View>
 
         {currentStep !== 3 && (
-          <View className="flex-row justify-around p-3  w-full items-center">
+          <View className="flex-row justify-around p-1 absolute bottom-0 w-full items-center h-[70px]">
             <Pressable
-              className="rounded-full w-[45%] items-center mt-3"
-              style={{backgroundColor: textColors.textYlGreen}}>
-              <Text className="text-white text-xl p-2">Reset</Text>
+              className="rounded-full w-[45%] items-center border"
+              style={{borderColor: textColors.textYlMain}}
+              onPress={resetForm}>
+              <Text
+                className="text-xl p-2"
+                style={{color: textColors.textYlMain}}>
+                Reset
+              </Text>
             </Pressable>
 
             <TouchableOpacity
-              className="rounded-full w-[45%] items-center mt-3"
+              className="rounded-full w-[45%] items-center"
               style={{
-                backgroundColor: isCurrentStepDataFilled
-                  ? textColors.textYlOrange
-                  : '#dc9f64',
+                backgroundColor: textColors.textYlMain,
               }}
-              disabled={!isCurrentStepDataFilled}
-              onPress={handleNextBtnClick}>
-              <Text className="text-white text-xl p-2">Next </Text>
-              {console.log('booking loading', loading?.bookingLoading)}
+              // disabled={!isCurrentStepDataFilled}
+              onPress={() => handleNextBtnClick()}>
+              <Text className="text-white text-xl p-2">Next</Text>
+              {/* {console.log('booking loading', loading?.bookingLoading)} */}
               {loading?.bookingLoading && (
                 <ActivityIndicator size="small" color="white" />
               )}
@@ -320,8 +523,6 @@ const FirstStepDetails = ({
   const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
     state => state.appTheme,
   );
-  const [childName, setChildName] = useState('');
-  const [parentName, setParentName] = useState('');
 
   const ageArray = [
     {label: '5', value: 5},
@@ -444,7 +645,11 @@ const FirstStepDetails = ({
       <View className="relative w-[100%] border border-gray-400 mt-4 rounded-[10px] py-3 flex-row justify-between px-2 items-center">
         <Text
           className="absolute py-1 px-1 -top-3 left-5"
-          style={{backgroundColor: bgColor, color: textColors.textSecondary , fontSize:14}}>
+          style={{
+            backgroundColor: bgColor,
+            color: textColors.textSecondary,
+            fontSize: 14,
+          }}>
           Your Phone Number
         </Text>
         <Text className="text-[17px]" style={{color: textColors.textPrimary}}>
@@ -457,20 +662,20 @@ const FirstStepDetails = ({
       <Input
         placeHolder="Enter Your Child Name"
         setValue={e => {
-          handleChangeValue({name: 'childName', value: e}), setChildName(e);
+          handleChangeValue({name: 'childName', value: e});
         }}
-        value={childName}
+        value={fields.childName}
       />
       <View className="my-1"></View>
 
       <Input
         placeHolder="Enter Parent Name"
         setValue={e => {
-          handleChangeValue({name: 'parentName', value: e}), setParentName(e);
+          handleChangeValue({name: 'parentName', value: e});
         }}
-        value={parentName}
+        value={fields.parentName}
       />
-        
+
       <DropdownComponent
         data={ageArray}
         placeHolder="Select Child Age"
@@ -494,6 +699,7 @@ const ThirdStpDetails = ({navigation, setCurrentStep, setSelectedTab}) => {
     console.log('Changing 5');
     setCurrentStep(1);
   };
+
   return (
     <>
       <View className="flex-col  items-center mt-5 p-3 py-4">

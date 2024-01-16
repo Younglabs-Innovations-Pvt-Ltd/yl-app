@@ -38,8 +38,7 @@ import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
-const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
+const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoType}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
@@ -55,7 +54,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
     popup,
     loading: {bookingSlotsLoading, bookingLoading},
     bookingCreatedSuccessfully,
-    childData
+    childData,
   } = useSelector(bookDemoSelector);
 
   // console.log('Booking Slots are', bookingSlots);
@@ -89,7 +88,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
       type: 'website',
     };
 
-    if(bookingSlots){
+    if (bookingSlots.length < 1) {
       dispatch(startFetchingBookingSlots(body));
     }
   }, [timezone]);
@@ -195,6 +194,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
           ]}
           key={slot.showDate}
           onPress={() => handleCurrentSlotDate(slot.showDate)}>
+            {console.log("showdate is", slot.showDate)}
           <TextWrapper
             color={
               currentSlotDate === slot.showDate ? COLORS.white : COLORS.black
@@ -234,6 +234,37 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
     });
   }, [slotsTime, currentSlotDate, currentSlotTime]);
 
+
+
+  const NoDemoSlotsScreen = () => {
+    const {textColors} = useSelector(state => state.appTheme);
+  
+    return (
+      <View className="w-full mt-4 items-center pb-4">
+        <View className="items-center w-[95%]">
+          <Text
+            className="text-center w-full text-2xl font-bold"
+            style={{color: textColors.textPrimary}}>
+            No Demo Slots Created
+          </Text>
+          <Text
+            className="text-center w-full text-base"
+            style={{color: textColors.textSecondary}}>
+            Contact with us on Whatsapp to book your free class.
+          </Text>
+        </View>
+        <View className="flex-row justify-around">
+          <Pressable
+            className="flex-row w-[90%] rounded py-2 justify-center items-center mt-3"
+            style={{backgroundColor: textColors.textYlGreen}}>
+            <MIcon name="whatsapp" size={30} color="white" />
+            <Text className="text-white text-base">Whatsapp us</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  };
+
   if (!isConnected) {
     Alert.alert(
       '',
@@ -260,15 +291,21 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
     <Spinner style={{alignSelf: 'center'}} />
   ) : bookingSlots && bookingSlots.length > 0 ? (
     <>
-      <View style={[{}]} className="flex-1 w-full px-2 mt-5">
+    {console.log("i am here")}
+      <View className=" w-full px-2 mt-5">
         <View className="p-1 bg-gray-300 rounded-md my-3">
-          <Text className="text-gray-700 ml-3">Booking Free class for <Text className="font-semibold">{childData?.childName}</Text></Text>
+          <Text className="text-gray-700 ml-3 ">
+            Booking Free class for{' '}
+            <Text className="font-semibold">{childData?.childName}</Text>
+          </Text>
         </View>
         <View style={styles.slotsWrapper}>
           <TextWrapper fs={20} color={textColors.textPrimary} fw="bold">
             Select date:
           </TextWrapper>
-          <View style={styles.slotDateList}>{SLOT_DATES}</View>
+          <View style={styles.slotDateList}>
+            {SLOT_DATES}
+            </View>
         </View>
 
         <Spacer />
@@ -289,7 +326,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
                   <Icon name="close-outline" size={24} color={COLORS.black} />
                 </Pressable>
               </View>
-              <TextWrapper color={COLORS.black}>
+              <TextWrapper color={COLORS.black} className="text-center text-xl font-semibold w-full">
                 Your booking limit exceeded, Contact us to book again.
               </TextWrapper>
               <Spacer space={16} />
@@ -310,7 +347,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId}) => {
       </View>
       <View style={styles.footer}></View>
       {/* show popup */}
-      {popup && <Popup onHandlePopup={handlePopup} onClose={onClose} />}
+      {/* {popup && <Popup onHandlePopup={handlePopup} onClose={onClose} />} */}
       {/* Loading spinner */}
       <Modal visible={bookingLoading}>
         <Center bg="rgba(0,0,0,0.2)">
@@ -361,32 +398,7 @@ const Popup = ({onHandlePopup, popup, onClose}) => {
   );
 };
 
-const NoDemoSlotsScreen = () => {
-  const {textColors} = useSelector(state => state.appTheme);
 
-  return (
-    <View className="w-full mt-4 items-center">
-      <View className="items-center w-[95%]">
-        <Text
-          className="text-center w-full text-2xl font-bold"
-          style={{color: textColors.textPrimary}}>
-          No Demo Slots Created
-        </Text>
-        <Text
-          className="text-center w-full text-base"
-          style={{color: textColors.textSecondary}}>
-          Contact with us on Whatsapp to book your free class.
-        </Text>
-      </View>
-      <View className="flex-row justify-around">
-          <Pressable className="flex-row w-[90%] rounded py-2 justify-center items-center mt-3" style={{backgroundColor:textColors.textYlGreen}}>
-            <MIcon name="whatsapp" size={30} color="white"/>
-            <Text className="text-white text-base">Whatsapp us</Text>
-          </Pressable>
-        </View>
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {

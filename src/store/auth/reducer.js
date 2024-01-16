@@ -9,6 +9,10 @@ const INITIAL_STATE = {
   confirm: null,
   email: '',
   user: null,
+  customer:"no",
+  childName:"Rahul Singh",
+  childAge:8,
+  credits:980
 };
 
 const reducers = {

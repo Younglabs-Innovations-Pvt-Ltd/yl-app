@@ -8,6 +8,7 @@ import CustomDrawerContent from '../components/custom-drawer.component';
 
 import {COLORS} from '../utils/constants/colors';
 import HomeScreenStackNavigator from './HomeScreenStackNavigator';
+import MainWelcomeScreen from './MainWelcomeScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -22,7 +23,7 @@ const DrawerScreen = () => {
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen
         name="Home"
-        component={HomeScreenStackNavigator}
+        component={MainWelcomeScreen}
         options={{sceneContainerStyle: {backgroundColor: COLORS.white}}}
       />
       {/* <Drawer.Screen

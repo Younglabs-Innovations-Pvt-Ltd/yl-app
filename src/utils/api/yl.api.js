@@ -272,3 +272,5 @@ export const getCourseVideo = async ({courseId}) => {
     body: JSON.stringify({courseId}),
   });
 };
+
+

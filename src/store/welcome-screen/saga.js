@@ -4,10 +4,14 @@ import {
   fetchBookingStatusFailed,
   fetchBookingStatusSuccess,
   setErrorMessage,
+  getCoursesForWelcomeScreen,
   setLoading,
+  getCoursesForLoadingScreenFailed,
+  getCoursesForWelcomeScreenSuccess,
 } from './reducer';
 
 import {fetchBookingDetailsFromPhone} from '../../utils/api/yl.api';
+import {fetchCoursesForWelcomeScreen} from '../../utils/api/welcome.screen.apis';
 import {isValidNumber} from '../../utils/isValidNumber';
 
 import {navigate, replace} from '../../navigationRef';
@@ -40,7 +44,7 @@ function* handleBookingStatus({payload: {phone, country}}) {
   try {
     // Check for length of a phone number according to country
     // Return true or false
-    const isValidPhone = isValidNumber(phone, "IN");
+    const isValidPhone = isValidNumber(phone, 'IN');
 
     if (!isValidPhone) {
       yield put(setErrorMessage('Please enter a valid number'));
@@ -87,7 +91,25 @@ function* startBookingStatus() {
   yield takeLatest(fetchBookingStatusStart.type, handleBookingStatus);
 }
 
+function* startFetchingCoursesForLandingPage({payload}) {
+  try {
+    const country = payload.country;
+    const res = yield fetchCoursesForWelcomeScreen(country);
+    const data = yield res.json();
+    yield put(getCoursesForWelcomeScreenSuccess(data));
+  } catch (error) {
+    yield put(getCoursesForLoadingScreenFailed());
+  }
+}
+
+function* fetchingCourses() {
+  yield takeLatest(
+    getCoursesForWelcomeScreen.type,
+    startFetchingCoursesForLandingPage,
+  );
+}
+
 // Main saga
 export function* welcomeScreenSagas() {
-  yield all([call(startBookingStatus)]);
+  yield all([call(startBookingStatus), call(fetchingCourses)]);
 }

@@ -7,7 +7,7 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
-  const {bgColor, textColors, colorYlMain, darkMode} = useSelector(
+  const {bgColor, textColors, colorYlMain, darkMode , bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
   const bottomSheetRef = useRef(null);
