@@ -25,12 +25,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import {uploadSelector} from '../store/upload-handwriting/selector';
 import {setSelectedImage} from '../store/upload-handwriting/reducer';
 import {FONTS} from '../utils/constants/fonts';
+import Email from './email.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
 const UploadHandwriting = ({demoData}) => {
   const [loading, setLoading] = useState(false);
   const [visibleOptions, setVisibleOptions] = useState(false);
+  const [visibleEmail, setVisibleEmail] = useState(false);
 
   const {selectedImage, modalVisible} = useSelector(uploadSelector);
   const dispatch = useDispatch();
@@ -167,20 +169,42 @@ const UploadHandwriting = ({demoData}) => {
     setVisibleOptions(true);
   };
 
+  const onVisibleEmail = () => {
+    setVisibleEmail(true);
+  };
+  const onCloseEmail = () => {
+    setVisibleEmail(false);
+  };
+
   return (
     <View style={{paddingBottom: 20}}>
-      <TextWrapper color={COLORS.white}>
-        Upload your child's handwriting image
+      <TextWrapper color={COLORS.white} fs={18}>
+        Submit Handwriting Image
       </TextWrapper>
       <Spacer space={4} />
-      <Pressable
-        onPress={onOpenOptions}
-        style={({pressed}) => [styles.btnUpload, {opacity: pressed ? 0.9 : 1}]}>
-        <Icon name="camera" size={24} color={COLORS.black} />
-        <TextWrapper color={COLORS.black} fs={18}>
-          Select image
-        </TextWrapper>
-      </Pressable>
+      <View style={{flexDirection: 'row', gap: 4}}>
+        <Pressable
+          onPress={onOpenOptions}
+          style={({pressed}) => [
+            styles.btnUpload,
+            {opacity: pressed ? 0.9 : 1},
+          ]}>
+          <Icon name="camera" size={24} color={COLORS.black} />
+          <TextWrapper color={COLORS.black} fs={18}>
+            Select image
+          </TextWrapper>
+        </Pressable>
+        <Pressable
+          style={({pressed}) => [
+            styles.btnUpload,
+            {opacity: pressed ? 0.9 : 1},
+          ]}
+          onPress={onVisibleEmail}>
+          <TextWrapper color={COLORS.black} fs={18}>
+            Get link on email
+          </TextWrapper>
+        </Pressable>
+      </View>
       <ModalComponent
         visible={visibleOptions}
         onRequestClose={onCloseOptions}
@@ -309,6 +333,31 @@ const UploadHandwriting = ({demoData}) => {
           </View>
         </View>
       </ModalComponent>
+      <ModalComponent visible={visibleEmail}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.15)',
+            paddingHorizontal: 16,
+          }}>
+          <View style={{flex: 1}}></View>
+          <View style={styles.emailContainer}>
+            <Email demoData={demoData} />
+            <Icon
+              name="close"
+              size={26}
+              color={COLORS.black}
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 12,
+              }}
+              onPress={onCloseEmail}
+            />
+          </View>
+          <View style={{flex: 1}}></View>
+        </View>
+      </ModalComponent>
     </View>
   );
 };
@@ -317,6 +366,7 @@ export default UploadHandwriting;
 
 const styles = StyleSheet.create({
   btnUpload: {
+    flex: 1,
     paddingVertical: 12,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -350,5 +400,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 48,
     borderRadius: 24,
+  },
+  emailContainer: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: COLORS.white,
+    minHeight: 180,
+    justifyContent: 'center',
+    position: 'relative',
   },
 });
