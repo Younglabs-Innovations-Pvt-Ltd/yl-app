@@ -42,8 +42,6 @@ function* handleBookingStatus({payload: {phone}}) {
     return;
   }
 
-  console.log(phone);
-
   try {
     // Check for length of a phone number according to country
     // Return true or false
@@ -61,25 +59,22 @@ function* handleBookingStatus({payload: {phone}}) {
 
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
 
-    if (response.status === 400) {
-      console.log('booking not found');
-      const deviceId = yield getCurrentDeviceId();
-      const deviceUID = yield DeviceInfo.getAndroidId();
-      const countryCode = 91;
-      const courseId = 'Eng_Hw';
+    const deviceId = yield getCurrentDeviceId();
+    const deviceUID = yield DeviceInfo.getAndroidId();
+    const countryCode = 91;
+    const courseId = 'Eng_Hw';
 
-      const leadRes = yield createLead({
-        phone,
-        countryCode,
-        courseId,
-        deviceId,
-        deviceUID,
-      });
-      const leadData = yield leadRes.json();
-      console.log('leadData', leadData);
-    }
+    const leadRes = yield createLead({
+      phone,
+      countryCode,
+      courseId,
+      deviceId,
+      deviceUID,
+    });
+    const leadData = yield leadRes.json();
+    console.log('leadData', leadData);
 
-    yield call(fetchDemoDetailsFromPhone);
+    // yield call(fetchDemoDetailsFromPhone);
     yield put(fetchBookingStatusSuccess(''));
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
     // }

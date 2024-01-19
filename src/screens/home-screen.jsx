@@ -342,12 +342,6 @@ const HomeScreen = ({navigation, route}) => {
             dispatch(alertAction);
           },
         },
-        {
-          text: 'Cancel',
-          onPress: () => {
-            dispatch(resetCurrentNetworkState());
-          },
-        },
       ],
     );
   }

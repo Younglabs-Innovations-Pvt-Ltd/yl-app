@@ -221,8 +221,6 @@ const PostDemoAction = ({rescheduleClass}) => {
     dispatch(setNotInterestedPopup(true));
   };
 
-  console.log('isAttended', isAttended);
-
   // if (ratingLoading || attendedLoading || loading) return null;
 
   return (

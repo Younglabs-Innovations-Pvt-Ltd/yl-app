@@ -47,6 +47,9 @@ import Icon from './src/components/icon.component';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
 import {initialize} from 'react-native-clarity';
+import Signup from './src/screens/signup-screen';
+import VerifyCode from './src/screens/verify-code.screen';
+import EmailLogin from './src/screens/email-login-screen';
 
 initialize('kdg30i0fnc');
 
@@ -220,6 +223,18 @@ function App() {
                 component={WelcomeScreen}
                 options={{headerShown: false}}
               />
+              <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={Signup} />
+              <Stack.Screen
+                name={SCREEN_NAMES.VERIFY_CODE}
+                component={VerifyCode}
+                options={{headerTitle: 'Verify OTP'}}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.EMAIL_LOGIN}
+                component={EmailLogin}
+                options={{headerTitle: 'Log in'}}
+              />
+
               <Stack.Screen
                 name={SCREEN_NAMES.MAIN}
                 component={MainScreen}

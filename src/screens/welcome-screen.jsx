@@ -33,10 +33,13 @@ import {networkSelector} from '../store/network/selector';
 
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
 const IMAGE_HEIGHT = deviceWidth * 0.7;
+
+const GAP = 54;
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
@@ -219,9 +222,9 @@ const DemoClassScreen = ({navigation}) => {
         source={require('../assets/images/background2.jpeg')}
         resizeMode="cover">
         {/* <LanguageSelection /> */}
-        <View style={{flex: CONTAINER_FLEX_STYLE}}>
-          <View style={[styles.container, CONTAINER_STYLE]}>
-            <View>
+        <View style={{flex: 1}}>
+          <View style={[styles.container]}>
+            <View style={{position: 'relative'}}>
               <Animated.Image
                 source={IMAGES.LOGO}
                 style={[
@@ -248,9 +251,9 @@ const DemoClassScreen = ({navigation}) => {
             },
           ]}>
           <View style={styles.footerContent}>
-            <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
+            {/* <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
               Book Free Handwriting Class
-            </TextWrapper>
+            </TextWrapper> */}
             <View style={styles.row}>
               <Pressable style={styles.btnCountryCode}>
                 <TextWrapper>{'+91'}</TextWrapper>
@@ -266,11 +269,6 @@ const DemoClassScreen = ({navigation}) => {
                 maxLength={maxPhoneLength}
               />
             </View>
-            {message && (
-              <TextWrapper fs={14} color={COLORS.pred}>
-                {message}
-              </TextWrapper>
-            )}
             <Pressable
               style={btnContinueStyle}
               disabled={loading}
@@ -279,6 +277,20 @@ const DemoClassScreen = ({navigation}) => {
                 Log in
               </TextWrapper>
             </Pressable>
+            <View style={{alignItems: 'flex-end', marginTop: 8}}>
+              <Pressable
+                style={{paddingVertical: 4}}
+                onPress={() => navigation.navigate(SCREEN_NAMES.SIGNUP)}>
+                <TextWrapper fs={16}>Don't have WhatsApp</TextWrapper>
+              </Pressable>
+              <Pressable
+                style={{paddingVertical: 4}}
+                onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
+                <TextWrapper fs={16}>
+                  Existing user? Login with Email
+                </TextWrapper>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
         <ModalComponent visible={loading}>
@@ -303,9 +315,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 20,
   },
   wrapper: {
     flex: 1,
@@ -328,7 +337,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'wrap',
-    paddingBottom: 12,
+    // paddingBottom: 12,
+    // position: 'absolute',
+    // bottom: -GAP,
   },
   animatedText: {
     fontSize: 20,
@@ -337,7 +348,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     letterSpacing: 2.5,
     textAlign: 'center',
-    lineHeight: 34,
+    lineHeight: 28,
   },
   btnRoundedClose: {
     width: 30,
@@ -351,20 +362,22 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    backgroundColor: '#eee',
-    paddingVertical: 6,
+    // backgroundColor: '#eee',
+    // paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 50,
+    borderWidth: 1,
+    borderColor: COLORS.pblue,
   },
   input: {
     flex: 1,
-    paddingVertical: 10,
-    fontSize: 18,
+    paddingVertical: 12,
+    fontSize: 16.5,
     letterSpacing: 1.15,
     color: COLORS.black,
   },
   btnContinue: {
-    height: 54,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -374,25 +387,24 @@ const styles = StyleSheet.create({
   },
   animatedImage: {
     alignSelf: 'center',
-    width: IMAGE_WIDTH,
-    height: IMAGE_HEIGHT,
-    maxWidth: 240,
-    maxHeight: 240,
+    height: 240,
+    aspectRatio: 1 / 1,
     objectFit: 'contain',
   },
   footer: {
     flex: 1,
-    maxHeight: 180,
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
   },
   footerContent: {
     backgroundColor: COLORS.white,
-    padding: 16,
+    // padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 12,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     // height: '100%',
-    justifyContent: 'center',
     elevation: 8,
+    height: 220,
   },
   btnCountryCode: {
     display: 'flex',

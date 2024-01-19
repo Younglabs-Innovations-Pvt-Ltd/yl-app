@@ -98,7 +98,7 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
     if (!timezone) return;
     const body = {
       courseId: 'Eng_Hw',
-      childAge: childAge,
+      childAge: childAge || 5,
       timeZone: timezone.toString(),
       type: 'website',
     };
