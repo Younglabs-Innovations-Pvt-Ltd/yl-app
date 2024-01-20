@@ -17,7 +17,8 @@ const INITIAL_STATE = {
   childData: null,
   bookingCreatedSuccessfully: false,
   selectedOneToOneDemoTime: '',
-  bookingFailReason: '',
+  oneToOneBookingFailed: false,
+  bookingFailReason: undefined,
 };
 
 // reducer
@@ -77,7 +78,6 @@ const reducer = {
     state.bookingCreatedSuccessfully = action.payload;
   },
   setSelectedOneToOneDemoTime(state, action) {
-    console.log('setting date in reducer', action.payload);
     if (action.payload !== null) {
       state.selectedOneToOneDemoTime = action.payload;
     } else {
@@ -86,6 +86,7 @@ const reducer = {
   },
 
   setNewOneToOneBookingStart(state, action) {
+    state.oneToOneBookingFailed = false;
     state.loading.bookingLoading = true;
   },
   setOneToOneBookingSuccess(state, action) {
@@ -93,9 +94,14 @@ const reducer = {
     state.bookingCreatedSuccessfully = true;
   },
   setOneToOneBookingFailed(state, action) {
+    state.oneToOneBookingFailed = true;
     state.loading.bookingLoading = false;
     state.bookingCreatedSuccessfully = false;
     state.bookingFailReason = action.payload;
+  },
+  setOneToOneBookingFailed2(state, action) {
+    state.oneToOneBookingFailed = action.payload;
+    state.bookingFailReason = "";
   },
 };
 
@@ -127,6 +133,7 @@ export const {
   setNewOneToOneBookingStart,
   setOneToOneBookingSuccess,
   setOneToOneBookingFailed,
+  setOneToOneBookingFailed2,
 } = bookDemoSlice.actions;
 
 // reducer

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useSelector} from 'react-redux';
+import { FONTS } from '../utils/constants/fonts';
 // import AntDesign from '@expo/vector-icons/AntDesign';
 
 const datas = [
@@ -28,7 +29,7 @@ const DropdownComponent = ({data, placeHolder, setSelectedValue}) => {
           style={[
             styles.label,
             {color: isFocus ? colorYlMain : textColors.textSecondary},
-            {backgroundColor: bgColor},
+            {backgroundColor: bgColor , fontFamily:FONTS.primaryFont},
           ]}>
           {placeHolder}
         </Text>
@@ -51,7 +52,7 @@ const DropdownComponent = ({data, placeHolder, setSelectedValue}) => {
         ]}
         placeholderStyle={[
           styles.placeholderStyle,
-          {color: textColors.textSecondary},
+          {color: textColors.textSecondary , fontFamily:FONTS.primaryFont},
         ]}
         selectedTextStyle={[
           styles.selectedTextStyle,

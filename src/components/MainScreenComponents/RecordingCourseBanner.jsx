@@ -1,11 +1,11 @@
-import {View, Text, ImageBackground} from 'react-native';
+import {View, Text, ImageBackground, Pressable} from 'react-native';
 import React from 'react';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import tw from 'twrnc';
 import {useSelector} from 'react-redux';
 import {FONTS} from '../../utils/constants/fonts';
 
-const RecordingCourseBanner = () => {
+const RecordingCourseBanner = ({navigation}) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -25,15 +25,24 @@ const RecordingCourseBanner = () => {
   ];
   return (
     <>
-      <View
-        style={[
-          tw`flex-col items-center rounded w-full bg-blue-200 rounded-md overflow-hidden`,
-          {
-            overflow: 'hidden',
-            backgroundColor: textColors.textYlMain,
-          },
-        ]}>
-        {/* <ImageBackground
+      <Pressable
+        className="w-full"
+        onPress={() => {
+          console.log('prssed'),
+            navigation.navigate('RecordedCourseDetailScreen', {
+              courseName: 'English Handwriting Recorded',
+              courseId: 'Eng_Hw_Rec',
+            });
+        }}>
+        <View
+          style={[
+            tw`flex-col items-center rounded w-full py-2 bg-blue-200 rounded-md overflow-hidden`,
+            {
+              overflow: 'hidden',
+              backgroundColor: textColors.textYlMain,
+            },
+          ]}>
+          {/* <ImageBackground
           source={{
             uri: 'https://im.hunt.in/local/Gallery/3077109/l/3077109_c81b4.png',
           }}
@@ -41,23 +50,24 @@ const RecordingCourseBanner = () => {
             tw`w-full h-[250px] shadow shadow-gray-400`,
             {resizeMode: 'contain'},
           ]}></ImageBackground> */}
-        <View style={[tw`w-[80%]  pl-2`]}>
-          <Text style={tw`font-bold text-[22px] text-white`}>
-            Learn at your pace with our personalized recorded course
-          </Text>
-          <Text
-            style={[
-              tw`text-[20px] text-white w-full justify-center items-center`,
-              {flexWrap: 'wrap', fontFamily: FONTS.dancing_script},
-            ]}>
-            Buy now at just{' '}
-            <Text
-              style={tw`text-[#F35C19] text-[18px] font-bold transform:rotate(15deg)`}>
-              ₹499
+          <View style={[tw`w-[80%]  pl-2`]}>
+            <Text style={tw`font-bold text-[22px] text-white`}>
+              Learn at your pace with our personalized recorded course
             </Text>
-          </Text>
+            <Text
+              style={[
+                tw`text-[20px] text-white w-full justify-center items-center`,
+                {flexWrap: 'wrap', fontFamily: FONTS.dancing_script},
+              ]}>
+              Buy now at just{' '}
+              <Text
+                style={tw`text-[#F35C19] text-[18px] font-bold transform:rotate(15deg)`}>
+                ₹499
+              </Text>
+            </Text>
+          </View>
         </View>
-      </View>
+      </Pressable>
     </>
   );
 };

@@ -37,6 +37,7 @@ import NetInfo from '@react-native-community/netinfo';
 import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { FONTS } from '../utils/constants/fonts';
 
 const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoType}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
@@ -243,22 +244,22 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
       <View className="w-full mt-4 items-center pb-4">
         <View className="items-center w-[95%]">
           <Text
-            className="text-center w-full text-2xl font-bold"
-            style={{color: textColors.textPrimary}}>
+            className="text-center w-full"
+            style={[FONTS.heading , {color: textColors.textPrimary}]}>
             No Demo Slots Created
           </Text>
           <Text
-            className="text-center w-full text-base"
-            style={{color: textColors.textSecondary}}>
+            className="text-center w-full text-base mt-3"
+            style={[FONTS.primary  ,{color: textColors.textSecondary}]}>
             Contact with us on Whatsapp to book your free class.
           </Text>
         </View>
         <View className="flex-row justify-around">
           <Pressable
-            className="flex-row w-[90%] rounded py-2 justify-center items-center mt-3"
+            className="flex-row w-[90%] rounded-full py-2 justify-center items-center mt-3"
             style={{backgroundColor: textColors.textYlGreen}}>
             <MIcon name="whatsapp" size={30} color="white" />
-            <Text className="text-white text-base">Whatsapp us</Text>
+            <Text className="text-white text-base ml-2" style={[{fontFamily:FONTS.primaryFont}]}>Whatsapp us</Text>
           </Pressable>
         </View>
       </View>
@@ -291,7 +292,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
     <Spinner style={{alignSelf: 'center'}} />
   ) : bookingSlots && bookingSlots.length > 0 ? (
     <>
-    {console.log("i am here")}
+    {/* {console.log("i am here")} */}
       <View className=" w-full px-2 mt-5">
         <View className="p-1 bg-gray-300 rounded-md my-3">
           <Text className="text-gray-700 ml-3 ">

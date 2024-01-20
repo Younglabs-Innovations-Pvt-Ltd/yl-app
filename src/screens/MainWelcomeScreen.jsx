@@ -1,4 +1,11 @@
-import {View, Text, Dimensions, ImageBackground, Pressable} from 'react-native';
+import {
+  View,
+  Text,
+  Dimensions,
+  ImageBackground,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import tw from 'twrnc';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,10 +22,11 @@ import Animated, {
   withSpring,
   withDelay,
 } from 'react-native-reanimated';
-import HeaderComponent from '../components/HeaderComponent';
+import HeaderComponent, {ChangeAddedChild} from '../components/HeaderComponent';
 import {
   setDemoData,
   startFetchBookingDetailsFromPhone,
+  startFetchBookingDetailsFromId,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import DemoDetailsScreen from '../components/MainScreenComponents/DemoDetailsScreen';
@@ -28,13 +36,20 @@ import PostDemoAction from '../components/join-demo-class-screen/post-demo-actio
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
-import {getCoursesForWelcomeScreen} from '../store/welcome-screen/reducer';
+import {
+  getCoursesForWelcomeScreen,
+  setSelectedChild,
+} from '../store/welcome-screen/reducer';
 import {Button} from 'react-native-share';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import RecordingCourseBanner from '../components/MainScreenComponents/RecordingCourseBanner';
 import SwiperSlide from '../components/MainScreenComponents/SwiperSlide';
 import {authSelector} from '../store/auth/selector';
+import Testimonial from '../components/MainScreenComponents/Testimonial';
+import {FONTS} from '../utils/constants/fonts';
+import BookDemoScreen from './book-demo-form.screen';
+import ShowCourses from '../components/MainScreenComponents/ShowCourses';
 
 const {width, height} = Dimensions.get('window');
 
@@ -78,7 +93,7 @@ const handwritingCourses = [
   },
 ];
 
-const courseListHeadingStyle = 'text-[23px] capitalize font-bold';
+const sectionHeadingStyle = '';
 
 const swiperData = [
   {
@@ -105,6 +120,30 @@ const swiperData = [
   },
 ];
 
+const testimonials = [
+  {
+    name: 'Jhon Doe',
+    posted_on: '12-04-2022',
+    comment:
+      'lorem ipsum d Pellentesque habitant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am',
+    coverPictureLink: null,
+  },
+  {
+    name: 'Harry hess',
+    posted_on: '16-03-2023',
+    comment:
+      'lorementesque habi tant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am lorem ipsum adhf hadfiuh ',
+    coverPictureLink: null,
+  },
+  {
+    name: 'Simon dull',
+    posted_on: '16-03-2023',
+    comment:
+      'lorementesque habi tant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am lorem ipsum adhf hadfiuh ',
+    coverPictureLink: null,
+  },
+];
+
 const phoneNum = 7668983758;
 
 const MainWelcomeScreen = ({navigation}) => {
@@ -113,9 +152,17 @@ const MainWelcomeScreen = ({navigation}) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimeover, setIsTimeover] = useState(false);
   const [showAddChildView, setShowAddChildView] = useState(false);
-  const [refreshCourses, setRefreshCourses] = useState({});
+  const [showChangeChildView, setShowChangeChildView] = useState(false);
+  const [showBookFreeClassSheet, setShowBookFreeClassSheet] = useState(false);
+  const [showRescheduleClassSheet, setShowRescheduleClassSheet] =
+    useState(false);
+
   const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
     useSelector(state => state.appTheme);
+
+  const {user} = useSelector(authSelector);
+  const {selectedChild} = useSelector(welcomeScreenSelector);
+
   const dispatch = useDispatch();
   const {
     demoData,
@@ -129,32 +176,14 @@ const MainWelcomeScreen = ({navigation}) => {
     bookingTime,
   } = useSelector(joinDemoSelector);
 
-  const {ipData} = useSelector(bookDemoSelector);
-
-  const {courses, coursesLoading, coursesLoadingFailed} = useSelector(
-    welcomeScreenSelector,
-  );
-
-  // console.log('course are ', courses[0]);
-
   useEffect(() => {
-    if (!ipData) {
-      dispatch(startFetchingIpData());
+    // console.log("running for selectedChild", selectedChild.bookingId)
+    if (selectedChild?.bookingId) {
+      dispatch(startFetchBookingDetailsFromId(selectedChild.bookingId));
+    } else if (!bookingDetails && user?.phone) {
+      dispatch(startFetchBookingDetailsFromPhone(user.phone));
     }
-  }, [ipData]);
-
-  useEffect(() => {
-    dispatch(
-      getCoursesForWelcomeScreen({country: ipData?.country_name || 'behrin'}),
-    );
-  }, [refreshCourses, ipData]);
-
-  useEffect(() => {
-    console.log('Getting booking Details');
-    if (!bookingDetails && phoneNum) {
-      dispatch(startFetchBookingDetailsFromPhone(phoneNum));
-    }
-  }, [phoneNum, bookingDetails]);
+  }, [user, bookingDetails, selectedChild]);
 
   // Demo actions useEffects here
 
@@ -177,18 +206,15 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (demoData) {
-      dispatch(setDemoData({demoData, phoneNum}));
+    if (demoData && user.phone) {
+      dispatch(setDemoData({demoData, phone: user?.phone}));
     }
-  }, [demoData]);
+  }, [demoData, user]);
 
   useEffect(() => {
     if (!bookingTime) return;
-
     const isDemoOver =
       new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
-
-    console.log('isDemoOver', isDemoOver);
 
     if (isDemoOver && isAttended && teamUrl) {
       setShowPostActions(true);
@@ -222,12 +248,36 @@ const MainWelcomeScreen = ({navigation}) => {
     };
   }, [bookingTime, demoPhoneNumber, dispatch]);
 
+  // Change Added Child actions
+  const onChangeChildSheetOpen = () => {
+    console.log('opening'), setShowChangeChildView(true);
+  };
+  const onChangeChildSheetClose = () => {
+    setShowChangeChildView(false);
+  };
+
+  // ---------
+
   return (
     <View style={[tw`items-center flex-1 `, {backgroundColor: bgColor}]}>
       <HeaderComponent
         navigation={navigation}
         setShowAddChildView={setShowAddChildView}
+        open={onChangeChildSheetOpen}
       />
+
+      {!loading && (
+        <View className="w-full" style={{backgroundColor: colorYlMain}}>
+          <Demo
+            timeLeft={timeLeft}
+            isTimeover={isTimeover}
+            showPostActions={showPostActions}
+            sheetOpen={() => setShowBookFreeClassSheet(true)}
+            openResheduleSheet={() => setShowRescheduleClassSheet(true)}
+            closeResheduleSheet={() => setShowRescheduleClassSheet(false)}
+          />
+        </View>
+      )}
 
       <ScrollView
         className="px-2 py-1"
@@ -236,18 +286,6 @@ const MainWelcomeScreen = ({navigation}) => {
           width: width,
         }}
         contentContainerStyle={{alignItems: 'center'}}>
-        {!showPostActions && (timeLeft || isTimeover) && (
-          <View
-            className="rounded-md w-full my-1"
-            style={{backgroundColor: colorYlMain}}>
-            <Demo
-              timeLeft={timeLeft}
-              isTimeover={isTimeover}
-              showPostActions={showPostActions}
-            />
-          </View>
-        )}
-
         {/* <TapeTimer timeLeft={timeLeft} isTimeover={isTimeover} /> */}
 
         <SwiperFlatList
@@ -277,62 +315,99 @@ const MainWelcomeScreen = ({navigation}) => {
           )}
         />
 
-        {/* Post demo Actions here */}
-        {showPostActions && (
-          <View
-            className="w-full p-2 rounded-md mt-3"
-            style={{
-              backgroundColor: darkMode ? bgSecondaryColor : colorYlMain,
-            }}>
-            <PostDemoAction rescheduleClass={'onOpen'} />
-          </View>
-        )}
+        <Spacer space={8} />
 
-        {/* Handwriting courses here */}
-        <Spacer space={5} />
-        <View style={tw`py-1 w-[100%]`}>
-          <View style={tw`gap-1 pl-2 pr-3 flex-row items-center`}>
+        <ShowCourses navigation={navigation} />
+
+        <Spacer space={8} />
+
+        {/* Testimonials */}
+        <View className="w-full">
+          <View>
             <Text
-              className={`w-[80%] ${courseListHeadingStyle}`}
-              style={{color: textColors?.textPrimary}}>
-              Handwriting Improvement
+              className={`${sectionHeadingStyle}`}
+              style={[FONTS.heading, {color: textColors.textPrimary}]}>
+              What Our Customer Speak
             </Text>
-
-            <Pressable
-              className="flex-row items-center"
-              onPress={() => {
-                navigation.navigate('AllCoursesScreen', {
-                  courses: handwritingCourses,
-                  heading: 'Handwriting Improvement',
-                });
-              }}>
-              <Text className="font-semibold" style={{color: COLORS.pblue}}>
-                See all
-              </Text>
-              <MIcon name="chevron-right" size={22} color={COLORS.pblue} />
-            </Pressable>
           </View>
-
-          <FlatList
-            data={courses}
-            keyExtractor={item => item.name}
-            renderItem={item => {
-              return (
-                <CourseItemRender
-                  data={item.item}
-                  navigation={navigation}
-                  phone={phoneNum}
-                />
-              );
-            }}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            style={tw`pt-1`}
-          />
+          <View className="w-[100%] mt-1">
+            <FlatList
+              data={testimonials}
+              keyExtractor={item => item.name}
+              renderItem={item => {
+                return <Testimonial data={item.item} />;
+              }}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+            />
+          </View>
         </View>
 
-        {/* English Learning courses here */}
-        {/* <Spacer space={0} />
+        <Spacer space={16} />
+      </ScrollView>
+
+      <BottomSheetComponent
+        isOpen={showAddChildView}
+        onClose={() => setShowAddChildView(false)}
+        Children={AddChildModule}
+        snapPoint={customer == 'yes' ? ['25%', '50%'] : ['50%', '90%']}
+      />
+
+      {/* Change Child Sheet */}
+
+      <BottomSheetComponent
+        isOpen={showChangeChildView}
+        onClose={() => onChangeChildSheetClose()}
+        Children={<ChangeAddedChild close={onChangeChildSheetClose} />}
+        snapPoint={['25%', '55%']}
+      />
+
+      {/* book free class sheet */}
+      <BottomSheetComponent
+        isOpen={showBookFreeClassSheet}
+        onClose={() => setShowBookFreeClassSheet(false)}
+        Children={
+          <BookDemoScreen
+            navigation={''}
+            data={{country: {callingCode: 91}, phone: 7668983758}}
+            courseId={'Eng_Hw'}
+            demoAvailableType={'both'}
+            place={'bookFreeClass'}
+          />
+        }
+        snapPoint={['50%', '90%']}
+      />
+
+      {/* Reschedule class sheet */}
+      <BottomSheetComponent
+        isOpen={showRescheduleClassSheet}
+        onClose={() => setShowRescheduleClassSheet(false)}
+        Children={
+          <BookDemoScreen
+            navigation={''}
+            data={{country: {callingCode: 91}, phone: 7668983758}}
+            courseId={'Eng_Hw'}
+            setSelectedTab={''}
+            demoAvailableType={'both'}
+            place={'rescheduleClass'}
+          />
+        }
+        snapPoint={['50%', '90%']}
+      />
+    </View>
+  );
+};
+
+export default MainWelcomeScreen;
+
+// Extra code and recorded course code
+
+{
+  /* English Learning courses here */
+}
+{
+  /* <Spacer space={0} />
+
         <View style={tw`gap-[0px]  w-full py-1`}>
           <View style={tw`gap-1 pl-2 pr-3 flex-row items-center`}>
             <Text
@@ -368,76 +443,15 @@ const MainWelcomeScreen = ({navigation}) => {
             style={tw`pt-1 `}
             className="h-[auto]"
           />
-        </View> */}
+        </View> */
+}
 
-        <Spacer space={8} />
+{
+  /* <Spacer space={8} />
         <View
           style={[
             tw`w-[100%] flex-row gap-2 items-center rounded-lg justify-center items-center`,
           ]}>
           <RecordingCourseBanner navigation={navigation} />
-        </View>
-
-        <Spacer space={16} />
-      </ScrollView>
-
-      <BottomSheetComponent
-        isOpen={showAddChildView}
-        onClose={() => setShowAddChildView(false)}
-        Children={AddChildModule}
-        snapPoint={customer == 'yes' ? ['25%', '50%'] : ['50%', '90%']}
-      />
-    </View>
-  );
-};
-
-export default MainWelcomeScreen;
-
-const CourseItemRender = ({data, navigation}) => {
-  const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
-  return (
-    <>
-      <Pressable
-        onPress={() => {
-          navigation.navigate('CourseDetailScreen', {
-            courseData: data,
-          });
-        }}>
-        <View
-          style={tw`overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[110px]`}>
-          <ImageBackground
-            source={{
-              uri:
-                data.coverPicture ||
-                'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEng_Tuitions_5-14%2FthimbnailUrl.jpeg?alt=media&token=be2b7b32-311d-4951-8e47-61ab5fbfc529',
-            }}
-            style={[
-              tw`w-[100%] rounded h-full justify-center items-center`,
-              {flex: 1, resizeMode: 'cover'},
-            ]}>
-            <LinearGradient
-              colors={['#00000014', '#000000db']}
-              className="w-full"
-              start={{x: 0.5, y: 0.5}}
-              // end={{x: 0.8, y: 1}}
-            >
-              <View style={tw`h-[20%] justify-center items-center`}></View>
-              <View style={tw`h-[80%] items-start justify-end p-1 `}>
-                {data?.alternativeNameOnApp?.split(' ').map((item, index) => {
-                  return (
-                    <Text
-                      key={index}
-                      style={[tw`font-semibold`, {lineHeight: 20}]}
-                      className="flex-wrap text-white text-[18px]">
-                      {item}
-                    </Text>
-                  );
-                })}
-              </View>
-            </LinearGradient>
-          </ImageBackground>
-        </View>
-      </Pressable>
-    </>
-  );
-};
+        </View> */
+}

@@ -8,6 +8,7 @@ import Icon from './icon.component';
 import Share from 'react-native-share';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {useSelector} from 'react-redux';
+import {FONTS} from '../utils/constants/fonts';
 
 const Icons = (name, focused) => {
   switch (name) {
@@ -15,7 +16,7 @@ const Icons = (name, focused) => {
       return (
         <Image
           source={require('../assets/images/spinner.png')}
-          style={{width: 36, height: 36, objectFit: 'contain'}}
+          style={{width: 28, height: 28, objectFit: 'contain'}}
         />
       );
     case 'Account':
@@ -69,9 +70,8 @@ function Tabbar({state, descriptors, navigation}) {
     <>
       {/* <View style={styles.tabbar}> */}
       <View
-        className="flex-row justify-center items-center px-2"
-        style={{backgroundColor: darkMode ? "#020e21" :"#e6e9f0"}}
-        >
+        className="flex-row justify-center items-center px-2 py-1"
+        style={{backgroundColor: darkMode ? '#020e21' : '#e6e9f0'}}>
         {state.routes.map(route => {
           const {options} = descriptors[route.key];
           const label =
@@ -105,8 +105,9 @@ function Tabbar({state, descriptors, navigation}) {
                   color={isFocused ? COLORS.pblue : textColors.textPrimary}
                 />
                 <TextWrapper
-                  fw="600"
+                  // fw="600"
                   fs={14}
+                  ff={FONTS.headingFont}
                   color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                   {label}
                 </TextWrapper>
@@ -130,7 +131,8 @@ function Tabbar({state, descriptors, navigation}) {
                   color={isFocused ? COLORS.pblue : textColors.textPrimary}
                 />
                 <TextWrapper
-                  fw="600"
+                  // fw="600"
+                  ff={FONTS.headingFont}
                   fs={14}
                   color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                   {label}
@@ -158,6 +160,7 @@ function Tabbar({state, descriptors, navigation}) {
                 <TextWrapper
                   fw="600"
                   fs={14}
+                  ff={FONTS.headingFont}
                   color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                   {label}
                 </TextWrapper>
@@ -184,6 +187,7 @@ function Tabbar({state, descriptors, navigation}) {
               <TextWrapper
                 fw="600"
                 fs={14}
+                ff={FONTS.headingFont}
                 color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                 {label}
               </TextWrapper>

@@ -5,7 +5,8 @@ import Input from '../CustomInputComponent';
 import DropdownComponent from '../DropdownComponent';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import BookDemoScreen from '../../screens/book-demo-form.screen';
-import { authSelector } from '../../store/auth/selector';
+import {authSelector} from '../../store/auth/selector';
+import {FONTS} from '../../utils/constants/fonts';
 
 export const AddChildModule = () => {
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
@@ -13,8 +14,8 @@ export const AddChildModule = () => {
   const [childName, setChildName] = useState(null);
   const [childAge, setChildAge] = useState(null);
   const [isFieldsFilled, setIsFieldsFilled] = useState(false);
-  
-  const {customer} = useSelector(authSelector)
+
+  const {customer} = useSelector(authSelector);
 
   const ageArray = [
     {label: '5', value: 5},
@@ -60,8 +61,8 @@ export const AddChildModule = () => {
         {customer === 'yes' ? (
           <>
             <Text
-              className="text-2xl font-semibold text-center"
-              style={{color: textColors.textSecondary}}>
+              className="font-semibold text-center"
+              style={[FONTS.heading , {color: textColors.textSecondary}]}>
               Add Another child
             </Text>
 
@@ -86,7 +87,9 @@ export const AddChildModule = () => {
                 style={{backgroundColor: colorYlMain}}
                 onPress={addChild}
                 disabled={!isFieldsFilled}>
-                <Text className="text-center text-white text-base font-semibold">
+                <Text
+                  className="text-center text-white text-[18px] font-semibold"
+                  style={[{fontFamily:FONTS.primaryFont}]}>
                   Click to add Child
                 </Text>
               </TouchableOpacity>

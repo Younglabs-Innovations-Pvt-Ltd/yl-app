@@ -8,11 +8,18 @@ const INITIAL_STATE = {
   message: '',
   confirm: null,
   email: '',
-  user: null,
-  customer:"no",
-  childName:"Rahul Singh",
-  childAge:8,
-  credits:980
+  // user: null,
+  user: {
+    leadId: 100058,
+    credits: 960,
+    phone: 7982726046,
+    token:
+      'eyJhbGciOiJSUzI1NiIsImtpZCI6IjdjZjdmODcyNzA5MWU0Yzc3YWE5OTVkYjYwNzQzYjdkZDJiYjcwYjUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20veW91bmdsYWJzLXVhdCIsImF1ZCI6InlvdW5nbGFicy11YXQiLCJhdXRoX3RpbWUiOjE3MDUzOTQwMzIsInVzZXJfaWQiOiJwVFBhcEV0R0RsVHVJZmtIbkFpOWtZTmJRMGsyIiwic3ViIjoicFRQYXBFdEdEbFR1SWZrSG5BaTlrWU5iUTBrMiIsImlhdCI6MTcwNTczMTIyNCwiZXhwIjoxNzA1NzM0ODI0LCJlbWFpbCI6InNlZW5hYmFidTM2NUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsic2VlbmFiYWJ1MzY1QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.hwquU2UqqMnjsse6RIPc5Ssr7oqgbFV5Jnw4Mu1E-U5Q1nZZPHZnH95jZBbk8UIbWUo5mDnQTKLsF2J6-p1SKMfHPD-qXyEt3dNTm1tcLIKU7F1Y8szW612zmi7fuX_uNxZExe0xoINq5JdLoX0MNMI4chvbuHKTIV2REMTL5TtnKiLR1ErOIi0ALZUhIP3FJJz0b6SnTmfaodSnQa1BoC2thKO6NNmdJbf5-BEIbxk_96jlvdHNZErqVRocYbtkrAO24RUEZ8x-XStT0Z7trPMe6Kya1Ogab-ymdpHOVlHdKo6sidqkPHodnLMgXvQHOsTqh28AflnjQkD9TVJ4ng',
+  },
+  customer: 'no',
+  childName: 'Rahul Singh',
+  childAge: 8,
+  credits: 980,
 };
 
 const reducers = {

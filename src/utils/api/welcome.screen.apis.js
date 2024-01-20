@@ -13,3 +13,24 @@ export const fetchCoursesForWelcomeScreen = async country => {
     },
   );
 };
+
+export const fetchAllBookinsFromPhone = async phone => {
+  return await fetch(`${BASE_URL}/admin/demobook/getBookingsByChild`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({phone}),
+  });
+};
+
+export const fetchAllOrdersFromLeadId = async payload => {
+  return await fetch(`${BASE_URL}/app/mycourses/orderrequests`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + payload.token,
+    },
+    body: JSON.stringify({leadId: payload.leadId}),
+  });
+};

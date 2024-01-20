@@ -29,7 +29,14 @@ import {TextInput} from 'react-native-gesture-handler';
 
 const {height: deviceHeight, width: deviceWidth} = Dimensions.get('window');
 
-const Demo = ({isTimeover, timeLeft, showPostActions}) => {
+const Demo = ({
+  isTimeover,
+  timeLeft,
+  showPostActions,
+  sheetOpen,
+  openResheduleSheet,
+  closeResheduleSheet,
+}) => {
   const [childName, setChildName] = useState('');
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -38,6 +45,8 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
 
   const {localLang} = i18nContext();
   const dispatch = useDispatch();
+  const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
+    useSelector(state => state.appTheme);
 
   const {
     demoData,
@@ -136,18 +145,18 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
   const NEW_BOOKING = useMemo(() => {
     if (demoData?.message === 'Booking not found' || !demoData) {
       return (
-        <View style={{paddingTop: 20}}>
-          <TextWrapper fs={20} color={COLORS.white}>
-            Book your first free Handwriting Class.
+        <View style={{}} className="flex-row  items-center flex-wrap py-1">
+          <TextWrapper fs={18} color={COLORS.white} ff={FONTS.primaryFont}>
+            Book your first free Handwriting Class
           </TextWrapper>
-          <Spacer />
-          {/* <Button
-            textColor={'#434a52'}
-            bg={COLORS.white}
-            rounded={6}
-            onPress={onOpenForm}>
-            Book
-          </Button> */}
+
+          <Pressable className="p-1 bg-white rounded ml-2" onPress={sheetOpen}>
+            <Text
+              className="font-semibold"
+              style={{color: textColors.textYlMain}}>
+              Book Now
+            </Text>
+          </Pressable>
         </View>
       );
     } else {
@@ -170,6 +179,7 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
       {/* Show join button */}
       {SHOW_JOIN_BUTTON && (
         <View className="w-full p-1">
+          {console.log('here 5')}
           {IS_CHILD_NAME}
           {/* <Button
             textColor={'#434a52'}
@@ -200,7 +210,11 @@ const Demo = ({isTimeover, timeLeft, showPostActions}) => {
         // If user attended demo class
         // Demo has ended
         // Show post action after demo class
-        showPostActions && <PostDemoAction rescheduleClass={onOpen} />
+        showPostActions && (
+          <View className="w-full">
+            <PostDemoAction rescheduleClass={openResheduleSheet} />
+          </View>
+        )
       }
 
       <Modal animationType="fade" visible={open} onRequestClose={onClose}>

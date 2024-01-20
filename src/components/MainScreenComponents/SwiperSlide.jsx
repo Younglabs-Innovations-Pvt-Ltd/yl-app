@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import tw from 'twrnc';
+import { FONTS } from '../../utils/constants/fonts';
 
 const {width, height} = Dimensions.get('window');
 
@@ -70,32 +71,36 @@ const SwiperSlide = ({item, navigation}) => {
               ]}>
               <Animated.View
                 style={{marginBottom: marginBottom, opacity: opacity}}>
-                <Text className="text-[32px] text-white font-[600]">
+                <Text className="text-[30px] text-white font-semibold" style={{fontFamily:FONTS.headingFont}}>
                   {item.title}
                 </Text>
-                <Text className="text-[16px] text-gray-300">
+                <Text className="text-base text-gray-300" style={{fontFamily:FONTS.primaryFont}}>
                   {item.subheading}
                 </Text>
                 <View className="flex-row gap-2 mt-1 justify-center">
                   <Pressable
-                    className="flex-row rounded-full py-2 px-3 justify-center items-center mt-3 border"
+                    className="flex-row rounded-full py-2 px-3 justify-center items-center mt-3 border "
                     style={{borderColor: textColors.textYlMain}}>
                     {/* <MIcon name="whatsapp" size={30} color="white" /> */}
                     <Text
                       className="text-base font-semibold"
-                      style={{color: textColors.textYlMain}}>
+                      style={{color: textColors.textYlMain , fontFamily:FONTS.primaryFont}}>
                       Connect with us
                     </Text>
                   </Pressable>
                   <Pressable
                     className="flex-row rounded-full py-2 px-3 justify-center items-center mt-3 border"
                     style={{borderColor: textColors.textYlMain}}
-                    onPress={()=>{navigation.navigate("CourseDetailScreen" , {courseData:item , subScreenToShow:"payAndEnroll"})}}
-                    >
+                    onPress={() => {
+                      navigation.navigate('CourseDetailScreen', {
+                        courseData: item,
+                        subScreenToShow: 'payAndEnroll',
+                      });
+                    }}>
                     {/* <MIcon name="whatsapp" size={30} color="white" /> */}
                     <Text
                       className="text-base font-semibold"
-                      style={{color: textColors.textYlMain}}>
+                      style={{color: textColors.textYlMain , fontFamily:FONTS.primaryFont}}>
                       Pay And Enroll
                     </Text>
                   </Pressable>

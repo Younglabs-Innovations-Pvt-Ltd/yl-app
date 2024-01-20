@@ -49,35 +49,38 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   // Show reschedule button
   // After 10 days when user join free class
-  const isAllowToReschedule = useMemo(() => {
-    if (demoData) {
-      const {
-        demoDate: {_seconds},
-      } = demoData;
-      const currentTime = Date.now();
-      const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24 * 10;
 
-      if (currentTime > afterTenDays) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }, [demoData]);
+  // Code To UnComment ------------------------
+  // const isAllowToReschedule = useMemo(() => {
+  //   if (demoData) {
+  //     const {
+  //       demoDate: {_seconds},
+  //     } = demoData;
+  //     const currentTime = Date.now();
+  //     const afterTenDays = _seconds * 1000 + 1000 * 60 * 60 * 24 * 10;
 
-  const demoTime = useMemo(() => {
-    if (demoData) {
-      const time = new Date(demoData.demoDate._seconds * 1000);
-      const demoHours = time.getHours();
-      const demoMinutes = time.getMinutes();
+  //     if (currentTime > afterTenDays) {
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   }
+  // }, [demoData]);
 
-      return demoHours >= 12
-        ? `${demoHours === 12 ? demoHours : `0${demoHours - 12}`}:${
-            demoMinutes > 0 ? demoMinutes : '00'
-          } PM`
-        : `${demoHours}:${demoMinutes > 0 ? demoMinutes : '00'} AM`;
-    }
-  }, [demoData]);
+  // const demoTime = useMemo(() => {
+  //   if (demoData) {
+  //     const time = new Date(demoData.demoDate._seconds * 1000);
+  //     const demoHours = time.getHours();
+  //     const demoMinutes = time.getMinutes();
+
+  //     return demoHours >= 12
+  //       ? `${demoHours === 12 ? demoHours : `0${demoHours - 12}`}:${
+  //           demoMinutes > 0 ? demoMinutes : '00'
+  //         } PM`
+  //       : `${demoHours}:${demoMinutes > 0 ? demoMinutes : '00'} AM`;
+  //   }
+  // }, [demoData]);
+  // Code To UnComment ------------------------
 
   // Check for rating from local storage
   // If rating then show post demos ctas
@@ -210,19 +213,18 @@ const PostDemoAction = ({rescheduleClass}) => {
       style={{
         width: '100%',
       }}
-      className="p-1"
-      >
+      className="">
       {!attended && (
-        <View style={styles.paContainer}>
+        <View style={styles.paContainer} className="p-1">
           <TextWrapper
-            fs={20}
+            fs={18}
             color={COLORS.white}
             ff={FONTS.signika_medium}
             styles={{textAlign: 'center'}}>
             Did you attend your free class?
           </TextWrapper>
-          <Spacer />
-          <View style={styles.paButtons}>
+          {/* <Spacer /> */}
+          <View style={styles.paButtons} className="mt-1">
             <Pressable
               style={({pressed}) => [
                 styles.paButton,
@@ -231,7 +233,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 },
               ]}
               onPress={saveAttended}>
-              <TextWrapper color={'#434a52'} fs={18}>
+              <TextWrapper color={'#434a52'} fs={16} ff={FONTS.primaryFont}>
                 Yes attended
               </TextWrapper>
             </Pressable>
@@ -243,36 +245,36 @@ const PostDemoAction = ({rescheduleClass}) => {
                 },
               ]}
               onPress={rescheduleClass}>
-              <TextWrapper color={'#434a52'} fs={18}>
+              <TextWrapper color={'#434a52'} fs={16} ff={FONTS.primaryFont}>
                 Reschedule
               </TextWrapper>
             </Pressable>
           </View>
         </View>
       )}
+      
       {!isRated && attended && (
-        <View style={styles.ratingContainer}>
+        <View style={styles.ratingContainer} className="p-1">
           <TextWrapper
-            fs={22}
+            fs={20}
             color={COLORS.white}
             fw="600"
-            styles={{textAlign: 'center'}}>
+            styles={{textAlign: 'center'}}
+            ff={FONTS.headingFont}>
             Congratulations for attending your free class.
           </TextWrapper>
           <View style={styles.ratingWrapper}>
-            <TextWrapper fs={18} color={COLORS.white}>
+            <TextWrapper fs={16} color={COLORS.white} ff={FONTS.headingFont}>
               Please rate your class experience
             </TextWrapper>
             <View style={styles.starsContainer}>{RATING_STARS}</View>
           </View>
         </View>
       )}
+      
       {isRated && !isNmi && (
-        <View style={styles.ctasWrapper}>
-          <TextWrapper
-            fs={17.5}
-            color={COLORS.white}
-            styles={{marginBottom: 8}}>
+        <View style={styles.ctasWrapper} className="p-1">
+          <TextWrapper fs={18} color={COLORS.white} styles={{marginBottom: 8}}>
             Would you like to continue with the course and improve your child's
             handwriting?
           </TextWrapper>
@@ -301,12 +303,18 @@ const PostDemoAction = ({rescheduleClass}) => {
           </View>
         </View>
       )}
-      {isNmi && (
+
+      {/* Commented out this code */}
+      {/* {isNmi && (
         <View style={{padding: 16, width: '100%'}}>
-          <TextWrapper color={COLORS.white} fs={18}>
+          <TextWrapper
+            color={COLORS.white}
+            fs={18}
+            ff={FONTS.headingFont}
+            styles={{textAlign: 'center'}}>
             Give your child a gift of beautiful handwriting today!
           </TextWrapper>
-          <Spacer space={4} />
+          <Spacer space={6} />
           <View
             style={{
               width: '100%',
@@ -320,7 +328,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={courseDetails}>
-              <TextWrapper>Course details</TextWrapper>
+              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Course details</TextWrapper>
             </Pressable>
             <Pressable
               style={({pressed}) => [
@@ -328,11 +336,14 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={batchDetails}>
-              <TextWrapper>Batch/Fee details</TextWrapper>
+              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Batch/Fee details</TextWrapper>
             </Pressable>
           </View>
         </View>
-      )}
+      )} */}
+      {/* Commented out this code */}
+
+
       <ModalComponent
         visible={visible}
         animationType="slide"
@@ -386,10 +397,10 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
   },
   paButtons: {
-    gap: 12,
+    gap: 8,
   },
   paButton: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 2,
     paddingVertical: 8,
     justifyContent: 'center',
     alignItems: 'center',

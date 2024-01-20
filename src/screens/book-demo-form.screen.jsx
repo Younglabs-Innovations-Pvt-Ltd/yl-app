@@ -27,12 +27,17 @@ import {
   setChildData,
   setNewBookingStart,
   setNewOneToOneBookingStart,
+  startFetchingIpData,
+  setOneToOneBookingFailed2,
 } from '../store/book-demo/book-demo.reducer';
 import {current} from '@reduxjs/toolkit';
 import DropdownComponent from '../components/DropdownComponent';
 import OneToOneDemoBook from '../components/demoComponents/OneToOneDemoBook';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
+import {FONTS} from '../utils/constants/fonts';
+import {authSelector} from '../store/auth/selector';
+import {startGetAllBookings} from '../store/welcome-screen/reducer';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -61,10 +66,9 @@ const BookDemoScreen = ({
   navigation,
   courseId,
   setSelectedTab,
-  demoAvailableType,
+  place,
 }) => {
   const toast = useToast();
-  const {phone, country} = data;
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
   const [childAge, setChildAge] = useState(null);
@@ -83,11 +87,21 @@ const BookDemoScreen = ({
     bookingCreatedSuccessfully,
     loading,
     selectedOneToOneDemoTime,
-    place,
+    bookingFailReason,
+    oneToOneBookingFailed,
   } = useSelector(bookDemoSelector);
 
+  const {user} = useSelector(authSelector);
+
+  const phone = user.phone;
   // console.log("ChildData is", childData)
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData]);
 
   // useEffect(() => {
   //   if (fields.childName && fields.parentName) {
@@ -216,7 +230,7 @@ const BookDemoScreen = ({
         console.log('condition running', selectedOneToOneDemoTime);
         return true;
       } else {
-        Showtoast({text: 'Please Select Date', toast});
+        Showtoast({text: 'Please Select Date', toast, type: 'warning'});
         return false;
       }
     }
@@ -273,6 +287,8 @@ const BookDemoScreen = ({
       setChildAge(null);
     }
     if (bookingCreatedSuccessfully) {
+      Showtoast({text: 'Booking Created Successfully', toast, type: 'success'});
+      dispatch(startGetAllBookings(user?.phone));
       setCurrentStep(3);
     }
   }, [childData, bookingCreatedSuccessfully]);
@@ -281,7 +297,7 @@ const BookDemoScreen = ({
     console.log('running handleBook');
     const bodyData = {
       name: fields.parentName,
-      childAge: 7,
+      childAge: childAge || 7,
       phone,
       childName: fields.childName,
       timeZone: timezone,
@@ -299,21 +315,42 @@ const BookDemoScreen = ({
   };
 
   const handleBookOneToOneDemo = () => {
+    //   {
+    //     "demoDate": "2024-01-17T14:00:43.098Z",
+    //     "childAge": 5,
+    //     "childName": "abc",
+    //     "courseId": "Eng_Hw",
+    //     "parentName": "test",
+    //     "phone": 7983068672,
+    //     "countryCode": 91,
+    //     "timeZone": 5.5,
+    //     "leadId": 105099,
+    //     "country": "India",
+    //     "source": "app"
+    // }
+
+    let countryCode = ipData?.calling_code;
+    if (countryCode?.charAt(0) == '+') {
+      countryCode = countryCode.slice(1);
+    }
+    countryCode = parseInt(countryCode);
+    console.log('countryCode', countryCode);
+
     let body = {
-      name: fields.parentName,
+      parentName: fields.parentName,
       childAge,
       phone,
       childName: fields.childName,
       timeZone: timezone,
       demoDate: selectedOneToOneDemoTime,
-      bookingType: 'direct',
       source: 'app',
-      course: courseId,
-      digits: 'na',
+      courseId: courseId,
       country: ipData.country_name.toUpperCase(),
-      countryCode: ipData.calling_code,
+      countryCode,
+      leadId: 105107,
     };
 
+    console.log('dispatching func');
     dispatch(setNewOneToOneBookingStart(body));
   };
 
@@ -336,19 +373,20 @@ const BookDemoScreen = ({
   };
 
   const {width, height} = Dimensions.get('window');
+  // console.log('place is', place);
 
   return (
     <View
       className="flex-1 items-center justify-center w-full h-full"
-      style={{height: height-190}}>
+      style={{height: place ? height - 190 : height}}>
       <View
         className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]"
         // style={{backgroundColor: darkMode ? bgSecondaryColor : '#b0b6ef30'}}
       >
         <Text
-          className={`text-2xl font-bold text-center w-full p-2 justify-center`}
+          className={`font-semibold text-center w-full p-2 justify-center`}
           // style={{backgroundColor: textColors.textYlMain, color: 'white'}}
-          style={{color: textColors.textYlMain}}>
+          style={[FONTS.heading, {color: textColors.textYlMain}]}>
           Book free Handwriting Class
         </Text>
 
@@ -365,15 +403,20 @@ const BookDemoScreen = ({
               }}
               onValueChange={() => setSelectedDemoType('group')}
             />
-            <View className="flex-row flex-1 flex-wrap items-center ">
+            <View className="flex-row flex-1 flex-wrap items-center">
               <Text
-                className={`font-semibold text-[12px]`}
-                style={{color: textColors.textSecondary}}>
+                className={`text-[12px]`}
+                style={[
+                  {color: textColors.textYlMain, fontFamily: FONTS.primaryFont},
+                ]}>
                 Group Demo:
               </Text>
               <Text
-                className="text-[12px] "
-                style={{color: textColors.textSecondary}}>
+                className="text-[12px]"
+                style={{
+                  color: textColors.textSecondary,
+                  fontFamily: FONTS.primaryFont,
+                }}>
                 Demo conducted with a group of 5-10 Students
               </Text>
             </View>
@@ -390,13 +433,19 @@ const BookDemoScreen = ({
             />
             <View className="flex-row flex-1 flex-wrap items-center ">
               <Text
-                className={`font-semibold text-[12px]`}
-                style={{color: textColors.textSecondary}}>
+                className={`text-[12px]`}
+                style={{
+                  color: textColors.textYlMain,
+                  fontFamily: FONTS.primaryFont,
+                }}>
                 One To One Demo:
               </Text>
               <Text
                 className="text-[12px] "
-                style={{color: textColors.textSecondary}}>
+                style={{
+                  color: textColors.textSecondary,
+                  fontFamily: FONTS.primaryFont,
+                }}>
                 Demo conducted 1-1 only
               </Text>
             </View>
@@ -404,7 +453,9 @@ const BookDemoScreen = ({
         </View>
 
         <View className="w-full py-2 items-center">
-          <Text className="text-[17px] font-semibold text-start w-full">
+          <Text
+            className="text-[17px] font-semibold text-start w-full"
+            style={[FONTS.subHeading, {color: textColors.textSecondary}]}>
             Steps To Book
           </Text>
           <View className="flex-row py-2  w-[100%] justify-between ">
@@ -422,17 +473,20 @@ const BookDemoScreen = ({
                           ? {backgroundColor: textColors.textYlMain}
                           : {backgroundColor: 'gray'},
                       ]}>
-                      <Text className="text-white text-center w-full">
+                      <Text
+                        className="text-white text-center w-full"
+                        style={[{fontFamily: FONTS.primaryFont}]}>
                         {step?.step}
                       </Text>
                     </View>
                     <Text
                       className="flex-wrap w-[80%] font-semibold text-[12px]"
-                      style={
+                      style={[
                         currentStep === step.step
                           ? {color: textColors.textYlMain}
-                          : {color: textColors.textSecondary}
-                      }>
+                          : {color: textColors.textSecondary},
+                        {fontFamily: FONTS.headingFont},
+                      ]}>
                       {step.label}
                     </Text>
                   </View>
@@ -447,7 +501,6 @@ const BookDemoScreen = ({
             <FirstStepDetails
               phone={phone}
               fields={fields}
-              country={country}
               handleChangeValue={handleChangeValue}
               handleChildAge={handleChildAge}
             />
@@ -472,6 +525,7 @@ const BookDemoScreen = ({
               navigation={navigation}
               setCurrentStep={setCurrentStep}
               setSelectedTab={setSelectedTab}
+              place={place}
             />
           ) : (
             <FirstStepDetails />
@@ -486,19 +540,27 @@ const BookDemoScreen = ({
               onPress={resetForm}>
               <Text
                 className="text-xl p-2"
-                style={{color: textColors.textYlMain}}>
+                style={{
+                  color: textColors.textYlMain,
+                  fontFamily: FONTS.primaryFont,
+                }}>
                 Reset
               </Text>
             </Pressable>
 
+            {/* {console.log('booking loading', loading?.bookingLoading)} */}
             <TouchableOpacity
-              className="rounded-full w-[45%] items-center"
+              className="rounded-full w-[45%] items-center flex-row justify-center"
               style={{
                 backgroundColor: textColors.textYlMain,
               }}
               // disabled={!isCurrentStepDataFilled}
               onPress={() => handleNextBtnClick()}>
-              <Text className="text-white text-xl p-2">Next</Text>
+              <Text
+                className="text-white text-xl p-2"
+                style={{fontFamily: FONTS.primaryFont}}>
+                Next
+              </Text>
               {/* {console.log('booking loading', loading?.bookingLoading)} */}
               {loading?.bookingLoading && (
                 <ActivityIndicator size="small" color="white" />
@@ -515,7 +577,6 @@ export default BookDemoScreen;
 
 const FirstStepDetails = ({
   fields,
-  country,
   phone,
   handleChangeValue,
   handleChildAge,
@@ -644,11 +705,12 @@ const FirstStepDetails = ({
 
       <View className="relative w-[100%] border border-gray-400 mt-4 rounded-[10px] py-3 flex-row justify-between px-2 items-center">
         <Text
-          className="absolute py-1 px-1 -top-3 left-5"
+          className="absolute py-1 px-1 -top-4 left-5"
           style={{
             backgroundColor: bgColor,
             color: textColors.textSecondary,
             fontSize: 14,
+            fontFamily: FONTS.primaryFont,
           }}>
           Your Phone Number
         </Text>
@@ -685,7 +747,12 @@ const FirstStepDetails = ({
   );
 };
 
-const ThirdStpDetails = ({navigation, setCurrentStep, setSelectedTab}) => {
+const ThirdStpDetails = ({
+  navigation,
+  setCurrentStep,
+  setSelectedTab,
+  place,
+}) => {
   const {textColors} = useSelector(state => state.appTheme);
   const dispatch = useDispatch();
 
@@ -706,10 +773,11 @@ const ThirdStpDetails = ({navigation, setCurrentStep, setSelectedTab}) => {
         <MIcon name="check-circle" size={60} color={textColors.textYlGreen} />
         <View className="flex-row items-center">
           <Text
-            className="text-2xl mr-2 font-semibold"
-            style={{color: textColors.textPrimary}}>
+            className="mr-2 font-semibold"
+            style={[FONTS.heading, {color: textColors.textPrimary}]}>
             Congratulations
           </Text>
+
           <MIcon
             name="party-popper"
             size={30}
@@ -717,8 +785,8 @@ const ThirdStpDetails = ({navigation, setCurrentStep, setSelectedTab}) => {
           />
         </View>
         <Text
-          className="text-base text-center"
-          style={{color: textColors.textSecondary}}>
+          className="text-base text-center mt-3"
+          style={[FONTS.subHeading, {color: textColors.textSecondary}]}>
           You have successfully booked your first free Handwriting class
         </Text>
         <View className="flex-row justify-around gap-3 mt-3">
@@ -727,17 +795,27 @@ const ThirdStpDetails = ({navigation, setCurrentStep, setSelectedTab}) => {
             style={{backgroundColor: textColors.textYlGreen}}
             // onPress={()=>{navigation.navigate('MainWelcomeScreen')}}
             onPress={bookAnotherClass}>
-            <Text className="text-base text-white">Book Another class</Text>
+            <Text
+              className="text-base text-white"
+              style={{fontFamily: FONTS.primaryFont}}>
+              Book Another class
+            </Text>
           </Pressable>
-          <Pressable
-            className="rounded-full max-w-[45%] items-center mt-3 py-2 px-4"
-            style={{backgroundColor: textColors.textYlOrange}}
-            onPress={() => {
-              // navigation.jumpTo('Pay & Enroll');
-              setSelectedTab('payAndEnroll');
-            }}>
-            <Text className="text-base text-white">Pay and Enroll</Text>
-          </Pressable>
+          {!place && (
+            <Pressable
+              className="rounded-full max-w-[45%] items-center mt-3 py-2 px-4"
+              style={{backgroundColor: textColors.textYlOrange}}
+              onPress={() => {
+                // navigation.jumpTo('Pay & Enroll');
+                setSelectedTab('payAndEnroll');
+              }}>
+              <Text
+                className="text-base text-white"
+                style={{fontFamily: FONTS.primaryFont}}>
+                Pay and Enroll
+              </Text>
+            </Pressable>
+          )}
         </View>
       </View>
     </>

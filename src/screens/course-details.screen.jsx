@@ -25,7 +25,6 @@ import {FONTS} from '../utils/constants/fonts';
 import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 
-
 const levels = ['Foundation', 'Advanced', 'Foundation+Advanced'];
 const AGE_GROUPS = ['5-7', '8-10', '11-14'];
 
@@ -42,20 +41,19 @@ const getLevelName = level => {
   }
 };
 
-const CourseDetails = ({navigation , courseId}) => {
+const CourseDetails = ({navigation, courseId}) => {
   const [aboutCourseArr, setAboutCourseArr] = useState([]);
   const [ageGroup, setAgeGroup] = useState('5-7');
   const [filteredCourse, setFilteredCourse] = useState(null);
   const [courseLevel, setCourseLevel] = useState('Foundation');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const dispatch = useDispatch();
-  const {textColors,bgColor} = useSelector(state => state.appTheme);
+  const {textColors, bgColor} = useSelector(state => state.appTheme);
 
   // console.log("CourseID here in this page", courseId)
 
   const {courseDetails, ageGroups, courseVideos, loading} =
     useSelector(courseSelector);
-
 
   // console.log("About course array is", aboutCourseArr[0].objArray[0].content)
 
@@ -68,9 +66,9 @@ const CourseDetails = ({navigation , courseId}) => {
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(()=>{
-    dispatch(fetchCourseStart({courseId : courseId }))
-  },[])
+  useEffect(() => {
+    dispatch(fetchCourseStart({courseId: courseId}));
+  }, []);
 
   useEffect(() => {
     if (!courseVideos) {
@@ -160,9 +158,13 @@ const CourseDetails = ({navigation , courseId}) => {
         courseLevel === 'Foundation' ||
         courseLevel === 'Foundation+Advanced'
       ) {
-        course = filteredCourse.objArray.find(item => parseInt(item.level) === 1);
+        course = filteredCourse.objArray.find(
+          item => parseInt(item.level) === 1,
+        );
       } else {
-        course = filteredCourse.objArray.find(item => parseInt(item.level) === 2);
+        course = filteredCourse.objArray.find(
+          item => parseInt(item.level) === 2,
+        );
       }
 
       setSelectedCourse(course);
@@ -170,18 +172,24 @@ const CourseDetails = ({navigation , courseId}) => {
   }, [courseLevel, filteredCourse]);
 
   return (
-    <View style={[styles.container,{backgroundColor:bgColor}]}>
+    <View style={[styles.container, {backgroundColor: bgColor}]}>
       <ScrollView
         style={{flex: 1}}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingBottom: 30}}>
-        <TextWrapper
+        {/* <TextWrapper
           fs={22}
           color={textColors.textSecondary}
-          fw="900"
-          styles={{textAlign: 'center'}}>
+          // fw="600"
+          styles={[FONTS.subHeading , {textAlign: 'center'}]}>
           More about course
-        </TextWrapper>
+        </TextWrapper> */}
+
+        <Text
+          className="font-semibold w-full text-center"
+          style={[FONTS.heading, {color: textColors.textSecondary}]}>
+          More About Course
+        </Text>
         <Spacer />
         <VideoPlayer uri={courseVideos?.videoUri} />
         <Spacer />
@@ -194,14 +202,15 @@ const CourseDetails = ({navigation , courseId}) => {
         ) : (
           <>
             <View>
-              <Text className="text-center text-[18px] font-semibold" style={{color:textColors.textYlMain}}>
+              <Text
+                className="text-center font-semibold"
+                style={[FONTS.subHeading, {color: textColors.textYlMain}]}>
                 Choose Age Group
               </Text>
               <View style={{alignItems: 'center'}}>
                 {/* <TextWrapper fs={17}>Age group</TextWrapper> */}
                 <Spacer space={8} />
                 <View style={{flexDirection: 'row', gap: 12}}>
-                  {console.log('textcolor', textColors.textYlMain)}
                   {AGE_GROUPS.map(group => (
                     <Pressable
                       key={group}
@@ -310,7 +319,7 @@ const CourseLevels = ({courseLevel, level, setCourseLevel}) => {
 const CourseContent = ({course}) => {
   const {textColors} = useSelector(state => state.appTheme);
   return (
-    <View style={{paddingVertical: 2}}>
+    <View style={{paddingVertical: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -318,21 +327,20 @@ const CourseContent = ({course}) => {
           gap: 4,
         }}>
         <MIcon name="bullseye-arrow" size={28} color={textColors.textYlMain} />
-        <TextWrapper
-          fs={21}
-          color={textColors.textYlMain}
-          ff={FONTS.signika_semiBold}>
+        <Text
+          className="font-semibold"
+          style={[FONTS.subHeading, {color: textColors.textYlMain}]}>
           {course?.subHeading}
-        </TextWrapper>
+        </Text>
       </View>
       <View style={{paddingHorizontal: 8, width: '100%'}} className="mt-1">
         {course?.points.map((point, index) => (
           <View key={index.toString()}>
-            <TextWrapper
-              color={textColors.textSecondary}
-              ff={FONTS.signika_medium}>
+            <Text
+              className="font-semibold"
+              style={[FONTS.primary, {color: textColors.textSecondary}]}>
               {point}
-            </TextWrapper>
+            </Text>
           </View>
         ))}
       </View>

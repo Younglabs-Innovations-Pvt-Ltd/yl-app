@@ -2,6 +2,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import React, {useState} from 'react';
 import {TextInput} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
+import { FONTS } from '../utils/constants/fonts';
 
 // setValue - state which will store the name
 // placeHolder - placeholder for input box also the label
@@ -20,7 +21,7 @@ const Input = ({setValue, placeHolder , value ,isDisabled}) => {
           style={[
             styles.label,
             {color: isFocus ? colorYlMain : textColors.textSecondary},
-            {backgroundColor: bgColor},
+            {backgroundColor: bgColor , fontFamily:FONTS.primaryFont},
           ]}
           >
           {placeHolder}

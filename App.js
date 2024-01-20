@@ -227,7 +227,7 @@ function App() {
                   cardStyleInterpolator:
                     CardStyleInterpolators.forHorizontalIOS,
                 })}
-                initialRouteName={SCREEN_NAMES.WELCOME}>
+                initialRouteName={SCREEN_NAMES.MAIN}>
                 <Stack.Screen
                   name={SCREEN_NAMES.WELCOME}
                   component={WelcomeScreen}

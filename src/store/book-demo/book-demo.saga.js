@@ -18,7 +18,7 @@ import {
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
 
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-import {makeNewBooking} from '../../utils/api/yl.api';
+import {makeNewBooking, addNewSoloBooking} from '../../utils/api/yl.api';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {ERROR_MESSAGES} from '../../utils/constants/messages';
 import {setCurrentNetworkState} from '../network/reducer';
@@ -124,8 +124,18 @@ function* startHandleNewBooking() {
 
 // Handle OneToOne Booking
 function* handleNewOneToOneBooking({payload}) {
-  console.log('payload is', payload);
-  yield put(setOneToOneBookingSuccess());
+  try {
+    console.log('in a function');
+    console.log('payload is', payload);
+    const response = yield addNewSoloBooking(payload);
+
+    if (response.status == 200) {
+      yield put(setOneToOneBookingSuccess());
+    }
+  } catch (error) {
+    console.log('eror', error.message);
+    yield put(setOneToOneBookingFailed('Somethis went wrong'));
+  }
 }
 
 function* startHandleOneToOneBooking() {

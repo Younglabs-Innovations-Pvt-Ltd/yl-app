@@ -6,6 +6,7 @@ import {bookDemoSelector} from '../../store/book-demo/book-demo.selector';
 import {
   setSelectedOneToOneDemoTime,
   setTimezone,
+  setOneToOneBookingFailed2,
 } from '../../store/book-demo/book-demo.reducer';
 import moment from 'moment';
 import ShowSnackbar from '../../utils/Snackbar';
@@ -13,6 +14,7 @@ import Snackbar from 'react-native-snackbar';
 import {useToast} from 'react-native-toast-notifications';
 import {Showtoast} from '../../utils/toast';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { FONTS } from '../../utils/constants/fonts';
 
 const OneToOneDemoBook = ({
   navigation,
@@ -23,17 +25,17 @@ const OneToOneDemoBook = ({
   const toast = useToast();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDemoDate, setSelectedDemoDate] = useState(null);
-  const {textColors , bgColor} = useSelector(state => state.appTheme);
+  const {textColors, bgColor} = useSelector(state => state.appTheme);
   const {childAge, parentName: name, phone, childName} = formData;
   const dispatch = useDispatch();
 
-  console.log('user selected date', selectedDemoDate);
+  // console.log('user selected date', selectedDemoDate);
 
   useEffect(() => {
     dispatch(setSelectedOneToOneDemoTime(selectedDemoDate));
   }, [selectedDemoDate]);
 
-  console.log('i am here');
+  // console.log('i am here');
   const {
     bookingSlots,
     timezone,
@@ -44,7 +46,18 @@ const OneToOneDemoBook = ({
     bookingCreatedSuccessfully,
     childData,
     selectedOneToOneDemoTime,
+    oneToOneBookingFailed,
   } = useSelector(bookDemoSelector);
+  // console.log('oneToOneBookingFailed is', oneToOneBookingFailed);
+
+  useEffect(() => {
+    if (oneToOneBookingFailed) {
+      setTimeout(() => {
+        console.log('disapperaring');
+        dispatch(setOneToOneBookingFailed2(false));
+      }, 2500);
+    }
+  }, [oneToOneBookingFailed]);
 
   useEffect(() => {
     if (ipData) {
@@ -103,37 +116,29 @@ const OneToOneDemoBook = ({
       <View className="">
         <Text
           className="font-semibold text-center"
-          style={{color: textColors.textPrimary, fontSize: 18}}>
+          style={[FONTS.subHeading , {color: textColors.textPrimary }]}>
           Choose A Preferred Date
         </Text>
         <Text
           className="font-semibold text-center"
-          style={{color: textColors.textSecondary, fontSize: 11}}>
+          style={{color: textColors.textSecondary, fontSize: 13 , fontFamily:FONTS.primaryFont}}>
           (Date should be in between of today and among next 7 days )
         </Text>
-
-        {console.log(
-          'selectedDemotime type is',
-          typeof selectedOneToOneDemoTime,
-        )}
         <View className="w-full mt-5">
           <View className="flex-col items-center w-full justify-center">
             <View
               className="h-20 w-20 rounded-full border items-center justify-center"
               style={{
                 borderColor: textColors.textYlMain,
-                backgroundColor:
-                  selectedOneToOneDemoTime
-                    ? textColors.textYlMain
-                    : bgColor,
+                backgroundColor: selectedOneToOneDemoTime
+                  ? textColors.textYlMain
+                  : bgColor,
               }}>
               <MIcon
                 name="calendar-clock"
                 size={45}
                 color={
-                  selectedOneToOneDemoTime
-                    ? 'white'
-                    : textColors.textYlMain
+                  selectedOneToOneDemoTime ? 'white' : textColors.textYlMain
                 }
                 onPress={showDatePicker}
               />
@@ -143,19 +148,29 @@ const OneToOneDemoBook = ({
               {selectedOneToOneDemoTime ? (
                 <Text
                   className="w-full text-center text-[15px] font-semibold"
-                  style={{color: textColors.textSecondary}}>
+                  style={{color: textColors.textSecondary , fontFamily:FONTS.primaryFont}}>
                   {`You have selected: ${moment(
                     selectedOneToOneDemoTime,
                   ).format('DD-MM-YYYY hh:mm A')}`}
                 </Text>
               ) : (
                 <Pressable className="w-full items-center">
-                  <Text className="text-[12px] font-semibold text-base w-full text-center" style={{color:textColors.textSecondary}}>
+                  <Text
+                    className="font-semibold text-[18px] w-full text-center"
+                    style={{color: textColors.textSecondary , fontFamily:FONTS.headingFont}}>
                     Click on Calendar to select date
                   </Text>
                 </Pressable>
               )}
             </View>
+
+            {oneToOneBookingFailed && (
+              <Text className="w-full text-center font-semibold text-red-500 mt-5 text-xl"
+              style={[FONTS.subHeading]}
+              >
+                Failed To create booking. Try Again
+              </Text>
+            )}
           </View>
         </View>
       </View>

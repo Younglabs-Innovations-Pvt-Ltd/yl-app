@@ -2,6 +2,7 @@ import {View, Text, Image, Pressable} from 'react-native';
 import React from 'react';
 import {useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { FONTS } from '../utils/constants/fonts';
 
 
 const NoBatchesModule = ({courseData}) => {
@@ -19,13 +20,13 @@ const NoBatchesModule = ({courseData}) => {
         />
       </View>
       <Text
-        className="text-2xl text-center font-semibold"
-        style={{color: textColors.textYlMain}}>
+        className="text-center font-semibold"
+        style={[FONTS.heading , {color: textColors.textYlMain }]}>
         Chat with us on WhatsApp for batches of this course.
       </Text>
       <Text
         className="text-base text-center mt-3"
-        style={{color: textColors.textSecondary}}>
+        style={{color: textColors.textSecondary , fontFamily:FONTS.primaryFont}}>
         Need help with timings, prices or if have questions, contact on WhatsApp
         or request callback
       </Text>
@@ -35,14 +36,14 @@ const NoBatchesModule = ({courseData}) => {
           className="rounded-full items-center mt-3 flex-row py-1 p-3"
           style={{backgroundColor: textColors.textYlGreen}}>
           <MIcon name="whatsapp" size={22} color="white" />
-          <Text className="text-white text-base ml-1">Chat with us</Text>
+          <Text className="text-white text-base ml-1" style={{fontFamily:FONTS.primaryFont}}>Chat with us</Text>
         </Pressable>
 
         <Pressable
           className="rounded-full items-center mt-3 flex-row py-1 p-3"
           style={{backgroundColor: textColors.textYlOrange}}>
           <MIcon name="phone-outline" size={22} color="white" />
-          <Text className="text-white text-base ml-1">Request a call</Text>
+          <Text className="text-white text-base ml-1" style={{fontFamily:FONTS.primaryFont}}>Request a call</Text>
         </Pressable>
       </View>
     </View>

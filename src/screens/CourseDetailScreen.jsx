@@ -7,6 +7,7 @@ import BatchFeeDetails from './batch-fees-details.screen';
 import {useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FlatList} from 'react-native-gesture-handler';
+import { FONTS } from '../utils/constants/fonts';
 
 const BANNER_H = 190;
 const CourseDetailsScreen = ({route, navigation}) => {
@@ -211,7 +212,10 @@ export const FeatureTray = ({
             className="text-[18px] text-center font-semibold"
             style={{
               color:
-                selectedTab === feature?.value ? textColors.textYlMain : '',
+                selectedTab === feature?.value
+                  ? textColors.textYlMain
+                  : "gray",
+              fontFamily:FONTS.headingFont
             }}>
             {feature.label}
           </Text>
