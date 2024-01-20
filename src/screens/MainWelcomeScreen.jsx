@@ -319,7 +319,7 @@ const MainWelcomeScreen = ({navigation}) => {
 
         <ShowCourses navigation={navigation} />
 
-        <Spacer space={8} />
+        <Spacer space={12} />
 
         {/* Testimonials */}
         <View className="w-full">

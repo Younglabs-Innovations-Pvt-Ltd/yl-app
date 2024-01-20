@@ -10,27 +10,7 @@ import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {useSelector} from 'react-redux';
 import {FONTS} from '../utils/constants/fonts';
 
-const Icons = (name, focused) => {
-  switch (name) {
-    case 'Drawer':
-      return (
-        <Image
-          source={require('../assets/images/spinner.png')}
-          style={{width: 28, height: 28, objectFit: 'contain'}}
-        />
-      );
-    case 'Account':
-      return (
-        <MIcon
-          name="account-circle"
-          size={28}
-          color={focused ? COLORS.pblue : '#222'}
-        />
-      );
-    default:
-      return;
-  }
-};
+
 
 const shareApp = async () => {
   const message =
@@ -51,6 +31,28 @@ function Tabbar({state, descriptors, navigation}) {
   const [actions, setActions] = useState(false);
   const {bgColor, bgSecondaryColor, textColors, darkMode, colorYlMain} =
     useSelector(state => state.appTheme);
+
+    const Icons = (name, focused) => {
+      switch (name) {
+        case 'Drawer':
+          return (
+            <Image
+              source={require('../assets/images/spinner.png')}
+              style={{width: 28, height: 28, objectFit: 'contain'}}
+            />
+          );
+        case 'Account':
+          return (
+            <MIcon
+              name="account"
+              size={26}
+              color={focused ? COLORS.pblue : textColors.textPrimary}
+            />
+          );
+        default:
+          return;
+      }
+    };
 
   const ScreenIcon = ({name, focused}) => {
     const icon = Icons(name, focused);
@@ -101,7 +103,7 @@ function Tabbar({state, descriptors, navigation}) {
                 style={{flex: 1, alignItems: 'center'}}>
                 <Icon
                   name="book-outline"
-                  size={24}
+                  size={26}
                   color={isFocused ? COLORS.pblue : textColors.textPrimary}
                 />
                 <TextWrapper

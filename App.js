@@ -241,11 +241,11 @@ function App() {
                   initialParams={{bookingId}}
                 />
 
-                <Stack.Screen
+                {/* <Stack.Screen
                   name={'UserProfileScreen'}
                   component={UserProfile}
                   options={{headerShown: false}}
-                />
+                /> */}
 
                 <Stack.Screen
                   name="CourseDetailScreen"

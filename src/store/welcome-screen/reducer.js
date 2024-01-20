@@ -12,7 +12,7 @@ const INITIAL_STATE = {
   allBookingsLoding: false,
   allBookingsLoadingFailed: false,
   userBookings: null,
-  userOrders: {},
+  userOrders:{},
   userOrdersLoading: false,
   userOrderLoadingFailed: false,
   userOrderLoadingFailedReason: '',
@@ -48,6 +48,7 @@ const reducer = {
 
   getCoursesForWelcomeScreen(state, action) {
     // console.log('payload in reducer', action.payload);
+    console.log("getting courses in reducer")
     state.coursesLoading = true;
     state.coursesLoadingFailed = false;
   },

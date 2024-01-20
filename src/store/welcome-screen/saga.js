@@ -6,7 +6,7 @@ import {
   setErrorMessage,
   getCoursesForWelcomeScreen,
   setLoading,
-  getCoursesForLoadingScreenFailed,
+  getCoursesForWelcomeScreenFailed,
   getCoursesForWelcomeScreenSuccess,
   startGetAllBookings,
   getAllBookingsSuccess,
@@ -108,9 +108,28 @@ function* startFetchingCoursesForLandingPage({payload}) {
     const country = payload.country;
     const res = yield fetchCoursesForWelcomeScreen(country);
     const data = yield res.json();
-    yield put(getCoursesForWelcomeScreenSuccess(data));
+    // console.log("got data",data)
+
+    if (data) {
+      const formattedCourses = {
+        handwriting: [],
+        others: [],
+      };
+      data?.forEach(obj => {
+        const {category} = obj;
+
+        if (category === 'handwriting') {
+          formattedCourses['handwriting'].push(obj);
+        } else {
+          formattedCourses['others'].push(obj);
+        }
+      });
+      // console.log("Formatted Course is", formattedCourses)
+      yield put(getCoursesForWelcomeScreenSuccess(formattedCourses));
+    }
   } catch (error) {
-    yield put(getCoursesForLoadingScreenFailed());
+    console.log('fetch courses error', error.message);
+    yield put(getCoursesForWelcomeScreenFailed());
   }
 }
 
@@ -126,6 +145,11 @@ function* fetchAllBookings({payload}) {
   try {
     console.log('fetching bookings in api');
     const response = yield fetchAllBookinsFromPhone(payload);
+
+    if (response.status !== 200) {
+      yield put(setAllBookingsFetchingFailed('Something went wrong'));
+      return;
+    }
     const data = yield response.json();
 
     if (data?.data) {
@@ -158,11 +182,14 @@ function* fetchAllOrders({payload}) {
   try {
     console.log('getting payload in');
     const response = yield fetchAllOrdersFromLeadId(payload);
-
-
+    if (response.status !== 200) {
+      yield put(userOrdersLoadingFailed('Something went Wrong'));
+      return;
+    }
 
     const data = yield response.json();
-    console.log('get courses', data , response.status);
+
+    // console.log('get courses', data, response.status);
 
     if (data?.orderData) {
       console.log('in if condition');
@@ -177,12 +204,14 @@ function* fetchAllOrders({payload}) {
       });
       const initialKey = Object.keys(formattedOrders)[0];
       const initialValue = Object.values(formattedOrders)[0];
-      console.log("initial key: " + initialKey , " initial value: " + initialValue)
+      console.log(
+        'initial key: ' + initialKey,
+        ' initial value: ' + initialValue,
+      );
       yield put(setSelectedUserOrder({[initialKey]: initialValue}));
       yield put(userOrderFetchingSuccess(formattedOrders));
-    }
-    else{
-      console.log("not data in order")
+    } else {
+      console.log('not data in order');
     }
   } catch (error) {
     console.log('fetch_all_order_err', error.message);

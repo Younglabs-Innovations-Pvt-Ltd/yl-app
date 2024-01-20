@@ -19,6 +19,13 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {authSelector} from '../../store/auth/selector';
 
 const ShowCourses = ({navigation}) => {
+  const coursesNameByCategory = {
+    handwriting: 'English Handwriting Courses',
+    learning: 'English Learning',
+    mathematics: 'Mathematics Courses',
+    others:"Other Acedemic Courses"
+  };
+
   const dispatch = useDispatch();
   const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
   const {courses, coursesLoading, coursesLoadingFailed} = useSelector(
@@ -38,42 +45,18 @@ const ShowCourses = ({navigation}) => {
     dispatch(
       getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
     );
-  }, [refreshCourses, ipData]);
+  }, [ipData, refreshCourses]);
 
   const reloadCourses = () => {
     setRefreshCourses({});
   };
 
+  //   console.log("courses are", courses)
   return (
-    <View className="py-1 w-[100%]">
-      <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
-        <Text
-          className={`w-[80%] p-0`}
-          style={[FONTS.heading, {color: textColors?.textPrimary}]}>
-          Handwriting Improvement
-        </Text>
-
-        <Pressable
-          className="flex-row"
-          onPress={() => {
-            navigation.navigate('AllCoursesScreen', {
-              //   courses: handwritingCourses,
-              heading: 'Handwriting Improvement',
-            });
-          }}>
-          <Text className="font-semibold" style={{color: COLORS.pblue}}>
-            See all
-          </Text>
-          <MIcon name="chevron-right" size={22} color={COLORS.pblue} />
-        </Pressable>
-      </View>
-
+    <View className="w-full">
       {coursesLoading ? (
-        <View className="w-full items-center h-[80px] justify-center mt-1">
-          <ActivityIndicator
-            color={textColors.textYlMain}
-            className="h-10 w-10"
-          />
+        <View className="w-full items-center">
+          <ActivityIndicator />
         </View>
       ) : coursesLoadingFailed ? (
         <View className="w-full items-center h-[80px] justify-center">
@@ -92,23 +75,105 @@ const ShowCourses = ({navigation}) => {
           </Pressable>
         </View>
       ) : (
-        <FlatList
-          data={courses}
-          keyExtractor={item => item.name}
-          renderItem={item => {
-            return (
-              <CourseItemRender
-                data={item.item}
-                navigation={navigation}
-                phone={user?.phone}
+        Object.keys(courses)?.map(key => {
+          return (
+            <View className="py-1 w-[100%]">
+              <View
+                className="gap-1 pl-2 pr-3 flex-row justify-between items-end"
+                key={key}>
+                <Text
+                  className={`w-[100%] p-0`}
+                  style={[FONTS.heading, {color: textColors?.textPrimary}]}>
+                  {coursesNameByCategory[key]}
+                </Text>
+              </View>
+
+              <FlatList
+                data={courses[key]}
+                keyExtractor={item => item.name}
+                renderItem={item => {
+                  return (
+                    <CourseItemRender
+                      data={item.item}
+                      navigation={navigation}
+                      phone={user?.phone}
+                    />
+                  );
+                }}
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                style={{paddingTop: 4}}
               />
-            );
-          }}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          style={{paddingTop: 4}}
-        />
+            </View>
+          );
+        })
       )}
+
+      {/* <View className="py-1 w-[100%]">
+        <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
+          <Text
+            className={`w-[80%] p-0`}
+            style={[FONTS.heading, {color: textColors?.textPrimary}]}>
+            Handwriting Improvement
+          </Text>
+
+          <Pressable
+            className="flex-row"
+            onPress={() => {
+              navigation.navigate('AllCoursesScreen', {
+                //   courses: handwritingCourses,
+                heading: 'Handwriting Improvement',
+              });
+            }}>
+            <Text className="font-semibold" style={{color: COLORS.pblue}}>
+              See all
+            </Text>
+            <MIcon name="chevron-right" size={22} color={COLORS.pblue} />
+          </Pressable>
+        </View>
+
+        {coursesLoading ? (
+          <View className="w-full items-center h-[80px] justify-center mt-1">
+            <ActivityIndicator
+              color={textColors.textYlMain}
+              className="h-10 w-10"
+            />
+          </View>
+        ) : coursesLoadingFailed ? (
+          <View className="w-full items-center h-[80px] justify-center">
+            <Text
+              className="font-semibold"
+              style={[FONTS.primary, {color: textColors.textSecondary}]}>
+              Unable To Load Courses For You
+            </Text>
+
+            <Pressable onPress={() => reloadCourses()}>
+              <Text
+                className="text-base mt-1"
+                style={{color: textColors.textYlMain}}>
+                Try Again
+              </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <FlatList
+            data={courses}
+            keyExtractor={item => item.name}
+            renderItem={item => {
+              return (
+                <CourseItemRender
+                  data={item.item}
+                  navigation={navigation}
+                  phone={user?.phone}
+                />
+              );
+            }}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            style={{paddingTop: 4}}
+          />
+        )}
+      </View> */}
     </View>
   );
 };

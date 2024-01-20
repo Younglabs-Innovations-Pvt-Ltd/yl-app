@@ -14,6 +14,7 @@ import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {localStorage} from '../utils/storage/storage-provider';
 
 import {i18nContext} from '../context/lang.context';
+import UserProfile from './UserProfile';
 
 const Tab = createBottomTabNavigator();
 
@@ -94,6 +95,12 @@ const MainScreen = ({route}) => {
         name={'Contact'}
         options={{tabBarLabel: localLang.tabNavContact}}
         component={ContactScreen}
+      />
+      <Tab.Screen
+        name={'Account'}
+        options={{tabBarLabel: "Account" , headerShown: false}}
+        component={UserProfile}
+
       />
     </Tab.Navigator>
   );

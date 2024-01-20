@@ -1,4 +1,4 @@
-import {View, Text, Pressable} from 'react-native';
+import {View, Text, Pressable, ActivityIndicator} from 'react-native';
 import React, {Children, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {setDarkMode} from '../store/app-theme/appThemeReducer';
@@ -19,12 +19,23 @@ import {select} from 'redux-saga/effects';
 const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   const handleShowDrawer = () => navigation.openDrawer();
   const [customerName, setCustomerName] = useState('');
+  const [ordersOrBookingsLoading, setOrdersOrBookingsLoading] = useState(false);
+  const [ordersOrBookingsLoadingFailed, setOrdersOrBookingsLoadingFailed] =
+    useState(false);
   const dispatch = useDispatch();
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
-  const {selectedChild, userBookings, userOrders, selectedUserOrder} =
-    useSelector(welcomeScreenSelector);
+  const {
+    selectedChild,
+    userBookings,
+    userOrders,
+    selectedUserOrder,
+    allBookingsLoding,
+    userOrdersLoading,
+    allBookingsLoadingFailed,
+    userOrderLoadingFailed,
+  } = useSelector(welcomeScreenSelector);
   const {user, customer} = useSelector(authSelector);
 
   // console.log("UserOrders are" , userOrders)
@@ -36,16 +47,16 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   useEffect(() => {
     console.log('useeffect running 1');
     if (customer !== 'yes') {
-      console.log("if 2")
+      console.log('if 2');
       if (!userBookings) {
-        console.log("if 3")
+        console.log('if 3');
         dispatch(startGetAllBookings(user?.phone));
       }
     }
   }, [userBookings, user, customer]);
 
   useEffect(() => {
-    if (customer == 'yes' && !userOrders) {
+    if (customer == 'yes') {
       console.log('condition 2');
       let body = {
         leadId: user.leadId,
@@ -64,6 +75,16 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
       setCustomerName(selectedChild.userName);
     }
   }, [customer, selectedChild, selectedUserOrder]);
+
+  useEffect(() => {
+    if (customer == 'yes') {
+      setOrdersOrBookingsLoading(userOrdersLoading);
+      setOrdersOrBookingsLoadingFailed(userOrderLoadingFailed);
+    } else {
+      setOrdersOrBookingsLoading(allBookingsLoding);
+      setOrdersOrBookingsLoadingFailed(allBookingsLoadingFailed);
+    }
+  }, [customer, allBookingsLoding, userOrdersLoading]);
 
   return (
     <>
@@ -91,39 +112,64 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
 
           <View className="relative">
             <TouchableOpacity onPress={open}>
-              <View style={tw` pr-2 flex-row gap-2 justify-end items-center`}>
-                <View
-                  style={[
-                    {
-                      borderRadius: 50,
-                      padding: 4,
-                      backgroundColor: textColors.textYlMain,
-                    },
-                  ]}>
-                  <MIcon name="account" size={25} color="white" />
-                </View>
-
-                <View style={tw`gap-0`}>
+              {ordersOrBookingsLoading ? (
+                <ActivityIndicator />
+              ) : ordersOrBookingsLoadingFailed ? (
+                <View>
                   <Text
+                    className="text-[12px]"
+                    style={{
+                      color: textColors.textSecondary,
+                      fontFamily: FONTS.primaryFont,
+                    }}>
+                    Error in Fetcing Data
+                  </Text>
+                  <Text
+                    className="text-[10px]"
+                    style={{
+                      color: textColors.textYlMain,
+                      fontFamily: FONTS.primaryFont,
+                    }}>
+                    Try Again
+                  </Text>
+                </View>
+              ) : (
+                <View style={tw` pr-2 flex-row gap-2 justify-end items-center`}>
+                  <View
                     style={[
                       {
-                        color: darkMode ? textColors.textSecondary : '#448BD6',
-                        fontFamily: FONTS.headingFont,
+                        borderRadius: 50,
+                        padding: 4,
+                        backgroundColor: textColors.textYlMain,
                       },
-                    ]}
-                    className={`font-semibold`}>
-                    Welcome, {customerName || ''}
-                  </Text>
+                    ]}>
+                    <MIcon name="account" size={25} color="white" />
+                  </View>
 
-                  <Text
-                    style={{
-                      color: darkMode ? textColors.textSecondary : '#448BD6',
-                    }}
-                    className={`text-[10px] font-semibold `}>
-                    {user?.credits} points
-                  </Text>
+                  <View style={tw`gap-0`}>
+                    <Text
+                      style={[
+                        {
+                          color: darkMode
+                            ? textColors.textSecondary
+                            : '#448BD6',
+                          fontFamily: FONTS.headingFont,
+                        },
+                      ]}
+                      className={`font-semibold`}>
+                      Welcome, {customerName || ''}
+                    </Text>
+
+                    <Text
+                      style={{
+                        color: darkMode ? textColors.textSecondary : '#448BD6',
+                      }}
+                      className={`text-[10px] font-semibold `}>
+                      {user?.credits} points
+                    </Text>
+                  </View>
                 </View>
-              </View>
+              )}
             </TouchableOpacity>
           </View>
 

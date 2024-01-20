@@ -20,6 +20,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import RedeemPointsView from '../components/UserProfileComponents/RedeemPointsView';
 import MyTicketsView from './MyTicketsView';
+import {welcomeScreenSelector} from '../store/welcome-screen/selector';
+import {authSelector} from '../store/auth/selector';
 
 const {width, height} = Dimensions.get('window');
 
@@ -50,6 +52,9 @@ const UserProfile = ({navigation}) => {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
   const [selectedBottomSheetComponent, setSelectedBottomSheetComponent] =
     useState('redeemPoints');
+
+  const {selectedUserOrder} = useSelector(welcomeScreenSelector);
+  const {customer} = useSelector(authSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -67,148 +72,157 @@ const UserProfile = ({navigation}) => {
 
   return (
     <>
-      <ScrollView className="flex-1 px-2" style={{backgroundColor: bgColor}}>
-        <View
-          className="w-full p-2 rounded-md mt-4 flex-row"
-          style={{backgroundColor: bgSecondaryColor, height: height / 4}}>
-          <View className="w-[45%] h-full items-center justify-center flex-col">
+      {customer === 'yes' ? (
+        <>
+          <ScrollView
+            className="flex-1 px-2"
+            style={{backgroundColor: bgColor}}>
             <View
-              className="h-[72%] w-[85%] bg-gray-400 overflow-hidden"
-              style={{borderRadius: 100}}>
-              <ImageBackground
-                source={{
-                  uri: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
-                }}
-                className="w-[100%] rounded h-full justify-center items-center"
-                style={[{flex: 1, resizeMode: 'cover'}]}></ImageBackground>
+              className="w-full p-2 rounded-md mt-4 flex-row"
+              style={{backgroundColor: bgSecondaryColor, height: height / 4}}>
+              <View className="w-[45%] h-full items-center justify-center flex-col">
+                <View
+                  className="h-[72%] w-[85%] bg-gray-400 overflow-hidden"
+                  style={{borderRadius: 100}}>
+                  <ImageBackground
+                    source={{
+                      uri: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
+                    }}
+                    className="w-[100%] rounded h-full justify-center items-center"
+                    style={[{flex: 1, resizeMode: 'cover'}]}></ImageBackground>
+                </View>
+                <View className="mt-2">
+                  <Text
+                    className={`text-[12px] text-center font-semibold`}
+                    style={{color: textColors.textYlMain}}>
+                    Rahul Sharma, Age: 9
+                  </Text>
+                  <Text
+                    className={`text-[12px] text-center`}
+                    style={{color: textColors.textYlMain}}>
+                    Parent Name: Sohan Sharma
+                  </Text>
+                </View>
+              </View>
+              <View className="w-[55%] h-full p-2 px-4">
+                <Pressable onPress={() => openBottomSheet('redeemPoints')}>
+                  <View
+                    className="border-b justify-end"
+                    style={{borderColor: textColors.textSecondary}}>
+                    <View className="flex-row items-center py-2">
+                      <MIcon
+                        name="hand-coin-outline"
+                        color={textColors.textYlOrange}
+                        size={38}
+                      />
+                      <View className="ml-1">
+                        <Text
+                          className="font-semibold"
+                          style={{color: textColors.textYlOrange}}>
+                          Refferal Points
+                        </Text>
+                        <Text
+                          className=""
+                          style={{color: textColors.textSecondary}}>
+                          960
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </Pressable>
+
+                <Pressable onPress={() => openBottomSheet('transactionsView')}>
+                  <View
+                    className="justify-start border-b"
+                    style={{borderColor: textColors.textSecondary}}>
+                    <View className="flex-row items-center py-2">
+                      <MIcon
+                        name="swap-horizontal"
+                        color={textColors.textYlGreen}
+                        size={40}
+                      />
+                      <View className="ml-1">
+                        <Text
+                          className="font-semibold"
+                          style={{color: textColors.textYlGreen}}>
+                          My Transactions
+                        </Text>
+                        <Text
+                          className=""
+                          style={{color: textColors.textSecondary}}>
+                          5460
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </Pressable>
+
+                <Pressable onPress={() => openBottomSheet('ticketsView')}>
+                  <View
+                    className="justify-start"
+                    style={{borderColor: textColors.textSecondary}}>
+                    <View className="flex-row items-center py-2">
+                      <MIcon
+                        name="ticket-confirmation-outline"
+                        color={textColors.textYlRed}
+                        size={40}
+                      />
+                      <View className="ml-1 flex-wrap">
+                        <Text
+                          className="font-semibold"
+                          style={{color: textColors.textYlRed}}>
+                          My Tickets
+                        </Text>
+                        <Text
+                          className="flex-wrap"
+                          style={{color: textColors.textSecondary}}>
+                          Total: 4 , Closed: 3
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </Pressable>
+              </View>
             </View>
-            <View className="mt-2">
+
+            {/* Bought Courses Here */}
+            <View className="mt-8">
               <Text
-                className={`text-[12px] text-center font-semibold`}
-                style={{color: textColors.textYlMain}}>
-                Rahul Sharma, Age: 9
+                className="text-[24px] capitalize font-bold px-1"
+                style={{color: textColors.textPrimary}}>
+                My Courses
               </Text>
-              <Text
-                className={`text-[12px] text-center`}
-                style={{color: textColors.textYlMain}}>
-                Parent Name: Sohan Sharma
-              </Text>
+
+              <View className="w-full">
+                {boughtCourses?.map((data, index) => {
+                  return (
+                    <CourseItemShow
+                      key={index}
+                      data={data}
+                      navigation={navigation}
+                    />
+                  );
+                })}
+              </View>
             </View>
-          </View>
-          <View className="w-[55%] h-full p-2 px-4">
-            <Pressable onPress={() => openBottomSheet('redeemPoints')}>
-              <View
-                className="border-b justify-end"
-                style={{borderColor: textColors.textSecondary}}>
-                <View className="flex-row items-center py-2">
-                  <MIcon
-                    name="hand-coin-outline"
-                    color={textColors.textYlOrange}
-                    size={38}
-                  />
-                  <View className="ml-1">
-                    <Text
-                      className="font-semibold"
-                      style={{color: textColors.textYlOrange}}>
-                      Refferal Points
-                    </Text>
-                    <Text
-                      className=""
-                      style={{color: textColors.textSecondary}}>
-                      960
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </Pressable>
-
-            <Pressable onPress={() => openBottomSheet('transactionsView')}>
-              <View
-                className="justify-start border-b"
-                style={{borderColor: textColors.textSecondary}}>
-                <View className="flex-row items-center py-2">
-                  <MIcon
-                    name="swap-horizontal"
-                    color={textColors.textYlGreen}
-                    size={40}
-                  />
-                  <View className="ml-1">
-                    <Text
-                      className="font-semibold"
-                      style={{color: textColors.textYlGreen}}>
-                      My Transactions
-                    </Text>
-                    <Text
-                      className=""
-                      style={{color: textColors.textSecondary}}>
-                      5460
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </Pressable>
-
-            <Pressable onPress={() => openBottomSheet('ticketsView')}>
-              <View
-                className="justify-start"
-                style={{borderColor: textColors.textSecondary}}>
-                <View className="flex-row items-center py-2">
-                  <MIcon
-                    name="ticket-confirmation-outline"
-                    color={textColors.textYlRed}
-                    size={40}
-                  />
-                  <View className="ml-1 flex-wrap">
-                    <Text
-                      className="font-semibold"
-                      style={{color: textColors.textYlRed}}>
-                      My Tickets
-                    </Text>
-                    <Text
-                      className="flex-wrap"
-                      style={{color: textColors.textSecondary}}>
-                      Total: 4 , Closed: 3
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Bought Courses Here */}
-        <View className="mt-8">
-          <Text
-            className="text-[24px] capitalize font-bold px-1"
-            style={{color: textColors.textPrimary}}>
-            My Courses
-          </Text>
-
-          <View className="w-full">
-            {boughtCourses?.map((data, index) => {
-              return (
-                <CourseItemShow
-                  key={index}
-                  data={data}
-                  navigation={navigation}
-                />
-              );
-            })}
-          </View>
-        </View>
-      </ScrollView>
-      <BottomSheetComponent
-        isOpen={bottomSheetOpen}
-        Children={
-          selectedBottomSheetComponent === 'redeemPoints'
-            ? RedeemPointsView
-            : selectedBottomSheetComponent === 'transactionsView'
-            ? MyTransactionsView
-            : selectedBottomSheetComponent === 'ticketsView' && MyTicketsView
-        }
-        snapPoint={['70%']}
-        onClose={() => setBottomSheetOpen(false)}
-      />
+          </ScrollView>
+          <BottomSheetComponent
+            isOpen={bottomSheetOpen}
+            Children={
+              selectedBottomSheetComponent === 'redeemPoints'
+                ? RedeemPointsView
+                : selectedBottomSheetComponent === 'transactionsView'
+                ? MyTransactionsView
+                : selectedBottomSheetComponent === 'ticketsView' &&
+                  MyTicketsView
+            }
+            snapPoint={['70%']}
+            onClose={() => setBottomSheetOpen(false)}
+          />
+        </>
+      ) : (
+        <NotACustomerProfilePage />
+      )}
     </>
   );
 };
@@ -222,8 +236,6 @@ const MyTransactionsView = () => {
     </>
   );
 };
-
-
 
 const CourseItemShow = ({data, navigation}) => {
   //   console.log('we have data', data);
@@ -291,6 +303,22 @@ const CourseItemShow = ({data, navigation}) => {
         </ImageBackground>
       </View>
     </Pressable>
+  );
+};
+
+const NotACustomerProfilePage = () => {
+  const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
+    state => state.appTheme,
+  );
+
+  return (
+    <>
+      <View className="flex-1" style={{backgroundColor:bgColor}}>
+        <Text style={{color: textColors.textSecondary}}>
+          Not a customer profile
+        </Text>
+      </View>
+    </>
   );
 };
 
