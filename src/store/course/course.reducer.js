@@ -18,7 +18,7 @@ const INITIAL_STATE = {
 };
 
 const reducer = {
-  fetchCourseStart(state) {
+  fetchCourseStart(state , action) {
     state.loading = true;
   },
   fetchCourseSuccess(state, action) {

@@ -19,14 +19,11 @@ import {
 } from '../store/course/course.reducer';
 import {courseSelector} from '../store/course/course.selector';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Button from '../components/button.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import VideoPlayer from '../components/video-player.component';
 import {FONTS} from '../utils/constants/fonts';
 import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
-
-// const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
 const levels = ['Foundation', 'Advanced', 'Foundation+Advanced'];
 const AGE_GROUPS = ['5-7', '8-10', '11-14'];
@@ -44,27 +41,21 @@ const getLevelName = level => {
   }
 };
 
-const CourseDetails = ({navigation}) => {
+const CourseDetails = ({navigation, courseId}) => {
   const [aboutCourseArr, setAboutCourseArr] = useState([]);
   const [ageGroup, setAgeGroup] = useState('5-7');
   const [filteredCourse, setFilteredCourse] = useState(null);
   const [courseLevel, setCourseLevel] = useState('Foundation');
   const [selectedCourse, setSelectedCourse] = useState(null);
-
   const dispatch = useDispatch();
+  const {textColors, bgColor} = useSelector(state => state.appTheme);
+
+  // console.log("CourseID here in this page", courseId)
 
   const {courseDetails, ageGroups, courseVideos, loading} =
     useSelector(courseSelector);
 
-  // Save current screen name
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     console.log('course focused..');
-  //     localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'course');
-  //   });
-
-  //   return unsubscribe;
-  // }, [navigation]);
+  // console.log("About course array is", aboutCourseArr[0].objArray[0].content)
 
   useEffect(() => {
     if (!courseDetails) {
@@ -147,20 +138,26 @@ const CourseDetails = ({navigation}) => {
       const filteredCourseArr = aboutCourseArr.find(
         item => item.ageGroup === ageGroup,
       );
+      // console.log("find item" , filteredCourseArr)
       setFilteredCourse(filteredCourseArr);
     }
   }, [ageGroup, aboutCourseArr]);
 
   useEffect(() => {
     if (filteredCourse) {
+      // console.log("here 1" , courseLevel)
       let course;
       if (
         courseLevel === 'Foundation' ||
         courseLevel === 'Foundation+Advanced'
       ) {
-        course = filteredCourse.objArray.find(item => item.level === '1');
+        course = filteredCourse.objArray.find(
+          item => parseInt(item.level) === 1,
+        );
       } else {
-        course = filteredCourse.objArray.find(item => item.level === '2');
+        course = filteredCourse.objArray.find(
+          item => parseInt(item.level) === 2,
+        );
       }
 
       setSelectedCourse(course);
@@ -168,18 +165,24 @@ const CourseDetails = ({navigation}) => {
   }, [courseLevel, filteredCourse]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: bgColor}]}>
       <ScrollView
         style={{flex: 1}}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingBottom: 30}}>
-        <TextWrapper
+        {/* <TextWrapper
           fs={22}
-          color={'gray'}
-          fw="700"
-          styles={{textAlign: 'center'}}>
+          color={textColors.textSecondary}
+          // fw="600"
+          styles={[FONTS.subHeading , {textAlign: 'center'}]}>
           More about course
-        </TextWrapper>
+        </TextWrapper> */}
+
+        <Text
+          className="font-semibold w-full text-center"
+          style={[FONTS.heading, {color: textColors.textSecondary}]}>
+          More About Course
+        </Text>
         <Spacer />
         <VideoPlayer
           uri={courseVideos?.videoUri}
@@ -195,9 +198,11 @@ const CourseDetails = ({navigation}) => {
         ) : (
           <>
             <View>
-              <TextWrapper fs={18} styles={{textAlign: 'center'}}>
-                Age group
-              </TextWrapper>
+              <Text
+                className="text-center font-semibold"
+                style={[FONTS.subHeading, {color: textColors.textYlMain}]}>
+                Choose Age Group
+              </Text>
               <View style={{alignItems: 'center'}}>
                 {/* <TextWrapper fs={17}>Age group</TextWrapper> */}
                 <Spacer space={8} />
@@ -206,30 +211,34 @@ const CourseDetails = ({navigation}) => {
                     <Pressable
                       key={group}
                       style={[
-                        styles.ageGroup,
-                        {
-                          backgroundColor:
-                            ageGroup === group ? COLORS.pblue : '#e7f4ff',
-                        },
+                        ageGroup === group
+                          ? {backgroundColor: textColors.textYlMain}
+                          : {},
+                        {borderColor: textColors.textYlMain},
                       ]}
+                      className={`py-[3px] border rounded-full px-4`}
                       onPress={() => setAgeGroup(group)}>
                       <TextWrapper
-                        fs={17}
+                        fs={18}
                         ff={FONTS.signika_medium}
-                        color={ageGroup === group ? COLORS.white : '#1b8ff5'}>
+                        style={[
+                          ageGroup === group
+                            ? {color: 'white'}
+                            : {color: textColors.textYlMain},
+                        ]}>
                         {group}
                       </TextWrapper>
                     </Pressable>
                   ))}
                 </View>
-                <Spacer space={8} />
+                <Spacer space={3} />
                 <View
                   style={{
                     flexDirection: 'row',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    gap: 12,
+                    gap: 5,
                   }}>
                   {levels.map(level => (
                     <CourseLevels
@@ -243,6 +252,7 @@ const CourseDetails = ({navigation}) => {
               </View>
             </View>
             <Spacer />
+
             <View>
               {selectedCourse?.content?.map((course, index) => (
                 <CourseContent course={course} key={index} />
@@ -258,7 +268,7 @@ const CourseDetails = ({navigation}) => {
           // height: 90,
           backgroundColor: '#eee',
         }}>
-        <Button
+        {/* <Button
           onPress={() => {
             navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
           }}
@@ -267,75 +277,66 @@ const CourseDetails = ({navigation}) => {
           bg={COLORS.pblue}
           rounded={4}>
           Batch/Fee Details
-        </Button>
+        </Button> */}
       </View>
     </View>
   );
 };
 
 const CourseLevels = ({courseLevel, level, setCourseLevel}) => {
+  const {textColors} = useSelector(state => state.appTheme);
+
   return (
     <Pressable
       style={[
-        styles.ageGroup,
-        {
-          width: 'auto',
-          paddingHorizontal: 6,
-          backgroundColor: courseLevel === level ? COLORS.pblue : '#e7f4ff',
-          position: 'relative',
-        },
+        {borderColor: textColors.textYlMain},
+        courseLevel === level ? {backgroundColor: textColors.textYlMain} : {},
       ]}
+      className={`border py-[2px] px-3 items-center justify-center rounded-full`}
       onPress={() => setCourseLevel(level)}>
       <TextWrapper
-        fs={15}
+        fs={13}
         ff={FONTS.signika_medium}
-        color={courseLevel === level ? COLORS.white : '#1b8ff5'}>
+        color={courseLevel === level ? COLORS.white : textColors.textYlMain}>
         {level}
       </TextWrapper>
       <TextWrapper
-        fs={14}
+        fs={11}
         ff={FONTS.signika_medium}
-        color={courseLevel === level ? COLORS.white : '#1b8ff5'}>
+        color={courseLevel === level ? COLORS.white : textColors.textYlMain}>
         {level === 'Foundation' || level === 'Advanced'
           ? '(12 classes)'
           : '(24 classes)'}
       </TextWrapper>
-      {/* <View
-        style={{
-          position: 'absolute',
-          top: '-50%',
-          right: 4,
-        }}>
-        <TextWrapper fs={14} ff={FONTS.signika_medium} color={'#434a52'}>
-          {level === 'Foundation' || level === 'Advanced'
-            ? '12 classes'
-            : '24 classes'}
-        </TextWrapper>
-      </View> */}
     </Pressable>
   );
 };
 
 const CourseContent = ({course}) => {
+  const {textColors} = useSelector(state => state.appTheme);
   return (
-    <View style={{paddingVertical: 8}}>
+    <View style={{paddingVertical: 1}}>
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           gap: 4,
         }}>
-        <MIcon name="bullseye-arrow" size={28} color={'#0046b2'} />
-        <TextWrapper fs={21} color={'#0046b2'} ff={FONTS.signika_semiBold}>
+        <MIcon name="bullseye-arrow" size={28} color={textColors.textYlMain} />
+        <Text
+          className="font-semibold"
+          style={[FONTS.subHeading, {color: textColors.textYlMain}]}>
           {course?.subHeading}
-        </TextWrapper>
+        </Text>
       </View>
-      <View style={{paddingHorizontal: 8, paddingTop: 8, width: '100%'}}>
+      <View style={{paddingHorizontal: 8, width: '100%'}} className="mt-1">
         {course?.points.map((point, index) => (
           <View key={index.toString()}>
-            <TextWrapper color="#434a52" ff={FONTS.signika_medium}>
+            <Text
+              className="font-semibold"
+              style={[FONTS.primary, {color: textColors.textSecondary}]}>
               {point}
-            </TextWrapper>
+            </Text>
           </View>
         ))}
       </View>

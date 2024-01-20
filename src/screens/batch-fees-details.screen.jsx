@@ -5,6 +5,7 @@ import {
   Dimensions,
   ScrollView,
   Pressable,
+  Image,
 } from 'react-native';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
@@ -29,12 +30,13 @@ import {FONTS} from '../utils/constants/fonts';
 import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
+import NoBatchesModule from '../components/NoBatchesModule';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
 const ITEM_WIDTH = deviceWidth * 0.75;
 
-const BatchFeeDetails = ({navigation}) => {
+const BatchFeeDetails = ({navigation, courseData}) => {
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [collapsedButton, setCollapsedButton] = useState(true);
   const [steps, setSteps] = useState({
@@ -57,8 +59,11 @@ const BatchFeeDetails = ({navigation}) => {
     courseVideos,
   } = useSelector(courseSelector);
   const {ipData} = useSelector(bookDemoSelector);
+  const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
+    state => state.appTheme,
+  );
 
-  // console.log('currentSelectedBatch: ', currentSelectedBatch);
+  console.log('all batches are: ', batches.length);
 
   // Save current screen name
   // useEffect(() => {
@@ -84,11 +89,9 @@ const BatchFeeDetails = ({navigation}) => {
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    if (!courseDetails) {
-      dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
-    }
-  }, [courseDetails]);
+  // useEffect(() => {
+  //   dispatch(fetchCourseStart({courseId: courseData.courseId}));
+  // }, []);
 
   useEffect(() => {
     if (!courseVideos) {
@@ -153,19 +156,31 @@ const BatchFeeDetails = ({navigation}) => {
             Loading...
           </TextWrapper>
         </View>
-      ) : (
+      ) : batches?.length > 0 ? (
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{flex: 1}}
           contentContainerStyle={{padding: 16}}>
-          <View style={{paddingVertical: 16}}>
-            <VideoMediaPlayer
-              uri={courseVideos?.postDemoVideo}
-              poster={courseVideos?.demoPoster}
+          {console.log('courseData.thumbnailUrl', courseData.thumbnailUrl)}
+          <View style={{paddingVertical: 16}} className="flex-1">
+            <Image
+              source={{uri: courseData.thumbnailUrl}}
+              resizeMode="cover"
+              className="w-full h-[200px] rounded"
             />
+            {/* {courseVideos?.postDemoVideo ? (
+              <VideoMediaPlayer uri={courseVideos?.postDemoVideo} />
+            ) : (
+            )} */}
           </View>
           {/* Age groups */}
-          <View style={{padding: 12, backgroundColor: '#eee', borderRadius: 4}}>
+
+          <View
+            style={{
+              padding: 12,
+              backgroundColor: bgSecondaryColor,
+              borderRadius: 4,
+            }}>
             <Pressable
               onPress={() => setSteps(s => ({...s, step1: !s.step1}))}
               style={{
@@ -173,7 +188,7 @@ const BatchFeeDetails = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <TextWrapper fs={22} fw="700">
+              <TextWrapper fs={22} fw="700" color={textColors.textPrimary}>
                 1. Select age group
               </TextWrapper>
               {!currentAgeGroup ? (
@@ -206,11 +221,11 @@ const BatchFeeDetails = ({navigation}) => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                backgroundColor: '#eee',
+                backgroundColor: bgSecondaryColor,
               }}
               disabled={!currentAgeGroup}
               onPress={() => setSteps(s => ({...s, step2: !s.step2}))}>
-              <TextWrapper fs={22} fw="700">
+              <TextWrapper fs={22} fw="700" color={textColors.textPrimary}>
                 2. Select a batch
               </TextWrapper>
               {!currentSelectedBatch ? (
@@ -271,10 +286,11 @@ const BatchFeeDetails = ({navigation}) => {
               </View>
             )}
           </View>
+
           <View
             style={{
               padding: 12,
-              backgroundColor: '#eee',
+              backgroundColor: bgSecondaryColor,
               borderRadius: 4,
               marginTop: 12,
             }}>
@@ -287,16 +303,20 @@ const BatchFeeDetails = ({navigation}) => {
                 opacity: currentAgeGroup && currentSelectedBatch ? 1 : 0.7,
               }}
               disabled={!currentAgeGroup || !currentSelectedBatch}>
-              <TextWrapper fs={22} fw="700">
+              <TextWrapper fs={22} fw="700" color={textColors.textPrimary}>
                 3. Make payment
               </TextWrapper>
               {currentSelectedBatch && currentAgeGroup ? (
-                <Icon name="checkmark-circle" size={32} color={COLORS.pblue} />
+                <Icon
+                  name="checkmark-circle"
+                  size={32}
+                  color={textColors.textYlMain}
+                />
               ) : (
                 <Icon
                   name={`chevron-${!steps.step3 ? 'up' : 'down'}-outline`}
                   size={24}
-                  color={COLORS.black}
+                  color={textColors.textSecondary}
                 />
               )}
             </Pressable>
@@ -317,6 +337,8 @@ const BatchFeeDetails = ({navigation}) => {
             </Collapsible>
           </View>
         </ScrollView>
+      ) : (
+        <NoBatchesModule courseData = {courseData}/>
       )}
     </View>
   );
@@ -328,6 +350,8 @@ const AgeSelector = ({
   handleCurrentAgeGroup,
   setSteps,
 }) => {
+  const {textColors} = useSelector(state => state.appTheme);
+
   const selectBatch = item => {
     handleCurrentAgeGroup(item.ageGroup);
   };
@@ -355,7 +379,9 @@ const AgeSelector = ({
             fs={20}
             fw="700"
             color={
-              currentAgeGroup === item.ageGroup ? COLORS.white : COLORS.black
+              currentAgeGroup === item.ageGroup
+                ? COLORS.white
+                : textColors.textSecondary
             }>
             {item.ageGroup}
           </TextWrapper>

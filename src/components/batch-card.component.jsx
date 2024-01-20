@@ -21,6 +21,8 @@ const BatchCard = ({
   const {currentLevel} = useSelector(courseSelector);
   const [price, setPrice] = useState(0);
   const [strikeThroughPrice, setStrikeThroughPrice] = useState(0);
+  const {bgSecondaryColor , textColors , darkMode} = useSelector(state => state.appTheme);
+
 
   useEffect(() => {
     if (prices && ipData) {
@@ -42,12 +44,14 @@ const BatchCard = ({
     }
   }, [ipData, prices, level]);
 
+
   return (
     <View
       style={{
         width: '100%',
         maxWidth: 380,
         alignSelf: 'center',
+        backgroundColor:darkMode ? bgSecondaryColor : "white"
       }}>
       <View
         style={{
@@ -69,14 +73,14 @@ const BatchCard = ({
             <TextWrapper
               fs={24}
               fw="700"
-              color={level === 1 ? '#2A6AC9' : COLORS.orange}>
+              color={level === 1 ? textColors.textYlBlue : textColors.textYlOrange}>
               {level === 1
                 ? 'Foundation'
                 : level === 2
                 ? 'Advanced'
                 : 'Foundation + Advanced'}
             </TextWrapper>
-            <TextWrapper fs={16} ff={FONTS.signika_medium} color="#434a52">
+            <TextWrapper fs={16} ff={FONTS.signika_medium} color={textColors.textSecondary}>
               {level === 1 || level === 2 ? '(12 classes)' : '(24 classes)'}
             </TextWrapper>
           </View>
@@ -89,12 +93,13 @@ const BatchCard = ({
               gap: 4,
             }}>
             <TextWrapper
-              fs={23}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
+              fs={23} color={textColors.textSecondary}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
             <TextWrapper
               styles={{textDecorationLine: 'line-through'}}
               fs={
                 17
-              }>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
+              }
+              color={textColors.textSecondary}>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
           </View>
         </View>
         <Spacer />
@@ -115,8 +120,7 @@ const BatchCard = ({
           Select batch start date and time
         </TextWrapper>
         <ScrollView
-          horizontal
-          contentContainerStyle={{gap: 6, paddingTop: 4, paddingBottom: 6}}>
+          contentContainerStyle={{gap: 6, paddingTop: 4, paddingBottom: 6, alignItems:"center"}}>
           {batchOptions.length > 0 &&
             batchOptions.map((batch, index) => {
               return (

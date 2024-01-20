@@ -103,6 +103,7 @@ function* fetchUserListener() {
   yield takeLatest(fetchUser.type, fetchUserSaga);
 }
 
+
 export function* authSaga() {
   yield all([
     call(startAuthentication),

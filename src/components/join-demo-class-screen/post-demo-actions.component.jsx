@@ -250,7 +250,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 },
               ]}
               onPress={rescheduleClass}>
-              <TextWrapper color={'#434a52'} fs={18}>
+              <TextWrapper color={'#434a52'} fs={16} ff={FONTS.primaryFont}>
                 Reschedule
               </TextWrapper>
             </Pressable>
@@ -260,14 +260,15 @@ const PostDemoAction = ({rescheduleClass}) => {
         {/* {!isRated && attended && ( */}
         <View style={styles.container}>
           <TextWrapper
-            fs={22}
+            fs={20}
             color={COLORS.white}
             fw="600"
-            styles={{textAlign: 'center'}}>
+            styles={{textAlign: 'center'}}
+            ff={FONTS.headingFont}>
             Congratulations for attending your free class.
           </TextWrapper>
           <View style={styles.ratingWrapper}>
-            <TextWrapper fs={18} color={COLORS.white}>
+            <TextWrapper fs={16} color={COLORS.white} ff={FONTS.headingFont}>
               Please rate your class experience
             </TextWrapper>
             <View style={styles.starsContainer}>
@@ -319,7 +320,7 @@ const PostDemoAction = ({rescheduleClass}) => {
           <TextWrapper color={COLORS.white} fs={18}>
             Give your child a gift of beautiful handwriting today!
           </TextWrapper>
-          <Spacer space={4} />
+          <Spacer space={6} />
           <View
             style={{
               width: '100%',
@@ -333,7 +334,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={courseDetails}>
-              <TextWrapper>Course details</TextWrapper>
+              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Course details</TextWrapper>
             </Pressable>
             <Pressable
               style={({pressed}) => [
@@ -341,7 +342,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={batchDetails}>
-              <TextWrapper>Batch/Fee details</TextWrapper>
+              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Batch/Fee details</TextWrapper>
             </Pressable>
           </View>
         </View>
@@ -401,13 +402,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ctaButton: {
-    height: 48,
-    paddingVertical: 6,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 1.85,
-    borderRadius: 4,
+    borderRadius: 50,
     gap: 8,
     backgroundColor: COLORS.white,
   },
@@ -420,11 +420,11 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
   },
   paButtons: {
-    gap: 12,
+    gap: 8,
   },
   paButton: {
-    paddingHorizontal: 22,
-    paddingVertical: 12,
+    paddingHorizontal: 2,
+    paddingVertical: 8,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.white,

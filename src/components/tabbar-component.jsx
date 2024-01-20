@@ -7,28 +7,10 @@ import CustomerSupportActions from './customer-support-actions';
 import Icon from './icon.component';
 import Share from 'react-native-share';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {useSelector} from 'react-redux';
+import {FONTS} from '../utils/constants/fonts';
 
-const Icons = (name, focused) => {
-  switch (name) {
-    case 'Drawer':
-      return (
-        <Image
-          source={require('../assets/images/spinner.png')}
-          style={{width: 36, height: 36, objectFit: 'contain'}}
-        />
-      );
-    case 'Account':
-      return (
-        <MIcon
-          name="account-circle"
-          size={28}
-          color={focused ? COLORS.pblue : '#222'}
-        />
-      );
-    default:
-      return;
-  }
-};
+
 
 const shareApp = async () => {
   const message =
@@ -47,6 +29,30 @@ const shareApp = async () => {
 function Tabbar({state, descriptors, navigation}) {
   const [currentTab, setCurrentTab] = useState('drawer');
   const [actions, setActions] = useState(false);
+  const {bgColor, bgSecondaryColor, textColors, darkMode, colorYlMain} =
+    useSelector(state => state.appTheme);
+
+    const Icons = (name, focused) => {
+      switch (name) {
+        case 'Drawer':
+          return (
+            <Image
+              source={require('../assets/images/spinner.png')}
+              style={{width: 28, height: 28, objectFit: 'contain'}}
+            />
+          );
+        case 'Account':
+          return (
+            <MIcon
+              name="account"
+              size={26}
+              color={focused ? COLORS.pblue : textColors.textPrimary}
+            />
+          );
+        default:
+          return;
+      }
+    };
 
   const ScreenIcon = ({name, focused}) => {
     const icon = Icons(name, focused);
@@ -64,7 +70,10 @@ function Tabbar({state, descriptors, navigation}) {
 
   return (
     <>
-      <View style={styles.tabbar}>
+      {/* <View style={styles.tabbar}> */}
+      <View
+        className="flex-row justify-center items-center px-2 py-1"
+        style={{backgroundColor: darkMode ? '#020e21' : '#e6e9f0'}}>
         {state.routes.map(route => {
           const {options} = descriptors[route.key];
           const label =
@@ -94,13 +103,14 @@ function Tabbar({state, descriptors, navigation}) {
                 style={{flex: 1, alignItems: 'center'}}>
                 <Icon
                   name="book-outline"
-                  size={24}
-                  color={isFocused ? COLORS.pblue : '#222'}
+                  size={26}
+                  color={isFocused ? COLORS.pblue : textColors.textPrimary}
                 />
                 <TextWrapper
-                  fw="600"
+                  // fw="600"
                   fs={14}
-                  color={isFocused ? COLORS.pblue : '#222'}>
+                  ff={FONTS.headingFont}
+                  color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                   {label}
                 </TextWrapper>
               </Pressable>
@@ -120,12 +130,13 @@ function Tabbar({state, descriptors, navigation}) {
                 <MIcon
                   name="headset"
                   size={24}
-                  color={isFocused ? COLORS.pblue : '#222'}
+                  color={isFocused ? COLORS.pblue : textColors.textPrimary}
                 />
                 <TextWrapper
-                  fw="600"
+                  // fw="600"
+                  ff={FONTS.headingFont}
                   fs={14}
-                  color={isFocused ? COLORS.pblue : '#222'}>
+                  color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                   {label}
                 </TextWrapper>
               </Pressable>
@@ -146,12 +157,13 @@ function Tabbar({state, descriptors, navigation}) {
                   key={route.key}
                   name="share-social-outline"
                   size={24}
-                  color={COLORS.black}
+                  color={textColors.textPrimary}
                 />
                 <TextWrapper
                   fw="600"
                   fs={14}
-                  color={isFocused ? COLORS.pblue : '#222'}>
+                  ff={FONTS.headingFont}
+                  color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                   {label}
                 </TextWrapper>
               </Pressable>
@@ -166,12 +178,19 @@ function Tabbar({state, descriptors, navigation}) {
               accessibilityLabel={options.tabBarAccessibilityLabel}
               testID={options.tabBarTestID}
               onPress={() => onPress(route.name)}
-              style={{flex: 1, alignItems: 'center'}}>
+              style={{flex: 1, alignItems: 'center'}}
+              className={`relative`}>
+              {isFocused && (
+                <View
+                  className="w-[70%] top-0 right-0 p-[2px] rounded-full"
+                  style={{backgroundColor: colorYlMain}}></View>
+              )}
               <ScreenIcon name={route.name} focused={isFocused} />
               <TextWrapper
                 fw="600"
                 fs={14}
-                color={isFocused ? COLORS.pblue : '#222'}>
+                ff={FONTS.headingFont}
+                color={isFocused ? COLORS.pblue : textColors.textPrimary}>
                 {label}
               </TextWrapper>
             </Pressable>

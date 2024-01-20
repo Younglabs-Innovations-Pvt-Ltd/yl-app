@@ -292,3 +292,14 @@ export const createLead = async ({
 };
 
 // console.log('BASE_URL', BASE_URL);
+
+export const addNewSoloBooking = async data => {
+  // console.log("calling api", data)
+  return await fetch(`${BASE_URL}/admin/app/addSoloDemoBooking`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+};

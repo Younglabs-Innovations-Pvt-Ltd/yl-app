@@ -13,6 +13,12 @@ const INITIAL_STATE = {
     bookingSlotsLoading: false,
     bookingLoading: false,
   },
+  selectedSlot: null,
+  childData: null,
+  bookingCreatedSuccessfully: false,
+  selectedOneToOneDemoTime: '',
+  oneToOneBookingFailed: false,
+  bookingFailReason: undefined,
 };
 
 // reducer
@@ -37,7 +43,8 @@ const reducer = {
   setIpDataLoadingState(state, action) {
     state.ipDataLoading = action.payload;
   },
-  setNewBookingStart(state) {
+  setNewBookingStart(state, action) {
+    // console.log("in reducer", action.payload)
     state.loading.bookingLoading = true;
   },
   setNewBookingSuccess(state) {
@@ -60,6 +67,41 @@ const reducer = {
     state.loading.ipDataLoading = false;
     state.loading.bookingSlotsLoading = false;
     state.bookingLoading = false;
+  },
+  setSelectedSlot(state, action) {
+    state.selectedSlot = action.payload;
+  },
+  setChildData(state, action) {
+    state.childData = action.payload;
+  },
+  changebookingCreatedSuccessfully(state, action) {
+    state.bookingCreatedSuccessfully = action.payload;
+  },
+  setSelectedOneToOneDemoTime(state, action) {
+    if (action.payload !== null) {
+      state.selectedOneToOneDemoTime = action.payload;
+    } else {
+      state.selectedOneToOneDemoTime = false;
+    }
+  },
+
+  setNewOneToOneBookingStart(state, action) {
+    state.oneToOneBookingFailed = false;
+    state.loading.bookingLoading = true;
+  },
+  setOneToOneBookingSuccess(state, action) {
+    state.loading.bookingLoading = false;
+    state.bookingCreatedSuccessfully = true;
+  },
+  setOneToOneBookingFailed(state, action) {
+    state.oneToOneBookingFailed = true;
+    state.loading.bookingLoading = false;
+    state.bookingCreatedSuccessfully = false;
+    state.bookingFailReason = action.payload;
+  },
+  setOneToOneBookingFailed2(state, action) {
+    state.oneToOneBookingFailed = action.payload;
+    state.bookingFailReason = "";
   },
 };
 
@@ -84,6 +126,14 @@ export const {
   setIsBookingLimitExceeded,
   closePopup,
   stopLoading,
+  setSelectedSlot,
+  setChildData,
+  changebookingCreatedSuccessfully,
+  setSelectedOneToOneDemoTime,
+  setNewOneToOneBookingStart,
+  setOneToOneBookingSuccess,
+  setOneToOneBookingFailed,
+  setOneToOneBookingFailed2,
 } = bookDemoSlice.actions;
 
 // reducer

@@ -7,9 +7,10 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
+  Text,
 } from 'react-native';
 import DemoWaiting from './join-demo-class-screen/demo-waiting.component';
-import Button from './button.component';
+// import Button from './button.component';
 import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
 import PostDemoAction from './join-demo-class-screen/post-demo-actions.component';
@@ -30,10 +31,18 @@ import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
+import {TextInput} from 'react-native-gesture-handler';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
-const Demo = ({timeLeft, openBottomSheet}) => {
+const Demo = ({
+  isTimeover,
+  timeLeft,
+  showPostActions,
+  sheetOpen,
+  openResheduleSheet,
+  closeResheduleSheet,
+}) => {
   const [childName, setChildName] = useState('');
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -42,6 +51,8 @@ const Demo = ({timeLeft, openBottomSheet}) => {
 
   const {localLang} = i18nContext();
   const dispatch = useDispatch();
+  const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
+    useSelector(state => state.appTheme);
 
   const {
     demoData,
@@ -109,6 +120,7 @@ const Demo = ({timeLeft, openBottomSheet}) => {
 
   // Join Class
   const handleJoinClass = async () => {
+    // console.log("first");
     dispatch(
       joinFreeClass({bookingDetails, childName, demoData, loading: true}),
     );
@@ -133,10 +145,11 @@ const Demo = ({timeLeft, openBottomSheet}) => {
   const IS_CHILD_NAME = useMemo(() => {
     return !cn ? (
       <>
-        <Input
+        <TextInput
           placeholder="Child Name"
           value={childName}
           onChangeText={onChangeChildName}
+          className="text-white border-b border-white p-1 text-base"
         />
         {message && (
           <TextWrapper fs={14} color={COLORS.pred}>
@@ -145,14 +158,15 @@ const Demo = ({timeLeft, openBottomSheet}) => {
         )}
       </>
     ) : (
-      <TextWrapper
-        color={COLORS.white}
-        fs={20}
-        ff={FONTS.signika_semiBold}
-        styles={{marginBottom: 12}}>
-        Class is on going, Join now.
-      </TextWrapper>
+      ''
     );
+    // <TextWrapper
+    //   color={COLORS.white}
+    //   fs={20}
+    //   ff={FONTS.signika_semiBold}
+    //   styles={{marginBottom: 12}}>
+    //   Class is on going, Join now.
+    // </TextWrapper>
   }, [cn, childName, message]);
 
   const NEW_BOOKING = useMemo(() => {
@@ -232,27 +246,35 @@ const Demo = ({timeLeft, openBottomSheet}) => {
             onPress={handleJoinClass}>
             Enter class
           </Button> */}
+
+          <View className="w-full p-1 px-3">
+            <Text className="text-white font-semibold text-base ml-3 ">
+              Your free handwriting class is going on
+            </Text>
+            <View className="w-full">
+              <Pressable
+                className="p-2 w-full rounded-full bg-white mt-2"
+                onPress={handleJoinClass}>
+                <Text className="text-base font-semibold text-gray-700 text-center">
+                  Enter Class
+                </Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
       )}
-      {/* {isClassOngoing && !teamUrl && (
-        <View
-          style={{
-            paddingVertical: 16,
-          }}>
-          <TextWrapper color={COLORS.white} fs={20}>
-            {localLang.rescheduleText}
-          </TextWrapper>
-          <Spacer />
-          <Button
-            textColor={COLORS.black}
-            bg={COLORS.white}
-            rounded={6}
-            onPress={onOpen}>
-            {localLang.rescheduleButtonText}
-          </Button>
-        </View>
-      )} */}
-      {POST_ACTIONS}
+
+      {
+        // If user attended demo class
+        // Demo has ended
+        // Show post action after demo class
+        showPostActions && (
+          <View className="w-full">
+            <PostDemoAction rescheduleClass={openResheduleSheet} />
+          </View>
+        )
+      }
+
       <Modal animationType="fade" visible={open} onRequestClose={onClose}>
         <View
           style={{

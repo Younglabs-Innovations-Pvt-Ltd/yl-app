@@ -7,6 +7,8 @@ import HomeScreen from './home-screen';
 import CustomDrawerContent from '../components/custom-drawer.component';
 
 import {COLORS} from '../utils/constants/colors';
+import HomeScreenStackNavigator from './HomeScreenStackNavigator';
+import MainWelcomeScreen from './MainWelcomeScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -23,10 +25,15 @@ const DrawerScreen = ({route}) => {
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen
         name="Home"
-        component={HomeScreen}
+        component={MainWelcomeScreen}
         options={{sceneContainerStyle: {backgroundColor: COLORS.white}}}
         initialParams={{data: data.data}}
       />
+      {/* <Drawer.Screen
+        name="MainWelcomeScreen"
+        component={MainWelcomeScreen}
+        options={{sceneContainerStyle: {backgroundColor: COLORS.white}}}
+      /> */}
     </Drawer.Navigator>
   );
 };

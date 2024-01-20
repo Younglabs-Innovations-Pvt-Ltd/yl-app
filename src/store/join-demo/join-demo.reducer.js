@@ -28,7 +28,7 @@ const reducer = {
   startFetchBookingDetailsFromPhone(state) {
     state.loading = true;
   },
-  startFetchBookingDetailsFromId(state) {
+  startFetchBookingDetailsFromId(state, action) {
     state.loading = true;
   },
   setBookingDetailSuccess(state, action) {

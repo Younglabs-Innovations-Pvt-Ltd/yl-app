@@ -8,6 +8,7 @@ import {
   View,
   Alert,
   Linking,
+  Text
 } from 'react-native';
 import Storage from '@react-native-firebase/storage';
 import RNFS from 'react-native-fs';
@@ -35,6 +36,7 @@ const UploadHandwriting = ({demoData}) => {
   const [visibleEmail, setVisibleEmail] = useState(false);
 
   const {selectedImage, modalVisible} = useSelector(uploadSelector);
+  const {darkMode, bgColor, textColors , colorYlMain} = useSelector(state => state.appTheme);
   const dispatch = useDispatch();
 
   const pickFile = async () => {
@@ -372,8 +374,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
+    borderRadius: 50,
   },
   modalContainer: {
     flex: 1,

@@ -2,10 +2,12 @@ import React, {useMemo} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../utils/constants/colors';
 import {FONTS} from '../utils/constants/fonts';
+import {useSelector} from 'react-redux';
 
 const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 
 const CountDown = ({timeLeft}) => {
+  const {darkMode, textColors} = useSelector(state => state.appTheme);
   // UI Constants
   const TIMER = useMemo(() => {
     return Object.entries(timeLeft)
@@ -17,8 +19,22 @@ const CountDown = ({timeLeft}) => {
 
         return (
           <View key={label} style={styles.timeContainer}>
-            <Text style={styles.timeText}>{zeroPrefix(value)}</Text>
-            <Text style={styles.timeLabel}>{updatedLabel}</Text>
+            <Text
+              style={[
+                styles.timeText,
+                {color: darkMode ? textColors.textYlMain : 'white'},
+              ]}>
+              {zeroPrefix(value)}
+            </Text>
+            <Text
+              style={[
+                styles.timeLabel,
+                {color: darkMode ? textColors.textYlMain : 'white'},
+              ]}
+              className="mt-[2px]"
+              >
+              {updatedLabel}
+            </Text>
           </View>
         );
       });
@@ -26,7 +42,7 @@ const CountDown = ({timeLeft}) => {
 
   return (
     <View>
-      <View style={styles.countdown}>
+      <View style={styles.countdown} className="w-full">
         <View style={styles.containerList}>{TIMER}</View>
       </View>
     </View>
@@ -43,21 +59,14 @@ const styles = StyleSheet.create({
   timeContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: COLORS.pgreen,
-    // borderRadius: 4,
-    // paddingVertical: 8,
-    // paddingHorizontal: 10,
   },
   timeLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#434a52',
-    // marginTop: 2,
     fontFamily: FONTS.roboto,
   },
   timeText: {
     fontSize: 32,
-    color: '#434a52',
     fontFamily: FONTS.bigShoulders_semibold,
   },
   containerList: {
