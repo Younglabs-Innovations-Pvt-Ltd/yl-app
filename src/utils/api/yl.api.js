@@ -251,9 +251,13 @@ export const saveHandwritingSample = async ({bookingId, image}) => {
 
 // Get app content
 export const getAppTestimonials = async () => {
-  return await fetch(`${BASE_URL}/app/content/getAppTestimonials`, {
-    method: 'GET',
-  });
+  // return await fetch(`${BASE_URL}/app/content/getAppTestimonials`, {
+  return await fetch(
+    `https://younglabsapis-33heck6yza-el.a.run.app/app/content/getAppTestimonials`,
+    {
+      method: 'GET',
+    },
+  );
 };
 
 // Get app worksheets

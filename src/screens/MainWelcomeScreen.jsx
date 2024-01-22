@@ -27,6 +27,7 @@ import {
   setDemoData,
   startFetchBookingDetailsFromPhone,
   startFetchBookingDetailsFromId,
+  setToInitialState,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import DemoDetailsScreen from '../components/MainScreenComponents/DemoDetailsScreen';
@@ -50,6 +51,7 @@ import Testimonial from '../components/MainScreenComponents/Testimonial';
 import {FONTS} from '../utils/constants/fonts';
 import BookDemoScreen from './book-demo-form.screen';
 import ShowCourses from '../components/MainScreenComponents/ShowCourses';
+import ReviewsAndTestimonials from '../components/MainScreenComponents/ReviewsAndTestimonials';
 
 const {width, height} = Dimensions.get('window');
 
@@ -144,9 +146,8 @@ const testimonials = [
   },
 ];
 
-const phoneNum = 7668983758;
-
 const MainWelcomeScreen = ({navigation}) => {
+  console.log('In main welcome screen');
   const {customer} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -179,11 +180,12 @@ const MainWelcomeScreen = ({navigation}) => {
   useEffect(() => {
     // console.log("running for selectedChild", selectedChild.bookingId)
     if (selectedChild?.bookingId) {
+      dispatch(setToInitialState());
       dispatch(startFetchBookingDetailsFromId(selectedChild.bookingId));
-    } else if (!bookingDetails && user?.phone) {
+    } else if (user?.phone) {
       dispatch(startFetchBookingDetailsFromPhone(user.phone));
     }
-  }, [user, bookingDetails, selectedChild]);
+  }, [user, selectedChild]);
 
   // Demo actions useEffects here
 
@@ -266,6 +268,7 @@ const MainWelcomeScreen = ({navigation}) => {
         open={onChangeChildSheetOpen}
       />
 
+      {/* {console.log("showPostactions is", showPostActions)} */}
       {!loading && (
         <View className="w-full" style={{backgroundColor: colorYlMain}}>
           <Demo
@@ -319,9 +322,12 @@ const MainWelcomeScreen = ({navigation}) => {
 
         <ShowCourses navigation={navigation} />
 
+        {/* Reviews And Testimonials Here */}
         <Spacer space={12} />
+        <ReviewsAndTestimonials />
 
         {/* Testimonials */}
+        <Spacer space={12} />
         <View className="w-full">
           <View>
             <Text

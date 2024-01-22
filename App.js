@@ -27,6 +27,8 @@ import {SCREEN_NAMES} from './src/utils/constants/screen-names';
 // Snackbar
 import Snackbar from 'react-native-snackbar';
 
+import { ToastProvider } from 'react-native-toast-notifications'
+
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';

@@ -64,6 +64,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
   );
 
   console.log('all batches are: ', batches.length);
+  console.log('course Details is here', courseDetails);
 
   // Save current screen name
   // useEffect(() => {
@@ -74,6 +75,12 @@ const BatchFeeDetails = ({navigation, courseData}) => {
 
   //   return unsubscribe;
   // }, [navigation]);
+
+  useEffect(() => {
+    {
+      dispatch(fetchCourseStart({courseId: courseData.id}));
+    }
+  }, [courseData]);
 
   useEffect(() => {
     if (!ipData) {
@@ -338,7 +345,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
           </View>
         </ScrollView>
       ) : (
-        <NoBatchesModule courseData = {courseData}/>
+        <NoBatchesModule courseData={courseData} />
       )}
     </View>
   );

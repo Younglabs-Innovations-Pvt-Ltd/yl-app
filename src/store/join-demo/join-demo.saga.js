@@ -231,13 +231,13 @@ function* onSetDemoData({payload: {demoData}}) {
     const demoTime = demoData?.demoDate?._seconds * 1000;
 
     if (demoTime) {
-      localStorage.set(LOCAL_KEYS.DEMO_TIME, parseInt(demoTime));
+      // localStorage.set(LOCAL_KEYS.DEMO_TIME, parseInt(demoTime));
 
       const isClassOngoing =
         moment().isAfter(moment(demoTime)) &&
         moment().isBefore(moment(demoTime).add(1, 'hours'));
 
-      console.log('isClassOngoing'), isClassOngoing;
+      // console.log('isClassOngoing'), isClassOngoing;
 
       if (isClassOngoing) {
         yield put(setClassOngoing(true));

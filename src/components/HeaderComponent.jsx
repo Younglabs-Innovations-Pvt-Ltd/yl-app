@@ -18,7 +18,7 @@ import {select} from 'redux-saga/effects';
 
 const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   const handleShowDrawer = () => navigation.openDrawer();
-  const [customerName, setCustomerName] = useState('');
+  const [customerName, setCustomerName] = useState('To Younglabs');
   const [ordersOrBookingsLoading, setOrdersOrBookingsLoading] = useState(false);
   const [ordersOrBookingsLoadingFailed, setOrdersOrBookingsLoadingFailed] =
     useState(false);
@@ -49,7 +49,6 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
     if (customer !== 'yes') {
       console.log('if 2');
       if (!userBookings) {
-        console.log('if 3');
         dispatch(startGetAllBookings(user?.phone));
       }
     }
@@ -78,11 +77,13 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
 
   useEffect(() => {
     if (customer == 'yes') {
+      console.log('here', userOrderLoadingFailed);
       setOrdersOrBookingsLoading(userOrdersLoading);
       setOrdersOrBookingsLoadingFailed(userOrderLoadingFailed);
     } else {
       setOrdersOrBookingsLoading(allBookingsLoding);
       setOrdersOrBookingsLoadingFailed(allBookingsLoadingFailed);
+      console.log('here 2', allBookingsLoadingFailed);
     }
   }, [customer, allBookingsLoding, userOrdersLoading]);
 
@@ -157,7 +158,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
                         },
                       ]}
                       className={`font-semibold`}>
-                      Welcome, {customerName || ''}
+                      Welcome, {customerName || 'To Younglabs'}
                     </Text>
 
                     <Text
@@ -311,7 +312,8 @@ export const ChangeAddedChild = ({close}) => {
                       ? textColors?.textYlMain
                       : textColors.textSecondary,
                 }}
-                onPress={() => handleSelectChild(booking)}>
+                onPress={() => handleSelectChild(booking)}
+                key={booking.bookingId}>
                 <View className="w-full flex-row items-center">
                   <View
                     className="h-[50px] w-[50px] items-center justify-center"

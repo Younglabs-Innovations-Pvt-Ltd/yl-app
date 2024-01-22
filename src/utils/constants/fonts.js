@@ -11,11 +11,12 @@ export const FONTS = {
   headingFont:'Signika Negative SemiBold',
   heading:{
     fontFamily:'Signika Negative SemiBold',
-    fontSize:24
+    fontSize:22,
+    fontWeight:500
   },
   subHeading:{
     fontFamily:'Signika Negative SemiBold',
-    fontSize:20,
+    fontSize:18,
   },
   primary:{
     fontFamily:'Signika Negative Medium',

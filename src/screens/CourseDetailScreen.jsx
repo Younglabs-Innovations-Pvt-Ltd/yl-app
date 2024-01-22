@@ -7,7 +7,7 @@ import BatchFeeDetails from './batch-fees-details.screen';
 import {useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FlatList} from 'react-native-gesture-handler';
-import { FONTS } from '../utils/constants/fonts';
+import {FONTS} from '../utils/constants/fonts';
 
 const BANNER_H = 190;
 const CourseDetailsScreen = ({route, navigation}) => {
@@ -166,23 +166,37 @@ export const FeatureTray = ({
   const courseDetailsImage = require('../assets/images/courseDetails.jpg');
   const bookFreeClassImage = require('../assets/images/demoBook.jpg');
   const payAndEnrollImage = require('../assets/images/payAndEnroll.jpg');
-  const features = [
-    {
-      label: 'Course Details',
-      value: 'courseDetails',
-      imgPath: courseDetailsImage,
-    },
-    {
-      label: 'Book Free Class',
-      value: 'bookFreeClass',
-      imgPath: bookFreeClassImage,
-    },
-    {
-      label: 'Pay And Enroll',
-      value: 'payAndEnroll',
-      imgPath: payAndEnrollImage,
-    },
-  ];
+  console.log('demoAvailable is', demoAvailable);
+  const features = demoAvailable
+    ? [
+        {
+          label: 'Course Details',
+          value: 'courseDetails',
+          imgPath: courseDetailsImage,
+        },
+        {
+          label: 'Book Free Class',
+          value: 'bookFreeClass',
+          imgPath: bookFreeClassImage,
+        },
+        {
+          label: 'Pay And Enroll',
+          value: 'payAndEnroll',
+          imgPath: payAndEnrollImage,
+        },
+      ]
+    : [
+        {
+          label: 'Course Details',
+          value: 'courseDetails',
+          imgPath: courseDetailsImage,
+        },
+        {
+          label: 'Pay And Enroll',
+          value: 'payAndEnroll',
+          imgPath: payAndEnrollImage,
+        },
+      ];
   const {darkMode, textColors, bgColor, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -212,10 +226,8 @@ export const FeatureTray = ({
             className="text-[18px] text-center font-semibold"
             style={{
               color:
-                selectedTab === feature?.value
-                  ? textColors.textYlMain
-                  : "gray",
-              fontFamily:FONTS.headingFont
+                selectedTab === feature?.value ? textColors.textYlMain : 'gray',
+              fontFamily: FONTS.headingFont,
             }}>
             {feature.label}
           </Text>
@@ -234,7 +246,7 @@ export const FeatureTray = ({
           // console.log('feature: ')
           return <FeatureItem feature={item.item} />;
         }}
-        className="w-full"
+        className=""
         contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}
         showsHorizontalScrollIndicator={false}
         horizontal

@@ -51,6 +51,7 @@ const PostDemoAction = ({rescheduleClass}) => {
     isNmi,
     attendanceLoading,
   } = useSelector(joinDemoSelector);
+  console.log("demoData is", demoData)
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -62,39 +63,39 @@ const PostDemoAction = ({rescheduleClass}) => {
   }, []);
 
   // Check for Attended
-  useEffect(() => {
-    const checkAttended = async () => {
-      try {
-        const checkAttended = localStorage.getString(LOCAL_KEYS.SAVE_ATTENDED);
+  // useEffect(() => {
+  //   const checkAttended = async () => {
+  //     try {
+  //       const checkAttended = localStorage.getString(LOCAL_KEYS.SAVE_ATTENDED);
 
-        if (checkAttended) {
-          dispatch(setIsAttended(true));
-        }
-      } catch (error) {
-        console.log('POST_ACTION_CHECK_ATTENDED_ERROR=', error);
-      }
-    };
+  //       if (checkAttended) {
+  //         dispatch(setIsAttended(true));
+  //       }
+  //     } catch (error) {
+  //       console.log('POST_ACTION_CHECK_ATTENDED_ERROR=', error);
+  //     }
+  //   };
 
-    checkAttended();
-  }, []);
+  //   checkAttended();
+  // }, []);
 
   // Check NMI
-  useEffect(() => {
-    const checkNMI = async () => {
-      try {
-        const nmi = localStorage.getString(LOCAL_KEYS.NMI);
-        console.log('nmiAsync', nmi);
-        if (nmi) {
-          console.log('hit NMI');
-          dispatch(setNMI(true));
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  // useEffect(() => {
+  //   const checkNMI = async () => {
+  //     try {
+  //       const nmi = localStorage.getString(LOCAL_KEYS.NMI);
+  //       console.log('nmiAsync', nmi);
+  //       if (nmi) {
+  //         console.log('hit NMI');
+  //         dispatch(setNMI(true));
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-    checkNMI();
-  }, []);
+  //   checkNMI();
+  // }, []);
 
   const scrollSlider = scrollToX => {
     sliderRef.current &&
@@ -107,6 +108,7 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   useEffect(() => {
+    console.log("isAttended=",isAttended , "isRated=",isRated , "isNmi=",isNmi)
     if (isAttended && !isRated) {
       console.log('slided');
       scrollSlider(deviceWidth);
@@ -127,10 +129,10 @@ const PostDemoAction = ({rescheduleClass}) => {
       dispatch(saveRating({bookingId: demoData.bookingId, rating: rated}));
     }
 
-    const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
-    if (isClassJoined) {
-      localStorage.delete(LOCAL_KEYS.JOIN_CLASS);
-    }
+    // const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+    // if (isClassJoined) {
+    //   localStorage.delete(LOCAL_KEYS.JOIN_CLASS);
+    // }
   };
 
   // On change rating state
@@ -146,7 +148,7 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   const saveAttended = async () => {
     // dispatch(startMarkAttendace({bookingId: demoData.bookingId}));
-    localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
+    // localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
     dispatch(setIsAttended(true));
     scrollSlider(deviceWidth);
   };

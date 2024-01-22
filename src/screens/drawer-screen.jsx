@@ -25,7 +25,7 @@ const DrawerScreen = ({route}) => {
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen
         name="Home"
-        component={MainWelcomeScreen}
+        component={HomeScreenStackNavigator}
         options={{sceneContainerStyle: {backgroundColor: COLORS.white}}}
         initialParams={{data: data.data}}
       />

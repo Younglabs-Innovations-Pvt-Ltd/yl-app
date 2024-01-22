@@ -172,25 +172,23 @@ const Demo = ({
   const NEW_BOOKING = useMemo(() => {
     if (demoData?.message === 'Booking not found' || !demoData) {
       return (
-        <View style={{paddingTop: 10, paddingHorizontal: 16}}>
-          <TextWrapper
-            fs={22.5}
-            ff={FONTS.signika_semiBold}
-            color={COLORS.white}>
-            Improve your child's handwriting
-          </TextWrapper>
-          <TextWrapper fs={19} color={COLORS.white}>
-            Book your first free Handwriting Class.
-          </TextWrapper>
-          <Spacer />
-          <Button
-            textColor={'#434a52'}
-            bg={COLORS.white}
-            textSize={18}
-            rounded={6}
-            onPress={openBottomSheet}>
-            Book Free Class
-          </Button>
+        <View style={{padding: 4}} className="flex-row justify-between">
+          <View>
+            <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
+              Improve your child's handwriting
+            </TextWrapper>
+            <TextWrapper fs={16} color={COLORS.white}>
+              Book your first free Handwriting Class.
+            </TextWrapper>
+          </View>
+          <View className="h-full items-center justify-center">
+            <Pressable
+              // onPress={()=>{openBottomSheet}}
+              onPress={() => sheetOpen()}
+              className="bg-white text-blue-500 py-2 px-3 rounded-md">
+              <Text className="font-semibold" style={{color:textColors.textYlMain}}>Book Now</Text>
+            </Pressable>
+          </View>
         </View>
       );
     } else {
@@ -239,13 +237,6 @@ const Demo = ({
               />
             )}
           </Pressable>
-          {/* <Button
-            textColor={'#434a52'}
-            bg={COLORS.white}
-            rounded={6}
-            onPress={handleJoinClass}>
-            Enter class
-          </Button> */}
 
           <View className="w-full p-1 px-3">
             <Text className="text-white font-semibold text-base ml-3 ">

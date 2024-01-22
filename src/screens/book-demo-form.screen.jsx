@@ -378,7 +378,7 @@ const BookDemoScreen = ({
   return (
     <View
       className="flex-1 items-center justify-center w-full h-full"
-      style={{height: place ? height - 190 : height}}>
+      style={{height: place ? height - 190 : height-70}}>
       <View
         className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]"
         // style={{backgroundColor: darkMode ? bgSecondaryColor : '#b0b6ef30'}}
@@ -461,7 +461,9 @@ const BookDemoScreen = ({
           <View className="flex-row py-2  w-[100%] justify-between ">
             {bookingSteps?.map((step, i) => {
               return (
-                <Pressable className="flex flex-row items-center w-[32%]">
+                <Pressable
+                  className="flex flex-row items-center w-[32%]"
+                  key={i}>
                   <View
                     className="flex flex-row items-center gap-1 w-full"
                     key={i}>

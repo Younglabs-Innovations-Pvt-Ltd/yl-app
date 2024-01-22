@@ -160,7 +160,8 @@ function* fetchAllBookings({payload}) {
     console.log('fetching bookings in api');
     const response = yield fetchAllBookinsFromPhone(payload);
 
-    if (response.status !== 200) {
+    if (response.status !== 200 && response.status !== 404) {
+      console.log("failing here" , response.status);
       yield put(setAllBookingsFetchingFailed('Something went wrong'));
       return;
     }

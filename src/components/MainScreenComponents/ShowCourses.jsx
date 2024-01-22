@@ -23,7 +23,7 @@ const ShowCourses = ({navigation}) => {
     handwriting: 'English Handwriting Courses',
     learning: 'English Learning',
     mathematics: 'Mathematics Courses',
-    others:"Other Acedemic Courses"
+    others: 'Other Acedemic Courses',
   };
 
   const dispatch = useDispatch();
@@ -77,10 +77,8 @@ const ShowCourses = ({navigation}) => {
       ) : (
         Object.keys(courses)?.map(key => {
           return (
-            <View className="py-1 w-[100%]">
-              <View
-                className="gap-1 pl-2 pr-3 flex-row justify-between items-end"
-                key={key}>
+            <View className="py-1 w-[100%]" key={key}>
+              <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
                 <Text
                   className={`w-[100%] p-0`}
                   style={[FONTS.heading, {color: textColors?.textPrimary}]}>
@@ -90,7 +88,7 @@ const ShowCourses = ({navigation}) => {
 
               <FlatList
                 data={courses[key]}
-                keyExtractor={item => item.name}
+                keyExtractor={item => item.id}
                 renderItem={item => {
                   return (
                     <CourseItemRender
