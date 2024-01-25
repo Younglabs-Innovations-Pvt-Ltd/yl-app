@@ -10,6 +10,8 @@ import CourseDetailsScreen from './CourseDetailScreen';
 import ViewAllCourses from './ViewAllCourses';
 import UserProfile from './UserProfile';
 import {useSelector} from 'react-redux';
+import { SCREEN_NAMES } from '../utils/constants/screen-names';
+import Payment from './payment.screen';
 
 const Stack = createStackNavigator();
 const HomeScreenStackNavigator = () => {
@@ -21,14 +23,14 @@ const HomeScreenStackNavigator = () => {
         screenOptions={{
           headerStyle: {
             backgroundColor: bgColor,
-            borderBottomWidth:1,
-            borderColor:textColors.textSecondary,
-            elevation:1.12,          
+            borderBottomWidth: 1,
+            borderColor: textColors.textSecondary,
+            elevation: 1.12,
           },
           headerTintColor: textColors.textSecondary,
           headerTitleStyle: {
             fontWeight: '500',
-            fontSize:18
+            fontSize: 18,
           },
         }}>
         <Stack.Screen
@@ -52,6 +54,13 @@ const HomeScreenStackNavigator = () => {
           name="UserProfileScreen"
           component={UserProfile}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={SCREEN_NAMES.PAYMENT}
+          component={Payment}
+          options={{
+            headerTitle: 'Checkout',
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

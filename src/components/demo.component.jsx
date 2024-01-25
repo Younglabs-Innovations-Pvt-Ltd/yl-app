@@ -32,6 +32,7 @@ import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
 import {TextInput} from 'react-native-gesture-handler';
+import { welcomeScreenSelector } from '../store/welcome-screen/selector';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
@@ -63,6 +64,8 @@ const Demo = ({
     joinClassLoading,
     joinClassErrorMsg,
   } = useSelector(joinDemoSelector);
+
+  const {isFirstTimeUser} = useSelector(welcomeScreenSelector)
 
   /**
    * @author Shobhit
@@ -170,7 +173,7 @@ const Demo = ({
   }, [cn, childName, message]);
 
   const NEW_BOOKING = useMemo(() => {
-    if (demoData?.message === 'Booking not found' || !demoData) {
+    if (isFirstTimeUser) {
       return (
         <View style={{padding: 4}} className="flex-row justify-between">
           <View>
@@ -186,7 +189,11 @@ const Demo = ({
               // onPress={()=>{openBottomSheet}}
               onPress={() => sheetOpen()}
               className="bg-white text-blue-500 py-2 px-3 rounded-md">
-              <Text className="font-semibold" style={{color:textColors.textYlMain}}>Book Now</Text>
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textYlMain}}>
+                Book Now
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -254,7 +261,7 @@ const Demo = ({
           </View>
         </View>
       )}
-
+      
       {
         // If user attended demo class
         // Demo has ended

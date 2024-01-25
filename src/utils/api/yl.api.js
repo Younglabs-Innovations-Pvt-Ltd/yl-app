@@ -77,6 +77,8 @@ export const fetchBookingDetailsFromPhone = async (phone, deviceId) => {
  * @description Fetch booking details by phone number
  */
 export const fetchBookingDetailsFromBookingId = async bookingId => {
+  console.log('booking id is', bookingId);
+
   return await fetch(`${BASE_URL}${BOOKING_URL}`, {
     method: 'POST',
     headers: {
@@ -228,13 +230,13 @@ export const getOfferCode = async ({phone}) => {
 };
 
 // Check for customer
-export const getCustomers = async ({leadId}) => {
+export const getCustomers = async body => {
   return await fetch(`${BASE_URL}/admin/customers/checkCustomer`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({leadId}),
+    body: JSON.stringify(body),
   });
 };
 

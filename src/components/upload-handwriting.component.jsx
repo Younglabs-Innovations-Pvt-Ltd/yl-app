@@ -33,7 +33,6 @@ const {width: deviceWidth} = Dimensions.get('window');
 const UploadHandwriting = ({demoData}) => {
   const [loading, setLoading] = useState(false);
   const [visibleOptions, setVisibleOptions] = useState(false);
-  const [visibleEmail, setVisibleEmail] = useState(false);
 
   const {selectedImage, modalVisible} = useSelector(uploadSelector);
   const {darkMode, bgColor, textColors , colorYlMain} = useSelector(state => state.appTheme);
@@ -171,42 +170,28 @@ const UploadHandwriting = ({demoData}) => {
     setVisibleOptions(true);
   };
 
-  const onVisibleEmail = () => {
-    setVisibleEmail(true);
-  };
-  const onCloseEmail = () => {
-    setVisibleEmail(false);
-  };
+  
 
   return (
-    <View style={{paddingBottom: 20}}>
-      <TextWrapper color={COLORS.white} fs={18}>
-        Submit Handwriting Image
-      </TextWrapper>
-      <Spacer space={4} />
-      <View style={{flexDirection: 'row', gap: 4}}>
+    <View style={{}}>
+      <View style={{}} className="justify-center">
         <Pressable
           onPress={onOpenOptions}
           style={({pressed}) => [
             styles.btnUpload,
             {opacity: pressed ? 0.9 : 1},
-          ]}>
-          <Icon name="camera" size={24} color={COLORS.black} />
-          <TextWrapper color={COLORS.black} fs={18}>
-            Select image
-          </TextWrapper>
-        </Pressable>
-        <Pressable
-          style={({pressed}) => [
-            styles.btnUpload,
-            {opacity: pressed ? 0.9 : 1},
           ]}
-          onPress={onVisibleEmail}>
-          <TextWrapper color={COLORS.black} fs={18}>
-            Get link on email
+          className="flex-col items-center"
+          >
+          <Icon name="camera" size={24} color={COLORS.white} />
+          <TextWrapper color={COLORS.black} fs={13} className="text-center text-[12px] text-white">
+            upload handwriting
           </TextWrapper>
         </Pressable>
+        
       </View>
+
+
       <ModalComponent
         visible={visibleOptions}
         onRequestClose={onCloseOptions}
@@ -335,31 +320,7 @@ const UploadHandwriting = ({demoData}) => {
           </View>
         </View>
       </ModalComponent>
-      <ModalComponent visible={visibleEmail}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.15)',
-            paddingHorizontal: 16,
-          }}>
-          <View style={{flex: 1}}></View>
-          <View style={styles.emailContainer}>
-            <Email demoData={demoData} />
-            <Icon
-              name="close"
-              size={26}
-              color={COLORS.black}
-              style={{
-                position: 'absolute',
-                top: 8,
-                right: 12,
-              }}
-              onPress={onCloseEmail}
-            />
-          </View>
-          <View style={{flex: 1}}></View>
-        </View>
-      </ModalComponent>
+      
     </View>
   );
 };

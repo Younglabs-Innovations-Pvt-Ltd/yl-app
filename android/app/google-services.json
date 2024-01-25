@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "54129267828",
-    "firebase_url": "https://younglabs-8c353-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "younglabs-8c353",
-    "storage_bucket": "younglabs-8c353.appspot.com"
+    "project_number": "351274768066",
+    "project_id": "younglabs-uat",
+    "storage_bucket": "younglabs-uat.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:54129267828:android:c54ca9c59d613eff462d21",
+        "mobilesdk_app_id": "1:351274768066:android:646203a86d911db89ccd5b",
         "android_client_info": {
           "package_name": "com.younglabs"
         }
       },
       "oauth_client": [
         {
-          "client_id": "54129267828-73o9bu1af3djrmh0e9krbk59s1g47rsp.apps.googleusercontent.com",
+          "client_id": "351274768066-ftkfamveov8pb1nkd558fv0mrur546lf.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD59OUXft6SwtbKvCwPpLa1RdsQOmQcH7M"
+          "current_key": "AIzaSyD9CqrJ0ov7aw550GE5aC3XK2t1ObMoh5s"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "54129267828-1ncbjs5tds7e884ijgc8a83mgp32kp2u.apps.googleusercontent.com",
+              "client_id": "351274768066-ftkfamveov8pb1nkd558fv0mrur546lf.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

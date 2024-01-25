@@ -13,7 +13,7 @@ const ReviewsAndTestimonials = () => {
   const {contentData, contentLoading} = useSelector(contentSelector);
   const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
     useSelector(state => state.appTheme);
-  console.log('content Data loading', contentLoading);
+  // console.log('content Data loading', contentLoading);
 
   useEffect(() => {
     dispatch(fetchContentDataStart());

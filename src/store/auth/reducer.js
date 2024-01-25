@@ -9,17 +9,19 @@ const INITIAL_STATE = {
   confirm: null,
   email: '',
   // user: null,
-  user: {
-    leadId: 100058,
-    credits: 960,
-    phone: 7982726046,
-    token:
-      'eyJhbGciOiJSUzI1NiIsImtpZCI6IjdjZjdmODcyNzA5MWU0Yzc3YWE5OTVkYjYwNzQzYjdkZDJiYjcwYjUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20veW91bmdsYWJzLXVhdCIsImF1ZCI6InlvdW5nbGFicy11YXQiLCJhdXRoX3RpbWUiOjE3MDUzOTQwMzIsInVzZXJfaWQiOiJwVFBhcEV0R0RsVHVJZmtIbkFpOWtZTmJRMGsyIiwic3ViIjoicFRQYXBFdEdEbFR1SWZrSG5BaTlrWU5iUTBrMiIsImlhdCI6MTcwNTc0NTUyNSwiZXhwIjoxNzA1NzQ5MTI1LCJlbWFpbCI6InNlZW5hYmFidTM2NUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsic2VlbmFiYWJ1MzY1QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.iV3mnMJg1_awQzkzbRBBXG0pGf80bL1gqxGdaLOjKGcdTRa1b8Z6Hb7bD_S64EZWqyzXtZtpbUQTgJrCiM4v584ay2SJBNZcT60UIxHSC5aP9HP9f_7EbccchlCYTbgD2kh1sqtV-h5HFrDfz_PD_N4yZQQj853q1ObMyMSf8R1nGdoUtQjvVPzquXXxWbkFAfteiOupZYVVixopIBY86yzXVZYU9DHDOGcyYN0_F4MIHVNHjFyhyaVBygo45LIBg-Rk63MlTYMq_q-oQ67pc9m6694JXixNUgTDkoGPSCOr9iPPoFkpcz1J_8bzwKJXD5QMLEl4mNOhbGaucmkS_g',
-  },
+  user: null,
+  //  {
+  // leadId: 100058,
+  // credits: 960,
+  // phone: 7982726046,
+  // token:
+  //   'eyJhbGciOiJSUzI1NiIsImtpZCI6IjdjZjdmODcyNzA5MWU0Yzc3YWE5OTVkYjYwNzQzYjdkZDJiYjcwYjUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20veW91bmdsYWJzLXVhdCIsImF1ZCI6InlvdW5nbGFicy11YXQiLCJhdXRoX3RpbWUiOjE3MDUzOTQwMzIsInVzZXJfaWQiOiJwVFBhcEV0R0RsVHVJZmtIbkFpOWtZTmJRMGsyIiwic3ViIjoicFRQYXBFdEdEbFR1SWZrSG5BaTlrWU5iUTBrMiIsImlhdCI6MTcwNTc0NTUyNSwiZXhwIjoxNzA1NzQ5MTI1LCJlbWFpbCI6InNlZW5hYmFidTM2NUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsic2VlbmFiYWJ1MzY1QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.iV3mnMJg1_awQzkzbRBBXG0pGf80bL1gqxGdaLOjKGcdTRa1b8Z6Hb7bD_S64EZWqyzXtZtpbUQTgJrCiM4v584ay2SJBNZcT60UIxHSC5aP9HP9f_7EbccchlCYTbgD2kh1sqtV-h5HFrDfz_PD_N4yZQQj853q1ObMyMSf8R1nGdoUtQjvVPzquXXxWbkFAfteiOupZYVVixopIBY86yzXVZYU9DHDOGcyYN0_F4MIHVNHjFyhyaVBygo45LIBg-Rk63MlTYMq_q-oQ67pc9m6694JXixNUgTDkoGPSCOr9iPPoFkpcz1J_8bzwKJXD5QMLEl4mNOhbGaucmkS_g',
+  // }
   customer: 'no',
   childName: 'Rahul Singh',
   childAge: 8,
   credits: 980,
+  logoutLoading: false,
 };
 
 const reducers = {
@@ -66,6 +68,13 @@ const reducers = {
   setUser(state, action) {
     state.user = action.payload;
   },
+  setIsCustomer(state, action) {
+    if (action.payload) {
+      state.customer = 'yes';
+    } else {
+      state.customer = 'no';
+    }
+  },
   logout() {},
 };
 
@@ -89,6 +98,7 @@ export const {
   fetchUser,
   setUser,
   logout,
+  setIsCustomer,
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

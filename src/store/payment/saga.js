@@ -30,6 +30,8 @@ function* makePaymentSaga({payload}) {
       bookingDetails,
       courseDetails,
       email,
+      childData,
+      credits,
     } = payload;
 
     let selectBatch = {...currentSelectedBatch};
@@ -56,8 +58,9 @@ function* makePaymentSaga({payload}) {
 
     const daysArrString = selectBatch?.daysArr.split(',').join('');
 
+    // console.log("selected Batch is" , selectBatch)
     const body = {
-      courseType: selectBatch?.courseType,
+      courseType: selectBatch?.groupType,
       leadId: bookingDetails.leadId,
       ageGroup: selectBatch?.ageGroup,
       courseId: selectBatch?.courseId,
@@ -65,14 +68,15 @@ function* makePaymentSaga({payload}) {
       promisedStartDate: startDateTime,
       promisedBatchFrequency: daysArrString,
       phone: bookingDetails.phone,
-      fullName: bookingDetails.parentName,
+      fullName: bookingDetails.fullName,
       batchId: selectBatch?.batchId,
-      childName: bookingDetails.childName,
+      childName: childData?.childName,
       email,
-      childAge: bookingDetails.childAge,
+      childAge: childData?.childAge,
       timezone,
       countryCode,
       source: 'app',
+      credits: credits || 0,
     };
 
     if (payload?.offerCode) {
@@ -87,6 +91,7 @@ function* makePaymentSaga({payload}) {
     // if (!isEmail) {
     //   yield AsyncStorage.setItem(LOCAL_KEYS.EMAIL, body.email);
     // }
+    // }
 
     // Save email to local storage
     localStorage.set(LOCAL_KEYS.EMAIL, body.email);
@@ -94,9 +99,9 @@ function* makePaymentSaga({payload}) {
     const offeringBody = generateOffering(selectBatch);
 
     body.offeringData = offeringBody;
-    console.log('body=', body);
 
     const token = yield auth().currentUser.getIdToken();
+    console.log('body=', body);
 
     const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
       method: 'POST',
@@ -114,7 +119,7 @@ function* makePaymentSaga({payload}) {
 
     const data = yield response.json();
 
-    console.log('order data=', data);
+    // console.log('order data=', data);
 
     const {amount, id: order_id, currency} = data.order;
 
@@ -130,7 +135,7 @@ function* makePaymentSaga({payload}) {
     });
 
     const orderRes = yield orderResp.json();
-    console.log('orderRes=', orderRes);
+    // console.log('orderRes=', orderRes);
 
     let config = {
       display: {

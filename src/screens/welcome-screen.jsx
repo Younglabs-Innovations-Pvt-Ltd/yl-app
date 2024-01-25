@@ -8,6 +8,7 @@ import {
   TextInput,
   StatusBar,
   ImageBackground,
+  Text,
 } from 'react-native';
 
 import {FONTS} from '../utils/constants/fonts';
@@ -34,6 +35,9 @@ import {networkSelector} from '../store/network/selector';
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import { Showtoast } from '../utils/toast';
+import { useToast } from 'react-native-toast-notifications';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -43,6 +47,10 @@ const GAP = 54;
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
+  const toast = useToast()
+  const {textColors, colorYlMain} =
+  useSelector(state => state.appTheme);
+
   const {localLang, currentLang} = i18nContext();
 
   const [phone, setPhone] = useState('');
@@ -79,6 +87,11 @@ const DemoClassScreen = ({navigation}) => {
    * Takes two parameter phone number and country({callingCode, countryCode})
    */
   const handleBookingStatus = async () => {
+    console.log("clicked");
+    
+    if(!phone){
+      Showtoast({text:"Please Enter Whatsapp Number", toast , type:"danger"})
+    }
     dispatch(fetchBookingStatusStart({phone}));
   };
 
@@ -244,22 +257,25 @@ const DemoClassScreen = ({navigation}) => {
         </View>
         {/* Footer */}
         <Animated.View
+          className=""
           style={[
             styles.footer,
             {
               opacity: animatedButtons,
             },
           ]}>
-          <View style={styles.footerContent}>
+          <View style={{}} className="py-6 bg-white px-3 rounded-2xl relative">
+            <View className="absolute p-[2px] rounded-full bg-gray-400 top-1 left-[48%] w-[15%]"></View>
+
             {/* <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
               Book Free Handwriting Class
             </TextWrapper> */}
-            <View style={styles.row}>
+            <View style={styles.row} className="mt-5">
               <Pressable style={styles.btnCountryCode}>
                 <TextWrapper>{'+91'}</TextWrapper>
               </Pressable>
               <TextInput
-                placeholder="Enter WhatsApp number"
+                placeholder="Enter Whatsapp number"
                 style={styles.input}
                 selectionColor={COLORS.black}
                 value={phone}
@@ -269,24 +285,33 @@ const DemoClassScreen = ({navigation}) => {
                 maxLength={maxPhoneLength}
               />
             </View>
-            <Pressable
+            <TouchableOpacity
+              activeOpacity={.8}
               style={btnContinueStyle}
               disabled={loading}
-              onPress={handleBookingStatus}>
-              <TextWrapper fs={18} fw="800" color={COLORS.white}>
+              onPress={handleBookingStatus}
+              className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}
+              >
+              <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
                 Log in
               </TextWrapper>
-            </Pressable>
-            <View style={{alignItems: 'flex-end', marginTop: 8}}>
+            </TouchableOpacity>
+
+            <View style={{alignItems: 'center', marginTop:28}}>
               <Pressable
                 style={{paddingVertical: 4}}
                 onPress={() => navigation.navigate(SCREEN_NAMES.SIGNUP)}>
-                <TextWrapper fs={16}>Don't have WhatsApp</TextWrapper>
+                <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">Don't have WhatsApp</TextWrapper>
               </Pressable>
+
+              <View className="my-3 border-t-[.7px] h-[1px] w-[80%] border-gray-400 relative">
+                  <Text className="absolute -top-3 bg-white px-1 left-[48%]">or</Text>
+              </View>
+
               <Pressable
                 style={{paddingVertical: 4}}
                 onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
-                <TextWrapper fs={16}>
+                <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">
                   Existing user? Login with Email
                 </TextWrapper>
               </Pressable>
@@ -344,7 +369,7 @@ const styles = StyleSheet.create({
   animatedText: {
     fontSize: 20,
     color: COLORS.black,
-    fontFamily: FONTS.gelasio_semibold,
+    fontFamily: FONTS.primaryFont,
     textTransform: 'capitalize',
     letterSpacing: 2.5,
     textAlign: 'center',

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Linking, Alert} from 'react-native';
+import {Linking, Alert, ActivityIndicator, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -27,7 +27,7 @@ import {SCREEN_NAMES} from './src/utils/constants/screen-names';
 // Snackbar
 import Snackbar from 'react-native-snackbar';
 
-import { ToastProvider } from 'react-native-toast-notifications'
+import {ToastProvider} from 'react-native-toast-notifications';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
@@ -46,6 +46,7 @@ import {COLORS} from './src/utils/constants/colors';
 import {NetworkProvider} from './src/context/network.state';
 
 import auth from '@react-native-firebase/auth';
+
 import Icon from './src/components/icon.component';
 import MainWelcomeScreen from './src/screens/MainWelcomeScreen';
 import CourseDetailsScreen from './src/screens/CourseDetailScreen';
@@ -71,7 +72,10 @@ const Stack = createStackNavigator();
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [isPhone, setIsPhone] = useState(false);
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const [initialRouteName, setInitialRouteName] = useState(
+    SCREEN_NAMES.WELCOME,
+  );
 
   const notificationRef = useRef({});
 
@@ -100,17 +104,51 @@ function App() {
   }, []);
 
   // check for authentication
-  useEffect(() => {
-    const checkAuth = () => {
-      const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-      if (phone) {
-        setIsPhone(true);
-      }
-      setLoading(false);
-    };
 
-    checkAuth();
+  console.log('is user authenticated', isUserAuthenticated);
+
+  useEffect(() => {
+    requestPermissions();
+    console.log('here');
+    let storedUser = localStorage.getString(LOCAL_KEYS.LOGINDETAILS);
+    console.log('got stored user');
+    if (!storedUser) {
+      console.log("did't get credentials");
+      setLoading(false);
+      return;
+    }
+    let loginDetails = JSON.parse(storedUser);
+    console.log('loginDetails is', loginDetails);
+    if (loginDetails.loginType === 'whatsAppNumber' && loginDetails.phone) {
+      setIsUserAuthenticated(true);
+      setInitialRouteName(SCREEN_NAMES.MAIN);
+      setLoading(false);
+    } else if (loginDetails.loginType === 'customerLogin') {
+      const email = loginDetails.email;
+      const password = loginDetails.password;
+
+      if (email && password) {
+        const authCustomer = async () => {
+          try {
+            console.log('adding');
+            await auth().signInWithEmailAndPassword(email, password.trim());
+            setIsUserAuthenticated(true);
+            setInitialRouteName(SCREEN_NAMES.MAIN);
+            setLoading(false);
+          } catch (error) {
+            setLoading(false);
+            console.log('error auth', error.message);
+          }
+        };
+        authCustomer();
+      } else {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
   }, []);
+
 
   // Handle redirect url (Deep Link)
   // useEffect(() => {
@@ -132,9 +170,9 @@ function App() {
   // }, []);
 
   // Request for Notification permission
-  useEffect(() => {
-    requestPermissions();
-  }, []);
+  // useEffect(() => {
+  //   requestPermissions();
+  // }, []);
 
   // Request for Notifications permission to above android 13 or above
   const requestPermissions = async () => {
@@ -177,15 +215,14 @@ function App() {
     }
   };
 
-  if (loading) return null;
+  if (loading)
+    return (
+      <View>
+        <ActivityIndicator color={'blue'} />
+      </View>
+    );
 
-  // UI Constants
-  let initialRouteName = SCREEN_NAMES.WELCOME;
-
-  if (isPhone) {
-    initialRouteName = SCREEN_NAMES.MAIN;
-  }
-
+  console.log('initialRouteName=', initialRouteName);
   const CustomBackButton = ({navigation}) => {
     return (
       <Icon
@@ -216,11 +253,11 @@ function App() {
                   headerStyle: {
                     elevation: 0,
                     shadowOpacity: 0,
-                    borderBottomWidth: 1,
-                    borderBottomColor: '#eaeaea',
+                    // borderBottomWidth: 1,
+                    // borderBottomColor: '#eaeaea',
                     backgroundColor: '#fff',
-                    headerTintColor: '#000',
                   },
+                  headerTintColor: '#636165',
                   headerTitleStyle: {
                     fontSize: 18,
                     fontFamily: FONTS.gelasio_semibold,
@@ -233,7 +270,7 @@ function App() {
                   cardStyleInterpolator:
                     CardStyleInterpolators.forHorizontalIOS,
                 })}
-                initialRouteName={SCREEN_NAMES.MAIN}>
+                initialRouteName={initialRouteName}>
                 <Stack.Screen
                   name={SCREEN_NAMES.WELCOME}
                   component={WelcomeScreen}
@@ -241,18 +278,18 @@ function App() {
                 />
 
                 <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={Signup} />
-              <Stack.Screen
-                name={SCREEN_NAMES.VERIFY_CODE}
-                component={VerifyCode}
-                options={{headerTitle: 'Verify OTP'}}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.EMAIL_LOGIN}
-                component={EmailLogin}
-                options={{headerTitle: 'Log in'}}
-              />
+                <Stack.Screen
+                  name={SCREEN_NAMES.VERIFY_CODE}
+                  component={VerifyCode}
+                  options={{headerTitle: 'Verify OTP'}}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.EMAIL_LOGIN}
+                  component={EmailLogin}
+                  options={{headerTitle: 'Log in'}}
+                />
 
-              <Stack.Screen
+                <Stack.Screen
                   name={SCREEN_NAMES.MAIN}
                   component={MainScreen}
                   options={{headerShown: false}}

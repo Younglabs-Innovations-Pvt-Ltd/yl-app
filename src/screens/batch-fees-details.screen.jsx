@@ -63,8 +63,6 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     state => state.appTheme,
   );
 
-  console.log('all batches are: ', batches.length);
-  console.log('course Details is here', courseDetails);
 
   // Save current screen name
   // useEffect(() => {
@@ -151,6 +149,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     dispatch(setCurrentAgeGroup(group));
   };
 
+  // console.log("courseData is", courseData)
   return (
     <View style={{flex: 1}}>
       {loading ? (
@@ -171,7 +170,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
           {console.log('courseData.thumbnailUrl', courseData.thumbnailUrl)}
           <View style={{paddingVertical: 16}} className="flex-1">
             <Image
-              source={{uri: courseData.thumbnailUrl}}
+              source={{uri: courseData.coverPicture}}
               resizeMode="cover"
               className="w-full h-[200px] rounded"
             />

@@ -58,8 +58,9 @@ const CourseDetails = ({navigation, courseId}) => {
   // console.log("About course array is", aboutCourseArr[0].objArray[0].content)
 
   useEffect(() => {
-    if (!courseDetails) {
-      dispatch(fetchCourseStart({courseId: 'Eng_Hw'}));
+    console.log("courseDetails is",courseDetails)
+    if (!courseDetails || courseDetails?.courseId !== courseId) {
+      dispatch(fetchCourseStart({courseId: courseId || 'Eng_Hw'}));
     }
   }, [courseDetails]);
 

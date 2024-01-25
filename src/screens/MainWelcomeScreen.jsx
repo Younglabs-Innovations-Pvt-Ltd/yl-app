@@ -52,6 +52,11 @@ import {FONTS} from '../utils/constants/fonts';
 import BookDemoScreen from './book-demo-form.screen';
 import ShowCourses from '../components/MainScreenComponents/ShowCourses';
 import ReviewsAndTestimonials from '../components/MainScreenComponents/ReviewsAndTestimonials';
+import {fetchUser, setIsCustomer} from '../store/auth/reducer';
+import {localStorage} from '../utils/storage/storage-provider';
+import {LOCAL_KEYS} from '../utils/storage/local-storage-keys';
+import {Showtoast} from '../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
 
 const {width, height} = Dimensions.get('window');
 
@@ -147,7 +152,7 @@ const testimonials = [
 ];
 
 const MainWelcomeScreen = ({navigation}) => {
-  console.log('In main welcome screen');
+  const toast = useToast();
   const {customer} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -162,6 +167,7 @@ const MainWelcomeScreen = ({navigation}) => {
     useSelector(state => state.appTheme);
 
   const {user} = useSelector(authSelector);
+  // console.log("user phone nym", user?.phone)
   const {selectedChild} = useSelector(welcomeScreenSelector);
 
   const dispatch = useDispatch();
@@ -177,6 +183,34 @@ const MainWelcomeScreen = ({navigation}) => {
     bookingTime,
   } = useSelector(joinDemoSelector);
 
+  useEffect(() => {
+    let loginDetails = localStorage.getString('loginDetails');
+    console.log("login details in top", loginDetails)
+    if (!user && loginDetails) {
+    console.log('fetching user...');
+    loginDetails = JSON.parse(loginDetails);
+    console.log('got login details: ' + loginDetails.loginType);
+
+    if (!loginDetails) {
+      Showtoast({
+        text: 'Failed To Load Data, please logout and login again',
+        toast,
+        type: 'danger',
+      });
+    }
+
+    console.log('login details is', loginDetails);
+    if (loginDetails.loginType === 'whatsAppNumber') {
+      console.log('getting user by', loginDetails.phone);
+      dispatch(fetchUser({phone: loginDetails.phone}));
+    } else if (loginDetails.loginType === 'customerLogin') {
+      console.log('getting user by', loginDetails.email);
+      dispatch(fetchUser({email: loginDetails.email}));
+      dispatch(setIsCustomer(true));
+    }
+    }
+  }, [user]);
+  
   useEffect(() => {
     // console.log("running for selectedChild", selectedChild.bookingId)
     if (selectedChild?.bookingId) {
@@ -208,7 +242,7 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (demoData && user.phone) {
+    if (demoData && user?.phone) {
       dispatch(setDemoData({demoData, phone: user?.phone}));
     }
   }, [demoData, user]);
@@ -344,6 +378,9 @@ const MainWelcomeScreen = ({navigation}) => {
                 return <Testimonial data={item.item} />;
               }}
               showsHorizontalScrollIndicator={false}
+              ItemSeparatorComponent={()=>{
+                return<View className="p-1"></View>
+              }}
               horizontal
             />
           </View>

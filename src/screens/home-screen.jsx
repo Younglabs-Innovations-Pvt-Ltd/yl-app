@@ -217,16 +217,15 @@ const HomeScreen = ({navigation, route}) => {
     if (demoData) {
       console.log('demoData', demoData);
       dispatch(setDemoData({demoData}));
-      // dispatch(fetchContentDataStart());
     }
   }, [demoData]);
 
   // fetch user data
-  useEffect(() => {
-    if (bookingDetails && bookingDetails?.leadId) {
-      dispatch(fetchUser({leadId: bookingDetails.leadId}));
-    }
-  }, [bookingDetails]);
+  // useEffect(() => {
+  //   if (bookingDetails && bookingDetails?.leadId) {
+  //     dispatch(fetchUser({leadId: bookingDetails.leadId}));
+  //   }
+  // }, [bookingDetails]);
 
   useEffect(() => {
     let timeout;

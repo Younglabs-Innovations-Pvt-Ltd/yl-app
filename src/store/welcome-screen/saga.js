@@ -15,6 +15,7 @@ import {
   userOrderFetchingSuccess,
   userOrdersLoadingFailed,
   setSelectedUserOrder,
+  setIsFirstTimeUser,
 } from './reducer';
 
 import {createLead, fetchBookingDetailsFromPhone} from '../../utils/api/yl.api';
@@ -62,17 +63,23 @@ function* handleBookingStatus({payload: {phone}}) {
     // Return true or false
     const isValidPhone = isValidNumber(phone, 'IN');
 
-    // if (!isValidPhone) {
-    //   yield put(setErrorMessage('Please enter a valid number'));
-    //   return;
-    // }
+    if (!isValidPhone) {
+      yield put(setErrorMessage('Please enter a valid number'));
+      return;
+    }
 
     // Get booking data
     // const response = yield fetchBookingDetailsFromPhone(phone);
-
-    const data = yield response.json();
+    // const data = yield response.json();
 
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
+    localStorage.set(
+      LOCAL_KEYS.LOGINDETAILS,
+      JSON.stringify({
+        loginType: 'whatsAppNumber',
+        phone,
+      }),
+    );
 
     const deviceId = yield getCurrentDeviceId();
     const deviceUID = yield DeviceInfo.getAndroidId();
@@ -157,15 +164,24 @@ function* fetchingCourses() {
 // Fetching user's all bookings
 function* fetchAllBookings({payload}) {
   try {
+    if(!payload){
+      return;
+    }
     console.log('fetching bookings in api');
     const response = yield fetchAllBookinsFromPhone(payload);
-
     if (response.status !== 200 && response.status !== 404) {
-      console.log("failing here" , response.status);
+      console.log('failing here', response.status);
       yield put(setAllBookingsFetchingFailed('Something went wrong'));
       return;
     }
     const data = yield response.json();
+    console.log("data is", data , "for payload" , payload);
+
+    if(data?.message == "bookings not found"){
+      yield put(getAllBookingsSuccess([]));
+      yield put(setIsFirstTimeUser(true));
+      return;
+    }
 
     if (data?.data) {
       const orignalObj = data.data;
@@ -195,14 +211,16 @@ function* fetchAllBookingsWithPhone() {
 // fetching user's all orders
 function* fetchAllOrders({payload}) {
   try {
-    console.log('getting payload in');
+    console.log('getting payload in' );
     const response = yield fetchAllOrdersFromLeadId(payload);
+    console.log("got response" , response , " got status", response.status)
     if (response.status !== 200) {
       yield put(userOrdersLoadingFailed('Something went Wrong'));
       return;
     }
 
     const data = yield response.json();
+    console.log("got data", data)
 
     // console.log('get courses', data, response.status);
 

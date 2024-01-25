@@ -15,6 +15,8 @@ import {
 } from '../store/welcome-screen/reducer';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {select} from 'redux-saga/effects';
+import {logout} from '../store/auth/reducer';
+import auth from '@react-native-firebase/auth';
 
 const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   const handleShowDrawer = () => navigation.openDrawer();
@@ -38,8 +40,8 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   } = useSelector(welcomeScreenSelector);
   const {user, customer} = useSelector(authSelector);
 
+  // console.log('User is', user);
   // console.log("UserOrders are" , userOrders)
-
   const changeDarkMode = payload => {
     dispatch(setDarkMode(payload));
   };
@@ -47,31 +49,35 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   useEffect(() => {
     console.log('useeffect running 1');
     if (customer !== 'yes') {
-      console.log('if 2');
-      if (!userBookings) {
-        dispatch(startGetAllBookings(user?.phone));
-      }
+      console.log('if 2', user?.phone);
+      dispatch(startGetAllBookings(user?.phone));
     }
-  }, [userBookings, user, customer]);
+  }, [user, customer]);
 
   useEffect(() => {
-    if (customer == 'yes') {
+    const getOrders = async () => {
+      console.log('gettting orders');
+      const token = await auth().currentUser.getIdToken();
+      console.log('Got token', token);
       console.log('condition 2');
       let body = {
         leadId: user.leadId,
-        token: user.token,
+        token,
       };
-
       dispatch(startFetchingUserOrders(body));
+    };
+    if (customer == 'yes') {
+      getOrders();
     }
   }, [customer, user]);
 
   useEffect(() => {
+    // console.log("allBookings are", user)
     if (customer == 'yes') {
       let userName = Object.keys(selectedUserOrder)[0];
       setCustomerName(userName);
     } else {
-      setCustomerName(selectedChild.userName);
+      setCustomerName(selectedChild?.userName);
     }
   }, [customer, selectedChild, selectedUserOrder]);
 
@@ -86,6 +92,10 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
       console.log('here 2', allBookingsLoadingFailed);
     }
   }, [customer, allBookingsLoding, userOrdersLoading]);
+
+  const handleLogOut = () => {
+    dispatch(logout());
+  };
 
   return (
     <>
@@ -187,10 +197,10 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
 
         <View style={tw`w-[20%]  flex-row gap-2 items-center justify-end`}>
           <MIcon
-            name="menu"
+            name="logout"
             size={30}
             color={textColors.textYlMain}
-            onPress={handleShowDrawer}
+            onPress={handleLogOut}
           />
         </View>
       </View>
@@ -203,7 +213,8 @@ export default HeaderComponent;
 export const ChangeAddedChild = ({close}) => {
   const {selectedChild, userBookings, userOrders, selectedUserOrder} =
     useSelector(welcomeScreenSelector);
-  const {childName, childAge, credits, allBookings} = useSelector(authSelector);
+  const {childName, childAge, credits, allBookings, user} =
+    useSelector(authSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -228,6 +239,7 @@ export const ChangeAddedChild = ({close}) => {
         }),
       );
     };
+
     return (
       <View className="w-full py-2 px-1 items-center">
         {Object.keys(userOrders)?.map(key => {

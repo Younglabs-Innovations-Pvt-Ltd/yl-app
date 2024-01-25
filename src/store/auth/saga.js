@@ -9,6 +9,8 @@ import {
   setFailedVerification,
   fetchUser,
   setUser,
+  setIsCustomer,
+  logout,
 } from './reducer';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/storage/local-storage-keys';
@@ -17,6 +19,8 @@ import {createLead, getCustomers} from '../../utils/api/yl.api';
 import {localStorage} from '../../utils/storage/storage-provider';
 import DeviceInfo from 'react-native-device-info';
 import {getCurrentDeviceId} from '../../utils/deviceId';
+import {navigate} from '../../navigationRef';
+import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
 function* phoneAuthentication({payload: {phone}}) {
   try {
@@ -76,17 +80,24 @@ function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
   }
 }
 
-function* fetchUserSaga({payload: {leadId}}) {
+function* fetchUserSaga({payload}) {
   try {
-    if (!leadId) {
+    if (!payload) {
       return;
     }
-    const res = yield getCustomers({leadId});
+    console.log('getting res', payload);
+    const res = yield getCustomers(payload);
+    // console.log("res is",res)
     const data = yield res.json();
-    console.log('uesrs', data.data.customer);
-    yield put(setUser(data.data));
+    console.log('data is here', data?.data?.customer);
+    console.log('uesrs', data?.data?.customer);
+    yield put(setUser(data?.data));
   } catch (error) {
-    console.log('FETCH_USER_ERROR', 'Something went wrong, try again later.');
+    console.log(
+      'FETCH_USER_ERROR',
+      'Something went wrong, try again later.',
+      error.message,
+    );
   }
 }
 
@@ -103,11 +114,24 @@ function* fetchUserListener() {
   yield takeLatest(fetchUser.type, fetchUserSaga);
 }
 
+function* logoutFunc() {
+  localStorage.clearAll();
 
+  const currentUser = auth().currentUser;
+  if (currentUser) {
+    yield auth().signOut();
+  }
+  navigate(SCREEN_NAMES.WELCOME);
+}
+
+function* logoutUser() {
+  yield takeLatest(logout, logoutFunc);
+}
 export function* authSaga() {
   yield all([
     call(startAuthentication),
     call(startCodeVerification),
     call(fetchUserListener),
+    call(logoutUser),
   ]);
 }
