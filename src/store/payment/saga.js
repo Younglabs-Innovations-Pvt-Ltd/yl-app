@@ -96,14 +96,17 @@ function* makePaymentSaga({payload}) {
     body.offeringData = offeringBody;
     console.log('body=', body);
 
-    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    const response = yield fetch(
+      `${BASE_URL}/shop/orderhandler/makepayment`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
       },
-      body: JSON.stringify(body),
-    });
+    );
 
     if (response.status === 403) {
       yield put(setLoading(false));
@@ -116,16 +119,19 @@ function* makePaymentSaga({payload}) {
 
     const {amount, id: order_id, currency} = data.order;
 
-    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const orderResp = yield fetch(
+      `${BASE_URL}/shop/orderhandler/addToBag`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bagDetails: {...body, rpOrderId: order_id, type: 'order'},
+          leadId: body.leadId,
+        }),
       },
-      body: JSON.stringify({
-        bagDetails: {...body, rpOrderId: order_id, type: 'order'},
-        leadId: body.leadId,
-      }),
-    });
+    );
 
     const orderRes = yield orderResp.json();
     console.log('orderRes=', orderRes);
@@ -150,7 +156,7 @@ function* makePaymentSaga({payload}) {
     };
 
     const options = {
-      key: RP_KEY,
+      key:RP_KEY,
       currency,
       amount: amount?.toString(),
       order_id,

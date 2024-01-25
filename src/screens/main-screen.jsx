@@ -14,6 +14,7 @@ import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {localStorage} from '../utils/storage/storage-provider';
 
 import {i18nContext} from '../context/lang.context';
+import CourseScreenNavigator from './course-screen-navigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -77,7 +78,7 @@ const MainScreen = ({route}) => {
       />
       <Tab.Screen
         name="Course"
-        component={CourseScreen}
+        component={CourseScreenNavigator}
         options={{
           headerShown: false,
           tabBarLabel: 'Course',

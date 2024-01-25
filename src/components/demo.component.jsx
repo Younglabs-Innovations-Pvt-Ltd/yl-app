@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import DemoWaiting from './join-demo-class-screen/demo-waiting.component';
-import Button from './button.component';
+// import Button from './button.component';
 import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
 import PostDemoAction from './join-demo-class-screen/post-demo-actions.component';
@@ -166,13 +166,13 @@ const Demo = ({isClassOngoing, timeLeft, showPostActions}) => {
             Book your first free Handwriting Class.
           </TextWrapper>
           <Spacer />
-          <Button
+          {/* <Button
             textColor={'#434a52'}
             bg={COLORS.white}
             rounded={6}
             onPress={onOpenForm}>
             Book Now
-          </Button>
+          </Button> */}
         </View>
       );
     } else {

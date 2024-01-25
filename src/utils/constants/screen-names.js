@@ -7,4 +7,7 @@ export const SCREEN_NAMES = {
   COURSE_DETAILS: 'CourseDetails',
   PAYMENT: 'payment',
   BATCH_FEE_DETAILS: 'BatchFeeDetails',
+  USER_COURSES_PAGE: 'UserCoursePage',
+  COURSE_LEVEL_PAGE: 'CourseLevelPage',
+  COURSE_CONDUCT_PAGE:"CourseConductScreen"
 };

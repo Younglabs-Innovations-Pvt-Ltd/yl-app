@@ -19,7 +19,7 @@ import {
 } from '../store/course/course.reducer';
 import {courseSelector} from '../store/course/course.selector';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Button from '../components/button.component';
+// import Button from '../components/button.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import VideoPlayer from '../components/video-player.component';
 import {FONTS} from '../utils/constants/fonts';
@@ -253,7 +253,7 @@ const CourseDetails = ({navigation}) => {
           // height: 90,
           backgroundColor: '#eee',
         }}>
-        <Button
+        {/* <Button
           onPress={() => {
             navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
           }}
@@ -262,7 +262,7 @@ const CourseDetails = ({navigation}) => {
           bg={COLORS.pblue}
           rounded={4}>
           Batch/Fee Details
-        </Button>
+        </Button> */}
       </View>
     </View>
   );

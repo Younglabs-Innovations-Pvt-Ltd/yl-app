@@ -48,6 +48,9 @@ import Icon from './src/components/icon.component';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
 import notifee from '@notifee/react-native';
+import UserCoursesPage from './src/screens/user-courses-page';
+import CourseLevelScreen from './src/screens/course-level-screen';
+import CourseConductScreen from './src/screens/course-conduct-screen';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -207,7 +210,7 @@ function App() {
   if (loading) return null;
 
   // UI Constants
-  let initialRouteName = SCREEN_NAMES.WELCOME;
+  let initialRouteName = SCREEN_NAMES.MAIN;
 
   if (isPhone || bookingId) {
     console.log('bookingId', bookingId);
@@ -220,6 +223,7 @@ function App() {
         name="arrow-back-outline"
         size={24}
         color={COLORS.black}
+        Conti
         style={{marginLeft: 4}}
         onPress={() => navigation.goBack()}
       />
@@ -258,6 +262,21 @@ function App() {
               <Stack.Screen
                 name={SCREEN_NAMES.WELCOME}
                 component={WelcomeScreen}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.USER_COURSES_PAGE}
+                component={UserCoursesPage}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.COURSE_LEVEL_PAGE}
+                component={CourseLevelScreen}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name={SCREEN_NAMES.COURSE_CONDUCT_PAGE}
+                component={CourseConductScreen}
                 options={{headerShown: false}}
               />
               <Stack.Screen

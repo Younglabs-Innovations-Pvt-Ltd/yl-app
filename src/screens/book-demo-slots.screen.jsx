@@ -4,7 +4,7 @@ import {StyleSheet, Pressable, View, Linking, Alert} from 'react-native';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
 import Spinner from '../components/spinner.component';
-import Button from '../components/button.component';
+// import Button from '../components/button.component';
 import Modal from '../components/modal.component';
 import {COLORS} from '../utils/constants/colors';
 
@@ -341,7 +341,7 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
           </View>
         </Modal>
       </View>
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <Button
           rounded={6}
           bg={COLORS.pblue}
@@ -349,7 +349,7 @@ const BookDemoSlots = ({navigation, route, onClose}) => {
           textColor={COLORS.white}>
           Book now
         </Button>
-      </View>
+      </View> */}
       {/* show popup */}
       {popup && <Popup onHandlePopup={handlePopup} onClose={onClose} />}
       {/* Loading spinner */}
@@ -386,7 +386,7 @@ const Popup = ({onHandlePopup, popup, onClose}) => {
           Congratulations your free class booking successful
         </TextWrapper>
         <Spacer />
-        <View>
+        {/* <View>
           <Button
             bg={COLORS.orange}
             textColor={COLORS.white}
@@ -394,7 +394,7 @@ const Popup = ({onHandlePopup, popup, onClose}) => {
             onPress={onHandlePopup}>
             Continue
           </Button>
-        </View>
+        </View> */}
       </View>
     </View>
   );

@@ -58,9 +58,7 @@ function Tabbar({state, descriptors, navigation}) {
     setActions(true);
   };
 
-  const goOnCourse = () => {
-    navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
-  };
+  const goOnCourse = () => {};
 
   return (
     <>
@@ -90,7 +88,7 @@ function Tabbar({state, descriptors, navigation}) {
                 accessibilityState={isFocused ? {selected: true} : {}}
                 accessibilityLabel={options.tabBarAccessibilityLabel}
                 testID={options.tabBarTestID}
-                onPress={goOnCourse}
+                onPress={() => onPress(route.name)}
                 style={{flex: 1, alignItems: 'center'}}>
                 <Icon
                   name="book-outline"
