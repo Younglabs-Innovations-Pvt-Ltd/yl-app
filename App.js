@@ -27,7 +27,7 @@ import {SCREEN_NAMES} from './src/utils/constants/screen-names';
 // Snackbar
 import Snackbar from 'react-native-snackbar';
 
-import { ToastProvider } from 'react-native-toast-notifications'
+import {ToastProvider} from 'react-native-toast-notifications';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
@@ -180,10 +180,10 @@ function App() {
   if (loading) return null;
 
   // UI Constants
-  let initialRouteName = SCREEN_NAMES.MAIN;
+  let initialRouteName = SCREEN_NAMES.WELCOME;
 
   if (isPhone) {
-    initialRouteName = SCREEN_NAMES.MAIN;
+    initialRouteName = SCREEN_NAMES.WELCOME;
   }
 
   const CustomBackButton = ({navigation}) => {
@@ -242,18 +242,18 @@ function App() {
                 />
 
                 <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={Signup} />
-              <Stack.Screen
-                name={SCREEN_NAMES.VERIFY_CODE}
-                component={VerifyCode}
-                options={{headerTitle: 'Verify OTP'}}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.EMAIL_LOGIN}
-                component={EmailLogin}
-                options={{headerTitle: 'Log in'}}
-              />
+                <Stack.Screen
+                  name={SCREEN_NAMES.VERIFY_CODE}
+                  component={VerifyCode}
+                  options={{headerTitle: 'Verify OTP'}}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.EMAIL_LOGIN}
+                  component={EmailLogin}
+                  options={{headerTitle: 'Log in'}}
+                />
 
-              <Stack.Screen
+                <Stack.Screen
                   name={SCREEN_NAMES.MAIN}
                   component={MainScreen}
                   options={{headerShown: false}}

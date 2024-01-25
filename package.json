@@ -25,7 +25,6 @@
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/material-top-tabs": "^6.6.5",
-    "@react-navigation/material-top-tabs": "^6.6.5",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.17",
     "@reduxjs/toolkit": "^1.9.5",
@@ -54,7 +53,6 @@
     "react-native-modal-datetime-picker": "^17.1.0",
     "react-native-pager-view": "^6.2.3",
     "react-native-orientation-locker": "^1.6.0",
-    "react-native-pager-view": "^6.2.3",
     "react-native-pdf": "^6.7.1",
     "react-native-permissions": "^3.9.2",
     "react-native-razorpay": "^2.3.0",
@@ -71,15 +69,13 @@
     "react-native-toast-notifications": "^3.4.0",
     "react-native-svg": "^14.1.0",
     "react-native-swiper": "^1.6.0",
-    "react-native-tab-view": "^3.5.2",
     "react-native-vector-icons": "^10.0.0",
     "react-native-video": "^5.2.1",
     "react-native-video-controls": "^2.8.1",
     "react-redux": "^8.1.1",
     "redux-saga": "^1.2.3",
     "tailwindcss": "3.3.2",
-    "twrnc": "^3.6.6",
-    "tailwindcss": "^3.3.2"
+    "twrnc": "^3.6.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
