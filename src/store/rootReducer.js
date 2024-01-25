@@ -10,7 +10,7 @@ import {courseReducer} from './course/course.reducer';
 import {paymentReducer} from './payment/reducer';
 import {uploadReducer} from './upload-handwriting/reducer';
 import {contentReducer} from './content/reducer';
-import {appThemeReducer} from './app-theme/appThemeReducer';
+import { appThemeReducer } from './app-theme/appThemeReducer';
 
 const reducer = combineReducers({
   joinDemo: joinDemoReducer,
@@ -23,7 +23,7 @@ const reducer = combineReducers({
   payment: paymentReducer,
   upload: uploadReducer,
   content: contentReducer,
-  appTheme: appThemeReducer,
+  appTheme: appThemeReducer
 });
 
 export const rootReducer = (state, action) => {

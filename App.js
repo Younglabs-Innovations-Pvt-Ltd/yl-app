@@ -27,6 +27,8 @@ import {SCREEN_NAMES} from './src/utils/constants/screen-names';
 // Snackbar
 import Snackbar from 'react-native-snackbar';
 
+import { ToastProvider } from 'react-native-toast-notifications'
+
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
 import OnBoardingScreen from './src/screens/on-boarding-screen';
@@ -45,12 +47,20 @@ import {NetworkProvider} from './src/context/network.state';
 
 import auth from '@react-native-firebase/auth';
 import Icon from './src/components/icon.component';
+import MainWelcomeScreen from './src/screens/MainWelcomeScreen';
+import CourseDetailsScreen from './src/screens/CourseDetailScreen';
+import ViewAllCourses from './src/screens/ViewAllCourses';
+import UserProfile from './src/screens/UserProfile';
+import ScrollingAnimation from './src/screens/ScrollingAnimation';
+import CustomToast from './src/components/CustomToast';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
-import notifee from '@notifee/react-native';
-import UserCoursesPage from './src/screens/user-courses-page';
-import CourseLevelScreen from './src/screens/course-level-screen';
-import CourseConductScreen from './src/screens/course-conduct-screen';
+import {initialize} from 'react-native-clarity';
+import Signup from './src/screens/signup-screen';
+import VerifyCode from './src/screens/verify-code.screen';
+import EmailLogin from './src/screens/email-login-screen';
+
+initialize('kdg30i0fnc');
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -62,7 +72,6 @@ const Stack = createStackNavigator();
 function App() {
   const [loading, setLoading] = useState(true);
   const [isPhone, setIsPhone] = useState(false);
-  const [bookingId, setBookingId] = useState('');
 
   const notificationRef = useRef({});
 
@@ -74,13 +83,6 @@ function App() {
   // Check for app update
   useEffect(() => {
     checkForUpdate();
-  }, []);
-
-  // Check if user already logged in
-  // then redirect to home screen
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
   }, []);
 
   useEffect(() => {
@@ -97,69 +99,37 @@ function App() {
     storeDeviceId();
   }, []);
 
-  async function checkNotifications() {
-    const initialNotification = await notifee.getInitialNotification();
-
-    if (initialNotification) {
-      const data = initialNotification.notification.data;
-      console.log('data', data);
-
-      if (data?.rating) {
-        notificationRef.current.rating = data.rating;
-      }
-
-      if (data?.screen) {
-        notificationRef.current.redirectTo = data.screen;
-      }
-    }
-  }
-
-  // Check for notifications
+  // check for authentication
   useEffect(() => {
-    checkNotifications()
-      .then(() => {
-        setLoading(false);
-      })
-      .catch(error => console.log('checkNotificationsError', error.message));
-  }, []);
-
-  async function onAuthStateChanged(user) {
-    try {
+    const checkAuth = () => {
       const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-      // const bookingId = await AsyncStorage.getItem(LOCAL_KEYS.BOOKING_ID);
-      console.log('phone', phone);
-      console.log('typeof phone', typeof phone);
-      let token;
-      if (user) {
-        const tokenResult = await auth().currentUser.getIdTokenResult();
-        token = tokenResult.token;
-      }
-      if (token && phone) {
+      if (phone) {
         setIsPhone(true);
       }
-    } catch (error) {
-      console.error('Error getting ID token:', error);
-    }
-  }
-
-  // Handle redirect url (Deep Link)
-  useEffect(() => {
-    const handleRedirectUrl = url => {
-      if (!url) {
-        return;
-      }
-
-      const parseUrl = url.split('?')[1];
-      const parseBookingId = parseUrl.split('=')[1];
-      const bookingId = parseBookingId.replace(/#/g, '');
-
-      setBookingId(bookingId);
+      setLoading(false);
     };
 
-    Linking.getInitialURL()
-      .then(handleRedirectUrl)
-      .catch(err => console.log(err));
+    checkAuth();
   }, []);
+
+  // Handle redirect url (Deep Link)
+  // useEffect(() => {
+  //   const handleRedirectUrl = url => {
+  //     if (!url) {
+  //       return;
+  //     }
+
+  //     const parseUrl = url.split('?')[1];
+  //     const parseBookingId = parseUrl.split('=')[1];
+  //     const bookingId = parseBookingId.replace(/#/g, '');
+
+  //     setBookingId(bookingId);
+  //   };
+
+  //   Linking.getInitialURL()
+  //     .then(handleRedirectUrl)
+  //     .catch(err => console.log(err));
+  // }, []);
 
   // Request for Notification permission
   useEffect(() => {
@@ -174,7 +144,7 @@ function App() {
       if (result === 'denied') {
         Alert.alert(
           'Permission required',
-          'To be able to update for events and offers, please grant permission.',
+          'Request permission to share timely notifications regarding your classes.',
           [
             {
               text: 'OK',
@@ -212,8 +182,7 @@ function App() {
   // UI Constants
   let initialRouteName = SCREEN_NAMES.MAIN;
 
-  if (isPhone || bookingId) {
-    console.log('bookingId', bookingId);
+  if (isPhone) {
     initialRouteName = SCREEN_NAMES.MAIN;
   }
 
@@ -230,7 +199,7 @@ function App() {
     );
   };
 
-  console.log('redirectRef', notificationRef);
+  console.log('notificationRef', notificationRef.current);
 
   return (
     // Provider for language
@@ -239,92 +208,118 @@ function App() {
       <NetworkProvider>
         {/* Provider for redux store */}
         <Provider store={store}>
-          <NavigationContainer ref={navigationRef}>
-            <Stack.Navigator
-              screenOptions={({navigation}) => ({
-                // headerShown: false,
-                headerStyle: {
-                  elevation: 0,
-                  shadowOpacity: 0,
-                  borderBottomWidth: 1,
-                  borderBottomColor: '#eaeaea',
-                },
-                headerTitleStyle: {
-                  fontSize: 18,
-                  fontFamily: FONTS.gelasio_semibold,
-                  fontWeight: '700',
-                },
-                headerLeft: () => <CustomBackButton navigation={navigation} />,
-                cardStyle: {backgroundColor: '#fff'},
-                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              })}
-              initialRouteName={initialRouteName}>
+          <ToastProvider
+            renderToast={toastOptions => <CustomToast toast={toastOptions} />}>
+            <NavigationContainer ref={navigationRef}>
+              <Stack.Navigator
+                screenOptions={({navigation}) => ({
+                  // headerShown: false,
+                  headerStyle: {
+                    elevation: 0,
+                    shadowOpacity: 0,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#eaeaea',
+                    backgroundColor: '#fff',
+                    headerTintColor: '#000',
+                  },
+                  headerTitleStyle: {
+                    fontSize: 18,
+                    fontFamily: FONTS.gelasio_semibold,
+                    fontWeight: '700',
+                  },
+                  headerLeft: () => (
+                    <CustomBackButton navigation={navigation} />
+                  ),
+                  cardStyle: {backgroundColor: '#fff'},
+                  cardStyleInterpolator:
+                    CardStyleInterpolators.forHorizontalIOS,
+                })}
+                initialRouteName={SCREEN_NAMES.MAIN}>
+                <Stack.Screen
+                  name={SCREEN_NAMES.WELCOME}
+                  component={WelcomeScreen}
+                  options={{headerShown: false}}
+                />
+
+                <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={Signup} />
               <Stack.Screen
-                name={SCREEN_NAMES.WELCOME}
-                component={WelcomeScreen}
-                options={{headerShown: false}}
+                name={SCREEN_NAMES.VERIFY_CODE}
+                component={VerifyCode}
+                options={{headerTitle: 'Verify OTP'}}
               />
               <Stack.Screen
-                name={SCREEN_NAMES.USER_COURSES_PAGE}
-                component={UserCoursesPage}
-                options={{headerShown: false}}
+                name={SCREEN_NAMES.EMAIL_LOGIN}
+                component={EmailLogin}
+                options={{headerTitle: 'Log in'}}
               />
+
               <Stack.Screen
-                name={SCREEN_NAMES.COURSE_LEVEL_PAGE}
-                component={CourseLevelScreen}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.COURSE_CONDUCT_PAGE}
-                component={CourseConductScreen}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.MAIN}
-                component={MainScreen}
-                options={{headerShown: false}}
-                initialParams={{data: notificationRef.current}}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.ON_BOARDING}
-                component={OnBoardingScreen}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.BOOK_DEMO_FORM}
-                component={BookDemoFormScreen}
-                options={{
-                  title: 'Book Free Handwriting Class',
-                }}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
-                component={BookDemoSlotsScreen}
-                options={{title: 'Book Free Handwriting Class'}}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.COURSE_DETAILS}
-                component={CourseDetails}
-                options={{
-                  headerTitle: 'Course Details',
-                }}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.BATCH_FEE_DETAILS}
-                component={BatchFeeDetails}
-                options={{
-                  // headerStyle: {elevation: 0},
-                  headerTitle: 'Batch/Fee Details',
-                }}
-              />
-              <Stack.Screen
-                name={SCREEN_NAMES.PAYMENT}
-                component={Payment}
-                options={{
-                  headerTitle: 'Checkout',
-                }}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
+                  name={SCREEN_NAMES.MAIN}
+                  component={MainScreen}
+                  options={{headerShown: false}}
+                  initialParams={{data: notificationRef.current}}
+                />
+
+                {/* <Stack.Screen
+                  name={'UserProfileScreen'}
+                  component={UserProfile}
+                  options={{headerShown: false}}
+                /> */}
+
+                <Stack.Screen
+                  name="CourseDetailScreen"
+                  component={CourseDetailsScreen}
+                  options={{headerShown: false}}
+                />
+                <Stack.Screen
+                  name="AllCoursesScreen"
+                  component={ViewAllCourses}
+                  options={({route}) => ({
+                    title: route.params.heading || 'All Courses',
+                  })}
+                />
+
+                <Stack.Screen
+                  name={SCREEN_NAMES.ON_BOARDING}
+                  component={OnBoardingScreen}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.BOOK_DEMO_FORM}
+                  component={BookDemoFormScreen}
+                  options={{
+                    title: 'Book Free Handwriting Class',
+                  }}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.BOOK_DEMO_SLOTS}
+                  component={BookDemoSlotsScreen}
+                  options={{title: 'Book Free Handwriting Class'}}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.COURSE_DETAILS}
+                  component={CourseDetails}
+                  options={{
+                    headerTitle: 'Course Details',
+                  }}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.BATCH_FEE_DETAILS}
+                  component={BatchFeeDetails}
+                  options={{
+                    // headerStyle: {elevation: 0},
+                    headerTitle: 'Batch/Fee Details',
+                  }}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.PAYMENT}
+                  component={Payment}
+                  options={{
+                    headerTitle: 'Checkout',
+                  }}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ToastProvider>
         </Provider>
       </NetworkProvider>
     </I18NProvider>

@@ -14,6 +14,7 @@ import {MESSAGES} from '../../utils/constants/messages';
 import {setEmail} from '../auth/reducer';
 import {BASE_URL, RP_KEY} from '@env';
 import {localStorage} from '../../utils/storage/storage-provider';
+import auth from '@react-native-firebase/auth';
 
 // const BASE_URL =
 //   'https://ab9e-2401-4900-1f39-499e-170-a19-6bdb-716d.ngrok-free.app';
@@ -29,7 +30,6 @@ function* makePaymentSaga({payload}) {
       bookingDetails,
       courseDetails,
       email,
-      token,
     } = payload;
 
     let selectBatch = {...currentSelectedBatch};
@@ -96,17 +96,16 @@ function* makePaymentSaga({payload}) {
     body.offeringData = offeringBody;
     console.log('body=', body);
 
-    const response = yield fetch(
-      `${BASE_URL}/shop/orderhandler/makepayment`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
+    const token = yield auth().currentUser.getIdToken();
+
+    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-    );
+      body: JSON.stringify(body),
+    });
 
     if (response.status === 403) {
       yield put(setLoading(false));

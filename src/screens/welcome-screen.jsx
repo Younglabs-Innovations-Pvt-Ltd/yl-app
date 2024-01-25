@@ -7,9 +7,8 @@ import {
   Animated,
   TextInput,
   StatusBar,
-  ActivityIndicator,
+  ImageBackground,
 } from 'react-native';
-import Spacer from '../components/spacer.component';
 
 import {FONTS} from '../utils/constants/fonts';
 import {COLORS} from '../utils/constants/colors';
@@ -34,52 +33,35 @@ import {networkSelector} from '../store/network/selector';
 
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
-import auth from '@react-native-firebase/auth';
-import {phoneAuthStart, setAuthToken, verifyCode} from '../store/auth/reducer';
-import {authSelector} from '../store/auth/selector';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
-import Icon from '../components/icon.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
 const IMAGE_HEIGHT = deviceWidth * 0.7;
 
+const GAP = 54;
+
 // Main Component
 const DemoClassScreen = ({navigation}) => {
   const {localLang, currentLang} = i18nContext();
 
-  const [phone, setPhone] = useState('7983068672');
-  const [code, setCode] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [phone, setPhone] = useState('');
 
   const dispatch = useDispatch();
-
-  const {
-    confirm,
-    message: authMsg,
-    loading: authLoading,
-    verificationErrorMessage,
-    verificationLoading,
-  } = useSelector(authSelector);
 
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
   const {ipData} = useSelector(bookDemoSelector);
-  const {country, modalVisible} = useSelector(welcomeScreenSelector);
+  const {country, modalVisible, loading, message} = useSelector(
+    welcomeScreenSelector,
+  );
 
   // Setting background color and style of Statusbar
   useEffect(() => {
     StatusBar.setBackgroundColor(COLORS.pblue);
     StatusBar.setBarStyle('light-content');
   }, []);
-
-  useEffect(() => {
-    if (confirm) {
-      setVisible(true);
-    }
-  }, [confirm]);
 
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
@@ -97,7 +79,7 @@ const DemoClassScreen = ({navigation}) => {
    * Takes two parameter phone number and country({callingCode, countryCode})
    */
   const handleBookingStatus = async () => {
-    dispatch(fetchBookingStatusStart({phone, country}));
+    dispatch(fetchBookingStatusStart({phone}));
   };
 
   // Select different countries
@@ -233,197 +215,95 @@ const DemoClassScreen = ({navigation}) => {
     {opacity: pressed ? 0.8 : 1},
   ];
 
-  // Handle the button press
-  async function signInWithPhoneNumber() {
-    dispatch(phoneAuthStart({phone, country}));
-  }
-
-  function confirmCode() {
-    dispatch(verifyCode({confirm, verificationCode: code}));
-  }
-
-  async function onAuthStateChanged(user) {
-    if (user) {
-      try {
-        setVisible(false);
-        setLoading(true);
-        const tokenResult = await auth().currentUser.getIdTokenResult();
-        dispatch(setAuthToken(tokenResult.token));
-        setLoading(false);
-        navigation.replace(SCREEN_NAMES.MAIN);
-      } catch (error) {
-        setLoading(false);
-        console.error('Error getting ID token:', error);
-      }
-    }
-  }
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
   return (
     <View style={styles.wrapper}>
-      {/* <LanguageSelection /> */}
-      <View style={{flex: CONTAINER_FLEX_STYLE}}>
-        <View style={[styles.container, CONTAINER_STYLE]}>
-          <View>
-            <Animated.Image
-              source={IMAGES.LOGO}
-              style={[
-                styles.animatedImage,
-                {
-                  transform: [
-                    {
-                      translateY: imageTranslateY,
-                    },
-                  ],
-                },
-              ]}
-            />
-            <View style={styles.animtedTextWrapper}>{ANIMATED_TEXT}</View>
-          </View>
-        </View>
-      </View>
-      {/* Footer */}
-      <Animated.View
-        style={[
-          styles.footer,
-          {
-            opacity: animatedButtons,
-          },
-        ]}>
-        <View style={styles.footerContent}>
-          <View style={styles.row}>
-            <Pressable style={styles.btnCountryCode}>
-              <TextWrapper>{'+91'}</TextWrapper>
-            </Pressable>
-            <TextInput
-              placeholder="Enter phone number"
-              style={styles.input}
-              selectionColor={COLORS.black}
-              value={phone}
-              onChangeText={handlePhone}
-              inputMode="numeric"
-              placeholderTextColor={'gray'}
-              maxLength={maxPhoneLength}
-            />
-          </View>
-          {/* {message && (
-            <TextWrapper fs={14} color={COLORS.pred}>
-              {message}
-            </TextWrapper>
-          )} */}
-          {!authMsg && <Spacer space={6} />}
-          {authMsg && (
-            <TextWrapper
-              fs={14}
-              color={COLORS.pred}
-              styles={{marginVertical: 4, marginLeft: 8}}>
-              {authMsg}
-            </TextWrapper>
-          )}
-          <Pressable
-            style={btnContinueStyle}
-            disabled={authLoading}
-            onPress={handleBookingStatus}>
-            <TextWrapper fs={18} fw="800" color={COLORS.white}>
-              Continue
-            </TextWrapper>
-            {authLoading && (
-              <ActivityIndicator
-                size={'small'}
-                color={COLORS.white}
-                style={{marginLeft: 4}}
+      <ImageBackground
+        style={{flex: 1}}
+        source={require('../assets/images/background2.jpeg')}
+        resizeMode="cover">
+        {/* <LanguageSelection /> */}
+        <View style={{flex: 1}}>
+          <View style={[styles.container]}>
+            <View style={{position: 'relative'}}>
+              <Animated.Image
+                source={IMAGES.LOGO}
+                style={[
+                  styles.animatedImage,
+                  {
+                    transform: [
+                      {
+                        translateY: imageTranslateY,
+                      },
+                    ],
+                  },
+                ]}
               />
-            )}
-          </Pressable>
+              <View style={styles.animtedTextWrapper}>{ANIMATED_TEXT}</View>
+            </View>
+          </View>
         </View>
-      </Animated.View>
-      <ModalComponent visible={loading}>
-        <Center bg="rgba(0,0,0,0.25)">
-          <Spinner />
-        </Center>
-      </ModalComponent>
-      <CountryList
-        visible={modalVisible}
-        onClose={onCloseBottomSheet}
-        onSelect={handleSelectCountry}
-      />
-      <ModalComponent
-        visible={visible}
-        onRequestClose={() => setVisible(false)}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            backgroundColor: 'rgba(0,0,0,0.25)',
-            paddingHorizontal: 16,
-          }}>
-          <View
-            style={{
-              padding: 16,
-              borderRadius: 8,
-              backgroundColor: COLORS.white,
-            }}>
-            <View
-              style={{
-                paddingBottom: 16,
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-                width: '100%',
-              }}>
-              <Pressable style={{padding: 4}} onPress={() => setVisible(false)}>
-                <Icon name="close-outline" size={24} color={COLORS.black} />
+        {/* Footer */}
+        <Animated.View
+          style={[
+            styles.footer,
+            {
+              opacity: animatedButtons,
+            },
+          ]}>
+          <View style={styles.footerContent}>
+            {/* <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
+              Book Free Handwriting Class
+            </TextWrapper> */}
+            <View style={styles.row}>
+              <Pressable style={styles.btnCountryCode}>
+                <TextWrapper>{'+91'}</TextWrapper>
+              </Pressable>
+              <TextInput
+                placeholder="Enter WhatsApp number"
+                style={styles.input}
+                selectionColor={COLORS.black}
+                value={phone}
+                onChangeText={handlePhone}
+                inputMode="numeric"
+                placeholderTextColor={'gray'}
+                maxLength={maxPhoneLength}
+              />
+            </View>
+            <Pressable
+              style={btnContinueStyle}
+              disabled={loading}
+              onPress={handleBookingStatus}>
+              <TextWrapper fs={18} fw="800" color={COLORS.white}>
+                Log in
+              </TextWrapper>
+            </Pressable>
+            <View style={{alignItems: 'flex-end', marginTop: 8}}>
+              <Pressable
+                style={{paddingVertical: 4}}
+                onPress={() => navigation.navigate(SCREEN_NAMES.SIGNUP)}>
+                <TextWrapper fs={16}>Don't have WhatsApp</TextWrapper>
+              </Pressable>
+              <Pressable
+                style={{paddingVertical: 4}}
+                onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
+                <TextWrapper fs={16}>
+                  Existing user? Login with Email
+                </TextWrapper>
               </Pressable>
             </View>
-            <TextInput
-              placeholder="Enter otp"
-              style={{
-                padding: 8,
-                borderWidth: StyleSheet.hairlineWidth,
-                borderColor: 'gray',
-                borderRadius: 4,
-                color: COLORS.black,
-                fontSize: 18,
-              }}
-              selectionColor={COLORS.black}
-              value={code}
-              onChangeText={e => setCode(e)}
-              inputMode="numeric"
-              placeholderTextColor={'gray'}
-            />
-            {verificationErrorMessage && (
-              <TextWrapper
-                fs={14}
-                color={COLORS.pred}
-                styles={{marginBottom: 4}}>
-                {verificationErrorMessage}
-              </TextWrapper>
-            )}
-            <Pressable
-              style={({pressed}) => [
-                styles.btnConfirm,
-                {
-                  opacity: pressed ? 0.8 : 1,
-                  backgroundColor: !code ? '#f4f4f4' : '#F1EEE9',
-                },
-              ]}
-              disabled={!code}
-              onPress={confirmCode}>
-              <TextWrapper fs={18}>Submit</TextWrapper>
-              {verificationLoading && (
-                <ActivityIndicator
-                  size={'small'}
-                  color={COLORS.black}
-                  style={{marginLeft: 4}}
-                />
-              )}
-            </Pressable>
           </View>
-        </View>
-      </ModalComponent>
+        </Animated.View>
+        <ModalComponent visible={loading}>
+          <Center bg="rgba(0,0,0,0.25)">
+            <Spinner />
+          </Center>
+        </ModalComponent>
+        <CountryList
+          visible={modalVisible}
+          onClose={onCloseBottomSheet}
+          onSelect={handleSelectCountry}
+        />
+      </ImageBackground>
     </View>
   );
 };
@@ -435,9 +315,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 20,
   },
   wrapper: {
     flex: 1,
@@ -460,7 +337,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'wrap',
-    paddingBottom: 12,
+    // paddingBottom: 12,
+    // position: 'absolute',
+    // bottom: -GAP,
   },
   animatedText: {
     fontSize: 20,
@@ -469,7 +348,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     letterSpacing: 2.5,
     textAlign: 'center',
-    lineHeight: 34,
+    lineHeight: 28,
   },
   btnRoundedClose: {
     width: 30,
@@ -483,47 +362,49 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    backgroundColor: '#eee',
-    paddingVertical: 6,
+    // backgroundColor: '#eee',
+    // paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 50,
+    borderWidth: 1,
+    borderColor: COLORS.pblue,
   },
   input: {
     flex: 1,
-    paddingVertical: 10,
-    fontSize: 18,
+    paddingVertical: 12,
+    fontSize: 16.5,
     letterSpacing: 1.15,
     color: COLORS.black,
   },
   btnContinue: {
-    height: 54,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     backgroundColor: COLORS.pblue,
     borderRadius: 54,
+    marginTop: 8,
   },
   animatedImage: {
     alignSelf: 'center',
-    width: IMAGE_WIDTH,
-    height: IMAGE_HEIGHT,
-    maxWidth: 240,
-    maxHeight: 240,
+    height: 240,
+    aspectRatio: 1 / 1,
     objectFit: 'contain',
   },
   footer: {
     flex: 1,
-    maxHeight: 180,
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
   },
   footerContent: {
     backgroundColor: COLORS.white,
-    padding: 16,
+    // padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 12,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    height: '100%',
-    justifyContent: 'center',
+    // height: '100%',
     elevation: 8,
+    height: 220,
   },
   btnCountryCode: {
     display: 'flex',

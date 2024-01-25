@@ -1,10 +1,11 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   View,
   Pressable,
   Dimensions,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import Video from 'react-native-video';
 import Icon from './icon.component';
@@ -12,8 +13,17 @@ import {COLORS} from '../utils/constants/colors';
 import Modal from './modal.component';
 import TextWrapper from './text-wrapper.component';
 import {FONTS} from '../utils/constants/fonts';
+import RNFS from 'react-native-fs';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
+
+const isFileExists = async uri => {
+  const videoName = uri.split('&token=')[1];
+  const filePath = ReactNativeBlobUtil.fs.dirs.DownloadDir + videoName + '.mp4';
+  const isExists = await RNFS.exists(filePath);
+  return {isExists, filePath, videoName};
+};
 
 const VideoPlayer = ({
   uri,
@@ -22,25 +32,25 @@ const VideoPlayer = ({
   width = 135,
   aspectRatio,
 }) => {
-  const videoRef = useRef();
-  const thumbRef = useRef();
   const [visible, setVisible] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [loading, setLoding] = useState(false);
-  const [isEnded, setIsEnded] = useState(false);
-  const [isEnded2, setIsEnded2] = useState(false);
-  const [thumbLoading, setThumbLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadedVideo, setLoadedVideo] = useState(false);
+  const currentVideo = useRef();
 
-  const onLoadStart = () => {
-    setLoding(true);
-  };
-
-  const onReadyForDisplay = () => {
-    setLoding(false);
-  };
-
-  const onOpen = () => {
-    setVisible(true);
+  const onOpen = async () => {
+    try {
+      const result = await isFileExists(uri);
+      if (result.isExists) {
+        currentVideo.current = result.filePath;
+      } else {
+        currentVideo.current = uri;
+      }
+      setVisible(true);
+    } catch (error) {
+      currentVideo.current = uri;
+      console.log(error);
+    }
   };
 
   const onClose = () => {
@@ -55,37 +65,55 @@ const VideoPlayer = ({
     setVisible(false);
   };
 
-  const onEnd = () => {
-    setIsEnded(true);
+  useEffect(() => {
+    if (uri) {
+      checkForLocal();
+    }
+  }, [uri]);
+
+  const checkForLocal = async () => {
+    try {
+      const result = await isFileExists(uri);
+      if (!result.isExists) {
+        const res = await ReactNativeBlobUtil.config({
+          fileCache: true,
+          addAndroidDownloads: {
+            useDownloadManager: true,
+            mediaScannable: true,
+            // notification: true,
+            title: result.videoName,
+            path:
+              ReactNativeBlobUtil.fs.dirs.DownloadDir +
+              result.videoName +
+              '.mp4',
+            mime: 'application/video',
+          },
+        }).fetch('GET', uri);
+      }
+      setLoadedVideo(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
-  const onEnd2 = () => {
-    setIsEnded2(true);
+
+  // console.log('localUri', localUri);
+  // console.log('currentUri', currentVideo.current);
+
+  const onLoadStart = () => {
+    setLoading(true);
+  };
+
+  const onReadyForDisplay = () => {
+    setLoading(false);
   };
 
   return (
     <>
       <Pressable
         style={[styles.container, {width: width, aspectRatio}]}
-        onPress={onOpen}>
-        <Video
-          ref={thumbRef}
-          source={{uri}}
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          focusable={false}
-          muted={true}
-          onEnd={onEnd}
-          resizeMode="cover"
-          disableFocus={true}
-          // poster={poster}
-          // posterResizeMode="cover"
-          paused={visible}
-          onLoadStart={() => setThumbLoading(true)}
-          onReadyForDisplay={() => setThumbLoading(false)}
-        />
-        {thumbLoading && (
+        onPress={onOpen}
+        disabled={!loadedVideo}>
+        {!loadedVideo ? (
           <View
             style={{
               position: 'absolute',
@@ -95,6 +123,12 @@ const VideoPlayer = ({
               bottom: 0,
               backgroundColor: '#eee',
             }}></View>
+        ) : (
+          <Image
+            source={{uri: poster}}
+            resizeMode="cover"
+            style={{width: '100%', height: '100%'}}
+          />
         )}
         {thumbnailText && (
           <View style={styles.poster}>
@@ -126,14 +160,12 @@ const VideoPlayer = ({
             />
           )}
           <Video
-            ref={videoRef}
-            source={{uri}}
+            source={{uri: currentVideo.current}}
             style={{width: '100%', height: '100%', alignSelf: 'center'}}
-            onLoadStart={onLoadStart}
-            onReadyForDisplay={onReadyForDisplay}
-            onEnd={onEnd2}
             muted={muted}
             resizeMode="contain"
+            onLoadStart={onLoadStart}
+            onReadyForDisplay={onReadyForDisplay}
           />
           <View style={styles.videoOverlay}>
             <View

@@ -10,7 +10,6 @@ const INITIAL_STATE = {
   showJoinButton: false,
   isAttended: false,
   bookingTime: null,
-  isAttendenceMarked: false,
   isRated: false,
   ratingLoading: true,
   nmiLoading: false,
@@ -20,6 +19,8 @@ const INITIAL_STATE = {
   message: '',
   joinClassLoading: false,
   joinClassErrorMsg: '',
+  attendanceLoading: false,
+  notInterestedPopup: false,
 };
 
 // reducer
@@ -27,7 +28,7 @@ const reducer = {
   startFetchBookingDetailsFromPhone(state) {
     state.loading = true;
   },
-  startFetchBookingDetailsFromId(state) {
+  startFetchBookingDetailsFromId(state, action) {
     state.loading = true;
   },
   setBookingDetailSuccess(state, action) {
@@ -59,19 +60,16 @@ const reducer = {
     state.showJoinButton = false;
     state.isAttended = false;
     state.bookingTime = null;
-    state.isAttendenceMarked = false;
-  },
-  setIsAttendenceMarked(state, action) {
-    state.isAttendenceMarked = action.payload;
   },
   setTeamUrl(state, action) {
     state.teamUrl = action.payload;
   },
-  setShowJoinButton(state, action) {
-    state.showJoinButton = action.payload;
-  },
   setIsAttended(state, action) {
+    state.attendanceLoading = false;
     state.isAttended = action.payload;
+  },
+  startMarkAttendace(state) {
+    state.attendanceLoading = true;
   },
   setIsRated(state, action) {
     state.isRated = action.payload;
@@ -111,6 +109,9 @@ const reducer = {
   setJoinClassErrorMsg(state, action) {
     state.joinClassErrorMsg = action.payload;
   },
+  setNotInterestedPopup(state, action) {
+    state.notInterestedPopup = action.payload;
+  },
   setPhoneAsync() {},
   setDemoData() {},
   setDemoNotifications() {},
@@ -138,7 +139,6 @@ export const {
   setDemoData,
   setBookingTime,
   setIsAttended,
-  setIsAttendenceMarked,
   setShowJoinButton,
   setTeamUrl,
   setDemoNotifications,
@@ -159,6 +159,8 @@ export const {
   setBookingDetailsFailed,
   setJoinClassLoading,
   setJoinClassErrorMsg,
+  startMarkAttendace,
+  setNotInterestedPopup,
 } = demoSlice.actions;
 
 export const joinDemoReducer = demoSlice.reducer;

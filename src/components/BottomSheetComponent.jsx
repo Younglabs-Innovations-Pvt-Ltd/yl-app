@@ -7,9 +7,8 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
-  const {bgColor, textColors, colorYlMain, darkMode} = useSelector(
-    state => state.appTheme,
-  );
+  const {bgColor, textColors, colorYlMain, darkMode, bgSecondaryColor} =
+    useSelector(state => state.appTheme);
   const bottomSheetRef = useRef(null);
 
   useEffect(() => {
@@ -42,8 +41,6 @@ const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
     onClose();
   };
 
-  console.log('check type of children', typeof Children);
-
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -54,7 +51,7 @@ const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
       style={{}}
       backgroundStyle={{backgroundColor: bgColor}}
       handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}>
-      <View className="w-full px-3 items-end">
+      {/* <View className="w-full px-3 items-end">
         <View
           className={`${
             darkMode ? 'bg-gray-500' : 'bg-gray-100'
@@ -66,7 +63,7 @@ const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
             onPress={closeBottomSheet}
           />
         </View>
-      </View>
+      </View> */}
       <ScrollView
         className="flex-1 px-2 z-50"
         contentContainerStyle={{alignItems: 'center'}}>

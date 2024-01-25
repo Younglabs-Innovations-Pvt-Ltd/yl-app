@@ -1,12 +1,23 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet, ActivityIndicator, View} from 'react-native';
+import {StyleSheet, View, ActivityIndicator} from 'react-native';
 import VideoPlayer from 'react-native-video-controls';
-import {COLORS} from '../utils/constants/colors';
 import {useNavigation} from '@react-navigation/native';
+import RNFS from 'react-native-fs';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import {COLORS} from '../utils/constants/colors';
+
+const isFileExists = async uri => {
+  const videoName = uri.split('&token=')[1];
+  const filePath = ReactNativeBlobUtil.fs.dirs.DownloadDir + videoName + '.mp4';
+  const isExists = await RNFS.exists(filePath);
+  return {isExists, filePath, videoName};
+};
 
 const VideoMediaPlayer = ({uri, ...otherProps}) => {
   const [videoLoading, setVideoLoading] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [localUri, setLocalUri] = useState('');
+  const [loadedVideo, setLoadedVideo] = useState(false);
   const videoRef = useRef(null);
 
   const navigation = useNavigation();
@@ -29,6 +40,41 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
     return unsubscribe;
   }, [navigation]);
 
+  useEffect(() => {
+    if (uri) {
+      checkForLocal();
+    }
+  }, [uri]);
+
+  const checkForLocal = async () => {
+    try {
+      const result = await isFileExists(uri);
+      if (!result.isExists) {
+        const res = await ReactNativeBlobUtil.config({
+          fileCache: true,
+          addAndroidDownloads: {
+            useDownloadManager: true,
+            mediaScannable: true,
+            // notification: true,
+            title: result.videoName,
+            path:
+              ReactNativeBlobUtil.fs.dirs.DownloadDir +
+              result.videoName +
+              '.mp4',
+            mime: 'application/video',
+          },
+        }).fetch('GET', uri);
+        setLocalUri(res.path());
+        setLoadedVideo(true);
+      } else {
+        setLocalUri(result.filePath);
+      }
+      setLoadedVideo(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const onLoadStart = () => {
     setVideoLoading(true);
   };
@@ -39,13 +85,17 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
 
   return (
     <View
-      style={[styles.videoContainer, {elevation: uri && videoLoading ? 4 : 0}]}>
-      {uri && (
+      style={[
+        styles.videoContainer,
+        {elevation: localUri && videoLoading ? 4 : 0},
+      ]}>
+      {localUri && (
         <VideoPlayer
           ref={videoRef}
-          source={{uri: uri}}
+          source={{uri: localUri}}
           style={styles.video}
           paused={paused}
+          // posterResizeMode="cover"
           resizeMode="cover"
           onLoadStart={onLoadStart}
           onReadyForDisplay={onReadyForDisplay}
@@ -55,7 +105,7 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
           {...otherProps}
         />
       )}
-      {videoLoading && uri && (
+      {!localUri && (
         <View style={styles.videoOvarlay}>
           <ActivityIndicator size={'large'} color={COLORS.black} />
         </View>

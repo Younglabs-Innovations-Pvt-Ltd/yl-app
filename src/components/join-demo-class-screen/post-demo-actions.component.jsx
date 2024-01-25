@@ -18,6 +18,9 @@ import {
   saveRating,
   checkForRating,
   setNMI,
+  setIsAttended,
+  startMarkAttendace,
+  setNotInterestedPopup,
 } from '../../store/join-demo/join-demo.reducer';
 
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
@@ -30,25 +33,25 @@ import {localStorage} from '../../utils/storage/storage-provider';
 import {FONTS} from '../../utils/constants/fonts';
 import RatingStars from '../rating-stars';
 
-const {width: deviceWidth} = Dimensions.get('window');
+const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
 
 const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
-  const [attended, setAttended] = useState(false);
-  const [attendedLoading, setAttendedLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
 
   const sliderRef = useRef();
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
-  const {demoData, bookingDetails, isRated, ratingLoading, nmiLoading, isNmi} =
-    useSelector(joinDemoSelector);
-
-  console.log('demoData', demoData);
-
-  console.log('isRated', isRated);
-  console.log('isNmi', isNmi);
+  const {
+    demoData,
+    bookingDetails,
+    isRated,
+    isAttended,
+    nmiLoading,
+    isNmi,
+    attendanceLoading,
+  } = useSelector(joinDemoSelector);
+  console.log("demoData is", demoData)
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -60,43 +63,39 @@ const PostDemoAction = ({rescheduleClass}) => {
   }, []);
 
   // Check for Attended
-  useEffect(() => {
-    const checkAttended = async () => {
-      try {
-        const checkAttended = localStorage.getString(LOCAL_KEYS.SAVE_ATTENDED);
+  // useEffect(() => {
+  //   const checkAttended = async () => {
+  //     try {
+  //       const checkAttended = localStorage.getString(LOCAL_KEYS.SAVE_ATTENDED);
 
-        if (checkAttended) {
-          setAttended(true);
-        }
+  //       if (checkAttended) {
+  //         dispatch(setIsAttended(true));
+  //       }
+  //     } catch (error) {
+  //       console.log('POST_ACTION_CHECK_ATTENDED_ERROR=', error);
+  //     }
+  //   };
 
-        setAttendedLoading(false);
-      } catch (error) {
-        console.log('POST_ACTION_CHECK_ATTENDED_ERROR=', error);
-      }
-    };
-
-    checkAttended();
-  }, []);
+  //   checkAttended();
+  // }, []);
 
   // Check NMI
-  useEffect(() => {
-    const checkNMI = async () => {
-      try {
-        const nmi = localStorage.getString(LOCAL_KEYS.NMI);
-        console.log('nmiAsync', nmi);
-        if (nmi) {
-          console.log('hit NMI');
-          dispatch(setNMI(true));
-        }
+  // useEffect(() => {
+  //   const checkNMI = async () => {
+  //     try {
+  //       const nmi = localStorage.getString(LOCAL_KEYS.NMI);
+  //       console.log('nmiAsync', nmi);
+  //       if (nmi) {
+  //         console.log('hit NMI');
+  //         dispatch(setNMI(true));
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    checkNMI();
-  }, []);
+  //   checkNMI();
+  // }, []);
 
   const scrollSlider = scrollToX => {
     sliderRef.current &&
@@ -108,10 +107,9 @@ const PostDemoAction = ({rescheduleClass}) => {
     setCurrentSlideIndex(scrollToX / deviceWidth);
   };
 
-  console.log('currentSlideIndex', currentSlideIndex);
-
   useEffect(() => {
-    if (!isRated && attended) {
+    console.log("isAttended=",isAttended , "isRated=",isRated , "isNmi=",isNmi)
+    if (isAttended && !isRated) {
       console.log('slided');
       scrollSlider(deviceWidth);
     } else if (isRated && !isNmi) {
@@ -119,7 +117,7 @@ const PostDemoAction = ({rescheduleClass}) => {
     } else if (isNmi) {
       scrollSlider(deviceWidth * 3);
     }
-  }, [attended, isRated, isNmi]);
+  }, [isAttended, isRated, isNmi]);
 
   // Save rating of user
   // Dispatch an action to reducer
@@ -130,6 +128,11 @@ const PostDemoAction = ({rescheduleClass}) => {
     if (demoData) {
       dispatch(saveRating({bookingId: demoData.bookingId, rating: rated}));
     }
+
+    // const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+    // if (isClassJoined) {
+    //   localStorage.delete(LOCAL_KEYS.JOIN_CLASS);
+    // }
   };
 
   // On change rating state
@@ -144,17 +147,10 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   const saveAttended = async () => {
-    try {
-      localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
-      setAttended(true);
-      // sliderRef.current &&
-      //   sliderRef.current.scrollTo({
-      //     x: deviceWidth,
-      //     animated: true,
-      //   });
-    } catch (error) {
-      console.log('POST_ACTION_SAVE_ATTENDED_ERROR=', error);
-    }
+    // dispatch(startMarkAttendace({bookingId: demoData.bookingId}));
+    // localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
+    dispatch(setIsAttended(true));
+    scrollSlider(deviceWidth);
   };
 
   const courseDetails = () => {
@@ -165,7 +161,10 @@ const PostDemoAction = ({rescheduleClass}) => {
     navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
   };
 
-  const onClose = () => setVisible(false);
+  const onMomentumScrollEnd = event => {
+    const scrollToOffsetX = event.nativeEvent.contentOffset.x / deviceWidth;
+    setCurrentSlideIndex(scrollToOffsetX);
+  };
 
   // Loading indicator while mark nmi
   const NMI_LOADING = useMemo(() => {
@@ -174,11 +173,55 @@ const PostDemoAction = ({rescheduleClass}) => {
     return (
       <ActivityIndicator
         color={COLORS.black}
-        size={'large'}
+        size={'small'}
         style={{alignSelf: 'flex-end'}}
       />
     );
   }, [nmiLoading]);
+
+  const IS_ATTENDED = useMemo(() => {
+    return isAttended ? (
+      <Pressable
+        style={({pressed}) => [
+          styles.paButton,
+          {
+            opacity: pressed ? 0.7 : 1,
+            flexDirection: 'row',
+          },
+        ]}
+        onPress={saveAttended}>
+        <TextWrapper color={'#434a52'} fs={18}>
+          Yes attended
+        </TextWrapper>
+      </Pressable>
+    ) : null;
+  }, [isAttended, saveAttended]);
+
+  const ATTENDED_TEXT = useMemo(() => {
+    return isAttended ? (
+      <TextWrapper
+        fs={20}
+        color={COLORS.white}
+        ff={FONTS.signika_medium}
+        styles={{textAlign: 'center'}}>
+        Did you attend your free class?
+      </TextWrapper>
+    ) : (
+      <View style={{paddingTop: 16}}>
+        <TextWrapper
+          fs={24}
+          color={COLORS.white}
+          ff={FONTS.signika_medium}
+          styles={{textAlign: 'center'}}>
+          You missed your class
+        </TextWrapper>
+      </View>
+    );
+  }, [isAttended]);
+
+  const onOpenNotInterested = () => {
+    dispatch(setNotInterestedPopup(true));
+  };
 
   // if (ratingLoading || attendedLoading || loading) return null;
 
@@ -187,35 +230,20 @@ const PostDemoAction = ({rescheduleClass}) => {
       <ScrollView
         ref={sliderRef}
         style={{
+          flex: 1,
           alignSelf: 'center',
         }}
         horizontal
         showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={onMomentumScrollEnd}
         scrollEnabled={false}
         pagingEnabled>
         {/* {!attended && !isRated && ( */}
         <View style={styles.container}>
-          <TextWrapper
-            fs={20}
-            color={COLORS.white}
-            ff={FONTS.signika_medium}
-            styles={{textAlign: 'center'}}>
-            Did you attend your free class?
-          </TextWrapper>
+          {ATTENDED_TEXT}
           <Spacer space={4} />
           <View style={styles.paButtons}>
-            <Pressable
-              style={({pressed}) => [
-                styles.paButton,
-                {
-                  opacity: pressed ? 0.7 : 1,
-                },
-              ]}
-              onPress={saveAttended}>
-              <TextWrapper color={'#434a52'} fs={18}>
-                Yes attended
-              </TextWrapper>
-            </Pressable>
+            {IS_ATTENDED}
             <Pressable
               style={({pressed}) => [
                 styles.paButton,
@@ -224,7 +252,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 },
               ]}
               onPress={rescheduleClass}>
-              <TextWrapper color={'#434a52'} fs={18}>
+              <TextWrapper color={'#434a52'} fs={16} ff={FONTS.primaryFont}>
                 Reschedule
               </TextWrapper>
             </Pressable>
@@ -234,14 +262,15 @@ const PostDemoAction = ({rescheduleClass}) => {
         {/* {!isRated && attended && ( */}
         <View style={styles.container}>
           <TextWrapper
-            fs={22}
+            fs={20}
             color={COLORS.white}
             fw="600"
-            styles={{textAlign: 'center'}}>
+            styles={{textAlign: 'center'}}
+            ff={FONTS.headingFont}>
             Congratulations for attending your free class.
           </TextWrapper>
           <View style={styles.ratingWrapper}>
-            <TextWrapper fs={18} color={COLORS.white}>
+            <TextWrapper fs={16} color={COLORS.white} ff={FONTS.headingFont}>
               Please rate your class experience
             </TextWrapper>
             <View style={styles.starsContainer}>
@@ -272,7 +301,7 @@ const PostDemoAction = ({rescheduleClass}) => {
               disabled={nmiLoading}
               onPress={markNeedMoreInfo}>
               {/* <MIcon name="whatsapp" size={22} color={COLORS.pgreen} /> */}
-              <TextWrapper>Yes, need more info</TextWrapper>
+              <TextWrapper>Yes, Need more info</TextWrapper>
               {NMI_LOADING}
             </Pressable>
             <Pressable
@@ -282,7 +311,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
-              onPress={() => setVisible(true)}>
+              onPress={onOpenNotInterested}>
               <TextWrapper>No, I don't want</TextWrapper>
             </Pressable>
           </View>
@@ -293,7 +322,7 @@ const PostDemoAction = ({rescheduleClass}) => {
           <TextWrapper color={COLORS.white} fs={18}>
             Give your child a gift of beautiful handwriting today!
           </TextWrapper>
-          <Spacer space={4} />
+          <Spacer space={6} />
           <View
             style={{
               width: '100%',
@@ -307,7 +336,7 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={courseDetails}>
-              <TextWrapper>Course details</TextWrapper>
+              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Course details</TextWrapper>
             </Pressable>
             <Pressable
               style={({pressed}) => [
@@ -315,38 +344,38 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={batchDetails}>
-              <TextWrapper>Batch/Fee details</TextWrapper>
+              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Batch/Fee details</TextWrapper>
             </Pressable>
           </View>
         </View>
         {/* )} */}
-        <ModalComponent
-          visible={visible}
-          animationType="slide"
-          onRequestClose={onClose}>
-          <NotInterested onClose={onClose} bookingDetails={bookingDetails} />
-        </ModalComponent>
       </ScrollView>
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          paddingVertical: 4,
-          gap: 12,
+          justifyContent: 'flex-end',
         }}>
-        {Array.from({length: 4}, (_, i) => {
-          return (
-            <View
-              style={[
-                styles.dotIndicator,
-                {
-                  backgroundColor:
-                    currentSlideIndex === i ? COLORS.white : '#434a52',
-                },
-              ]}
-              key={i}></View>
-          );
-        })}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 8,
+            gap: 8,
+          }}>
+          {Array.from({length: 4}, (_, i) => {
+            return (
+              <View
+                style={[
+                  styles.dotIndicator,
+                  {
+                    backgroundColor:
+                      currentSlideIndex === i ? COLORS.white : '#434a52',
+                  },
+                ]}
+                key={i}></View>
+            );
+          })}
+        </View>
       </View>
     </React.Fragment>
   );
@@ -357,7 +386,6 @@ export default PostDemoAction;
 const styles = StyleSheet.create({
   container: {
     width: deviceWidth,
-    borderWidth: 1,
     paddingHorizontal: 16,
   },
   ratingContainer: {
@@ -376,13 +404,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ctaButton: {
-    height: 48,
-    paddingVertical: 6,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 1.85,
-    borderRadius: 4,
+    borderRadius: 50,
     gap: 8,
     backgroundColor: COLORS.white,
   },
@@ -395,11 +422,11 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
   },
   paButtons: {
-    gap: 12,
+    gap: 8,
   },
   paButton: {
-    paddingHorizontal: 22,
-    paddingVertical: 12,
+    paddingHorizontal: 2,
+    paddingVertical: 8,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.white,

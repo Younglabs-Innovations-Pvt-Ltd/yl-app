@@ -35,7 +35,7 @@ export const DropdownList = ({
       style={[styles.optionList, {paddingTop: gutter + 20}]}
       onPress={onClose}>
       <View style={styles.listWrapper}>
-        <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={true}>
           {data.map(age => (
             <DropdownItem
               key={age}
@@ -84,10 +84,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   listWrapper: {
-    width: '100%',
+    // width: '100%',
     padding: 12,
     backgroundColor: COLORS.white,
-    height: 240,
+    height: 160,
     shadowColor: '#171717',
     shadowOffset: {width: -2, height: 4},
     shadowOpacity: 0.2,

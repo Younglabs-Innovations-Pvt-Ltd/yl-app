@@ -9,6 +9,7 @@ import {
   RATING_API,
   MARK_MORE_INFO_API,
   DEVICE_ID_URL,
+  CREATE_LEAD,
 } from '@env';
 
 const SOURCE = 'app';
@@ -168,16 +169,13 @@ export const saveNeedMoreInfo = async ({bookingId}) => {
 
 // Store every device id to database
 export const storeDeviceId = async ({deviceId, phone, deviceUID}) => {
-  return fetch(
-    `https://09d7-2401-4900-1c5d-8461-8865-a8db-e43a-f89e.ngrok-free.app${DEVICE_ID_URL}`,
-    {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({deviceId, phone, deviceUID}),
+  return fetch(`${BASE_URL}${DEVICE_ID_URL}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
     },
-  );
+    body: JSON.stringify({deviceId, phone, deviceUID}),
+  });
 };
 
 /**
@@ -219,13 +217,13 @@ export const markNotInterest = async ({bookingId, comment}) => {
 };
 
 // Get available coupon codes
-export const getOfferCode = async ({token}) => {
-  return await fetch(`${BASE_URL}/offers/activeoffers`, {
-    method: 'GET',
+export const getOfferCode = async ({phone}) => {
+  return await fetch(`${BASE_URL}/offers/activeAppOffers`, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token,
     },
+    body: JSON.stringify({phone}),
   });
 };
 
@@ -253,9 +251,13 @@ export const saveHandwritingSample = async ({bookingId, image}) => {
 
 // Get app content
 export const getAppTestimonials = async () => {
-  return await fetch(`${BASE_URL}/app/content/getAppTestimonials`, {
-    method: 'GET',
-  });
+  // return await fetch(`${BASE_URL}/app/content/getAppTestimonials`, {
+  return await fetch(
+    `https://younglabsapis-33heck6yza-el.a.run.app/app/content/getAppTestimonials`,
+    {
+      method: 'GET',
+    },
+  );
 };
 
 // Get app worksheets
@@ -273,5 +275,35 @@ export const getCourseVideo = async ({courseId}) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({courseId}),
+  });
+};
+
+// Create lead
+export const createLead = async ({
+  phone,
+  countryCode,
+  courseId,
+  deviceUID,
+  deviceId,
+}) => {
+  return fetch(`${BASE_URL}${CREATE_LEAD}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({deviceId, phone, deviceUID, countryCode, courseId}),
+  });
+};
+
+// console.log('BASE_URL', BASE_URL);
+
+export const addNewSoloBooking = async data => {
+  // console.log("calling api", data)
+  return await fetch(`${BASE_URL}/admin/app/addSoloDemoBooking`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
   });
 };

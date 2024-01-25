@@ -12,9 +12,11 @@ const {height: deviceHeight, width} = Dimensions.get('window');
 const TwoStepForm = ({closeModal}) => {
   const scrollViewRef = useRef(null);
   const [formFields, setFormFields] = useState(null);
+  const [isNextSlide, setIsNextSlide] = useState(false);
 
   const goToNextSlide = data => {
     setFormFields(data);
+    setIsNextSlide(true);
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({
         x: width,
@@ -30,34 +32,39 @@ const TwoStepForm = ({closeModal}) => {
         animated: true,
       });
     }
+    setIsNextSlide(false);
   };
 
   return (
     <View style={styles.container}>
-      <TextWrapper
-        fs={18}
-        ff={FONTS.signika_medium}
-        styles={{marginHorizontal: 16, marginTop: 8}}>
-        Book Handwriting Class
-      </TextWrapper>
+      <View style={styles.header}>
+        {isNextSlide && (
+          <Icon
+            name={'arrow-back-outline'}
+            size={28}
+            color={COLORS.black}
+            style={{marginLeft: 16}}
+            onPress={goToPreviousSlide}
+          />
+        )}
+        <TextWrapper
+          fs={20}
+          ff={FONTS.signika_medium}
+          styles={{marginHorizontal: 16}}>
+          Book Free Handwriting Class
+        </TextWrapper>
+      </View>
+
       <ScrollView
         ref={scrollViewRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        scrollEnabled={false}
-        contentContainerStyle={{paddingBottom: 40}}>
+        scrollEnabled={false}>
         <View style={{width}}>
           <BookingForm goToNextSlide={goToNextSlide} />
         </View>
         <View style={{width}}>
-          <Icon
-            name={'arrow-back-outline'}
-            size={28}
-            color={COLORS.black}
-            style={{marginTop: 16, marginLeft: 16}}
-            onPress={goToPreviousSlide}
-          />
           {formFields && (
             <BookDemoSlots
               route={{params: {formFields}}}
@@ -74,7 +81,13 @@ export default TwoStepForm;
 
 const styles = StyleSheet.create({
   container: {
-    height: deviceHeight * 0.65,
+    // height: deviceHeight * 0.65,
+    flex: 1,
     backgroundColor: COLORS.white,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
 });

@@ -14,6 +14,7 @@ import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {localStorage} from '../utils/storage/storage-provider';
 
 import {i18nContext} from '../context/lang.context';
+import UserProfile from './UserProfile';
 import CourseScreenNavigator from './course-screen-navigator';
 
 const Tab = createBottomTabNavigator();
@@ -35,11 +36,11 @@ const MainScreen = ({route}) => {
   const dispatch = useDispatch();
   const {localLang} = i18nContext();
 
-  useEffect(() => {
-    StatusBar.setHidden(false);
-    StatusBar.setBackgroundColor(COLORS.pblue);
-    StatusBar.setBarStyle('light-content');
-  }, []);
+  // useEffect(() => {
+  //   StatusBar.setHidden(false);
+  //   StatusBar.setBackgroundColor(COLORS.pgreen);
+  //   StatusBar.setBarStyle('light-content');
+  // }, []);
 
   // useEffect(() => {
   //   if (!data) return;
@@ -96,6 +97,12 @@ const MainScreen = ({route}) => {
         name={'Contact'}
         options={{tabBarLabel: localLang.tabNavContact}}
         component={ContactScreen}
+      />
+      <Tab.Screen
+        name={'Account'}
+        options={{tabBarLabel: "Account" , headerShown: false}}
+        component={UserProfile}
+
       />
     </Tab.Navigator>
   );

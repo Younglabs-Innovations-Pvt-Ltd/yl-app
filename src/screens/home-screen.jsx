@@ -17,8 +17,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {
   startFetchBookingDetailsFromPhone,
-  setShowJoinButton,
   joinDemo,
+  setDemoData,
+  setNotInterestedPopup,
 } from '../store/join-demo/join-demo.reducer';
 import {resetCurrentNetworkState} from '../store/network/reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
@@ -31,11 +32,7 @@ import TextWrapper from '../components/text-wrapper.component';
 
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 import Demo from '../components/demo.component';
-
-import * as Sentry from '@sentry/react-native';
 import Reviews from '../components/reviews.component';
-
-import Worksheets from '../components/worksheets.component';
 import VideoPlayer from '../components/video.component';
 
 // Icons
@@ -43,11 +40,7 @@ import TipsIcon from '../assets/icons/tipsandtricks.png';
 import WorksheetIcon from '../assets/icons/document.png';
 import ReviewIcon from '../assets/icons/reviews.png';
 import ImprovementIcon from '../assets/icons/improvement.png';
-import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
-
-import auth from '@react-native-firebase/auth';
-import {fetchUser, setAuthToken} from '../store/auth/reducer';
+import {fetchUser} from '../store/auth/reducer';
 import {FONTS} from '../utils/constants/fonts';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
@@ -60,11 +53,16 @@ import Snackbar from 'react-native-snackbar';
 import Icon from '../components/icon.component';
 import {authSelector} from '../store/auth/selector';
 import {setPaymentMessage} from '../store/payment/reducer';
-import {saveDeviceId} from '../utils/deviceId';
 import RatingPopup from '../components/popups/rating';
 import {fetchContentDataStart} from '../store/content/reducer';
 import {contentSelector} from '../store/content/selector';
+import BottomSheet from '@gorhom/bottom-sheet';
 import moment from 'moment';
+import TwoStepForm from '../components/two-step-form.component';
+import notifee from '@notifee/react-native';
+import NotInterested from '../components/not-interested.component';
+import {addEventListener} from '@react-native-community/netinfo';
+import Worksheets from '../components/worksheets.component';
 
 const INITIAL_TIME = {
   days: 0,
@@ -102,8 +100,6 @@ const sectionOffsets = {
 
 const HomeScreen = ({navigation, route}) => {
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
-  // const [isTimeover, setIsTimeover] = useState(false);
-  const [showPostActions, setShowPostActions] = useState(false);
   const [visibleCred, setVisibleCred] = useState(false);
   const [offsets, setOffsets] = useState(sectionOffsets);
   const [ratingModal, setRatingModal] = useState(false);
@@ -112,122 +108,92 @@ const HomeScreen = ({navigation, route}) => {
 
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
+  const bottomSheetRef = useRef();
 
-  const {
-    demoData,
-    loading,
-    demoPhoneNumber,
-    bookingDetails,
-    isAttended,
-    bookingTime,
-    isClassOngoing,
-    demoFlag,
-  } = useSelector(joinDemoSelector);
+  const {demoData, loading, bookingTime, bookingDetails, notInterestedPopup} =
+    useSelector(joinDemoSelector);
 
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
 
-  const {ipData} = useSelector(bookDemoSelector);
   const {paymentMessage} = useSelector(paymentSelector);
   const {user} = useSelector(authSelector);
   const {contentData, contentLoading} = useSelector(contentSelector);
 
-  async function onAuthStateChanged(user) {
-    if (user) {
-      try {
-        const tokenResult = await auth().currentUser.getIdTokenResult();
-        dispatch(setAuthToken(tokenResult.token));
-      } catch (error) {
-        console.error('Error getting ID token:', error);
+  async function checkNotifications() {
+    const initialNotification = await notifee.getInitialNotification();
+
+    if (initialNotification) {
+      const data = initialNotification.notification.data;
+      if (data?.rating) {
+        setTimeout(() => {
+          setRatingModal(true);
+        }, 1000);
+      }
+
+      if (data?.screen) {
+        // notificationRef.current.redirectTo = data.screen;
+        navigation.navigate(data.screen);
       }
     }
   }
 
+  // Check for notifications
   useEffect(() => {
-    const {data} = routeData;
-    console.log('routeData', data);
-    if (data?.redirectTo) {
-      navigation.navigate(data.redirectTo);
-    } else if (data?.rating) {
-      setRatingModal(true);
-    }
-  }, [routeData]);
-
-  // Auth listener
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
+    checkNotifications()
+      .then(() => {
+        console.log('notification');
+      })
+      .catch(error => {
+        console.log('checkNotificationsError', error.message);
+      });
   }, []);
 
-  // Save current screen name
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log('home focused..');
-      localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'home');
+    // Subscribe
+    const unsubscribe = addEventListener(state => {
+      if (state.isConnected) {
+        dispatch(startFetchBookingDetailsFromPhone());
+      }
     });
 
-    return unsubscribe;
-  }, [navigation]);
+    // Unsubscribe
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
+    let timeout;
     const handleAppStateChange = async nextAppState => {
-      console.log('appState', nextAppState);
-      if (nextAppState === 'active') {
-        console.log('hit active state');
-        // const currentScreen = localStorage.getString(LOCAL_KEYS.CURRENT_SCREEN);
-        // console.log('currentScreen', currentScreen);
-        // if (currentScreen === 'home') {
-        //   const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-        //   console.log('phone', phone);
-        //   dispatch(startFetchBookingDetailsFromPhone(phone));
-        // }
-        const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
-        console.log('isClassJoined', isClassJoined);
-        if (isClassJoined) {
-          setRatingModal(true);
-        }
+      try {
+        console.log('appState', nextAppState);
+        if (nextAppState === 'active') {
+          console.log('hit active state');
+          // const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+          const demoTime = localStorage.getNumber(LOCAL_KEYS.DEMO_TIME);
+          console.log('demoTime', demoTime);
 
-        const demoTime = localStorage.getNumber(LOCAL_KEYS.DEMO_TIME);
-        console.log(moment(demoTime).add(1, 'hours').isAfter(moment()));
-        if (demoTime) {
-          console.log('demoTime', typeof demoTime);
-          const demoNotOver = moment(demoTime)
-            .add(1, 'hours')
-            .isAfter(moment());
-          if (demoNotOver) {
-            const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-            console.log('phone', phone);
-            dispatch(startFetchBookingDetailsFromPhone(phone));
+          if (demoTime) {
+            const time =
+              moment().isAfter(moment(demoTime)) &&
+              moment().isBefore(moment(demoTime).add(2, 'hours'));
+
+            if (time) {
+              console.log('fetching...');
+              dispatch(startFetchBookingDetailsFromPhone());
+            }
           }
         }
+      } catch (error) {
+        console.log('APPSTATEERROR', error);
       }
     };
     const appState = AppState.addEventListener('change', handleAppStateChange);
     return () => {
       appState.remove();
+      if (timeout) clearTimeout(timeout);
     };
   }, []);
-
-  useEffect(() => {
-    dispatch(fetchContentDataStart());
-  }, []);
-
-  // fetch user data
-  useEffect(() => {
-    if (bookingDetails) {
-      dispatch(fetchUser({leadId: bookingDetails?.leadId}));
-    }
-  }, [bookingDetails]);
-
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description Set demo phone number from localStorage to redux state
-   */
-  // useEffect(() => {
-  //   dispatch(setPhoneAsync());
-  // }, []);
 
   /**
    * @author Shobhit
@@ -235,27 +201,11 @@ const HomeScreen = ({navigation, route}) => {
    * @description Call api to get booking status from phone number
    */
   useEffect(() => {
-    dispatch(startFetchBookingDetailsFromPhone());
-  }, []);
-
-  /**
-   * @author Shobhit
-   * @since 22/09/2023
-   * @description Set parent name and phone as username to Sentry to specify errors
-   */
-  useEffect(() => {
-    if (bookingDetails) {
-      Sentry.setUser({
-        username: `${bookingDetails.parentName}-${bookingDetails.phone}`,
-      });
+    if (!demoData) {
+      dispatch(startFetchBookingDetailsFromPhone());
+      console.log('startFetchBookingDetailsFromPhone');
     }
-  }, [bookingDetails]);
-
-  useEffect(() => {
-    if (!ipData) {
-      dispatch(startFetchingIpData());
-    }
-  }, [ipData]);
+  }, [demoData]);
 
   /**
    * @author Shobhit
@@ -263,11 +213,20 @@ const HomeScreen = ({navigation, route}) => {
    * @description
    * set demo data
    */
-  // useEffect(() => {
-  //   if (demoData) {
-  //     dispatch(setDemoData({demoData, phone: demoPhoneNumber}));
-  //   }
-  // }, [demoData]);
+  useEffect(() => {
+    if (demoData) {
+      console.log('demoData', demoData);
+      dispatch(setDemoData({demoData}));
+      // dispatch(fetchContentDataStart());
+    }
+  }, [demoData]);
+
+  // fetch user data
+  useEffect(() => {
+    if (bookingDetails && bookingDetails?.leadId) {
+      dispatch(fetchUser({leadId: bookingDetails.leadId}));
+    }
+  }, [bookingDetails]);
 
   useEffect(() => {
     let timeout;
@@ -283,22 +242,6 @@ const HomeScreen = ({navigation, route}) => {
       }
     };
   }, [paymentMessage]);
-
-  // useEffect(() => {
-  //   const unsubscribe = NetInfo.addEventListener(async state => {
-  //     if (state.isConnected && isConnected) {
-  //       if (demoPhoneNumber) {
-  //         dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-  //       } else if (demoBookingId) {
-  //         dispatch(startFetchBookingDetailsFromId(demoBookingId));
-  //       }
-  //     }
-  //   });
-
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, [demoPhoneNumber, demoBookingId, dispatch, isConnected]);
 
   /**
    * @author Shobhit
@@ -328,74 +271,40 @@ const HomeScreen = ({navigation, route}) => {
     return () => {
       clearInterval(timer);
     };
-  }, [bookingTime, demoPhoneNumber, dispatch]);
+  }, [bookingTime, dispatch]);
 
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description Do not show join button after 50 minutes of demo ended
-   */
+  // Rating after 45 minutes of class
   useEffect(() => {
     if (bookingTime) {
-      const afterHalfHourFromDemoDate =
-        new Date(bookingTime).getTime() + 1000 * 60 * 50;
+      const isClassOver = moment().isAfter(
+        moment(bookingTime).add(45, 'minutes'),
+      );
 
-      // Check after demo ended
-      if (afterHalfHourFromDemoDate <= Date.now()) {
-        // Hide class join button
-        dispatch(setShowJoinButton(false));
+      const isJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+
+      if (isJoined && isClassOver) {
+        setRatingModal(true);
       }
     }
   }, [bookingTime, demoData]);
 
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description Set  Notifications for demo class
-   */
-  // useEffect(() => {
-  //   if (bookingTime) {
-  //     dispatch(setDemoNotifications({bookingTime}));
-  //   }
-  // }, [bookingTime]);
-
-  /**
-   * @author Shobhit
-   * @since 07/08/2023
-   * @description Post Actions after join class successfuly
-   */
   useEffect(() => {
-    if (!bookingTime) return;
-
-    // const isDemoOver =
-    //   new Date(bookingTime).getTime() + 1000 * 60 * 60 * 4 <= Date.now();
-    const isDemoOver = moment(bookingTime).add(1, 'hours').isBefore(moment());
-
-    console.log('isDemoOver', isDemoOver);
-
-    if (isDemoOver && isAttended) {
-      console.log('post action true');
-      setShowPostActions(true);
-    } else {
-      setShowPostActions(false);
-    }
-  }, [bookingTime, isAttended]);
-
-  useEffect(() => {
-    console.log('demoFlag', demoFlag);
     if (demoData) {
+      console.log('demoFlag', demoData.demoFlag);
+
+      const demoTime = demoData?.demoDate?._seconds * 1000;
       if (
-        moment().isBefore(moment(bookingTime).add(1, 'hours')) &&
-        moment().isAfter(moment(bookingTime))
+        moment().isBefore(moment(demoTime).add(1, 'hours')) &&
+        moment().isAfter(moment(demoTime))
       ) {
-        if (!demoFlag) {
+        if (!demoData.demoFlag) {
           console.log('caling join demo...');
-          Alert.alert('', 'caling join demo...');
+          // Alert.alert('', 'caling join demo...');
           dispatch(joinDemo({bookingId: demoData.bookingId}));
         }
       }
     }
-  }, [bookingTime, demoData, demoFlag]);
+  }, [demoData]);
 
   /**
    * @author Shobhit
@@ -412,23 +321,14 @@ const HomeScreen = ({navigation, route}) => {
     }
   }, [bookingTime]);
 
-  useEffect(() => {
-    console.log('hit demophone');
-    if (demoPhoneNumber) {
-      saveDeviceId({phone: demoPhoneNumber, deviceUID: ''});
-    }
-  }, [demoPhoneNumber]);
+  // useEffect(() => {
+  //   if (!demoData) {
+  //     bottomSheetRef.current && bottomSheetRef.current.expand();
+  //   }
+  // }, [demoData, bottomSheetRef.current]);
 
   // show drawer
   const handleShowDrawer = () => navigation.openDrawer();
-
-  // Reschedule a class
-  // const rescheduleFreeClass = () => {
-  //   const {childAge, parentName, phone, childName} = bookingDetails;
-  //   const formFields = {childAge, parentName, phone, childName};
-
-  //   navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
-  // };
 
   if (!isConnected) {
     Alert.alert(
@@ -440,12 +340,6 @@ const HomeScreen = ({navigation, route}) => {
           onPress: () => {
             dispatch(resetCurrentNetworkState());
             dispatch(alertAction);
-          },
-        },
-        {
-          text: 'Cancel',
-          onPress: () => {
-            dispatch(resetCurrentNetworkState());
           },
         },
       ],
@@ -490,6 +384,27 @@ const HomeScreen = ({navigation, route}) => {
     }
   };
 
+  const bottomSheetSnappoint = `${Math.round(
+    ((deviceHeight * 0.65) / deviceHeight) * 100,
+  )}%`;
+
+  const openBottomSheet = () => {
+    bottomSheetRef.current && bottomSheetRef.current.expand();
+  };
+
+  const closeBottomSheet = () => {
+    bottomSheetRef.current && bottomSheetRef.current.close();
+    dispatch(startFetchBookingDetailsFromPhone());
+  };
+
+  const onCloseNotInterested = () => {
+    dispatch(setNotInterestedPopup(false));
+  };
+  // console.log('demoData', demoData);
+  // console.log('isClassOnging', isClassOngoing);
+  // console.log('timeLeft', timeLeft);
+  // console.log('bookingDetails', bookingDetails);
+
   return (
     <View style={{flex: 1, backgroundColor: '#76c8f2'}}>
       <View style={styles.topSection}>
@@ -521,9 +436,10 @@ const HomeScreen = ({navigation, route}) => {
           />
         ) : (
           <Demo
-            isClassOngoing={isClassOngoing}
+            // isClassOngoing={isClassOngoing}
             timeLeft={timeLeft}
-            showPostActions={showPostActions}
+            // showPostActions={showPostActions}
+            openBottomSheet={openBottomSheet}
           />
         )}
       </View>
@@ -848,6 +764,30 @@ const HomeScreen = ({navigation, route}) => {
         onClose={() => setRatingModal(false)}
         bookingId={demoData?.bookingId}
       />
+      <BottomSheet
+        index={-1}
+        snapPoints={[bottomSheetSnappoint, '90%']}
+        ref={bottomSheetRef}
+        enablePanDownToClose={true}
+        onChange={e => console.log('e', e)}
+        style={{
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+          elevation: 12,
+        }}>
+        <TwoStepForm closeModal={closeBottomSheet} />
+      </BottomSheet>
+      <ModalComponent
+        visible={notInterestedPopup}
+        animationType="slide"
+        onRequestClose={onCloseNotInterested}>
+        {bookingDetails && (
+          <NotInterested
+            onClose={onCloseNotInterested}
+            bookingDetails={bookingDetails}
+          />
+        )}
+      </ModalComponent>
     </View>
   );
 };

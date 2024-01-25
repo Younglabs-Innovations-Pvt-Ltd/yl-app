@@ -10,13 +10,11 @@ export const getCurrentDeviceId = async () => {
 export const saveDeviceId = async ({phone, deviceUID}) => {
   try {
     const token = await getCurrentDeviceId();
+    // console.log('token', token);
 
-    console.log('token', token);
-
-    return;
     const response = await storeDeviceId({deviceId: token, phone, deviceUID});
     const data = await response.json();
-    console.log('tokenData mobile', data);
+    // console.log('tokenData mobile', data);
   } catch (error) {
     console.log('DEVICE_ID_ERROR_APP=', error);
   }
