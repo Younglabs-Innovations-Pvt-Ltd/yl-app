@@ -16,7 +16,8 @@ const INITIAL_STATE = {
   userOrdersLoading: false,
   userOrderLoadingFailed: false,
   userOrderLoadingFailedReason: '',
-  selectedUserOrder:{}
+  selectedUserOrder:{},
+  isFirstTimeUser:false,
 };
 
 const reducer = {
@@ -78,6 +79,8 @@ const reducer = {
     state.allBookingsLoading = false;
     state.allBookingsLoadingFailed = true;
   },
+
+  // For current Selected Booking of child
   setSelectedChild(state, action) {
     state.selectedChild = action.payload;
   },
@@ -97,8 +100,13 @@ const reducer = {
     state.userOrdersLoading = false;
     state.userOrderLoadingFailedReason = action.payload;
   },
+
+  // For selected user Order
   setSelectedUserOrder(state,action){
     state.selectedUserOrder = action.payload;
+  },
+  setIsFirstTimeUser(state,action){
+    state.isFirstTimeUser = action.payload;
   }
 };
 
@@ -128,7 +136,8 @@ export const {
   startFetchingUserOrders,
   userOrderFetchingSuccess,
   userOrdersLoadingFailed,
-  setSelectedUserOrder
+  setSelectedUserOrder,
+  setIsFirstTimeUser
 } = slice.actions;
 
 export const welcomeScreenReducer = slice.reducer;

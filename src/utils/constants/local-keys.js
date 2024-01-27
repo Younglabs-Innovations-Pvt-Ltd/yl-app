@@ -14,6 +14,7 @@ const localKeys = {
   CURRENT_SCREEN: 'currentScreen',
   JOIN_CLASS: 'joinClass',
   DEMO_TIME: 'demoTime',
+  LOGINDETAILS: 'loginDetails',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);

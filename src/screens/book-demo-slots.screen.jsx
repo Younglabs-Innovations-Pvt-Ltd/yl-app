@@ -48,13 +48,13 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
     ipData,
     isBookingLimitExceeded,
     popup,
-    loading: {bookingLoading},
+    loading: {bookingSlotsLoading},
     bookingCreatedSuccessfully,
     childData,
   } = useSelector(bookDemoSelector);
 
   // console.log('Booking Slots are', bookingSlots);
-  const {demoBookingId} = useSelector(joinDemoSelector);
+  // const {demoBookingId} = useSelector(joinDemoSelector);
   const {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);

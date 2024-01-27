@@ -1,5 +1,5 @@
-import React from 'react';
-import {Dimensions, StyleSheet, View, Text} from 'react-native';
+import React, {useState} from 'react';
+import {Dimensions, StyleSheet, View, Text, Pressable} from 'react-native';
 import TextWrapper from '../text-wrapper.component';
 import CountDown from '../countdown.component';
 import Spacer from '../spacer.component';
@@ -7,6 +7,10 @@ import {COLORS} from '../../utils/constants/colors';
 import {useSelector} from 'react-redux';
 import {i18nContext} from '../../context/lang.context';
 import UploadHandwriting from '../upload-handwriting.component';
+import ModalComponent from '../modal.component';
+import Email from '../email.component';
+import Icon from '../icon.component';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const months = [
   'Jan',
@@ -44,39 +48,101 @@ const getClassDate = seconds => {
 };
 
 const DemoWaiting = ({timeLeft}) => {
+  const [visibleEmail, setVisibleEmail] = useState(false);
+
   const {demoData} = useSelector(state => state.joinDemo);
 
   const {localLang} = i18nContext();
+
+  const onVisibleEmail = () => {
+    setVisibleEmail(true);
+  };
+  const onCloseEmail = () => {
+    setVisibleEmail(false);
+  };
 
   if (!demoData) return;
 
   const {demoDate} = demoData;
   const seconds = demoDate._seconds;
   return (
-    <View className="flex-row items-center p-1">
-      {/* <TextWrapper fs={14} className="text-white">
+    <View className="items-center">
+      <View className="flex-row items-end p-1">
+        {/* <TextWrapper fs={14} className="text-white">
           Your class is on{' '}
 
           <TextWrapper className="text-white font-bold" fw="bold">
-            {getClassDate(seconds)}
+          {getClassDate(seconds)}
           </TextWrapper>
-
+          
         </TextWrapper> */}
 
-      {/* <CountDown timeLeft={timeLeft} /> */}
+        {/* <CountDown timeLeft={timeLeft} /> */}
 
-      <View className="flex-col w-[75%]">
-        <Text className="text-xs text-white">
-          Your First free handwriting class starts in
-        </Text>
-        <View className="flex-row mt-1">
-          <CountDownTimer timeLeft={timeLeft} />
+        <View className="flex-col w-[75%]">
+          <Text className="text-xs text-white">
+            Your First free handwriting class starts in
+          </Text>
+          <View className="flex-row mt-1">
+            <CountDownTimer timeLeft={timeLeft} />
+          </View>
+        </View>
+
+        <View className="w-[25%]">
+          <UploadHandwriting demoData={demoData} />
         </View>
       </View>
 
-      <View className="w-[25%]">
-        <UploadHandwriting demoData={demoData} />
+      <View className="w-full p-1">
+        <Pressable
+          style={({pressed}) => [
+            {
+              width: '100%',
+              backgroundColor: 'white',
+              paddingVertical: 8,
+              borderRadius: 4,
+              justifyContent: 'center',
+              flexDirection: 'row',
+              alignItems: 'center',
+            },
+            {opacity: pressed ? 0.9 : 1},
+          ]}
+          onPress={onVisibleEmail}>
+          <MIcon name="gmail" size={24} color={COLORS.pblue} />
+          <Text style={{color: COLORS.pblue}} className="ml-2 text-base">
+            Get link on email
+          </Text>
+        </Pressable>
       </View>
+      <ModalComponent visible={visibleEmail}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.35)',
+            paddingHorizontal: 16,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <View className="bg-white p-6 rounded">
+            <View style={{}}></View>
+            <View style={{}}>
+              <Email demoData={demoData} />
+              <Icon
+                name="close"
+                size={26}
+                color={COLORS.black}
+                style={{
+                  position: 'absolute',
+                  top: -10,
+                  right: -10,
+                }}
+                onPress={onCloseEmail}
+              />
+            </View>
+            <View style={{}}></View>
+          </View>
+        </View>
+      </ModalComponent>
     </View>
   );
 };

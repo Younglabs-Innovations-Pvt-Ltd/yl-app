@@ -9,6 +9,7 @@ const localKeys = {
   IS_RATED: 'isRated',
   LANGUAGE_KEY: 'lang',
   DEVICE_ID: 'deviceId',
+  EMAIL: 'email',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);

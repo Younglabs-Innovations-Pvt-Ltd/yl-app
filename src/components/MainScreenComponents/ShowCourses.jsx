@@ -41,6 +41,8 @@ const ShowCourses = ({navigation}) => {
     }
   }, [ipData]);
 
+  // console.log("ip data is", ipData)
+
   useEffect(() => {
     dispatch(
       getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),

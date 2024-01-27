@@ -13,7 +13,7 @@ const Testimonial = ({data}) => {
   // console.log('data here is', data);
   return (
     <View
-      className="h-[200px] rounded-md ml-2 items-center border-gray-100 overflow-hidden"
+      className="h-[200px] rounded-md items-center border-gray-100 overflow-hidden"
       style={{
         width: width - 130,
         backgroundColor: darkMode ? bgSecondaryColor : bgColor,

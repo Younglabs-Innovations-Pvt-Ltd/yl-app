@@ -4,12 +4,46 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import {useSelector} from 'react-redux';
 import {ScrollView} from 'react-native-gesture-handler';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 
 const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
   const {bgColor, textColors, colorYlMain, darkMode, bgSecondaryColor} =
     useSelector(state => state.appTheme);
   const bottomSheetRef = useRef(null);
+
+  const CustomBackdrop = ({animatedIndex, style}) => {
+    // animated variables
+    const containerAnimatedStyle = useAnimatedStyle(() => ({
+      opacity: interpolate(
+        animatedIndex.value,
+        [0, 1],
+        [0, 1]
+      ),
+    }));
+
+    // styles
+    const containerStyle = useMemo(
+      () => [
+        style,
+        {
+          backgroundColor: '#000000a7',
+        },
+        containerAnimatedStyle,
+      ],
+      [style, containerAnimatedStyle],
+    );
+
+    return <Animated.View style={containerStyle} />;
+  };
+
+  const CustomBackDrop = ()=>{
+    return(<View className="bg-[#000000a7]"></View>)
+  }
 
   useEffect(() => {
     setBottomSheetOpen(isOpen);
@@ -50,7 +84,10 @@ const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
       enablePanDownToClose={true}
       style={{}}
       backgroundStyle={{backgroundColor: bgColor}}
-      handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}>
+      handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}
+      stackBehavior="replace"
+      // backdropComponent={CustomBackdrop}
+      >
       {/* <View className="w-full px-3 items-end">
         <View
           className={`${
