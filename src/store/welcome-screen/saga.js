@@ -62,15 +62,15 @@ function* handleBookingStatus({payload: {phone}}) {
     // Return true or false
     const isValidPhone = isValidNumber(phone, 'IN');
 
-    // if (!isValidPhone) {
-    //   yield put(setErrorMessage('Please enter a valid number'));
-    //   return;
-    // }
+    if (!isValidPhone) {
+      yield put(setErrorMessage('Please enter a valid number'));
+      return;
+    }
 
     // Get booking data
     // const response = yield fetchBookingDetailsFromPhone(phone);
 
-    const data = yield response.json();
+    // const data = yield response.json();
 
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
 
@@ -87,7 +87,6 @@ function* handleBookingStatus({payload: {phone}}) {
       deviceUID,
     });
     const leadData = yield leadRes.json();
-    console.log('leadData', leadData);
 
     // yield call(fetchDemoDetailsFromPhone);
     yield put(fetchBookingStatusSuccess(''));
@@ -120,6 +119,8 @@ function* startBookingStatus() {
 function* startFetchingCoursesForLandingPage({payload}) {
   try {
     const country = payload.country;
+    console.log('country: ', country);
+
     const res = yield fetchCoursesForWelcomeScreen(country);
     const data = yield res.json();
     // console.log("got data",data)
@@ -161,7 +162,7 @@ function* fetchAllBookings({payload}) {
     const response = yield fetchAllBookinsFromPhone(payload);
 
     if (response.status !== 200 && response.status !== 404) {
-      console.log("failing here" , response.status);
+      console.log('failing here', response.status);
       yield put(setAllBookingsFetchingFailed('Something went wrong'));
       return;
     }

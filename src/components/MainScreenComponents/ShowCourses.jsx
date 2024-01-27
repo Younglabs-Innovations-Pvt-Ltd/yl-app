@@ -42,9 +42,11 @@ const ShowCourses = ({navigation}) => {
   }, [ipData]);
 
   useEffect(() => {
-    dispatch(
-      getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
-    );
+    if (ipData) {
+      dispatch(
+        getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
+      );
+    }
   }, [ipData, refreshCourses]);
 
   const reloadCourses = () => {

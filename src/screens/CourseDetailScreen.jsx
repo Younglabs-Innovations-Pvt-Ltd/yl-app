@@ -25,8 +25,6 @@ const CourseDetailsScreen = ({route, navigation}) => {
   const [buttonToShow, setButtonToShow] = useState('top');
   const [showScrollerButton, setShowScrollerButton] = useState(true);
 
-  console.log('buttonToShow', buttonToShow);
-
   const scrollA = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -133,7 +131,7 @@ const CourseDetailsScreen = ({route, navigation}) => {
         <View className="flex-1 relative rounded-t-2xl pt-2 px-2 mb">
           <View className="flex-1">
             {selectedTab === 'courseDetails' ? (
-              <CourseDetails navigation={navigation} courseId={courseData.id} />
+              <CourseDetails navigation={navigation} courseData={courseData} />
             ) : selectedTab === 'bookFreeClass' ? (
               <BookDemoScreen
                 navigation={navigation}
