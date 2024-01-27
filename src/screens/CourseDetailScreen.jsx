@@ -23,9 +23,6 @@ const CourseDetailsScreen = ({route, navigation}) => {
   const [contentHeight, setContentHeight] = useState(0);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
   const [buttonToShow, setButtonToShow] = useState('top');
-  const [showScrollerButton, setShowScrollerButton] = useState(true);
-
-  console.log('buttonToShow', buttonToShow);
 
   const scrollA = useRef(new Animated.Value(0)).current;
 
@@ -66,7 +63,6 @@ const CourseDetailsScreen = ({route, navigation}) => {
 
     // Do any additional logic based on the content size if needed
     setContentHeight(height);
-    console.log('Content Size:', height);
   };
 
   const handleLayout = event => {
@@ -74,25 +70,29 @@ const CourseDetailsScreen = ({route, navigation}) => {
     setScrollViewHeight(height);
   };
 
-  useEffect(() => {
-    if (selectedTab !== 'payAndEnroll') {
-      // Check if the user is 20% from the top or bottom
-      const isTop20Percent = scrollPosition < 0.15 * contentHeight;
-      const isBottom20Percent =
-        scrollPosition > 0.85 * (contentHeight - scrollViewHeight);
 
-      // Perform actions based on scroll position
-      if (isTop20Percent) {
-        setButtonToShow('bottom');
-      } else if (isBottom20Percent) {
-        setButtonToShow('top');
-      }
-    }
-  }, [scrollPosition, contentHeight, scrollViewHeight, selectedTab]);
+  // set show Button for scrolling up and down 
+  // useEffect(() => {
+  //   if (selectedTab !== 'payAndEnroll') {
+  //     // Check if the user is 20% from the top or bottom
+  //     const isTop20Percent = scrollPosition < 0.15 * contentHeight;
+  //     const isBottom20Percent =
+  //       scrollPosition > 0.85 * (contentHeight - scrollViewHeight);
+
+  //     // Perform actions based on scroll position
+  //     if (isTop20Percent) {
+  //       setButtonToShow('bottom');
+  //     } else if (isBottom20Percent) {
+  //       setButtonToShow('top');
+  //     }
+  //   }
+  // }, [scrollPosition, contentHeight, scrollViewHeight, selectedTab]);
 
   return (
     <View className="w-full flex-1" style={{backgroundColor: bgColor}}>
-      {selectedTab !== 'payAndEnroll' && showScrollerButton && (
+
+    {/* Button for scrolling up and down  */}
+      {/* {selectedTab !== 'payAndEnroll' && (
         <Pressable
           className="absolute bottom-[80px] right-5 h-12 w-12 z-50 rounded-full items-center justify-center"
           style={{backgroundColor: textColors.textYlMain}}
@@ -107,7 +107,8 @@ const CourseDetailsScreen = ({route, navigation}) => {
             />
           </View>
         </Pressable>
-      )}
+      )} */}
+
       <Animated.ScrollView
         onScroll={Animated.event(
           [{nativeEvent: {contentOffset: {y: scrollA}}}],
@@ -166,7 +167,6 @@ export const FeatureTray = ({
   const courseDetailsImage = require('../assets/images/courseDetails.jpg');
   const bookFreeClassImage = require('../assets/images/demoBook.jpg');
   const payAndEnrollImage = require('../assets/images/payAndEnroll.jpg');
-  console.log('demoAvailable is', demoAvailable);
   const features = demoAvailable
     ? [
         {

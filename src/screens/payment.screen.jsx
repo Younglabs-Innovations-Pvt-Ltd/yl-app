@@ -746,7 +746,7 @@ const Payment = ({navigation}) => {
                   <View className="w-[85%] justify-between flex-row">
                     <Text className="text-[16px] text-black">Coupon Code</Text>
                     <Text className="text-[16px] text-black">
-                      - {couponDiscount}
+                      - {couponDiscount.toFixed(2)}
                     </Text>
                   </View>
                 )}
