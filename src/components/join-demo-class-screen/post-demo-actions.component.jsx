@@ -50,7 +50,9 @@ const PostDemoAction = ({rescheduleClass}) => {
     nmiLoading,
     isNmi,
     attendanceLoading,
+    notInterestedPopup,
   } = useSelector(joinDemoSelector);
+
   // console.log("demoData is", demoData)
 
   const navigation = useNavigation();
@@ -108,7 +110,14 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   useEffect(() => {
-    console.log("isAttended=",isAttended , "isRated=",isRated , "isNmi=",isNmi)
+    console.log(
+      'isAttended=',
+      isAttended,
+      'isRated=',
+      isRated,
+      'isNmi=',
+      isNmi,
+    );
     if (isAttended && !isRated) {
       console.log('slided');
       scrollSlider(deviceWidth);
@@ -223,6 +232,9 @@ const PostDemoAction = ({rescheduleClass}) => {
     dispatch(setNotInterestedPopup(true));
   };
 
+  const onCloseNotInterested = () => {
+    dispatch(setNotInterestedPopup(false));
+  };
   // if (ratingLoading || attendedLoading || loading) return null;
 
   return (
@@ -336,7 +348,11 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={courseDetails}>
-              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Course details</TextWrapper>
+              <TextWrapper
+                ff={FONTS.primaryFont}
+                styles={{color: COLORS.pblue}}>
+                Course details
+              </TextWrapper>
             </Pressable>
             <Pressable
               style={({pressed}) => [
@@ -344,7 +360,11 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={batchDetails}>
-              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Batch/Fee details</TextWrapper>
+              <TextWrapper
+                ff={FONTS.primaryFont}
+                styles={{color: COLORS.pblue}}>
+                Batch/Fee details
+              </TextWrapper>
             </Pressable>
           </View>
         </View>
@@ -377,6 +397,18 @@ const PostDemoAction = ({rescheduleClass}) => {
           })}
         </View>
       </View>
+
+      <ModalComponent
+        visible={notInterestedPopup}
+        animationType="slide"
+        onRequestClose={onCloseNotInterested}>
+        {bookingDetails && (
+          <NotInterested
+            onClose={onCloseNotInterested}
+            bookingDetails={bookingDetails}
+          />
+        )}
+      </ModalComponent>
     </React.Fragment>
   );
 };
@@ -430,7 +462,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    borderRadius: 4,
+    borderRadius: 50,
   },
   dotIndicator: {
     width: 8,

@@ -84,6 +84,8 @@ const Demo = ({
     }
   }, [demoData, bookingDetails]);
 
+  console.log("is Time Over=" ,isTimeover)
+
   useEffect(() => {
     if (bookingDetails) {
       const {childAge, parentName, phone, childName} = bookingDetails;
@@ -234,7 +236,7 @@ const Demo = ({
       showsVerticalScrollIndicator={false}>
       {NEW_BOOKING}
       {/* Timer */}
-      {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
+      {SHOW_TIMER && !isClassOngoing && <DemoWaiting timeLeft={timeLeft} />}
       {/* Show join button */}
       {isClassOngoing && (
         <View style={{paddingHorizontal: 16, paddingTop: 12}}>

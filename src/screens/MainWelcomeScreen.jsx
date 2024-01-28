@@ -30,7 +30,6 @@ import {
   setToInitialState,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import DemoDetailsScreen from '../components/MainScreenComponents/DemoDetailsScreen';
 import Demo from '../components/demo.component';
 import TapeTimer from '../components/TapeTimer';
 import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
@@ -244,12 +243,12 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    console.log("demo data here is" , demoData);
+    console.log("demo data here is");
     if (demoData && user?.phone) {
       console.log("dispatching function")
       dispatch(setDemoData({demoData, phone: user?.phone}));
     }
-  }, [demoData, user]);
+  }, [demoData, user , isTimeover]);
 
   useEffect(() => {
     if (!bookingTime) return;
@@ -441,6 +440,8 @@ const MainWelcomeScreen = ({navigation}) => {
         }
         snapPoint={['50%', '90%']}
       />
+
+      
     </View>
   );
 };
