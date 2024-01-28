@@ -89,7 +89,7 @@ function* fetchUserSaga({payload}) {
     const res = yield getCustomers(payload);
     // console.log("res is",res)
     const data = yield res.json();
-    console.log('data is here', data?.data?.customer);
+    // console.log('data is here', data?.data?.customer);
     console.log('uesrs', data?.data?.customer);
     yield put(setUser(data?.data));
   } catch (error) {

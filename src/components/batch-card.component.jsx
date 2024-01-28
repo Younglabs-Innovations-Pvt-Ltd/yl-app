@@ -26,20 +26,20 @@ const BatchCard = ({
 
   useEffect(() => {
     if (prices && ipData) {
-      const batchPrices = prices.prices.batchPrices;
-      const country = batchPrices?.find(
-        item => item.countryCode === ipData.country_code2,
-      );
+      const batchPrices = prices.prices["group"];
+      // const country = batchPrices?.find(
+      //   item => item.countryCode === ipData.country_code2,
+      // );
 
       if (level === 1) {
-        setPrice(country?.prices?.level1?.offer);
-        setStrikeThroughPrice(country?.prices?.level1?.price);
+        setPrice(batchPrices?.level1?.offer);
+        setStrikeThroughPrice(batchPrices?.level2?.price);
       } else if (level === 2) {
-        setPrice(country?.prices?.level2?.offer);
-        setStrikeThroughPrice(country?.prices?.level2?.price);
+        setPrice(batchPrices?.level2?.offer);
+        setStrikeThroughPrice(batchPrices?.level2?.price);
       } else {
-        setPrice(country?.prices?.combo?.offer);
-        setStrikeThroughPrice(country?.prices?.combo?.price);
+        setPrice(batchPrices?.combo?.offer);
+        setStrikeThroughPrice(batchPrices?.combo?.price);
       }
     }
   }, [ipData, prices, level]);

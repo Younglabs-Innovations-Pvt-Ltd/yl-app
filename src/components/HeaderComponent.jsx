@@ -58,8 +58,8 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
     const getOrders = async () => {
       console.log('gettting orders');
       const token = await auth().currentUser.getIdToken();
-      console.log('Got token', token);
-      console.log('condition 2');
+      // console.log('Got token', token);
+      // console.log('condition 2');
       let body = {
         leadId: user.leadId,
         token,

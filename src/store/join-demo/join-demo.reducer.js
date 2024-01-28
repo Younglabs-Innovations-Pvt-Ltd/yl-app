@@ -113,7 +113,10 @@ const reducer = {
     state.notInterestedPopup = action.payload;
   },
   setPhoneAsync() {},
-  setDemoData() {},
+  setDemoData() {
+    console.log("in reducer");
+    
+  },
   setDemoNotifications() {},
   saveRating() {},
   checkForRating() {},

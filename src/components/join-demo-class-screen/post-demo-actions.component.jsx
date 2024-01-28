@@ -51,7 +51,7 @@ const PostDemoAction = ({rescheduleClass}) => {
     isNmi,
     attendanceLoading,
   } = useSelector(joinDemoSelector);
-  console.log("demoData is", demoData)
+  // console.log("demoData is", demoData)
 
   const navigation = useNavigation();
   const dispatch = useDispatch();

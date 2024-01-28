@@ -138,6 +138,7 @@ export function* fetchDemoDetailsFromPhone() {
  */
 function* fetchDemoDetailsFromBookingId({payload}) {
   try {
+    console.log("payload is for getting details", payload)
     const response = yield call(fetchBookingDetailsFromBookingId, payload);
     const data = yield response.json();
 
@@ -157,7 +158,7 @@ function* fetchDemoDetailsFromBookingId({payload}) {
 
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
-    console.log(TAG, error);
+    console.log(TAG ,"3", error);
     console.log('error');
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setLoading(false));

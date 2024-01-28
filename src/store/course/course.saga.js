@@ -13,11 +13,10 @@ function* courseDetail({payload}) {
   try {
     console.log(payload);
 
-    const {courseId, courseType, country} = payload;
+    const {courseId, country} = payload;
     // console.log("Getting coursid 3", courseId);
     const response = yield call(getCourseDetails, {
       courseId,
-      courseType,
       country,
     });
     const data = yield response.json();

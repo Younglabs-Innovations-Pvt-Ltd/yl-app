@@ -310,7 +310,7 @@ const BookDemoScreen = ({
       country: ipData.country_name.toUpperCase(),
       countryCode: ipData.calling_code,
     };
-    console.log('body data is', bodyData);
+    // console.log('body data is', bodyData);
     dispatch(setNewBookingStart({data: bodyData}));
   };
 

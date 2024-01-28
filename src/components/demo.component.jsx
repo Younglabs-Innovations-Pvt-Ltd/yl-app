@@ -32,7 +32,7 @@ import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
 import {TextInput} from 'react-native-gesture-handler';
-import { welcomeScreenSelector } from '../store/welcome-screen/selector';
+import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
@@ -65,7 +65,7 @@ const Demo = ({
     joinClassErrorMsg,
   } = useSelector(joinDemoSelector);
 
-  const {isFirstTimeUser} = useSelector(welcomeScreenSelector)
+  const {isFirstTimeUser} = useSelector(welcomeScreenSelector);
 
   /**
    * @author Shobhit
@@ -121,6 +121,7 @@ const Demo = ({
   const onOpenForm = () => setVisible(true);
   const onCloseForm = () => setVisible(false);
 
+  // console.log("demodata is" , demoData)
   // Join Class
   const handleJoinClass = async () => {
     // console.log("first");
@@ -148,12 +149,19 @@ const Demo = ({
   const IS_CHILD_NAME = useMemo(() => {
     return !cn ? (
       <>
-        <TextInput
-          placeholder="Child Name"
-          value={childName}
-          onChangeText={onChangeChildName}
-          className="text-white border-b border-white p-1 text-base"
-        />
+        <View className="w-full flex-row items-end mb-3">
+          <Text className="text-white font-semibold text-base">
+            Your Child Name
+          </Text>
+          <View className="flex-1 px-3">
+            <TextInput
+              placeholder="Child Name"
+              value={childName}
+              onChangeText={onChangeChildName}
+              className="text-white border-b border-white p-1 text-base w-full"
+            />
+          </View>
+        </View>
         {message && (
           <TextWrapper fs={14} color={COLORS.pred}>
             {message}
@@ -218,6 +226,8 @@ const Demo = ({
     navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
   };
 
+  console.log('isClass Ongoing', isClassOngoing, 'Show TImer is', SHOW_TIMER);
+
   return (
     <ScrollView
       style={styles.contentWrapper}
@@ -229,7 +239,7 @@ const Demo = ({
       {isClassOngoing && (
         <View style={{paddingHorizontal: 16, paddingTop: 12}}>
           {IS_CHILD_NAME}
-          <Pressable
+          {/* <Pressable
             style={styles.btnClass}
             onPress={handleJoinClass}
             disabled={joinClassLoading}>
@@ -243,7 +253,7 @@ const Demo = ({
                 style={{marginLeft: 4}}
               />
             )}
-          </Pressable>
+          </Pressable> */}
 
           <View className="w-full p-1 px-3">
             <Text className="text-white font-semibold text-base ml-3 ">
@@ -251,17 +261,24 @@ const Demo = ({
             </Text>
             <View className="w-full">
               <Pressable
-                className="p-2 w-full rounded-full bg-white mt-2"
+                className="p-2 w-full rounded-full bg-white mt-2 flex-row justify-center"
                 onPress={handleJoinClass}>
-                <Text className="text-base font-semibold text-gray-700 text-center">
-                  Enter Class
+                <Text className="text-base font-semibold text-gray-700 text-center flex-row">
+                  Enter Class{' '}
                 </Text>
+                {joinClassLoading && (
+                  <ActivityIndicator
+                    size={'small'}
+                    color={COLORS.black}
+                    style={{marginLeft: 4}}
+                  />
+                )}
               </Pressable>
             </View>
           </View>
         </View>
       )}
-      
+
       {
         // If user attended demo class
         // Demo has ended

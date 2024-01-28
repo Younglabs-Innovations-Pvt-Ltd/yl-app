@@ -210,9 +210,11 @@ const MainWelcomeScreen = ({navigation}) => {
     }
     }
   }, [user]);
+
   
   useEffect(() => {
-    // console.log("running for selectedChild", selectedChild.bookingId)
+  
+   console.log("running for selectedChild", selectedChild.bookingId)
     if (selectedChild?.bookingId) {
       dispatch(setToInitialState());
       dispatch(startFetchBookingDetailsFromId(selectedChild.bookingId));
@@ -242,7 +244,9 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
+    console.log("demo data here is" , demoData);
     if (demoData && user?.phone) {
+      console.log("dispatching function")
       dispatch(setDemoData({demoData, phone: user?.phone}));
     }
   }, [demoData, user]);
