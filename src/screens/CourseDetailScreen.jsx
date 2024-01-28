@@ -134,7 +134,7 @@ const CourseDetailsScreen = ({route, navigation}) => {
         <View className="flex-1 relative rounded-t-2xl pt-2 px-2 mb">
           <View className="flex-1">
             {selectedTab === 'courseDetails' ? (
-              <CourseDetails navigation={navigation} courseId={courseData.id} />
+              <CourseDetails navigation={navigation} courseData={courseData} />
             ) : selectedTab === 'bookFreeClass' ? (
               <BookDemoScreen
                 navigation={navigation}

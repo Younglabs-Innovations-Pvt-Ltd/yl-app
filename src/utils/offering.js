@@ -50,6 +50,9 @@ export const generateOffering = currentCourse => {
       offeringName,
       price: currentCourse.price,
     };
+
+    console.log('offeringObj', offeringObj);
+
     return offeringObj;
   }
 };

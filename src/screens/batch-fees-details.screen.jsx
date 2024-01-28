@@ -31,6 +31,7 @@ import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import NoBatchesModule from '../components/NoBatchesModule';
+import SoloBatchPayment from '../components/payments/SoloBatchPayment';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -58,11 +59,10 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     currentAgeGroup,
     courseVideos,
   } = useSelector(courseSelector);
-  const {ipData} = useSelector(bookDemoSelector);
+  const {ipData, timezone} = useSelector(bookDemoSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
-
 
   // Save current screen name
   // useEffect(() => {
@@ -75,9 +75,12 @@ const BatchFeeDetails = ({navigation, courseData}) => {
   // }, [navigation]);
 
   useEffect(() => {
-    {
-      dispatch(fetchCourseStart({courseId: courseData.id}));
-    }
+    dispatch(
+      fetchCourseStart({
+        courseId: courseData.id,
+        country: 'India',
+      }),
+    );
   }, [courseData]);
 
   useEffect(() => {
@@ -344,7 +347,13 @@ const BatchFeeDetails = ({navigation, courseData}) => {
           </View>
         </ScrollView>
       ) : (
-        <NoBatchesModule courseData={courseData} />
+        // <NoBatchesModule courseData={courseData} />
+        <SoloBatchPayment
+          courseData={courseData}
+          ipData={ipData}
+          timezone={timezone}
+          prices={prices?.prices}
+        />
       )}
     </View>
   );

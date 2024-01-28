@@ -29,6 +29,7 @@ const reducers = {
     state.paymentMessage = action.payload;
     state.payment = '';
   },
+  makeSoloPayment(state, action) {},
 };
 
 const paymentSlice = createSlice({
@@ -44,6 +45,7 @@ export const {
   setLoading,
   setPayment,
   setPaymentMessage,
+  makeSoloPayment,
 } = paymentSlice.actions;
 
 export const paymentReducer = paymentSlice.reducer;

@@ -32,6 +32,7 @@ const reducer = {
   fetchIpDataSuccess(state, action) {
     state.loading.ipDataLoading = false;
     state.ipData = action.payload;
+    state.timezone = action.payload.time_zone.offset_with_dst;
   },
   startFetchingBookingSlots(state) {
     state.loading.bookingSlotsLoading = true;
@@ -101,7 +102,7 @@ const reducer = {
   },
   setOneToOneBookingFailed2(state, action) {
     state.oneToOneBookingFailed = action.payload;
-    state.bookingFailReason = "";
+    state.bookingFailReason = '';
   },
 };
 

@@ -4,6 +4,7 @@ import {
   makePaymentFailed,
   makePaymentSuccess,
   setLoading,
+  makeSoloPayment,
 } from './reducer';
 import moment from 'moment';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -180,10 +181,104 @@ function* makePaymentSaga({payload}) {
   }
 }
 
+function* makeSoloPaymentSaga({payload}) {
+  try {
+    const body = payload.body;
+
+    const url =
+      'https://3671-2401-4900-1c5a-92a0-4868-58de-b7f8-1ce8.ngrok-free.app';
+
+    const batch = {
+      ageGroup: body.ageGroup,
+      batchType: body.batchType,
+      classCount: 12,
+      courseId: body.courseId,
+      level: 1,
+      price: parseInt(body.price),
+    };
+
+    console.log('batch', batch);
+
+    const offeringBody = generateOffering(batch);
+
+    body.offeringData = offeringBody;
+
+    const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = yield response.json();
+
+    console.log('order data=', data);
+
+    if (response.status === 403) {
+      // yield put(setLoading(false));
+      return;
+    }
+
+    const {amount, id: order_id, currency} = data.order;
+
+    const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bagDetails: {...body, rpOrderId: order_id, type: 'order'},
+        leadId: body.leadId,
+      }),
+    });
+
+    const orderRes = yield orderResp.json();
+    console.log('orderRes=', orderRes);
+
+    let config = {
+      display: {
+        blocks: {
+          banks: {
+            name: 'Pay via UPI',
+            instruments: [
+              {
+                method: 'upi',
+              },
+            ],
+          },
+        },
+        sequence: ['block.banks'],
+        preferences: {
+          show_default_blocks: false,
+        },
+      },
+    };
+
+    const options = {
+      key: 'rzp_test_0cYlLVRMEaCUDx',
+      currency,
+      amount: amount?.toString(),
+      order_id,
+      name: 'Younglabs',
+      description: 'Younglabs Innovations',
+    };
+
+    const rzRes = yield RazorpayCheckout.open(options);
+    console.log('rzRes=', rzRes);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function* makePaymentListener() {
   yield takeLatest(startMakePayment.type, makePaymentSaga);
 }
 
+function* soloPaymentListener() {
+  yield takeLatest(makeSoloPayment.type, makeSoloPaymentSaga);
+}
+
 export function* paymentSaga() {
-  yield all([call(makePaymentListener)]);
+  yield all([call(makePaymentListener), call(soloPaymentListener)]);
 }

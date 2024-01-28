@@ -41,7 +41,7 @@ const getLevelName = level => {
   }
 };
 
-const CourseDetails = ({navigation, courseId}) => {
+const CourseDetails = ({navigation, courseData}) => {
   const [aboutCourseArr, setAboutCourseArr] = useState([]);
   const [ageGroup, setAgeGroup] = useState('5-7');
   const [filteredCourse, setFilteredCourse] = useState(null);
@@ -58,9 +58,13 @@ const CourseDetails = ({navigation, courseId}) => {
   // console.log("About course array is", aboutCourseArr[0].objArray[0].content)
 
   useEffect(() => {
-    console.log("courseDetails is",courseDetails)
-    if (!courseDetails || courseDetails?.courseId !== courseId) {
-      dispatch(fetchCourseStart({courseId: courseId || 'Eng_Hw'}));
+    if (!courseDetails || courseDetails?.courseId !== courseData.id) {
+      dispatch(
+        fetchCourseStart({
+          courseId: courseData.id,
+          country: 'India',
+        }),
+      );
     }
   }, [courseDetails]);
 

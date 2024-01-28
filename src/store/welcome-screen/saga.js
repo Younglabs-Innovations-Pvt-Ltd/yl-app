@@ -70,7 +70,7 @@ function* handleBookingStatus({payload: {phone}}) {
 
     // Get booking data
     // const response = yield fetchBookingDetailsFromPhone(phone);
-    // const data = yield response.json();
+    // // const data = yield response.json();
 
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
     localStorage.set(
@@ -94,7 +94,6 @@ function* handleBookingStatus({payload: {phone}}) {
       deviceUID,
     });
     const leadData = yield leadRes.json();
-    console.log('leadData', leadData);
 
     // yield call(fetchDemoDetailsFromPhone);
     yield put(fetchBookingStatusSuccess(''));
@@ -127,6 +126,8 @@ function* startBookingStatus() {
 function* startFetchingCoursesForLandingPage({payload}) {
   try {
     const country = payload.country;
+    console.log('country: ', country);
+
     const res = yield fetchCoursesForWelcomeScreen(country);
     const data = yield res.json();
     // console.log("got data",data)
