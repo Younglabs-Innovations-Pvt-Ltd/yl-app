@@ -19,7 +19,11 @@ import moment from 'moment';
 import {courseSelector} from '../store/course/course.selector';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {setPaymentMessage, startMakePayment} from '../store/payment/reducer';
+import {
+  makeSoloPayment,
+  setPaymentMessage,
+  startMakePayment,
+} from '../store/payment/reducer';
 import {paymentSelector} from '../store/payment/selector';
 import {MESSAGES} from '../utils/constants/messages';
 import ModalComponent from '../components/modal.component';
@@ -48,7 +52,9 @@ GoogleSignin.configure({
 
 const {width: deviceWidth} = Dimensions.get('window');
 
-const Payment = ({navigation}) => {
+const Payment = ({navigation, route}) => {
+  const {paymentBatchType} = route.params;
+
   const [email, setEmail] = useState('');
   const [emailErr, setEmailErr] = useState('');
   const [dateTime, setDateTime] = useState('');
@@ -104,7 +110,12 @@ const Payment = ({navigation}) => {
 
   useEffect(() => {
     if (currentSelectedBatch) {
-      const date = new Date(currentSelectedBatch.startDate._seconds * 1000);
+      if (currentSelectedBatch?.type === 'solo') {
+        const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
+        setDateTime(dateAndTime);
+        return;
+      }
+      const date = new Date(currentSelectedBatch?.startDate._seconds * 1000);
       const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
       setDateTime(dateAndTime);
     }
@@ -183,7 +194,6 @@ const Payment = ({navigation}) => {
       setAuthVisible(true);
       return;
     }
-
     // console.log('selected child here', selectedChild);
 
     const body = {
@@ -219,6 +229,68 @@ const Payment = ({navigation}) => {
     dispatch(startMakePayment(body));
 
     setEmailErr('');
+  };
+
+  const handleSoloBatchCheckOut = () => {
+    console.log("user is")
+    if (!email) {
+      setEmailErr('Enter your email address.');
+      return;
+    }
+
+    const currentUser = auth().currentUser;
+
+    // console.log('currentuser is', courseDetails);
+
+    if (!currentUser) {
+      setAuthVisible(true);
+      return;
+    }
+
+    const startDateTime = currentSelectedBatch?.startDate;
+
+    const body = {
+      courseType: 'solo',
+      leadId: user?.leadId,
+      ageGroup: currentAgeGroup,
+      courseId: courseDetails.courseId,
+      FCY: `${ipData?.currency?.code} ${price}`,
+      promisedStartDate: startDateTime,
+      promisedBatchFrequency: null,
+      phone: user?.phone,
+      fullName: user?.fullName || 'unknown', // TODO: this should be from user
+      batchId: null,
+      childName: selectedChildForOrder.childName,
+      email: email,
+      childAge: selectedChildForOrder.childAge,
+      timezone: user?.timezone,
+      countryCode: user?.countryCode, // TODO: this should be from user
+      source: 'app',
+      batchType: 'unhandled',
+      startDate: startDateTime,
+      price: price,
+      level:currentLevel,
+    };
+
+    if (selectedCoupon) {
+      body.offerCode = selectedCoupon.offerCode;
+    }
+
+    if (selectedReferralCode) {
+      body.offerCode = selectedReferralCode;
+    }
+
+    if (couponApplied) {
+      body.discountedPrice = amount;
+    }
+
+    if (totalCreditsUsed > 0) {
+      body.credits = totalCreditsUsed;
+    }
+
+    // console.log('body  giving is =', body);
+    console.log("i am here")
+    dispatch(makeSoloPayment({body , ipData}));
   };
 
   const handleRefferalApply = async () => {
@@ -784,7 +856,11 @@ const Payment = ({navigation}) => {
 
           <Spacer space={4} />
           <Pressable
-            onPress={handleCheckout}
+            onPress={
+              paymentBatchType && paymentBatchType === 'solo'
+                ? handleSoloBatchCheckOut
+                : handleCheckout
+            }
             style={({pressed}) => [
               styles.btnCheckout,
               {

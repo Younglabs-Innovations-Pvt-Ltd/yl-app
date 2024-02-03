@@ -152,7 +152,7 @@ const testimonials = [
 
 const MainWelcomeScreen = ({navigation}) => {
   const toast = useToast();
-  const {customer} = useSelector(authSelector);
+  const {customer ,user} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimeover, setIsTimeover] = useState(false);
@@ -165,7 +165,6 @@ const MainWelcomeScreen = ({navigation}) => {
   const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
     useSelector(state => state.appTheme);
 
-  const {user} = useSelector(authSelector);
   // console.log("user phone nym", user?.phone)
   const {selectedChild} = useSelector(welcomeScreenSelector);
 
@@ -182,38 +181,39 @@ const MainWelcomeScreen = ({navigation}) => {
     bookingTime,
   } = useSelector(joinDemoSelector);
 
+
+  // console.log("user is", customer)
+
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');
-    console.log("login details in top", loginDetails)
+    console.log('login details in top', loginDetails);
     if (!user && loginDetails) {
-    console.log('fetching user...');
-    loginDetails = JSON.parse(loginDetails);
-    console.log('got login details: ' + loginDetails.loginType);
+      console.log('fetching user...');
+      loginDetails = JSON.parse(loginDetails);
+      console.log('got login details: ' + loginDetails.loginType);
 
-    if (!loginDetails) {
-      Showtoast({
-        text: 'Failed To Load Data, please logout and login again',
-        toast,
-        type: 'danger',
-      });
-    }
+      if (!loginDetails) {
+        Showtoast({
+          text: 'Failed To Load Data, please logout and login again',
+          toast,
+          type: 'danger',
+        });
+      }
 
-    console.log('login details is', loginDetails);
-    if (loginDetails.loginType === 'whatsAppNumber') {
-      console.log('getting user by', loginDetails.phone);
-      dispatch(fetchUser({phone: loginDetails.phone}));
-    } else if (loginDetails.loginType === 'customerLogin') {
-      console.log('getting user by', loginDetails.email);
-      dispatch(fetchUser({email: loginDetails.email}));
-      dispatch(setIsCustomer(true));
-    }
+      console.log('login details is', loginDetails);
+      if (loginDetails.loginType === 'whatsAppNumber') {
+        console.log('getting user by', loginDetails.phone);
+        dispatch(fetchUser({phone: loginDetails.phone}));
+      } else if (loginDetails.loginType === 'customerLogin') {
+        console.log('getting user by', loginDetails.email);
+        dispatch(fetchUser({email: loginDetails.email}));
+        dispatch(setIsCustomer(true));
+      }
     }
   }, [user]);
 
-  
   useEffect(() => {
-  
-   console.log("running for selectedChild", selectedChild.bookingId)
+    console.log('running for selectedChild', selectedChild.bookingId);
     if (selectedChild?.bookingId) {
       dispatch(setToInitialState());
       dispatch(startFetchBookingDetailsFromId(selectedChild.bookingId));
@@ -243,24 +243,30 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    console.log("demo data here is");
+    // console.log('demo data here is');
     if (demoData && user?.phone) {
-      console.log("dispatching function")
+      console.log('dispatching function');
       dispatch(setDemoData({demoData, phone: user?.phone}));
     }
-  }, [demoData, user , isTimeover]);
+  }, [demoData, user, isTimeover]);
 
   useEffect(() => {
     if (!bookingTime) return;
     const isDemoOver =
       new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
 
-    if (isDemoOver && isAttended && teamUrl) {
+    // console.log('demoData is', bookingDetails);
+    if (
+      isDemoOver &&
+      isAttended &&
+      teamUrl &&
+      bookingDetails?.needMoreInfo !== true
+    ) {
       setShowPostActions(true);
     } else {
       setShowPostActions(false);
     }
-  }, [bookingTime, isAttended, teamUrl]);
+  }, [bookingTime, isAttended, teamUrl, bookingDetails]);
 
   useEffect(() => {
     let timer;
@@ -381,8 +387,8 @@ const MainWelcomeScreen = ({navigation}) => {
                 return <Testimonial data={item.item} />;
               }}
               showsHorizontalScrollIndicator={false}
-              ItemSeparatorComponent={()=>{
-                return<View className="p-1"></View>
+              ItemSeparatorComponent={() => {
+                return <View className="p-1"></View>;
               }}
               horizontal
             />
@@ -396,7 +402,7 @@ const MainWelcomeScreen = ({navigation}) => {
         isOpen={showAddChildView}
         onClose={() => setShowAddChildView(false)}
         Children={AddChildModule}
-        snapPoint={customer == 'yes' ? ['25%', '50%'] : ['50%', '90%']}
+        snapPoint={['25%', '50%']}
       />
 
       {/* Change Child Sheet */}
@@ -440,66 +446,8 @@ const MainWelcomeScreen = ({navigation}) => {
         }
         snapPoint={['50%', '90%']}
       />
-
-      
     </View>
   );
 };
 
 export default MainWelcomeScreen;
-
-// Extra code and recorded course code
-
-{
-  /* English Learning courses here */
-}
-{
-  /* <Spacer space={0} />
-
-        <View style={tw`gap-[0px]  w-full py-1`}>
-          <View style={tw`gap-1 pl-2 pr-3 flex-row items-center`}>
-            <Text
-              className={`w-[80%] ${courseListHeadingStyle}`}
-              style={{color: textColors?.textPrimary}}>
-              English Learning
-            </Text>
-
-            <Pressable
-              className="flex-row items-center"
-              onPress={() => {
-                navigation.navigate('AllCoursesScreen', {
-                  courses: englishLearningCourses,
-                });
-              }}>
-              <Text className="font-semibold" style={{color: COLORS.pblue}}>
-                See all
-              </Text>
-              <MIcon name="chevron-right" size={22} color={COLORS.pblue} />
-            </Pressable>
-          </View>
-
-          <FlatList
-            data={englishLearningCourses}
-            keyExtractor={item => item.name}
-            renderItem={item => {
-              return (
-                <CourseItemRender data={item.item} navigation={navigation} />
-              );
-            }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={tw`pt-1 `}
-            className="h-[auto]"
-          />
-        </View> */
-}
-
-{
-  /* <Spacer space={8} />
-        <View
-          style={[
-            tw`w-[100%] flex-row gap-2 items-center rounded-lg justify-center items-center`,
-          ]}>
-          <RecordingCourseBanner navigation={navigation} />
-        </View> */
-}

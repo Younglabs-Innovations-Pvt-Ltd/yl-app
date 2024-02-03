@@ -84,7 +84,7 @@ const Demo = ({
     }
   }, [demoData, bookingDetails]);
 
-  console.log("is Time Over=" ,isTimeover)
+  // console.log("is Time Over=" ,isTimeover)
 
   useEffect(() => {
     if (bookingDetails) {
@@ -228,7 +228,7 @@ const Demo = ({
     navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
   };
 
-  console.log('isClass Ongoing', isClassOngoing, 'Show TImer is', SHOW_TIMER);
+  // console.log('isClass Ongoing', isClassOngoing, 'Show TImer is', SHOW_TIMER);
 
   return (
     <ScrollView

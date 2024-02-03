@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../../utils/constants/colors';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -11,15 +11,35 @@ import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {FONTS} from '../../utils/constants/fonts';
 import {ScrollView} from 'react-native-gesture-handler';
+import {
+  resetCourseDetails,
+  setCurrentAgeGroup,
+  setCurrentLevel,
+  setCurrentSelectedBatch,
+  setLevelText,
+  setPrice,
+  setStrikeThroughPrice,
+} from '../../store/course/course.reducer';
+import {courseSelector} from '../../store/course/course.selector';
+import {Showtoast} from '../../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
 
-const ageGroups = ['5-7', '8-10', '11-14'];
+// const ageGroups = ['5-7', '8-10', '11-14'];
 
 GoogleSignin.configure({
   webClientId:
     '54129267828-73o9bu1af3djrmh0e9krbk59s1g47rsp.apps.googleusercontent.com',
 });
 
-const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
+const SoloBatchPayment = ({
+  courseData,
+  ipData,
+  timezone,
+  prices,
+  navigation,
+  ageGroups,
+}) => {
+  const toast = useToast();
   const {textColors, bgColor, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -38,7 +58,12 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
   const setSelectedDate = date => {
     hideDatePicker();
     setDate(date);
+    dispatch(setCurrentSelectedBatch({startDate: date, type: 'solo'}));
   };
+
+  const {price, strikeThroughPrice, currentAgeGroup} =
+    useSelector(courseSelector);
+  console.log('price in selctor', price, strikeThroughPrice);
 
   const makeAgeGroup = age => {
     return ageGroups.find(group => {
@@ -65,41 +90,49 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
     }
   }
 
+  // useEffect(() => {
+  //   dispatch(resetCourseDetails());
+  // }, []);
+
   const payNow = () => {
-    const ageGroup = makeAgeGroup(selectedChild.childAge);
-    const startDateTime = moment(date).format('YYYY-MM-DD HH:mm');
+    // const ageGroup = makeAgeGroup(selectedChild.childAge);
+    // const startDateTime = moment(date).format('YYYY-MM-DD HH:mm');
 
-    const body = {
-      courseType: 'solo',
-      leadId: selectedChild.leadId,
-      ageGroup: ageGroup,
-      courseId: courseData.id,
-      FCY: `${ipData?.currency?.code} ${selectedLevelToBuy.price}`,
-      promisedStartDate: startDateTime,
-      promisedBatchFrequency: null,
-      phone: selectedChild.phone,
-      fullName: 'shobhit', // TODO: this should be from user
-      batchId: null,
-      childName: selectedChild.childName,
-      email: 'shobhitsaini709@gmail.com',
-      childAge: selectedChild.childAge,
-      timezone,
-      countryCode: selectedChild.countryCode, // TODO: this should be from user
-      source: 'app',
-      batchType: 'unhandled',
-      startDate: startDateTime,
-      price: selectedLevelToBuy?.price,
-    };
+    if (!currentAgeGroup || currentAgeGroup === '') {
+      Showtoast({text: 'Please Select Age Group', toast, type: 'danger'});
+      return;
+    }
 
-    console.log(body);
-    dispatch(makeSoloPayment({body}));
+    if (!selectedLevelToBuy) {
+      Showtoast({text: 'Please Select a batch', toast, type: 'danger'});
+      return;
+    }
+
+    if(!date || date == ""){
+      Showtoast({text: 'Please Select Your preferrable date', toast, type: 'danger'});
+      return;
+    }
+
+    navigation.navigate('Payment', {paymentBatchType: 'solo'});
   };
 
-  console.log('selectd level to purchase', selectedLevelToBuy);
+  // console.log('selectd level to purchase', prices);
 
+  const handleBatchSelect = (levelText, level, price, strikeThroughPrice) => {
+    dispatch(setLevelText(levelText));
+    dispatch(setCurrentLevel(level));
+    dispatch(setPrice(price));
+    dispatch(setStrikeThroughPrice(strikeThroughPrice));
+  };
+
+  const handleAgeGroup = group => {
+    dispatch(setCurrentAgeGroup(group));
+  };
+
+  console.log("in solo payment")
   return (
-    <ScrollView style={{flex: 1}} className="">
-      <View>
+    <ScrollView style={{flex: 1}} className="flex-1">
+      <View className="flex-1">
         {/* <Pressable
         style={{
           padding: 12,
@@ -167,6 +200,35 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
                 Select A batch For you
               </Text>
 
+              <View className="w-full my-2 flex-row px-2 items-center justify-center">
+                <Text style={{color:textColors.textSecondary}}>Select Age Group:</Text>
+                <View className="flex-row px-3">
+                  {ageGroups?.map((group, i) => {
+                    return (
+                      <Pressable
+                        key={i}
+                        className="py-1 px-3 items-center justify-center mr-2 border rounded-full"
+                        style={
+                          currentAgeGroup === group.ageGroup
+                            ? {
+                                borderColor: textColors.textYlMain,
+                                backgroundColor: textColors.textYlMain,
+                              }
+                            : {
+                                borderColor: textColors.textSecondary,
+                                backgroundColor: bgColor,
+                              }
+                        }
+                        onPress={() => handleAgeGroup(group?.ageGroup)}>
+                        <Text style={{color: textColors.textSecondary}}>
+                          {group?.ageGroup}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+
               <View className="flex-row justify-around w-full mt-3">
                 <Pressable
                   className="p-1 border-2 rounded px-3"
@@ -176,12 +238,18 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
                         ? textColors.textYlMain
                         : textColors.textSecondary,
                   }}
-                  onPress={() =>
-                    setSelectedLevelToBuy({
-                      level: 1,
-                      price: prices?.solo?.level1?.offer,
-                    })
-                  }>
+                  onPress={() => {
+                    handleBatchSelect(
+                      'Foundation',
+                      1,
+                      prices?.solo?.level1?.offer,
+                      prices?.solo?.level1?.price,
+                    ),
+                      setSelectedLevelToBuy({
+                        level: 1,
+                        price: prices?.solo?.level1?.offer,
+                      });
+                  }}>
                   <View className=" items-center justify-center">
                     <Text
                       className="font-semibold text-base"
@@ -221,12 +289,18 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
                         ? textColors.textYlMain
                         : textColors.textSecondary,
                   }}
-                  onPress={() =>
-                    setSelectedLevelToBuy({
-                      level: 2,
-                      price: prices?.solo?.level2?.offer,
-                    })
-                  }>
+                  onPress={() => {
+                    handleBatchSelect(
+                      'Advanced',
+                      2,
+                      prices?.solo?.level2?.offer,
+                      prices?.solo?.level2?.price,
+                    ),
+                      setSelectedLevelToBuy({
+                        level: 2,
+                        price: prices?.solo?.level2?.offer,
+                      });
+                  }}>
                   <View
                     className="items-center justify-center"
                     style={{borderColor: textColors.textSecondary}}>
@@ -268,12 +342,18 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
                         ? textColors.textYlMain
                         : textColors.textSecondary,
                   }}
-                  onPress={() =>
-                    setSelectedLevelToBuy({
-                      level: 'combo',
-                      price: prices?.solo?.combo?.offer,
-                    })
-                  }>
+                  onPress={() => {
+                    handleBatchSelect(
+                      'Foundation + Advanced',
+                      3,
+                      prices?.solo?.combo?.offer,
+                      prices?.solo?.combo?.price,
+                    ),
+                      setSelectedLevelToBuy({
+                        level: 'combo',
+                        price: prices?.solo?.combo?.offer,
+                      });
+                  }}>
                   <View
                     className="items-center"
                     style={{borderColor: textColors.textSecondary}}>
@@ -325,7 +405,7 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
                         </Text>
                       ) : (
                         <Text className="w-full text-gray-400">
-                          Click to select data
+                          Click to select date
                         </Text>
                       )}
                     </View>
@@ -359,8 +439,7 @@ const SoloBatchPayment = ({courseData, ipData, timezone, prices}) => {
             <Pressable
               className="w-[95%] rounded py-2 items-center"
               style={{backgroundColor: textColors.textYlMain}}
-              onPress={payNow}
-              >
+              onPress={payNow}>
               <Text
                 className="text-white font-semibold text-base"
                 style={{fontFamily: FONTS.primaryFont}}>

@@ -58,43 +58,43 @@ export const AddChildModule = () => {
   return (
     <>
       <View className="w-full items-center flex-1">
-        {customer === 'yes' ? (
-          <>
+        {/* {customer === 'yes' ? (
+          <> */}
+        <Text
+          className="font-semibold text-center"
+          style={[FONTS.heading, {color: textColors.textSecondary}]}>
+          Add Another child
+        </Text>
+
+        <View className="w-[95%] mt-4">
+          <Input
+            setValue={setChildName}
+            placeHolder="Enter Child Name"
+            value={childName}
+            isDisabled={false}
+          />
+
+          <View className="w-full mt-1">
+            <DropdownComponent
+              data={ageArray}
+              placeHolder="Select Child Age"
+              setSelectedValue={setChildAge}
+            />
+          </View>
+
+          <TouchableOpacity
+            className="py-3 rounded-full w-full mt-3"
+            style={{backgroundColor: colorYlMain}}
+            onPress={addChild}
+            disabled={!isFieldsFilled}>
             <Text
-              className="font-semibold text-center"
-              style={[FONTS.heading , {color: textColors.textSecondary}]}>
-              Add Another child
+              className="text-center text-white text-[18px] font-semibold"
+              style={[{fontFamily: FONTS.primaryFont}]}>
+              Click to add Child
             </Text>
-
-            <View className="w-[95%] mt-4">
-              <Input
-                setValue={setChildName}
-                placeHolder="Enter Child Name"
-                value={childName}
-                isDisabled={false}
-              />
-
-              <View className="w-full mt-1">
-                <DropdownComponent
-                  data={ageArray}
-                  placeHolder="Select Child Age"
-                  setSelectedValue={setChildAge}
-                />
-              </View>
-
-              <TouchableOpacity
-                className="py-3 rounded-full w-full mt-3"
-                style={{backgroundColor: colorYlMain}}
-                onPress={addChild}
-                disabled={!isFieldsFilled}>
-                <Text
-                  className="text-center text-white text-[18px] font-semibold"
-                  style={[{fontFamily:FONTS.primaryFont}]}>
-                  Click to add Child
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </>
+          </TouchableOpacity>
+        </View>
+        {/* </>
         ) : (
           <BookDemoScreen
             navigation={''}
@@ -104,7 +104,7 @@ export const AddChildModule = () => {
             demoAvailableType={'both'}
             place={'addChildModal'}
           />
-        )}
+        )} */}
       </View>
     </>
   );

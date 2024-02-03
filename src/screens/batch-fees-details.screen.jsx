@@ -65,8 +65,12 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     state => state.appTheme,
   );
   const [selectedCourseTypeToBuy, setSelectedCourseTypeToBuy] =
-    useState('solo');
+    useState('group');
+  const [isOneToOneCourseAvailable, setIsOneToOneCourseAvailable] =
+    useState(false);
+  const [isGroupCourseAvailable, setIsGroupCourseAvailable] = useState(false);
 
+  // console.log('course Data is', courseData);
   // Save current screen name
   // useEffect(() => {
   //   const unsubscribe = navigation.addListener('focus', () => {
@@ -76,6 +80,26 @@ const BatchFeeDetails = ({navigation, courseData}) => {
 
   //   return unsubscribe;
   // }, [navigation]);
+
+  useEffect(() => {
+    if (courseData?.courseAvailable) {
+      console.log('course Available', courseData.courseAvailableType);
+      if (courseData?.courseAvailableType === 'both') {
+        setIsGroupCourseAvailable(true);
+        setIsOneToOneCourseAvailable(true);
+        setSelectedCourseTypeToBuy('group');
+      } else if (courseData?.courseAvailableType === 'solo') {
+        console.log('i am here');
+        setIsGroupCourseAvailable(false);
+        setIsOneToOneCourseAvailable(true);
+        setSelectedCourseTypeToBuy('solo');
+      } else if (courseData?.courseAvailableType === 'group') {
+        setIsGroupCourseAvailable(true);
+        setIsOneToOneCourseAvailable(false);
+        setSelectedCourseTypeToBuy('group');
+      }
+    }
+  }, [courseData]);
 
   useEffect(() => {
     dispatch(
@@ -160,68 +184,76 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     <>
       <View className="items-center">
         <View className="flex-row">
-          <Pressable onPress={() => setSelectedCourseTypeToBuy('group')}>
-            <View
-              className="border rounded py-2 px-4 items-center"
-              style={{
-                borderColor:
-                  selectedCourseTypeToBuy === 'group'
-                    ? textColors.textYlMain
-                    : textColors.textSecondary,
-                backgroundColor:
-                  selectedCourseTypeToBuy === 'group'
-                    ? textColors.textYlMain
-                    : bgColor,
-              }}>
-              <Text
-                className=""
+          {isGroupCourseAvailable && (
+            <Pressable onPress={() => setSelectedCourseTypeToBuy('group')}>
+              <View
+                className="border rounded py-2 px-4 items-center"
                 style={{
-                  color:
+                  borderColor:
                     selectedCourseTypeToBuy === 'group'
-                      ? 'white'
+                      ? textColors.textYlMain
                       : textColors.textSecondary,
+                  backgroundColor:
+                    selectedCourseTypeToBuy === 'group'
+                      ? textColors.textYlMain
+                      : bgColor,
                 }}>
-                Group Course
-              </Text>
-            </View>
-          </Pressable>
+                <Text
+                  className=""
+                  style={{
+                    color:
+                      selectedCourseTypeToBuy === 'group'
+                        ? 'white'
+                        : textColors.textSecondary,
+                  }}>
+                  Group Course
+                </Text>
+              </View>
+            </Pressable>
+          )}
 
-          <Pressable onPress={() => setSelectedCourseTypeToBuy('solo')}>
-            <View
-              className="border rounded py-2 px-4 items-center ml-2"
-              style={{
-                borderColor:
-                  selectedCourseTypeToBuy === 'solo'
-                    ? textColors.textYlMain
-                    : textColors.textSecondary,
-                backgroundColor:
-                  selectedCourseTypeToBuy === 'solo'
-                    ? textColors.textYlMain
-                    : bgColor,
-              }}>
-              <Text
-                className=""
+          {isOneToOneCourseAvailable && (
+            <Pressable onPress={() => setSelectedCourseTypeToBuy('solo')}>
+              <View
+                className="border rounded py-2 px-4 items-center ml-2"
                 style={{
-                  color:
+                  borderColor:
                     selectedCourseTypeToBuy === 'solo'
-                      ? 'white'
+                      ? textColors.textYlMain
                       : textColors.textSecondary,
+                  backgroundColor:
+                    selectedCourseTypeToBuy === 'solo'
+                      ? textColors.textYlMain
+                      : bgColor,
                 }}>
-                Solo Course
-              </Text>
-            </View>
-          </Pressable>
+                <Text
+                  className=""
+                  style={{
+                    color:
+                      selectedCourseTypeToBuy === 'solo'
+                        ? 'white'
+                        : textColors.textSecondary,
+                  }}>
+                  Solo Course
+                </Text>
+              </View>
+            </Pressable>
+          )}
         </View>
       </View>
 
+      {console.log("selectedCourseTypeToBuy" , selectedCourseTypeToBuy)}
       {selectedCourseTypeToBuy === 'solo' ? (
-        <View className="mt-7">
+        <View className="mt-7" style={{backgroundColor:bgColor}}>
           <SoloBatchPayment
             courseData={courseData}
             ipData={ipData}
             timezone={timezone}
             prices={prices?.prices}
+            navigation={navigation}
+            ageGroups={ageGroups}
           />
+          <Text>solo batch</Text>
         </View>
       ) : (
         <View style={{flex: 1}}>
@@ -240,7 +272,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
               showsVerticalScrollIndicator={false}
               style={{flex: 1}}
               contentContainerStyle={{padding: 16}}>
-              {console.log('courseData.thumbnailUrl', courseData.thumbnailUrl)}
+              {/* {console.log('courseData.thumbnailUrl', courseData.thumbnailUrl)} */}
               <View style={{paddingVertical: 16}} className="flex-1">
                 <Image
                   source={{uri: courseData.coverPicture}}
@@ -326,8 +358,8 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                   )}
                 </Pressable>
 
-                {console.log('prices are', prices)}
-                {console.log('prices are', prices)}
+                {/* {console.log('prices are', prices)}
+                {console.log('prices are', prices)} */}
                 {filteredBatches.length > 0 && (
                   <View style={{paddingTop: 8}}>
                     <Collapsible collapsed={steps.step2} duration={450}>
@@ -419,7 +451,11 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         marginTop: 20,
                       },
                     ]}
-                    onPress={() => navigation.navigate(SCREEN_NAMES.PAYMENT)}>
+                    onPress={() =>
+                      navigation.navigate(SCREEN_NAMES.PAYMENT, {
+                        paymentBatchType: 'group',
+                      })
+                    }>
                     <TextWrapper fs={18} fw="700" color={COLORS.white}>
                       Pay and Enroll
                     </TextWrapper>
