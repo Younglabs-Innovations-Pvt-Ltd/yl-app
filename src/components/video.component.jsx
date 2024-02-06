@@ -41,12 +41,16 @@ const VideoPlayer = ({
   const onOpen = async () => {
     try {
       const result = await isFileExists(uri);
+
       if (result.isExists) {
         currentVideo.current = result.filePath;
       } else {
         currentVideo.current = uri;
       }
+
       setVisible(true);
+
+      !result.isExists && checkForLocal(currentVideo.current);
     } catch (error) {
       currentVideo.current = uri;
       console.log(error);
@@ -65,13 +69,13 @@ const VideoPlayer = ({
     setVisible(false);
   };
 
-  useEffect(() => {
-    if (uri) {
-      checkForLocal();
-    }
-  }, [uri]);
+  // useEffect(() => {
+  //   if (uri) {
+  //     checkForLocal();
+  //   }
+  // }, [uri]);
 
-  const checkForLocal = async () => {
+  const checkForLocal = async uri => {
     try {
       const result = await isFileExists(uri);
       if (!result.isExists) {
@@ -96,9 +100,6 @@ const VideoPlayer = ({
     }
   };
 
-  // console.log('localUri', localUri);
-  // console.log('currentUri', currentVideo.current);
-
   const onLoadStart = () => {
     setLoading(true);
   };
@@ -112,8 +113,8 @@ const VideoPlayer = ({
       <Pressable
         style={[styles.container, {width: width, aspectRatio}]}
         onPress={onOpen}
-        disabled={!loadedVideo}>
-        {!loadedVideo ? (
+        disabled={!poster}>
+        {/* {!loadedVideo ? (
           <View
             style={{
               position: 'absolute',
@@ -129,7 +130,12 @@ const VideoPlayer = ({
             resizeMode="cover"
             style={{width: '100%', height: '100%'}}
           />
-        )}
+        )} */}
+        <Image
+          source={{uri: poster}}
+          resizeMode="cover"
+          style={{width: '100%', height: '100%'}}
+        />
         {thumbnailText && (
           <View style={styles.poster}>
             <View
