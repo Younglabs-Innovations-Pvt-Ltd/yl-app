@@ -148,7 +148,7 @@ const Demo = ({
   // If there is no child name in booking details
   // then show input field for childname
   // otherwise show text
-  
+
   const IS_CHILD_NAME = useMemo(() => {
     return !cn ? (
       <>
@@ -242,22 +242,6 @@ const Demo = ({
       {isClassOngoing && (
         <View style={{paddingHorizontal: 16, paddingTop: 12}}>
           {IS_CHILD_NAME}
-          {/* <Pressable
-            style={styles.btnClass}
-            onPress={handleJoinClass}
-            disabled={joinClassLoading}>
-            <TextWrapper fs={18} color="#434a52">
-              Enter class
-            </TextWrapper>
-            {joinClassLoading && (
-              <ActivityIndicator
-                size={'small'}
-                color={COLORS.black}
-                style={{marginLeft: 4}}
-              />
-            )}
-          </Pressable> */}
-
           <View className="w-full p-1 px-3">
             <Text className="text-white font-semibold text-base ml-3 ">
               Your free handwriting class is going on
