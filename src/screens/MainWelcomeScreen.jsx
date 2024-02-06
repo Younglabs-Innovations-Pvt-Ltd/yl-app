@@ -1,5 +1,5 @@
 import {View, Text, Dimensions} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {Children, useEffect, useState} from 'react';
 import tw from 'twrnc';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import Spacer from '../components/spacer.component';
@@ -29,8 +29,11 @@ import {localStorage} from '../utils/storage/storage-provider';
 import {useToast} from 'react-native-toast-notifications';
 import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
 import auth from '@react-native-firebase/auth';
-import { startFetchBookingDetailsByName } from '../store/user/reducer';
-import { userSelector } from '../store/user/selector';
+import {
+  setIsFirstTimeUser,
+  startFetchBookingDetailsByName,
+} from '../store/user/reducer';
+import {userSelector} from '../store/user/selector';
 
 const {width, height} = Dimensions.get('window');
 
@@ -96,15 +99,15 @@ const MainWelcomeScreen = ({navigation}) => {
   const [showBookFreeClassSheet, setShowBookFreeClassSheet] = useState(false);
   const [showRescheduleClassSheet, setShowRescheduleClassSheet] =
     useState(false);
-    // console.log("user children is", user)
+  // console.log("user children is", user)
 
   const {bgColor, textColors, colorYlMain} = useSelector(
     state => state.appTheme,
   );
-  const {currentChild} = useSelector(userSelector)
+  const {currentChild, children} = useSelector(userSelector);
 
-  // console.log('user is customer', customer);
-  // console.log("user phone nym", user?.phone)
+  console.log('children are ', children);
+
   const {selectedChild} = useSelector(welcomeScreenSelector);
 
   const dispatch = useDispatch();
@@ -124,6 +127,7 @@ const MainWelcomeScreen = ({navigation}) => {
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');
     if (!user && loginDetails) {
+      // console.log("gettin user details")
       dispatch(fetchUserFormLoginDetails());
     }
   }, [user]);
@@ -148,9 +152,13 @@ const MainWelcomeScreen = ({navigation}) => {
   useEffect(() => {
     // console.log('running for selectedChild', selectedChild.bookingId);
     if (currentChild) {
-      dispatch(setToInitialState());
-      // dispatch(startFetchBookingDetailsFromId(selectedChild?.bookingId));
-      dispatch(startFetchBookingDetailsByName({childName :currentChild?.name}))
+      if (currentChild?.bookingId) {
+        dispatch(setToInitialState());
+        dispatch(startFetchBookingDetailsFromId(currentChild?.bookingId));
+      } else {
+        dispatch(setIsFirstTimeUser(true));
+      }
+      // dispatch(startFetchBookingDetailsByName({childName :currentChild?.name}))
     } else if (user?.phone) {
       dispatch(startFetchBookingDetailsFromPhone(user.phone));
     }
@@ -187,7 +195,6 @@ const MainWelcomeScreen = ({navigation}) => {
     if (!bookingTime) return;
     const isDemoOver =
       new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
-
     // console.log('demoData is', bookingDetails);
     if (
       isDemoOver &&
