@@ -12,12 +12,13 @@ const INITIAL_STATE = {
   allBookingsLoding: false,
   allBookingsLoadingFailed: false,
   userBookings: null,
-  userOrders:{},
+  userOrders: null,
   userOrdersLoading: false,
   userOrderLoadingFailed: false,
   userOrderLoadingFailedReason: '',
-  selectedUserOrder:{},
-  isFirstTimeUser:false,
+  selectedUserOrder: {},
+  currentUserOrders: null,
+  isFirstTimeUser: false,
 };
 
 const reducer = {
@@ -49,7 +50,7 @@ const reducer = {
 
   getCoursesForWelcomeScreen(state, action) {
     // console.log('payload in reducer', action.payload);
-    console.log("getting courses in reducer")
+    console.log('getting courses in reducer');
     state.coursesLoading = true;
     state.coursesLoadingFailed = false;
   },
@@ -86,7 +87,7 @@ const reducer = {
   },
   // User order ops
   startFetchingUserOrders(state) {
-    console.log("fethching user orders reducer")
+    console.log('fethching user orders reducer');
     state.userOrdersLoading = true;
     state.userOrderLoadingFailed = false;
     state.userOrderLoadingFailedReason = '';
@@ -102,11 +103,14 @@ const reducer = {
   },
 
   // For selected user Order
-  setSelectedUserOrder(state,action){
+  setSelectedUserOrder(state, action) {
     state.selectedUserOrder = action.payload;
   },
-  setIsFirstTimeUser(state,action){
+  setIsFirstTimeUser(state, action) {
     state.isFirstTimeUser = action.payload;
+  },
+  setCurrentUserOrders(state, action) {
+    state.currentUserOrders = action.payload;
   }
 };
 
@@ -137,7 +141,10 @@ export const {
   userOrderFetchingSuccess,
   userOrdersLoadingFailed,
   setSelectedUserOrder,
-  setIsFirstTimeUser
+  setIsFirstTimeUser,
+  getUserOrdersByName,
+  getUserOrdersByNameSuccess,
+  setCurrentUserOrders
 } = slice.actions;
 
 export const welcomeScreenReducer = slice.reducer;

@@ -50,6 +50,9 @@ const CourseDetails = ({navigation, courseData}) => {
   const dispatch = useDispatch();
   const {textColors, bgColor} = useSelector(state => state.appTheme);
 
+  const [filteredLevels, setFilteredLevels] = useState([]);
+  const [selectedLevelItemToShow, setSelectedLevelItemToShow] = useState(null);
+
   // console.log("CourseID here in this page", courseId)
 
   const {courseDetails, ageGroups, courseVideos, loading} =
@@ -74,14 +77,18 @@ const CourseDetails = ({navigation, courseData}) => {
     }
   }, [courseVideos]);
 
+  const getCurricumumLevelName = level => {
+    // console.log(' curriculum=', level);
+  };
   useEffect(() => {
     let arr = [];
     ageGroups?.map(ageGroupItem => {
       let ageGrp = ageGroupItem.ageGroup;
+      console.log('ageGroup is', ageGrp);
       let objArray = ageGroupItem?.levels?.map(level => {
         let obj = {
           heading:
-            courseDetails.definedCourseType === 'definedClasses'
+            courseDetails.course_type === 'curriculum'
               ? level?.altName || getLevelName(level?.level)
               : getLevelName(level?.level),
           level: level?.level,
@@ -169,20 +176,27 @@ const CourseDetails = ({navigation, courseData}) => {
     }
   }, [courseLevel, filteredCourse]);
 
+  useEffect(() => {
+    console.log('changing for ', ageGroup);
+    const filtered = aboutCourseArr?.filter(item => {
+      return item?.ageGroup == ageGroup;
+    });
+
+    setFilteredLevels(filtered);
+  }, [ageGroup, aboutCourseArr]);
+
+  useEffect(() => {
+    if (filteredLevels) {
+      setSelectedLevelItemToShow(filteredLevels[0]?.objArray[0] || []);
+    }
+  }, [filteredLevels]);
+
   return (
     <View style={[styles.container, {backgroundColor: bgColor}]}>
       <ScrollView
         style={{flex: 1}}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingBottom: 30}}>
-        {/* <TextWrapper
-          fs={22}
-          color={textColors.textSecondary}
-          // fw="600"
-          styles={[FONTS.subHeading , {textAlign: 'center'}]}>
-          More about course
-        </TextWrapper> */}
-
         <Text
           className="font-semibold w-full text-center"
           style={[FONTS.heading, {color: textColors.textSecondary}]}>
@@ -209,7 +223,6 @@ const CourseDetails = ({navigation, courseData}) => {
                 Choose Age Group
               </Text>
               <View style={{alignItems: 'center'}}>
-                {/* <TextWrapper fs={17}>Age group</TextWrapper> */}
                 <Spacer space={8} />
                 <View style={{flexDirection: 'row', gap: 12}}>
                   {AGE_GROUPS.map(group => (
@@ -238,6 +251,7 @@ const CourseDetails = ({navigation, courseData}) => {
                 </View>
                 <Spacer space={3} />
                 <View
+                  className="mt-1"
                   style={{
                     flexDirection: 'row',
                     flexWrap: 'wrap',
@@ -245,23 +259,48 @@ const CourseDetails = ({navigation, courseData}) => {
                     alignItems: 'center',
                     gap: 5,
                   }}>
-                  {levels.map(level => (
-                    <CourseLevels
-                      key={level}
-                      level={level}
-                      courseLevel={courseLevel}
-                      setCourseLevel={setCourseLevel}
-                    />
-                  ))}
+                  {filteredLevels.map((item, i) => {
+                    return item?.objArray?.map((item, index) => {
+                      return (
+                        <Pressable
+                          key={index}
+                          className="py-1 px-3 border rounded-full"
+                          style={
+                            selectedLevelItemToShow?.heading === item?.heading
+                              ? {
+                                  borderColor: COLORS.pblue,
+                                  backgroundColor: COLORS.pblue,
+                                }
+                              : {
+                                  borderColor: COLORS.pblue,
+                                }
+                          }
+                          onPress={() => setSelectedLevelItemToShow(item)}>
+                          <Text
+                            className="font-semibold "
+                            style={{
+                              color:
+                                selectedLevelItemToShow?.heading ===
+                                item?.heading
+                                  ? 'white'
+                                  : textColors.textYlMain,
+                            }}>
+                            {item?.heading}
+                          </Text>
+                        </Pressable>
+                      );
+                    });
+                  })}
                 </View>
               </View>
             </View>
-            <Spacer />
 
+            {/* <Spacer /> */}
             <View>
-              {selectedCourse?.content?.map((course, index) => (
-                <CourseContent course={course} key={index} />
-              ))}
+              {/* {console.log('selected level ', selectedLevelItemToShow)} */}
+              {selectedLevelItemToShow && (
+                <CourseContent content={selectedLevelItemToShow?.content} />
+              )}
             </View>
           </>
         )}
@@ -317,34 +356,46 @@ const CourseLevels = ({courseLevel, level, setCourseLevel}) => {
   );
 };
 
-const CourseContent = ({course}) => {
+const CourseContent = ({content}) => {
   const {textColors} = useSelector(state => state.appTheme);
   return (
-    <View style={{paddingVertical: 1}}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 4,
-        }}>
-        <MIcon name="bullseye-arrow" size={28} color={textColors.textYlMain} />
-        <Text
-          className="font-semibold"
-          style={[FONTS.subHeading, {color: textColors.textYlMain}]}>
-          {course?.subHeading}
-        </Text>
-      </View>
-      <View style={{paddingHorizontal: 8, width: '100%'}} className="mt-1">
-        {course?.points.map((point, index) => (
-          <View key={index.toString()}>
-            <Text
-              className="font-semibold"
-              style={[FONTS.primary, {color: textColors.textSecondary}]}>
-              {point}
-            </Text>
+    <View>
+      {content?.map((item, index) => {
+        return (
+          <View style={{paddingVertical: 1}} key={index}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+              }}>
+              <MIcon
+                name="bullseye-arrow"
+                size={28}
+                color={textColors.textYlMain}
+              />
+              <Text
+                className="font-semibold"
+                style={[FONTS.subHeading, {color: textColors.textYlMain}]}>
+                {item?.subHeading}
+              </Text>
+            </View>
+            <View
+              style={{paddingHorizontal: 8, width: '100%'}}
+              className="mt-1">
+              {item?.points.map((point, index) => (
+                <View key={index.toString()}>
+                  <Text
+                    className="font-semibold"
+                    style={[FONTS.primary, {color: textColors.textSecondary}]}>
+                    {point}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
-        ))}
-      </View>
+        );
+      })}
     </View>
   );
 };

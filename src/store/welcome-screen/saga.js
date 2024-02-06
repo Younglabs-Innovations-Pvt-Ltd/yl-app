@@ -212,41 +212,39 @@ function* fetchAllBookingsWithPhone() {
 // fetching user's all orders
 function* fetchAllOrders({payload}) {
   try {
-    console.log('getting payload in');
     const response = yield fetchAllOrdersFromLeadId(payload);
     // console.log('got response', response, ' got status', response.status);
+    console.log('got response', response.status);
     if (response.status !== 200) {
       yield put(userOrdersLoadingFailed('Something went Wrong'));
       return;
     }
 
     const data = yield response.json();
-    // console.log('got data', data);
-
-    // console.log('get courses', data, response.status);
 
     if (data?.orderData) {
-      console.log('in if condition');
-      const formattedOrders = {};
-      data?.orderData?.forEach(obj => {
-        const {childName} = obj;
-
-        if (!formattedOrders[childName]) {
-          formattedOrders[childName] = [];
-        }
-        formattedOrders[childName].push(obj);
-      });
-      const initialKey = Object.keys(formattedOrders)[0];
-      const initialValue = Object.values(formattedOrders)[0];
-      console.log(
-        'initial key: ' + initialKey,
-        ' initial value: ' + initialValue,
-      );
-      yield put(setSelectedUserOrder({[initialKey]: initialValue}));
-      yield put(userOrderFetchingSuccess(formattedOrders));
+      yield put(userOrderFetchingSuccess(data?.orderData));
     } else {
-      console.log('not data in order');
+      yield put(userOrderFetchingSuccess([]));
     }
+    // console.log('get courses', data, response.status);
+
+    // if (data?.orderData) {
+    //   const formattedOrders = {};
+    //   data?.orderData?.forEach(obj => {
+    //     const {childName} = obj;
+    //     if (!formattedOrders[childName]) {
+    //       formattedOrders[childName] = [];
+    //     }
+    //     formattedOrders[childName].push(obj);
+    //   });
+    //   const initialKey = Object.keys(formattedOrders)[0];
+    //   const initialValue = Object.values(formattedOrders)[0];
+    //   yield put(setSelectedUserOrder({[initialKey]: initialValue}));
+    //   yield put(userOrderFetchingSuccess(formattedOrders));
+    // } else {
+    //   console.log('not data in order');
+    // }
   } catch (error) {
     console.log('fetch_all_order_err', error.message);
     yield put(userOrdersLoadingFailed('Something went Wrong'));

@@ -19,6 +19,8 @@ const ReviewsAndTestimonials = () => {
     dispatch(fetchContentDataStart());
   }, []);
 
+  // console.log("Content Data is" , contentData)
+
   return (
     <View className="w-full">
       {/* Video slider */}

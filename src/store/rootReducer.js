@@ -11,6 +11,7 @@ import {paymentReducer} from './payment/reducer';
 import {uploadReducer} from './upload-handwriting/reducer';
 import {contentReducer} from './content/reducer';
 import { appThemeReducer } from './app-theme/appThemeReducer';
+import { userReducer } from './user/reducer';
 
 const reducer = combineReducers({
   joinDemo: joinDemoReducer,
@@ -23,7 +24,8 @@ const reducer = combineReducers({
   payment: paymentReducer,
   upload: uploadReducer,
   content: contentReducer,
-  appTheme: appThemeReducer
+  appTheme: appThemeReducer,
+  user:userReducer
 });
 
 export const rootReducer = (state, action) => {

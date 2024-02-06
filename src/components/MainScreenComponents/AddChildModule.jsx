@@ -1,12 +1,16 @@
-import {View, Text} from 'react-native';
+import {View, Text, Pressable, ActivityIndicator} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Input from '../CustomInputComponent';
 import DropdownComponent from '../DropdownComponent';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import BookDemoScreen from '../../screens/book-demo-form.screen';
 import {authSelector} from '../../store/auth/selector';
 import {FONTS} from '../../utils/constants/fonts';
+import {startAddingChild} from '../../store/user/reducer';
+import {userSelector} from '../../store/user/selector';
+import {Showtoast} from '../../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
 
 export const AddChildModule = () => {
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
@@ -14,8 +18,12 @@ export const AddChildModule = () => {
   const [childName, setChildName] = useState(null);
   const [childAge, setChildAge] = useState(null);
   const [isFieldsFilled, setIsFieldsFilled] = useState(false);
+  const {customer, user} = useSelector(authSelector);
 
-  const {customer} = useSelector(authSelector);
+  const {childAddLoading} = useSelector(userSelector);
+
+  const dispatch = useDispatch();
+  const toast = useToast();
 
   const ageArray = [
     {label: '5', value: 5},
@@ -31,29 +39,26 @@ export const AddChildModule = () => {
   ];
 
   const addChild = () => {
-    let body = {
-      name: childName,
-      age: childAge,
-    };
-
-    console.log('isFiled filled', isFieldsFilled);
-    console.log('body is', body);
-  };
-
-  useEffect(() => {
-    console.log('runn');
-
     if (childName == null || childName?.length < 2) {
-      setIsFieldsFilled(false);
-      return;
-    } else if (childAge === null || !childAge) {
-      setIsFieldsFilled(false);
-      return;
-    } else {
-      setIsFieldsFilled(true);
+      Showtoast({text: 'Enter valid Child name', toast, type: 'danger'});
       return;
     }
-  }, [childAge, childName]);
+    if (childAge === null || !childAge) {
+      Showtoast({text: 'Select Child Age', toast, type: 'danger'});
+      return;
+    }
+    
+    let body = {
+      childName,
+      childAge,
+      leadId: user?.leadId,
+    };
+
+    console.log('adding child');
+    dispatch(startAddingChild(body));
+    // console.log('isFiled filled', isFieldsFilled);
+    // console.log('body is', body);
+  };
 
   return (
     <>
@@ -82,17 +87,24 @@ export const AddChildModule = () => {
             />
           </View>
 
-          <TouchableOpacity
-            className="py-3 rounded-full w-full mt-3"
+          <Pressable
+            className="py-3 rounded-full w-full mt-3 flex-row"
             style={{backgroundColor: colorYlMain}}
             onPress={addChild}
-            disabled={!isFieldsFilled}>
+            disabled={childAddLoading}>
             <Text
-              className="text-center text-white text-[18px] font-semibold"
+              className="text-center text-white text-[18px] font-semibold w-full"
               style={[{fontFamily: FONTS.primaryFont}]}>
               Click to add Child
             </Text>
-          </TouchableOpacity>
+            {childAddLoading && (
+              <ActivityIndicator
+                size={'small'}
+                color={'white'}
+                className="ml-1"
+              />
+            )}
+          </Pressable>
         </View>
         {/* </>
         ) : (

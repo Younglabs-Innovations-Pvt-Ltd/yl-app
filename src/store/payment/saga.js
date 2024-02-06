@@ -94,7 +94,7 @@ function* payOnTazapay({body, ipData}) {
       },
       body: JSON.stringify({
         bagDetails: {...body},
-        leadId: body.leadId,
+        leadId: body?.leadId,
       }),
     });
     console.log('got response');
@@ -186,7 +186,7 @@ function* makePaymentSaga({payload}) {
     // console.log("selected Batch is" , selectBatch)
     const body = {
       courseType: selectBatch?.groupType,
-      leadId: bookingDetails.leadId,
+      leadId: bookingDetails?.leadId,
       ageGroup: selectBatch?.ageGroup,
       courseId: selectBatch?.courseId,
       FCY: `${ipData?.currency?.code} ${selectBatch?.price}`,
@@ -259,7 +259,7 @@ function* makePaymentSaga({payload}) {
       },
       body: JSON.stringify({
         bagDetails: {...body, rpOrderId: order_id, type: 'order'},
-        leadId: body.leadId,
+        leadId: body?.leadId,
       }),
     });
 
@@ -368,7 +368,7 @@ function* makeSoloPaymentSaga({payload}) {
       },
       body: JSON.stringify({
         bagDetails: {...body, rpOrderId: order_id, type: 'order'},
-        leadId: body.leadId,
+        leadId: body?.leadId,
       }),
     });
 

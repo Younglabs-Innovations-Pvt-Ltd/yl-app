@@ -33,6 +33,7 @@ import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
 import {TextInput} from 'react-native-gesture-handler';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
+import {userSelector} from '../store/user/selector';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
@@ -65,8 +66,7 @@ const Demo = ({
     joinClassErrorMsg,
   } = useSelector(joinDemoSelector);
 
-  const {isFirstTimeUser} = useSelector(welcomeScreenSelector);
-
+  const {isFirstTimeUser} = useSelector(userSelector);
   /**
    * @author Shobhit
    * @since 07/08/2023
@@ -148,6 +148,7 @@ const Demo = ({
   // If there is no child name in booking details
   // then show input field for childname
   // otherwise show text
+  
   const IS_CHILD_NAME = useMemo(() => {
     return !cn ? (
       <>

@@ -38,6 +38,10 @@ import {useToast} from 'react-native-toast-notifications';
 import {FONTS} from '../utils/constants/fonts';
 import {authSelector} from '../store/auth/selector';
 import {startGetAllBookings} from '../store/welcome-screen/reducer';
+import ModalComponent from '../components/modal.component';
+import {Button} from 'react-native-share';
+import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
+import {userSelector} from '../store/user/selector';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -61,13 +65,7 @@ const bookingSteps = [
   },
 ];
 
-const BookDemoScreen = ({
-  data,
-  navigation,
-  courseId,
-  setSelectedTab,
-  place,
-}) => {
+const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
   const toast = useToast();
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
@@ -76,6 +74,7 @@ const BookDemoScreen = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [isCurrentStepDataFilled, setIsCurrentStepDataFilled] = useState(false);
   const [selectedDemoType, setSelectedDemoType] = useState('solo');
+  const [showAddChildView, setShowAddChildView] = useState(false);
   const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
     state => state.appTheme,
   );
@@ -97,11 +96,20 @@ const BookDemoScreen = ({
   // console.log("ChildData is", childData)
   const dispatch = useDispatch();
 
+  // useEffect(() => {
+  //   if (user?.fullName && fields) {
+  //     console.log('setting');
+  //     setFields(preVal => ({...preVal, parentName: user?.fullName}));
+  //   }
+  // }, [user]);
+
   useEffect(() => {
     if (!ipData) {
       dispatch(startFetchingIpData());
     }
   }, [ipData]);
+
+  // console.log('fields are', fields);
 
   // useEffect(() => {
   //   if (fields.childName && fields.parentName) {
@@ -197,13 +205,8 @@ const BookDemoScreen = ({
   ];
 
   const checkFirstStepData = () => {
-    console.log(
-      'childName: ' + fields.childName,
-      'parentname',
-      fields.parentName,
-      ' childAge',
-      childAge,
-    );
+    console.log('Child data', fields, childAge);
+
     if (!fields?.childName?.length || fields?.childName?.length < 3) {
       Showtoast({text: 'Enter Valid Child name', toast});
       return false;
@@ -279,16 +282,9 @@ const BookDemoScreen = ({
       console.log('Changing 1');
       setCurrentStep(2);
     }
-    if (!childData) {
-      setFields({
-        parentName: '',
-        childName: '',
-      });
-      setChildAge(null);
-    }
     if (bookingCreatedSuccessfully) {
       Showtoast({text: 'Booking Created Successfully', toast, type: 'success'});
-      dispatch(startGetAllBookings(user?.phone));
+      // dispatch(startGetAllBookings(user?.phone));
       setCurrentStep(3);
     }
   }, [childData, bookingCreatedSuccessfully]);
@@ -505,6 +501,8 @@ const BookDemoScreen = ({
               fields={fields}
               handleChangeValue={handleChangeValue}
               handleChildAge={handleChildAge}
+              setFields={setFields}
+              setShowAddChildView={setShowAddChildView}
             />
           ) : currentStep === 2 ? (
             selectedDemoType === 'solo' ? (
@@ -571,6 +569,20 @@ const BookDemoScreen = ({
           </View>
         )}
       </View>
+
+      <ModalComponent
+        visible={showAddChildView}
+        onRequestClose={() => setShowAddChildView(false)}
+        animationType="fade"
+        duration={10}>
+        <View
+          className="bg-[#1312125c] relative z-50"
+          style={{height: height + 15, width}}>
+          <View className="flex-1 absolute bottom-0 pb-10 w-full bg-white p-3 rounded h-[450px]">
+            <AddChildModule />
+          </View>
+        </View>
+      </ModalComponent>
     </View>
   );
 };
@@ -582,10 +594,27 @@ const FirstStepDetails = ({
   phone,
   handleChangeValue,
   handleChildAge,
+  setFields,
+  setShowAddChildView,
 }) => {
   const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
     state => state.appTheme,
   );
+  const {user} = useSelector(authSelector);
+  const {children} = useSelector(userSelector);
+  const [childList, setChildList] = useState([]);
+
+  useEffect(() => {
+    if (children?.length > 0) {
+      let arr = [];
+      children.forEach(element => {
+        arr.push({label: element.name, value: element});
+      });
+      setChildList(arr);
+    } else {
+      setChildList([{label: 'No Child added. Add One', value: 'addChild'}]);
+    }
+  }, [children]);
 
   const ageArray = [
     {label: '5', value: 5},
@@ -600,111 +629,24 @@ const FirstStepDetails = ({
     {label: '14', value: 14},
   ];
 
+  const handleSelectChild = child => {
+    if (!child) {
+      return;
+    }
+    if (child === 'addChild') {
+      setShowAddChildView(true);
+      return;
+    }
+    const {name, age} = child;
+    // const parentName = user?.fullName || 'unknown';
+    console.log(name, age);
+
+    setFields(pre => ({...pre, childName: name}));
+    handleChildAge(age);
+  };
+
   return (
     <>
-      {/* <View className="w-full p-2">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Your Phone number
-          </Text>
-        </View>
-        <Text
-          placeholder="Phone Number"
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textSecondary,
-          }}>
-          {`${country.callingCode} ${phone}`}
-        </Text>
-        {/* <TextInput placeholder="Phone Number" value={} className="border-b p-1 mt-1" style={{borderColor:textColors.textSecondary}}/> */}
-      {/* </View> */}
-
-      {/* <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Parent Name
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textPrimary,
-          }}
-          value={fields.parentName}
-          onChangeText={e => handleChangeValue({name: 'parentName', value: e})}
-        />
-      </View>
-
-      <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Child Name
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textPrimary,
-          }}
-          value={fields.childName}
-          onChangeText={e => handleChangeValue({name: 'childName', value: e})}
-        />
-      </View>
-
-      <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Select Child Age
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{borderColor: textColors.textSecondary}}
-        />
-      </View> */}
-
       <View className="relative w-[100%] border border-gray-400 mt-4 rounded-[10px] py-3 flex-row justify-between px-2 items-center">
         <Text
           className="absolute py-1 px-1 -top-4 left-5"
@@ -722,8 +664,15 @@ const FirstStepDetails = ({
       </View>
 
       <View className="my-1"></View>
+      {childList && (
+        <DropdownComponent
+          data={childList}
+          placeHolder="Select Child"
+          setSelectedValue={handleSelectChild}
+        />
+      )}
 
-      <Input
+      {/* <Input
         placeHolder="Enter Your Child Name"
         setValue={e => {
           handleChangeValue({name: 'childName', value: e});
@@ -731,6 +680,7 @@ const FirstStepDetails = ({
         value={fields.childName}
       />
       <View className="my-1"></View>
+    */}
 
       <Input
         placeHolder="Enter Parent Name"
@@ -740,11 +690,11 @@ const FirstStepDetails = ({
         value={fields.parentName}
       />
 
-      <DropdownComponent
+      {/* <DropdownComponent
         data={ageArray}
         placeHolder="Select Child Age"
         setSelectedValue={handleChildAge}
-      />
+      /> */}
     </>
   );
 };
@@ -875,6 +825,115 @@ const styles = StyleSheet.create({
 });
 
 // <KeyboardAvoidingView>
+
+{
+  /* <View className="w-full p-2">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Your Phone number
+          </Text>
+        </View>
+        <Text
+          placeholder="Phone Number"
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{
+            borderColor: textColors.textSecondary,
+            color: textColors.textSecondary,
+          }}>
+          {`${country.callingCode} ${phone}`}
+        </Text>
+        {/* <TextInput placeholder="Phone Number" value={} className="border-b p-1 mt-1" style={{borderColor:textColors.textSecondary}}/> */
+}
+{
+  /* </View> */
+}
+
+{
+  /* <View className="w-full p-2 mt-4">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Parent Name
+          </Text>
+        </View>
+        <TextInput
+          placeholder=""
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{
+            borderColor: textColors.textSecondary,
+            color: textColors.textPrimary,
+          }}
+          value={fields.parentName}
+          onChangeText={e => handleChangeValue({name: 'parentName', value: e})}
+        />
+      </View>
+
+      <View className="w-full p-2 mt-4">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Child Name
+          </Text>
+        </View>
+        <TextInput
+          placeholder=""
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{
+            borderColor: textColors.textSecondary,
+            color: textColors.textPrimary,
+          }}
+          value={fields.childName}
+          onChangeText={e => handleChangeValue({name: 'childName', value: e})}
+        />
+      </View>
+
+      <View className="w-full p-2 mt-4">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Select Child Age
+          </Text>
+        </View>
+        <TextInput
+          placeholder=""
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{borderColor: textColors.textSecondary}}
+        />
+      </View> */
+}
 
 {
   /* <ScrollView

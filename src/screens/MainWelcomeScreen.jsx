@@ -1,27 +1,10 @@
-import {
-  View,
-  Text,
-  Dimensions,
-  ImageBackground,
-  Pressable,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Text, Dimensions} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import tw from 'twrnc';
-import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import Spacer from '../components/spacer.component';
-import MainSwiper from '../components/MainScreenComponents/MainSwiper';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
-import {COLORS} from '../utils/constants/colors';
-import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
-import {setDarkMode} from '../store/app-theme/appThemeReducer';
-import Animated, {
-  useSharedValue,
-  withSpring,
-  withDelay,
-} from 'react-native-reanimated';
 import HeaderComponent, {ChangeAddedChild} from '../components/HeaderComponent';
 import {
   setDemoData,
@@ -31,19 +14,9 @@ import {
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import Demo from '../components/demo.component';
-import TapeTimer from '../components/TapeTimer';
-import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
-import {
-  getCoursesForWelcomeScreen,
-  setSelectedChild,
-} from '../store/welcome-screen/reducer';
-import {Button} from 'react-native-share';
-import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
-import RecordingCourseBanner from '../components/MainScreenComponents/RecordingCourseBanner';
 import SwiperSlide from '../components/MainScreenComponents/SwiperSlide';
 import {authSelector} from '../store/auth/selector';
 import Testimonial from '../components/MainScreenComponents/Testimonial';
@@ -51,53 +24,15 @@ import {FONTS} from '../utils/constants/fonts';
 import BookDemoScreen from './book-demo-form.screen';
 import ShowCourses from '../components/MainScreenComponents/ShowCourses';
 import ReviewsAndTestimonials from '../components/MainScreenComponents/ReviewsAndTestimonials';
-import {fetchUser, setIsCustomer} from '../store/auth/reducer';
+import {fetchUser, fetchUserFormLoginDetails} from '../store/auth/reducer';
 import {localStorage} from '../utils/storage/storage-provider';
-import {LOCAL_KEYS} from '../utils/storage/local-storage-keys';
-import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
+import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
+import auth from '@react-native-firebase/auth';
+import { startFetchBookingDetailsByName } from '../store/user/reducer';
+import { userSelector } from '../store/user/selector';
 
 const {width, height} = Dimensions.get('window');
-
-const handwritingCourses = [
-  {
-    name: 'English Cursive',
-    courseId: 'Eng_Hw',
-    icon: 'alpha-e',
-    showBookDemoScreen: true,
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
-  },
-  {
-    name: 'English Print',
-    icon: 'pinterest',
-    courseId: 'English_PrintHW',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEnglish_PrintHW%2FthimbnailUrl.webp?alt=media&token=b81a6eb1-e4bf-4e0c-af96-4659c0106422',
-  },
-  {
-    name: 'Hindi Handwriting',
-    icon: 'abugida-devanagari',
-    courseId: 'Maths_Learning',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/course%20cover%20pictures%2Freading.webp?alt=media&token=34617f04-1c15-4bff-a75e-8a6668ad373a',
-  },
-  {
-    name: 'English Cursive2',
-    icon: 'abjad-arabic',
-    courseId: 'Science_Learning',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2Ftuition_homework%2FthimbnailUrl.png?alt=media&token=19d07140-4a86-4671-88c2-c50003868795',
-  },
-];
 
 const sectionHeadingStyle = '';
 
@@ -152,7 +87,7 @@ const testimonials = [
 
 const MainWelcomeScreen = ({navigation}) => {
   const toast = useToast();
-  const {customer ,user} = useSelector(authSelector);
+  const {customer, user} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimeover, setIsTimeover] = useState(false);
@@ -161,10 +96,14 @@ const MainWelcomeScreen = ({navigation}) => {
   const [showBookFreeClassSheet, setShowBookFreeClassSheet] = useState(false);
   const [showRescheduleClassSheet, setShowRescheduleClassSheet] =
     useState(false);
+    // console.log("user children is", user)
 
-  const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
-    useSelector(state => state.appTheme);
+  const {bgColor, textColors, colorYlMain} = useSelector(
+    state => state.appTheme,
+  );
+  const {currentChild} = useSelector(userSelector)
 
+  // console.log('user is customer', customer);
   // console.log("user phone nym", user?.phone)
   const {selectedChild} = useSelector(welcomeScreenSelector);
 
@@ -174,56 +113,50 @@ const MainWelcomeScreen = ({navigation}) => {
     loading,
     demoPhoneNumber,
     bookingDetails,
-    demoBookingId,
     teamUrl,
     isAttended,
-    isAttendenceMarked,
     bookingTime,
   } = useSelector(joinDemoSelector);
 
-
   // console.log("user is", customer)
 
+  // Fetching user details here
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');
-    console.log('login details in top', loginDetails);
     if (!user && loginDetails) {
-      console.log('fetching user...');
-      loginDetails = JSON.parse(loginDetails);
-      console.log('got login details: ' + loginDetails.loginType);
-
-      if (!loginDetails) {
-        Showtoast({
-          text: 'Failed To Load Data, please logout and login again',
-          toast,
-          type: 'danger',
-        });
-      }
-
-      console.log('login details is', loginDetails);
-      if (loginDetails.loginType === 'whatsAppNumber') {
-        console.log('getting user by', loginDetails.phone);
-        dispatch(fetchUser({phone: loginDetails.phone}));
-      } else if (loginDetails.loginType === 'customerLogin') {
-        console.log('getting user by', loginDetails.email);
-        dispatch(fetchUser({email: loginDetails.email}));
-        dispatch(setIsCustomer(true));
-      }
+      dispatch(fetchUserFormLoginDetails());
     }
   }, [user]);
 
+  // fetching user orders here
   useEffect(() => {
-    console.log('running for selectedChild', selectedChild.bookingId);
-    if (selectedChild?.bookingId) {
+    const getOrders = async () => {
+      console.log('gettting orders');
+      const token = await auth().currentUser?.getIdToken();
+      let body = {
+        leadId: user?.leadId,
+        token,
+      };
+      dispatch(startFetchingUserOrders(body));
+    };
+    if (customer == 'yes') {
+      getOrders();
+    }
+  }, [customer, user]);
+
+  // Fetching booking Details of user
+  useEffect(() => {
+    // console.log('running for selectedChild', selectedChild.bookingId);
+    if (currentChild) {
       dispatch(setToInitialState());
-      dispatch(startFetchBookingDetailsFromId(selectedChild.bookingId));
+      // dispatch(startFetchBookingDetailsFromId(selectedChild?.bookingId));
+      dispatch(startFetchBookingDetailsByName({childName :currentChild?.name}))
     } else if (user?.phone) {
       dispatch(startFetchBookingDetailsFromPhone(user.phone));
     }
-  }, [user, selectedChild]);
+  }, [user, currentChild]);
 
   // Demo actions useEffects here
-
   const getTimeRemaining = bookingDate => {
     const countDownTime = new Date(bookingDate).getTime();
     const now = Date.now();
@@ -362,9 +295,7 @@ const MainWelcomeScreen = ({navigation}) => {
         />
 
         <Spacer space={8} />
-
         <ShowCourses navigation={navigation} />
-
         {/* Reviews And Testimonials Here */}
         <Spacer space={12} />
         <ReviewsAndTestimonials />

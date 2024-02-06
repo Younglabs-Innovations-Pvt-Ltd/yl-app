@@ -57,21 +57,7 @@ const CourseDetailsScreen = ({route, navigation}) => {
     }
   }, [selectedTab]);
 
-  const handleContentSizeChange = (contentWidth, height) => {
-    // Update the content size state
-    // setContentSize({ width: contentWidth, height: contentHeight });
-
-    // Do any additional logic based on the content size if needed
-    setContentHeight(height);
-  };
-
-  const handleLayout = event => {
-    const {height} = event.nativeEvent.layout;
-    setScrollViewHeight(height);
-  };
-
-
-  // set show Button for scrolling up and down 
+  // set show Button for scrolling up and down
   // useEffect(() => {
   //   if (selectedTab !== 'payAndEnroll') {
   //     // Check if the user is 20% from the top or bottom
@@ -90,8 +76,7 @@ const CourseDetailsScreen = ({route, navigation}) => {
 
   return (
     <View className="w-full flex-1" style={{backgroundColor: bgColor}}>
-
-    {/* Button for scrolling up and down  */}
+      {/* Button for scrolling up and down  */}
       {/* {selectedTab !== 'payAndEnroll' && (
         <Pressable
           className="absolute bottom-[80px] right-5 h-12 w-12 z-50 rounded-full items-center justify-center"
@@ -115,9 +100,7 @@ const CourseDetailsScreen = ({route, navigation}) => {
           {useNativeDriver: true, listener: handleScroll},
         )}
         scrollEventThrottle={16}
-        ref={scrollViewRef}
-        onContentSizeChange={handleContentSizeChange}
-        onLayout={handleLayout}>
+        ref={scrollViewRef}>
         <View
           style={[styles.bannerContainer, {backgroundColor: colorYlMain}]}
           className="w-full relative justify-center">
@@ -138,7 +121,6 @@ const CourseDetailsScreen = ({route, navigation}) => {
             ) : selectedTab === 'bookFreeClass' ? (
               <BookDemoScreen
                 navigation={navigation}
-                data={{country: {callingCode: 91}, phone: 7668983758}}
                 courseId={courseData.id}
                 setSelectedTab={setSelectedTab}
                 demoAvailableType={courseData?.demoAvailableType}

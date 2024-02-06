@@ -2,22 +2,15 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useSelector} from 'react-redux';
-import { FONTS } from '../utils/constants/fonts';
+import {FONTS} from '../utils/constants/fonts';
 // import AntDesign from '@expo/vector-icons/AntDesign';
 
-
-const DropdownComponent = ({data, placeHolder, setSelectedValue , defaultSelectedItem}) => {
+const DropdownComponent = ({data, placeHolder, setSelectedValue}) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
     useSelector(state => state.appTheme);
-  const [value, setValue] = useState(defaultSelectedItem);
+  const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
-
-  // useEffect(()=>{
-  //   if(defaultSelectedItem){
-  //     setValue(defaultSelectedItem)
-  //   }
-  // },[defaultSelectedItem])
 
   const renderLabel = () => {
     if (value || isFocus) {
@@ -26,7 +19,7 @@ const DropdownComponent = ({data, placeHolder, setSelectedValue , defaultSelecte
           style={[
             styles.label,
             {color: isFocus ? colorYlMain : textColors.textSecondary},
-            {backgroundColor: bgColor , fontFamily:FONTS.primaryFont},
+            {backgroundColor: bgColor, fontFamily: FONTS.primaryFont},
           ]}>
           {placeHolder}
         </Text>
@@ -35,11 +28,12 @@ const DropdownComponent = ({data, placeHolder, setSelectedValue , defaultSelecte
     return null;
   };
 
+
   return (
     <View style={styles.container} className="">
       {renderLabel()}
       <Dropdown
-        mode="auto"
+        mode="default"
         style={[
           styles.dropdown,
           isFocus && {
@@ -49,7 +43,7 @@ const DropdownComponent = ({data, placeHolder, setSelectedValue , defaultSelecte
         ]}
         placeholderStyle={[
           styles.placeholderStyle,
-          {color: textColors.textSecondary , fontFamily:FONTS.primaryFont},
+          {color: textColors.textSecondary, fontFamily: FONTS.primaryFont},
         ]}
         selectedTextStyle={[
           styles.selectedTextStyle,
@@ -77,19 +71,11 @@ const DropdownComponent = ({data, placeHolder, setSelectedValue , defaultSelecte
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          setValue(item.value);
           setSelectedValue(item.value);
+          setValue(item);
           setIsFocus(false);
         }}
         itemContainerStyle={{borderRadius: 8}}
-        // renderLeftIcon={() => (
-        //   <AntDesign
-        //     style={styles.icon}
-        //     color={isFocus ? 'blue' : 'black'}
-        //     name="Safety"
-        //     size={20}
-        //   />
-        // )}
       />
     </View>
   );

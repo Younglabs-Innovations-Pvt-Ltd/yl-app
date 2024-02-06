@@ -38,7 +38,7 @@ function* fetchIpData() {
     });
 
     const data = yield response.json();
-    console.log("got ip data", data)
+    // console.log("got ip data", data)
     yield put(fetchIpDataSuccess(data));
   } catch (error) {
     console.log('Timezone error', error);

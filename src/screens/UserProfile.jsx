@@ -22,6 +22,8 @@ import RedeemPointsView from '../components/UserProfileComponents/RedeemPointsVi
 import MyTicketsView from './MyTicketsView';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {authSelector} from '../store/auth/selector';
+import {userSelector} from '../store/user/selector';
+import { logout } from '../store/auth/reducer';
 
 const {width, height} = Dimensions.get('window');
 
@@ -53,6 +55,8 @@ const UserProfile = ({navigation}) => {
   const [selectedBottomSheetComponent, setSelectedBottomSheetComponent] =
     useState('redeemPoints');
 
+  const {currentChild} = useSelector(userSelector);
+  const {user} = useSelector(authSelector);
   const {selectedUserOrder} = useSelector(welcomeScreenSelector);
   const {customer} = useSelector(authSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
@@ -95,12 +99,13 @@ const UserProfile = ({navigation}) => {
                   <Text
                     className={`text-[12px] text-center font-semibold`}
                     style={{color: textColors.textYlMain}}>
-                    Rahul Sharma, Age: 9
+                    {currentChild?.name || user?.fullName}, Age:{' '}
+                    {currentChild?.age}
                   </Text>
                   <Text
                     className={`text-[12px] text-center`}
                     style={{color: textColors.textYlMain}}>
-                    Parent Name: Sohan Sharma
+                    Parent Name: {user?.fullName}
                   </Text>
                 </View>
               </View>
@@ -310,13 +315,82 @@ const NotACustomerProfilePage = () => {
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
+  const {user} = useSelector(authSelector);
+  const {currentChild} = useSelector(userSelector);
 
+  console.log('user is', user);
+
+  const dispatch = useDispatch()
   return (
     <>
-      <View className="flex-1" style={{backgroundColor:bgColor}}>
-        <Text style={{color: textColors.textSecondary}}>
-          Not a customer profile
-        </Text>
+      <View className="flex-1 items-center" style={{backgroundColor: bgColor}}>
+        <View className="items-end w-full px-4 mt-3">
+          <Pressable
+            className="flex-row items-center px-3 py-1  border rounded-full"
+            style={{borderColor: textColors?.textYlMain}}
+            onPress={()=>{
+              dispatch(logout())
+            }}
+            >
+            <MIcon name="logout" size={20} color={textColors.textYlMain} />
+            <Text
+              className="text-[14px]"
+              style={{color: textColors?.textYlMain}}>
+              Signout
+            </Text>
+          </Pressable>
+        </View>
+        <View
+          className="w-[95%] px-2 py-5 mt-3 rounded-md flex-row justify-between"
+          style={{backgroundColor: bgSecondaryColor}}>
+          <View className="w-[35%] items-center justify-center">
+            <View className="h-[110px] w-[110px] rounded-full bg-white justify-center items-center overflow-hidden">
+              <Text
+                className="text-6xl font-semibold"
+                style={{color: textColors.textYlMain}}>
+                {currentChild?.name?.charAt(0)}
+              </Text>
+            </View>
+          </View>
+          <View className="w-[60%] items-start justify-center">
+            <View className="w-full flex-row">
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textSecondary}}>
+                Name :
+              </Text>
+              <Text
+                className="capitalize ml-[2px]"
+                style={{color: textColors.textYlMain}}>
+                {currentChild?.name || 'not set'}
+              </Text>
+            </View>
+            <View className="w-full flex-row mt-1">
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textSecondary}}>
+                Age :
+              </Text>
+              <Text
+                className="capitalize ml-[2px]"
+                style={{color: textColors.textYlMain}}>
+                {currentChild?.age || user?.childAge}
+              </Text>
+            </View>
+            <View className="w-full flex-row mt-1">
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textSecondary}}>
+                Parent Name :
+              </Text>
+              <Text
+                className="capitalize ml-[2px]"
+                style={{color: textColors.textYlMain}}>
+                {user?.fullName}
+              </Text>
+            </View>
+          </View>
+        </View>
       </View>
     </>
   );
