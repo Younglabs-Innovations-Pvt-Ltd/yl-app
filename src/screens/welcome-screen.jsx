@@ -26,6 +26,7 @@ import {
   setCountry,
   setModalVisible,
   fetchBookingStatusStart,
+  setCustomer,
 } from '../store/welcome-screen/reducer';
 
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
@@ -35,9 +36,9 @@ import {networkSelector} from '../store/network/selector';
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
-import { Showtoast } from '../utils/toast';
-import { useToast } from 'react-native-toast-notifications';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import {Showtoast} from '../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -47,9 +48,8 @@ const GAP = 54;
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
-  const toast = useToast()
-  const {textColors, colorYlMain} =
-  useSelector(state => state.appTheme);
+  const toast = useToast();
+  const {textColors, colorYlMain} = useSelector(state => state.appTheme);
 
   const {localLang, currentLang} = i18nContext();
 
@@ -61,7 +61,7 @@ const DemoClassScreen = ({navigation}) => {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
   const {ipData} = useSelector(bookDemoSelector);
-  const {country, modalVisible, loading, message} = useSelector(
+  const {country, modalVisible, loading, message, customer} = useSelector(
     welcomeScreenSelector,
   );
 
@@ -70,6 +70,21 @@ const DemoClassScreen = ({navigation}) => {
     StatusBar.setBackgroundColor(COLORS.pblue);
     StatusBar.setBarStyle('light-content');
   }, []);
+
+  // show message to customer to login with right credentials (email and password)
+  useEffect(() => {
+    console.log('called');
+
+    if (customer === 'yes') {
+      Showtoast({
+        text: 'Login with right credentials (email, password)',
+        toast,
+        type: 'danger',
+      });
+
+      dispatch(setCustomer(''));
+    }
+  }, [customer]);
 
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
@@ -87,10 +102,8 @@ const DemoClassScreen = ({navigation}) => {
    * Takes two parameter phone number and country({callingCode, countryCode})
    */
   const handleBookingStatus = async () => {
-    console.log("clicked");
-    
-    if(!phone){
-      Showtoast({text:"Please Enter Whatsapp Number", toast , type:"danger"})
+    if (!phone) {
+      Showtoast({text: 'Please Enter Whatsapp Number', toast, type: 'danger'});
     }
     dispatch(fetchBookingStatusStart({phone}));
   };
@@ -286,32 +299,41 @@ const DemoClassScreen = ({navigation}) => {
               />
             </View>
             <TouchableOpacity
-              activeOpacity={.8}
+              activeOpacity={0.8}
               style={btnContinueStyle}
               disabled={loading}
               onPress={handleBookingStatus}
-              className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}
-              >
+              className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}>
               <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
                 Log in
               </TextWrapper>
             </TouchableOpacity>
 
-            <View style={{alignItems: 'center', marginTop:28}}>
+            <View style={{alignItems: 'center', marginTop: 28}}>
               <Pressable
                 style={{paddingVertical: 4}}
                 onPress={() => navigation.navigate(SCREEN_NAMES.SIGNUP)}>
-                <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">Don't have WhatsApp</TextWrapper>
+                <TextWrapper
+                  fs={16}
+                  ff={FONTS.primaryFont}
+                  className="text-gray-600">
+                  Don't have WhatsApp
+                </TextWrapper>
               </Pressable>
 
               <View className="my-3 border-t-[.7px] h-[1px] w-[80%] border-gray-400 relative">
-                  <Text className="absolute -top-3 bg-white px-1 left-[48%]">or</Text>
+                <Text className="absolute -top-3 bg-white px-1 left-[48%]">
+                  or
+                </Text>
               </View>
 
               <Pressable
                 style={{paddingVertical: 4}}
                 onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
-                <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">
+                <TextWrapper
+                  fs={16}
+                  ff={FONTS.primaryFont}
+                  className="text-gray-600">
                   Existing user? Login with Email
                 </TextWrapper>
               </Pressable>
