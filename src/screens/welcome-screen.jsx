@@ -39,6 +39,8 @@ import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
+import Icon from '../components/icon.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -54,6 +56,7 @@ const DemoClassScreen = ({navigation}) => {
   const {localLang, currentLang} = i18nContext();
 
   const [phone, setPhone] = useState('');
+  const [visible, setVisible] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -73,8 +76,6 @@ const DemoClassScreen = ({navigation}) => {
 
   // show message to customer to login with right credentials (email and password)
   useEffect(() => {
-    console.log('called');
-
     if (customer === 'yes') {
       Showtoast({
         text: 'Login with right credentials (email, password)',
@@ -86,12 +87,32 @@ const DemoClassScreen = ({navigation}) => {
     }
   }, [customer]);
 
+  // fetch ipData
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+
+    if (ipData) {
+      dispatch(
+        setCountry({
+          callingCode: ipData.calling_code,
+          countryCode: {cca2: ipData.country_code2},
+        }),
+      );
+    }
+  }, [ipData]);
+
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
     if (phoneRegex.test(e)) {
       setPhone(e);
     }
   };
+
+  // Show and hide country list
+  const onModalOpen = () => setVisible(true);
+  const onModalClose = () => setVisible(false);
 
   /**
    * @author Shobhit
@@ -121,7 +142,7 @@ const DemoClassScreen = ({navigation}) => {
         countryCode: {cca2: country.countryCode.cca2},
       }),
     );
-    dispatch(setModalVisible(false));
+    onModalClose();
   };
 
   const onCloseBottomSheet = () => dispatch(setModalVisible(false));
@@ -216,12 +237,13 @@ const DemoClassScreen = ({navigation}) => {
   }, [animatedValues]);
 
   // Check for max length of a phone number according country
-  const maxPhoneLength = useMemo(() => {
-    if (!country?.countryCode) {
-      return 15;
-    }
-    return phoneNumberLength[country.countryCode.cca2];
-  }, [country]);
+  // const maxPhoneLength = useMemo(() => {
+  //   if (!country?.countryCode) {
+  //     return 15;
+  //   }
+
+  //   return phoneNumberLength[country.countryCode.cca2];
+  // }, [country]);
 
   const isTablet = deviceWidth > 540;
   let CONTAINER_STYLE = {};
@@ -244,7 +266,9 @@ const DemoClassScreen = ({navigation}) => {
   return (
     <View style={styles.wrapper}>
       <ImageBackground
-        style={{flex: 1}}
+        style={{
+          flex: 1,
+        }}
         source={require('../assets/images/background2.jpeg')}
         resizeMode="cover">
         {/* <LanguageSelection /> */}
@@ -277,15 +301,18 @@ const DemoClassScreen = ({navigation}) => {
               opacity: animatedButtons,
             },
           ]}>
-          <View style={{}} className="py-6 bg-white px-3 rounded-2xl relative">
-            <View className="absolute p-[2px] rounded-full bg-gray-400 top-1 left-[48%] w-[15%]"></View>
+          <View
+            style={{elevation: 10}}
+            className="py-6 bg-white px-3 rounded-2xl relative">
+            {/* <View className="absolute p-[2px] rounded-full bg-gray-400 top-1 left-[48%] w-[15%]"></View> */}
 
             {/* <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
               Book Free Handwriting Class
             </TextWrapper> */}
-            <View style={styles.row} className="mt-5">
-              <Pressable style={styles.btnCountryCode}>
-                <TextWrapper>{'+91'}</TextWrapper>
+            <View style={styles.row}>
+              <Pressable style={styles.btnCountryCode} onPress={onModalOpen}>
+                <TextWrapper>{country?.callingCode}</TextWrapper>
+                <Icon name="chevron-down" size={20} color={COLORS.black} />
               </Pressable>
               <TextInput
                 placeholder="Enter Whatsapp number"
@@ -295,7 +322,7 @@ const DemoClassScreen = ({navigation}) => {
                 onChangeText={handlePhone}
                 inputMode="numeric"
                 placeholderTextColor={'gray'}
-                maxLength={maxPhoneLength}
+                maxLength={15}
               />
             </View>
             <TouchableOpacity
@@ -346,8 +373,8 @@ const DemoClassScreen = ({navigation}) => {
           </Center>
         </ModalComponent>
         <CountryList
-          visible={modalVisible}
-          onClose={onCloseBottomSheet}
+          visible={visible}
+          onClose={onModalClose}
           onSelect={handleSelectCountry}
         />
       </ImageBackground>
@@ -362,6 +389,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     position: 'relative',
+    marginTop: deviceWidth * 0.2,
   },
   wrapper: {
     flex: 1,
@@ -454,8 +482,9 @@ const styles = StyleSheet.create({
     height: 220,
   },
   btnCountryCode: {
-    display: 'flex',
+    flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 8,
   },
   btnConfirm: {
