@@ -93,8 +93,8 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
       <View
         style={tw`flex flex-row justify-between w-[100%] px-2 py-1 bg-[${bgSecondaryColor}]
           }`}>
-        <View className="flex-row items-center">
-          <View className="px-2 justify-center">
+        <View className="flex-row items-center w-[75%]">
+          {/* <View className="px-2 justify-center">
             {darkMode ? (
               <MIcon
                 name="brightness-4"
@@ -110,9 +110,8 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
                 onPress={() => changeDarkMode(true)}
               />
             )}
-          </View>
-
-          <View className="relative">
+          </View> */}
+          <View className="relative w-full items-start overflow-hidden">
             <TouchableOpacity onPress={open}>
               {ordersOrBookingsLoading ? (
                 <ActivityIndicator />
@@ -174,25 +173,17 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
               )}
             </TouchableOpacity>
           </View>
-
-          <View className="ml-5">
-            <Pressable
-              className={`${
-                darkMode ? 'bg-gray-500' : 'bg-gray-200'
-              } rounded-full p-1`}
-              onPress={() => setShowAddChildView(true)}>
-              <MIcon name="plus" size={25} color={textColors.textPrimary} />
-            </Pressable>
-          </View>
         </View>
 
-        <View style={tw`w-[20%]  flex-row gap-2 items-center justify-end`}>
-          <MIcon
-            name="logout"
-            size={30}
-            color={textColors.textYlMain}
-            onPress={handleLogOut}
-          />
+        <View className="w-[25%]">
+          <Pressable
+            className={` flex-row items-center justify-center ${
+              darkMode ? 'bg-gray-500' : 'bg-blue-200'
+            } rounded-full py-1 px-2`}
+            onPress={() => setShowAddChildView(true)}>
+            <MIcon name="plus" size={20} color={textColors.textPrimary} />
+            <Text className="text-xs" style={{fontFamily:FONTS.primaryFont}}>Add Child</Text>
+          </Pressable>
         </View>
       </View>
     </>
@@ -209,7 +200,7 @@ export const ChangeAddedChild = ({close}) => {
     state => state.appTheme,
   );
   const dispatch = useDispatch();
-  const {currentChild , children} = useSelector(userSelector);
+  const {currentChild, children} = useSelector(userSelector);
 
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');

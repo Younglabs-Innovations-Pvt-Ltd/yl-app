@@ -38,6 +38,8 @@ const SoloBatchPayment = ({
   prices,
   navigation,
   ageGroups,
+  course_type,
+  levelNames,
 }) => {
   const toast = useToast();
   const {textColors, bgColor, bgSecondaryColor} = useSelector(
@@ -46,11 +48,59 @@ const SoloBatchPayment = ({
   const [visible, setVisible] = useState(false);
   const [date, setDate] = useState(undefined);
   const [selectedLevelToBuy, setSelectedLevelToBuy] = useState(null);
+  const [filteredBatches, setFilteredBatches] = useState([]);
 
-  const {selectedChild} = useSelector(welcomeScreenSelector);
-  const {user} = useSelector(authSelector);
+  console.log('filtered batches ', filteredBatches);
+
+  useEffect(() => {
+    if (prices?.solo) {
+      const obj = {...prices.solo}; // Create a shallow copy of prices.solo
+      const sortedObj = {};
+      Object.entries(obj)
+        .sort(([, a], [, b]) => {
+          // Compare the 'level' property of objects 'a' and 'b' directly
+          return a.level - b.level; // Assuming level is numeric
+        })
+        .forEach(([key, value]) => {
+          if (value.visibility === false) {
+            console.log('deleting', value);
+            delete obj[key];
+          } else {
+            sortedObj[key] = value;
+          }
+        });
+      setFilteredBatches(sortedObj);
+    }
+  }, [prices]);
 
   const dispatch = useDispatch();
+
+  console.log('courset ype is', course_type);
+  const getLevelName = level => {
+    if (course_type === 'curriculum') {
+      switch (level) {
+        case 1:
+          return levelNames?.level1Name;
+
+        case 2:
+          return levelNames?.level2Name;
+
+        case 3:
+          return levelNames?.level3Name;
+      }
+    } else {
+      switch (level) {
+        case 1:
+          return 'Foundation';
+
+        case 2:
+          return 'Advanced';
+
+        case 3:
+          return 'Foundation + Advanced';
+      }
+    }
+  };
 
   const visibleDatePicker = () => setVisible(true);
   const hideDatePicker = () => setVisible(false);
@@ -90,10 +140,6 @@ const SoloBatchPayment = ({
     }
   }
 
-  // useEffect(() => {
-  //   dispatch(resetCourseDetails());
-  // }, []);
-
   const payNow = () => {
     // const ageGroup = makeAgeGroup(selectedChild.childAge);
     // const startDateTime = moment(date).format('YYYY-MM-DD HH:mm');
@@ -108,17 +154,23 @@ const SoloBatchPayment = ({
       return;
     }
 
-    if(!date || date == ""){
-      Showtoast({text: 'Please Select Your preferrable date', toast, type: 'danger'});
+    if (!date || date == '') {
+      Showtoast({
+        text: 'Please Select Your preferrable date',
+        toast,
+        type: 'danger',
+      });
       return;
     }
 
-    navigation.navigate('Payment', {paymentBatchType: 'solo'});
+    navigation.navigate('Payment', {
+      paymentBatchType: 'solo',
+      paymentMethod: courseData?.paymentMethod,
+    });
   };
 
-  // console.log('selectd level to purchase', prices);
-
-  const handleBatchSelect = (levelText, level, price, strikeThroughPrice) => {
+  const handleBatchSelect = (level, price, strikeThroughPrice) => {
+    let levelText = getLevelName(level);
     dispatch(setLevelText(levelText));
     dispatch(setCurrentLevel(level));
     dispatch(setPrice(price));
@@ -129,46 +181,12 @@ const SoloBatchPayment = ({
     dispatch(setCurrentAgeGroup(group));
   };
 
-  console.log("in solo payment")
+  console.log('level name is', getLevelName(1));
+
+  console.log('in solo payment');
   return (
     <ScrollView style={{flex: 1}} className="flex-1">
       <View className="flex-1">
-        {/* <Pressable
-        style={{
-          padding: 12,
-          alignItems: 'center',
-          backgroundColor: COLORS.pblue,
-          borderRadius: 8,
-        }}
-        onPress={visibleDatePicker}>
-        <Text style={{fontSize: 16, color: COLORS.white}}>
-          Select class date and time
-        </Text>
-      </Pressable>
-      <Pressable
-        style={{
-          padding: 12,
-          alignItems: 'center',
-          backgroundColor: COLORS.pblue,
-          borderRadius: 8,
-          marginTop: 16,
-        }}
-        onPress={payNow}>
-        <Text style={{fontSize: 16, color: COLORS.white}}>Buy now</Text>
-      </Pressable>
-
-      <Pressable
-        style={{
-          padding: 12,
-          alignItems: 'center',
-          backgroundColor: COLORS.pblue,
-          borderRadius: 8,
-          marginTop: 16,
-        }}
-        onPress={onGoogleButtonPress}>
-        <Text style={{fontSize: 16, color: COLORS.white}}>Google login</Text>
-      </Pressable> */}
-
         <View className="flex-1">
           <View className="px-2">
             <Text
@@ -201,7 +219,9 @@ const SoloBatchPayment = ({
               </Text>
 
               <View className="w-full my-2 flex-row px-2 items-center justify-center">
-                <Text style={{color:textColors.textSecondary}}>Select Age Group:</Text>
+                <Text style={{color: textColors.textSecondary}}>
+                  Select Age Group:
+                </Text>
                 <View className="flex-row px-3">
                   {ageGroups?.map((group, i) => {
                     return (
@@ -216,11 +236,17 @@ const SoloBatchPayment = ({
                               }
                             : {
                                 borderColor: textColors.textSecondary,
-                                backgroundColor: bgColor,
+                                backgroundColor: bgSecondaryColor,
                               }
                         }
                         onPress={() => handleAgeGroup(group?.ageGroup)}>
-                        <Text style={{color: textColors.textSecondary}}>
+                        <Text
+                          style={{
+                            color:
+                              currentAgeGroup === group.ageGroup
+                                ? 'white'
+                                : textColors.textSecondary,
+                          }}>
                           {group?.ageGroup}
                         </Text>
                       </Pressable>
@@ -230,162 +256,50 @@ const SoloBatchPayment = ({
               </View>
 
               <View className="flex-row justify-around w-full mt-3">
-                <Pressable
-                  className="p-1 border-2 rounded px-3"
-                  style={{
-                    borderColor:
-                      selectedLevelToBuy?.level == 1
-                        ? textColors.textYlMain
-                        : textColors.textSecondary,
-                  }}
-                  onPress={() => {
-                    handleBatchSelect(
-                      'Foundation',
-                      1,
-                      prices?.solo?.level1?.offer,
-                      prices?.solo?.level1?.price,
-                    ),
-                      setSelectedLevelToBuy({
-                        level: 1,
-                        price: prices?.solo?.level1?.offer,
-                      });
-                  }}>
-                  <View className=" items-center justify-center">
-                    <Text
-                      className="font-semibold text-base"
+                {Object.entries(filteredBatches).map(([key, obj]) => {
+                  console.log('key is', key, obj);
+                  return (
+                    <Pressable
+                      className="p-1 border-2 rounded px-3 max-w-[32%] items-center"
                       style={{
-                        fontFamily: FONTS.headingFont,
-                        color: textColors.textYlMain,
+                        borderColor:
+                          selectedLevelToBuy?.level == obj.level
+                            ? textColors.textYlMain
+                            : textColors.textSecondary,
+                      }}
+                      onPress={() => {
+                        handleBatchSelect(obj.level, obj?.offer, obj?.price),
+                          setSelectedLevelToBuy({
+                            level: obj.level,
+                            price: obj?.offer,
+                          });
                       }}>
-                      Foundation
-                    </Text>
-                    <Text
-                      className="text-xs"
-                      style={{color: textColors.textSecondary}}>
-                      (12 classes)
-                    </Text>
+                      <View className="items-center justify-center flex-1">
+                        <Text
+                          className="font-semibold text-[18px] text-center"
+                          style={{
+                            fontFamily: FONTS.headingFont,
+                            color: textColors.textYlMain,
+                          }}>
+                          {getLevelName(obj.level)}
+                        </Text>
 
-                    {/* {console.log("ipdata is", ipData)} */}
-                    <View className="flex-row">
-                      <Text
-                        className=""
-                        style={{color: textColors.textSecondary}}>
-                        {ipData?.currency?.symbol} {prices?.solo?.level1?.offer}
-                      </Text>
-                      <Text
-                        className="line-through ml-1"
-                        style={{color: textColors.textSecondary}}>
-                        {prices?.solo?.level1?.price}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-
-                <Pressable
-                  className="p-1 border-2 rounded px-3"
-                  style={{
-                    borderColor:
-                      selectedLevelToBuy?.level == 2
-                        ? textColors.textYlMain
-                        : textColors.textSecondary,
-                  }}
-                  onPress={() => {
-                    handleBatchSelect(
-                      'Advanced',
-                      2,
-                      prices?.solo?.level2?.offer,
-                      prices?.solo?.level2?.price,
-                    ),
-                      setSelectedLevelToBuy({
-                        level: 2,
-                        price: prices?.solo?.level2?.offer,
-                      });
-                  }}>
-                  <View
-                    className="items-center justify-center"
-                    style={{borderColor: textColors.textSecondary}}>
-                    <Text
-                      className="font-semibold text-base"
-                      style={{
-                        fontFamily: FONTS.headingFont,
-                        color: textColors.textYlRed,
-                      }}>
-                      Advanced
-                    </Text>
-                    <Text
-                      className="text-xs"
-                      style={{color: textColors.textSecondary}}>
-                      (12 classes)
-                    </Text>
-
-                    {/* {console.log("ipdata is", ipData)} */}
-                    <View className="flex-row">
-                      <Text
-                        className=""
-                        style={{color: textColors.textSecondary}}>
-                        {ipData?.currency?.symbol} {prices?.solo?.level2?.offer}
-                      </Text>
-                      <Text
-                        className="line-through ml-1"
-                        style={{color: textColors.textSecondary}}>
-                        {prices?.solo?.level2?.price}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-
-                <Pressable
-                  className="p-1 border-2 rounded px-3 max-w-[33%]"
-                  style={{
-                    borderColor:
-                      selectedLevelToBuy?.level == 'combo'
-                        ? textColors.textYlMain
-                        : textColors.textSecondary,
-                  }}
-                  onPress={() => {
-                    handleBatchSelect(
-                      'Foundation + Advanced',
-                      3,
-                      prices?.solo?.combo?.offer,
-                      prices?.solo?.combo?.price,
-                    ),
-                      setSelectedLevelToBuy({
-                        level: 'combo',
-                        price: prices?.solo?.combo?.offer,
-                      });
-                  }}>
-                  <View
-                    className="items-center"
-                    style={{borderColor: textColors.textSecondary}}>
-                    <Text
-                      className="font-semibold text-base flex-wrap text-center leading-5"
-                      style={{
-                        fontFamily: FONTS.headingFont,
-                        color: textColors.textYlGreen,
-                      }}>
-                      Foundation + Advanced
-                    </Text>
-                    <Text
-                      className="text-xs"
-                      style={{color: textColors.textSecondary}}>
-                      (12 classes)
-                    </Text>
-
-                    {/* {console.log("ipdata is", ipData)} */}
-                    <View className="flex-row">
-                      <Text
-                        className=""
-                        style={{color: textColors.textSecondary}}>
-                        {ipData?.currency?.symbol} {prices?.solo?.combo?.offer}
-                      </Text>
-                      <Text
-                        className="line-through ml-1"
-                        style={{color: textColors.textSecondary}}>
-                        {prices?.solo?.combo?.price}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
+                        <View className="flex-row">
+                          <Text
+                            className=""
+                            style={{color: textColors.textSecondary}}>
+                            {ipData?.currency?.symbol} {obj?.offer}
+                          </Text>
+                          <Text
+                            className="line-through ml-1"
+                            style={{color: textColors.textSecondary}}>
+                            {obj?.price}
+                          </Text>
+                        </View>
+                      </View>
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
 
@@ -418,20 +332,13 @@ const SoloBatchPayment = ({
                 </Pressable>
               </View>
               <Text
-                className="mt-3"
+                className="mt-3 text-center w-full"
                 style={{
                   color: textColors.textSecondary,
                   fontFamily: FONTS.primaryFont,
                 }}>
                 Choose Your Preffered Time and Date to Start Your Classes
               </Text>
-              {/* <View className="flex-row">
-            <Text
-              className="font-semibold"
-              style={{color: textColors.textSecondary}}>
-              Note:
-            </Text>
-          </View> */}
             </View>
           </View>
 

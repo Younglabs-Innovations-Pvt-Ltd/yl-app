@@ -153,6 +153,7 @@ const MainWelcomeScreen = ({navigation}) => {
     // console.log('running for selectedChild', selectedChild.bookingId);
     if (currentChild) {
       if (currentChild?.bookingId) {
+        setIsFirstTimeUser(false);
         dispatch(setToInitialState());
         dispatch(startFetchBookingDetailsFromId(currentChild?.bookingId));
       } else {
@@ -339,7 +340,7 @@ const MainWelcomeScreen = ({navigation}) => {
       <BottomSheetComponent
         isOpen={showAddChildView}
         onClose={() => setShowAddChildView(false)}
-        Children={AddChildModule}
+        Children={<AddChildModule onClose={() => setShowAddChildView(false)} />}
         snapPoint={['25%', '50%']}
       />
 

@@ -11,16 +11,19 @@ import {startAddingChild} from '../../store/user/reducer';
 import {userSelector} from '../../store/user/selector';
 import {Showtoast} from '../../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
+import {COLORS} from '../../utils/constants/colors';
 
-export const AddChildModule = () => {
+export const AddChildModule = ({onClose}) => {
+  console.log('got onClose in sheet', onClose);
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
     useSelector(state => state.appTheme);
   const [childName, setChildName] = useState(null);
   const [childAge, setChildAge] = useState(null);
   const [isFieldsFilled, setIsFieldsFilled] = useState(false);
   const {customer, user} = useSelector(authSelector);
-
   const {childAddLoading} = useSelector(userSelector);
+
+  console.log('child add loading', childAddLoading);
 
   const dispatch = useDispatch();
   const toast = useToast();
@@ -47,15 +50,17 @@ export const AddChildModule = () => {
       Showtoast({text: 'Select Child Age', toast, type: 'danger'});
       return;
     }
-    
+
     let body = {
       childName,
       childAge,
       leadId: user?.leadId,
+      onClose,
     };
 
     console.log('adding child');
     dispatch(startAddingChild(body));
+    setChildName('');
     // console.log('isFiled filled', isFieldsFilled);
     // console.log('body is', body);
   };
@@ -88,12 +93,12 @@ export const AddChildModule = () => {
           </View>
 
           <Pressable
-            className="py-3 rounded-full w-full mt-3 flex-row"
+            className="py-3 rounded-full w-full mt-3 flex-row justify-center"
             style={{backgroundColor: colorYlMain}}
             onPress={addChild}
             disabled={childAddLoading}>
             <Text
-              className="text-center text-white text-[18px] font-semibold w-full"
+              className="text-center text-white text-[18px] font-semibold"
               style={[{fontFamily: FONTS.primaryFont}]}>
               Click to add Child
             </Text>

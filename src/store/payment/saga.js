@@ -312,8 +312,7 @@ function* makeSoloPaymentSaga({payload}) {
   try {
     const body = payload.body;
     const ipData = payload.ipData;
-
-    const payOn = 'tazapay';
+    const paymentMethod = payload.paymentMethod;
 
     console.log('body hre is=');
     const batch = {
@@ -331,14 +330,12 @@ function* makeSoloPaymentSaga({payload}) {
 
     // console.log("getting token", token)
 
-    if (payOn === 'tazapay') {
+    if (paymentMethod === 'tazapay') {
       yield payOnTazapay({body, ipData});
       return;
     }
 
     const token = yield auth().currentUser.getIdToken();
-    const url =
-      'https://e5f0-2401-4900-1c5b-4c3d-19f0-20dc-706b-4aae.ngrok-free.app';
     const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
@@ -347,6 +344,7 @@ function* makeSoloPaymentSaga({payload}) {
       },
       body: JSON.stringify(body),
     });
+
 
     const data = yield response.json();
 
@@ -397,18 +395,6 @@ function* makeSoloPaymentSaga({payload}) {
     };
 
     console.log('i am her 3');
-
-    // yield payOnTazapay({
-    //   ipData,
-    //   orderData: orderRes,
-    //   email: body.email,
-    //   authToken: token,
-    //   phone: body.phone,
-    //   fullName: body.fullName,
-    //   toPay: amount || 1999,
-    // });
-    // console.log('here 4');
-    // return;
 
     const options = {
       key: 'rzp_test_0cYlLVRMEaCUDx',

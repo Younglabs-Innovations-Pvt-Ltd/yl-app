@@ -44,6 +44,8 @@ import DropdownComponent from '../components/DropdownComponent';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
+import {userSelector} from '../store/user/selector';
+import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 
 GoogleSignin.configure({
   webClientId:
@@ -84,6 +86,8 @@ const Payment = ({navigation, route}) => {
   const [selectedChildForOrder, setSelectedChildForOrder] = useState(null);
   const [showChangeChildSheet, setShowChangeChildSheet] = useState(false);
   const [leadDataFormVisible, setLeadDataFormVisible] = useState(false);
+  const [openAddChildSheet, setOpenAddChildSheet] = useState(false);
+
   console.log('selected Child for order', selectedChildForOrder);
 
   const [totalDiscounts, setTotalDiscounts] = useState();
@@ -142,11 +146,7 @@ const Payment = ({navigation, route}) => {
 
   const {customer} = useSelector(authSelector);
   const dispatch = useDispatch();
-
-  // console.log("selected child is", selectedChild);
-  // console.log("offer codes are", offerCodes);
-
-  // Set current screen name
+  const {children} = useSelector(userSelector);
 
   useEffect(() => {
     setAmount(price);
@@ -232,7 +232,7 @@ const Payment = ({navigation, route}) => {
   };
 
   const handleSoloBatchCheckOut = () => {
-    console.log("user is")
+    console.log('user is');
     if (!email) {
       setEmailErr('Enter your email address.');
       return;
@@ -260,16 +260,16 @@ const Payment = ({navigation, route}) => {
       phone: user?.phone,
       fullName: user?.fullName || 'unknown', // TODO: this should be from user
       batchId: null,
-      childName: selectedChildForOrder.childName,
+      childName: selectedChildForOrder.name,
       email: email,
-      childAge: selectedChildForOrder.childAge,
+      childAge: selectedChildForOrder.age,
       timezone: user?.timezone,
       countryCode: user?.countryCode, // TODO: this should be from user
       source: 'app',
       batchType: 'unhandled',
       startDate: startDateTime,
       price: price,
-      level:currentLevel,
+      level: currentLevel,
     };
 
     if (selectedCoupon) {
@@ -289,8 +289,8 @@ const Payment = ({navigation, route}) => {
     }
 
     // console.log('body  giving is =', body);
-    console.log("i am here")
-    dispatch(makeSoloPayment({body , ipData}));
+    console.log('i am here');
+    dispatch(makeSoloPayment({body, ipData}));
   };
 
   const handleRefferalApply = async () => {
@@ -502,37 +502,10 @@ const Payment = ({navigation, route}) => {
   };
 
   useEffect(() => {
-    if (customer === 'yes') {
-      let dataToStore = [];
-      if (typeof userOrders === 'object') {
-        Object.keys(userOrders).map((key, i) => {
-          userOrders[key].map((item, i) => {
-            dataToStore.push({
-              childName: item.childName,
-              childAge: item.childAge,
-            });
-          });
-        });
-      }
-      setSelectedChildForOrder(dataToStore[0]);
-      setDropDownData(dataToStore);
-    } else {
-      let dataToStore = [];
-      // console.log("userBookings",userBookings);
-
-      if (userBookings?.length > 0) {
-        userBookings.map((item, i) => {
-          dataToStore.push({
-            childName: item.childName,
-            childAge: item.childAge,
-          });
-          // return;
-        });
-
-        setDropDownData(dataToStore);
-      }
+    if (children) {
+      setDropDownData(children);
     }
-  }, [userOrders, userBookings]);
+  }, [children]);
 
   return (
     <View style={{flex: 1, backgroundColor: '#f4f4f4'}}>
@@ -551,19 +524,15 @@ const Payment = ({navigation, route}) => {
           <View>
             <Text className="font-semibold text-[18px] mt-3">Order For</Text>
 
-            {dropdownData && dropdownData.length > 0 ? (
+            {dropdownData && dropdownData.length > 1 ? (
               <View className="flex-row justify-start w-full mt-3">
                 <View className="w-[40%]">
                   <Text className="font-semibold">Child Name</Text>
-                  <Text className="mt-1">
-                    {selectedChildForOrder?.childName}
-                  </Text>
+                  <Text className="mt-1">{selectedChildForOrder?.name}</Text>
                 </View>
                 <View className="w-[25%]">
                   <Text className="font-semibold">Child Age</Text>
-                  <Text className="mt-1">
-                    {selectedChildForOrder?.childAge}
-                  </Text>
+                  <Text className="mt-1">{selectedChildForOrder?.age}</Text>
                 </View>
                 <View className="flex justify-end ml-3">
                   <Pressable
@@ -576,7 +545,18 @@ const Payment = ({navigation, route}) => {
             ) : (
               <>
                 <View className="w-full">
-                  <View className="w-full mt-5 flex-row justify-between">
+                  <View className="w-full flex-row items-center">
+                    <Text className="text-base text-red-500">
+                      You Don't have added Any Child
+                    </Text>
+                    <Pressable
+                      className="py-1 px-3 rounded-full items-center ml-3"
+                      style={{backgroundColor: COLORS.pblue}}
+                      onPress={() => setOpenAddChildSheet(true)}>
+                      <Text className="text-white font-semibold">Add one</Text>
+                    </Pressable>
+                  </View>
+                  {/* <View className="w-full mt-5 flex-row justify-between">
                     <View className="w-[55%]">
                       <Text className="font-semibold ">Enter Child Name:</Text>
                       <TextInput
@@ -603,7 +583,7 @@ const Payment = ({navigation, route}) => {
                         className=" mt-1 border-b border-gray-400 p-1 text-base w-full text-[15px] bg-gray-100"
                       />
                     </View>
-                  </View>
+                  </View> */}
                 </View>
               </>
             )}
@@ -916,6 +896,17 @@ const Payment = ({navigation, route}) => {
         snapPoint={['40%', '75%']}
       />
 
+      {console.log("childrens here are ", children)}
+
+      <BottomSheetComponent
+        isOpen={openAddChildSheet}
+        onClose={() => setOpenAddChildSheet(false)}
+        Children={
+          <AddChildModule onClose={() => setOpenAddChildSheet(false)} />
+        }
+        snapPoint={['50%']}
+      />
+
       <ModalComponent
         visible={leadDataFormVisible}
         animationType="fade"
@@ -1041,28 +1032,28 @@ const Payment = ({navigation, route}) => {
 };
 
 const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
-  const [orderChildData, setOrderChildData] = useState({
-    childName: '',
-    childAge: '',
-  });
-  const toast = useToast();
+  // const [orderChildData, setOrderChildData] = useState({
+  //   childName: '',
+  //   childAge: '',
+  // });
+  // const toast = useToast();
 
-  const addAnotherChild = () => {
-    if (!orderChildData?.childName || orderChildData?.childName?.length < 3) {
-      Showtoast({text: 'Enter child name', toast, type: 'danger'});
-      return;
-    } else if (
-      !orderChildData?.childAge ||
-      orderChildData?.childAge < 5 ||
-      orderChildData?.childAge > 14
-    ) {
-      Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
-      return;
-    } else {
-      setChild(orderChildData);
-      closeSheet();
-    }
-  };
+  // const addAnotherChild = () => {
+  //   if (!orderChildData?.childName || orderChildData?.childName?.length < 3) {
+  //     Showtoast({text: 'Enter child name', toast, type: 'danger'});
+  //     return;
+  //   } else if (
+  //     !orderChildData?.childAge ||
+  //     orderChildData?.childAge < 5 ||
+  //     orderChildData?.childAge > 14
+  //   ) {
+  //     Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
+  //     return;
+  //   } else {
+  //     setChild(orderChildData);
+  //     closeSheet();
+  //   }
+  // };
   return (
     <View className="w-full items-center">
       <Text
@@ -1071,7 +1062,7 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
         change child
       </Text>
 
-      <View className="p-2  w-[100%] mt-3 bg-gray-100 rounded">
+      {/* <View className="p-2  w-[100%] mt-3 bg-gray-100 rounded">
         <Text
           className="text-base font-semibold"
           style={{fontFamily: FONTS.primaryFont}}>
@@ -1116,7 +1107,7 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
             </Pressable>
           </View>
         </View>
-      </View>
+      </View> */}
 
       <View className="w-full items-center mt-4">
         {data?.map((child, i) => {
@@ -1130,11 +1121,11 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
               <View
                 className="flex-row p-2 border border-gray-400 rounded"
                 style={
-                  selectChild?.childName === child?.childName
+                  selectChild?.name === child?.name
                     ? {borderColor: COLORS.pblue}
                     : {}
                 }>
-                {selectChild?.childName === child?.childName && (
+                {selectChild?.name === child?.name && (
                   <View
                     className="absolute -top-2 -right-2 bg-white"
                     style={{}}>
@@ -1150,12 +1141,12 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
                   <Text
                     className="text-xl font-semibold"
                     style={{fontFamily: FONTS.primaryFont}}>
-                    {child.childName}
+                    {child.name}
                   </Text>
                   <Text
                     className="mt-1"
                     style={{fontFamily: FONTS.primaryFont}}>
-                    Age: {child.childAge}
+                    Age: {child.age}
                   </Text>
                 </View>
               </View>
@@ -1187,7 +1178,10 @@ const LeadDataForm = ({setChild, child, close}) => {
       Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
       return;
     } else {
-      setChild(orderChildData);
+      setChild({
+        name:orderChildData?.childName,
+        age:orderChildData?.childAge,
+      });
       close();
       // closeSheet();
     }
