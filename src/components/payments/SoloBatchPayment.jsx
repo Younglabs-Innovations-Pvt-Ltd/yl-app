@@ -49,8 +49,10 @@ const SoloBatchPayment = ({
   const [date, setDate] = useState(undefined);
   const [selectedLevelToBuy, setSelectedLevelToBuy] = useState(null);
   const [filteredBatches, setFilteredBatches] = useState([]);
+  const [classCount, setClassCount] = useState(0);
+  const {courseDetails} = useSelector(courseSelector);
 
-  console.log('filtered batches ', filteredBatches);
+  console.log("total classes are" , classCount)
 
   useEffect(() => {
     if (prices?.solo) {
@@ -75,7 +77,6 @@ const SoloBatchPayment = ({
 
   const dispatch = useDispatch();
 
-  console.log('courset ype is', course_type);
   const getLevelName = level => {
     if (course_type === 'curriculum') {
       switch (level) {
@@ -113,7 +114,6 @@ const SoloBatchPayment = ({
 
   const {price, strikeThroughPrice, currentAgeGroup} =
     useSelector(courseSelector);
-  console.log('price in selctor', price, strikeThroughPrice);
 
   const makeAgeGroup = age => {
     return ageGroups.find(group => {
@@ -166,6 +166,7 @@ const SoloBatchPayment = ({
     navigation.navigate('Payment', {
       paymentBatchType: 'solo',
       paymentMethod: courseData?.paymentMethod,
+      classesSold:classCount || null,
     });
   };
 
@@ -175,15 +176,23 @@ const SoloBatchPayment = ({
     dispatch(setCurrentLevel(level));
     dispatch(setPrice(price));
     dispatch(setStrikeThroughPrice(strikeThroughPrice));
+    console.log('i am here', courseDetails?.course_type);
+    if (courseDetails?.course_type == 'curriculum') {
+      let classes = levelText.split(' ')[0];
+      classes = parseInt(classes)
+      if(isNaN(classes)){
+        return;
+      }else{
+        setClassCount(classes)
+      }
+      
+    }
   };
 
   const handleAgeGroup = group => {
     dispatch(setCurrentAgeGroup(group));
   };
 
-  console.log('level name is', getLevelName(1));
-
-  console.log('in solo payment');
   return (
     <ScrollView style={{flex: 1}} className="flex-1">
       <View className="flex-1">
@@ -257,7 +266,6 @@ const SoloBatchPayment = ({
 
               <View className="flex-row justify-around w-full mt-3">
                 {Object.entries(filteredBatches).map(([key, obj]) => {
-                  console.log('key is', key, obj);
                   return (
                     <Pressable
                       className="p-1 border-2 rounded px-3 max-w-[32%] items-center"

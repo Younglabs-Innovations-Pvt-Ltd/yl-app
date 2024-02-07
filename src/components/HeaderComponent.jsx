@@ -111,7 +111,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
               />
             )}
           </View> */}
-          <View className="relative w-full items-start overflow-hidden">
+          <View className="relative w-full items-start overflow-hidden pl-3">
             <TouchableOpacity onPress={open}>
               {ordersOrBookingsLoading ? (
                 <ActivityIndicator />
@@ -182,7 +182,9 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
             } rounded-full py-1 px-2`}
             onPress={() => setShowAddChildView(true)}>
             <MIcon name="plus" size={20} color={textColors.textPrimary} />
-            <Text className="text-xs" style={{fontFamily:FONTS.primaryFont}}>Add Child</Text>
+            <Text className="text-xs" style={{fontFamily: FONTS.primaryFont}}>
+              Add Child
+            </Text>
           </Pressable>
         </View>
       </View>

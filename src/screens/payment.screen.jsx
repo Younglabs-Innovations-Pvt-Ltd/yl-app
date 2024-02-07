@@ -56,23 +56,21 @@ const {width: deviceWidth} = Dimensions.get('window');
 
 const Payment = ({navigation, route}) => {
   const {paymentBatchType} = route.params;
-
+  const {paymentMethod} = route.params;
+  const {classesSold} = route.params;
   const [email, setEmail] = useState('');
   const [emailErr, setEmailErr] = useState('');
   const [dateTime, setDateTime] = useState('');
   const [visible, setVisible] = useState(false);
   const [offerCodes, setOfferCodes] = useState([]);
   const [couponCode, setCouponCode] = useState('');
-
   const [amount, setAmount] = useState(0);
   const [couponMsg, setCouponMsg] = useState('');
   const [fadeOut, setFadeOut] = useState(false);
   const [visibleCongratulations, setVisibleCongratulations] = useState(false);
   const [authVisible, setAuthVisible] = useState(false);
-
   // reducers values
   const {user} = useSelector(authSelector);
-
   // referral and coupon handle
   const [totalCredits, setTotalCredits] = useState(0);
   const [totalCreditsUsed, setTotalCreditsUsed] = useState(0);
@@ -87,6 +85,18 @@ const Payment = ({navigation, route}) => {
   const [showChangeChildSheet, setShowChangeChildSheet] = useState(false);
   const [leadDataFormVisible, setLeadDataFormVisible] = useState(false);
   const [openAddChildSheet, setOpenAddChildSheet] = useState(false);
+  const [classCount, setClassCount] = useState(null);
+
+  useEffect(() => {
+    let classesSolds;
+    if (classesSold && classesSold > 0) {
+      classesSolds = classesSold;
+    } else {
+      classesSolds = currentLevel === 1 || currentLevel === 2 ? 12 : 24;
+    }
+
+    setClassCount(classesSolds);
+  }, [classesSold, currentLevel]);
 
   console.log('selected Child for order', selectedChildForOrder);
 
@@ -135,15 +145,12 @@ const Payment = ({navigation, route}) => {
     courseDetails,
   } = useSelector(courseSelector);
 
-  // console.log("current seelcted batch is " , currentSelectedBatch)
-
   const {loading, payment, message} = useSelector(paymentSelector);
   const confettiRef = useRef();
   const cannonWrapperRef = useRef();
   const {bookingDetails} = useSelector(joinDemoSelector);
   const {selectedChild, userBookings} = useSelector(welcomeScreenSelector);
   const {ipData} = useSelector(bookDemoSelector);
-
   const {customer} = useSelector(authSelector);
   const dispatch = useDispatch();
   const {children} = useSelector(userSelector);
@@ -270,6 +277,7 @@ const Payment = ({navigation, route}) => {
       startDate: startDateTime,
       price: price,
       level: currentLevel,
+      classesSold: classesSold || null,
     };
 
     if (selectedCoupon) {
@@ -290,7 +298,7 @@ const Payment = ({navigation, route}) => {
 
     // console.log('body  giving is =', body);
     console.log('i am here');
-    dispatch(makeSoloPayment({body, ipData}));
+    dispatch(makeSoloPayment({body, ipData, paymentMethod}));
   };
 
   const handleRefferalApply = async () => {
@@ -630,7 +638,7 @@ const Payment = ({navigation, route}) => {
         </View>
         <Spacer space={6} />
         <TextWrapper fs={20} fw="700">
-          Course Detailss
+          Course Details
         </TextWrapper>
         <Spacer space={4} />
         <View style={styles.card}>
@@ -648,13 +656,12 @@ const Payment = ({navigation, route}) => {
             </TextWrapper>
           </TextWrapper>
           <Spacer space={6} />
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <MIcon name="book-variant" size={26} color={COLORS.black} />
-            <TextWrapper fs={18}>
-              Total Classes:{' '}
-              {currentLevel === 1 || currentLevel === 2 ? 12 : 24}
-            </TextWrapper>
-          </View>
+          {classCount && (
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+              <MIcon name="book-variant" size={26} color={COLORS.black} />
+              <TextWrapper fs={18}>Total Classes: {classCount}</TextWrapper>
+            </View>
+          )}
           <Spacer space={6} />
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
             <MIcon name="cake-variant" size={26} color={COLORS.black} />
@@ -754,12 +761,14 @@ const Payment = ({navigation, route}) => {
             </View>
           </View>
 
-          <View className="flex-row justify-between items-center my-4 pt-1">
-            <Text>{totalCredits} Redeem Points Available</Text>
-            <Pressable onPress={redeemCredits} disabled={totalCredits == 0}>
-              <Text className="text-blue-600">Reddem Now</Text>
-            </Pressable>
-          </View>
+          {customer === 'yes' && (
+            <View className="flex-row justify-between items-center my-4 pt-1">
+              <Text>{totalCredits} Redeem Points Available</Text>
+              <Pressable onPress={redeemCredits} disabled={totalCredits == 0}>
+                <Text className="text-blue-600">Reddem Now</Text>
+              </Pressable>
+            </View>
+          )}
 
           {couponMsg && (
             <TextWrapper fs={14} color={COLORS.pred}>
@@ -896,7 +905,7 @@ const Payment = ({navigation, route}) => {
         snapPoint={['40%', '75%']}
       />
 
-      {console.log("childrens here are ", children)}
+      {console.log('childrens here are ', children)}
 
       <BottomSheetComponent
         isOpen={openAddChildSheet}
@@ -1179,8 +1188,8 @@ const LeadDataForm = ({setChild, child, close}) => {
       return;
     } else {
       setChild({
-        name:orderChildData?.childName,
-        age:orderChildData?.childAge,
+        name: orderChildData?.childName,
+        age: orderChildData?.childAge,
       });
       close();
       // closeSheet();

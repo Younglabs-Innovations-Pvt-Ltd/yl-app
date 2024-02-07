@@ -314,18 +314,24 @@ function* makeSoloPaymentSaga({payload}) {
     const ipData = payload.ipData;
     const paymentMethod = payload.paymentMethod;
 
+    let classesSold;
+    if (body.classesSold && body.classesSold > 0) {
+      classesSold = body.classesSold;
+    } else {
+      classesSold = body.level === 1 || body.level === 2 ? 12 : 24;
+    }
+
     console.log('body hre is=');
     const batch = {
       ageGroup: body.ageGroup,
       batchType: body.batchType,
-      classCount: body.level === 1 || body.level === 2 ? 12 : 24,
+      classCount: classesSold,
       courseId: body.courseId,
       level: body.level,
       price: parseInt(body.discountedPrice || body.price),
     };
 
     const offeringBody = generateOffering(batch);
-
     body.offeringData = offeringBody;
 
     // console.log("getting token", token)
@@ -336,7 +342,9 @@ function* makeSoloPaymentSaga({payload}) {
     }
 
     const token = yield auth().currentUser.getIdToken();
-    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
+    const url = 'https://7327-2401-4900-1c5b-64c3-7032-1d6d-9a5b-9f8d.ngrok-free.app';
+    console.log('calling api');
+    const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -345,6 +353,7 @@ function* makeSoloPaymentSaga({payload}) {
       body: JSON.stringify(body),
     });
 
+    // console.log('res is', response.status);
 
     const data = yield response.json();
 
@@ -356,10 +365,10 @@ function* makeSoloPaymentSaga({payload}) {
       return;
     }
 
-    console.log('i am here finnaly');
+    console.log('i am here finnaly' , data);
     const {amount, id: order_id, currency} = data.order;
 
-    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
+    const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -410,7 +419,7 @@ function* makeSoloPaymentSaga({payload}) {
     const rzRes = yield RazorpayCheckout.open(options);
     console.log('rzRes=', rzRes);
   } catch (error) {
-    console.log(error);
+    console.log('getting err', error.message);
   }
 }
 
