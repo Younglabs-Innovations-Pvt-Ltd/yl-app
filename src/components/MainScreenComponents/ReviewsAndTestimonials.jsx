@@ -6,7 +6,7 @@ import {fetchContentDataStart} from '../../store/content/reducer';
 import TextWrapper from '../text-wrapper.component';
 import {FONTS} from '../../utils/constants/fonts';
 import {FlatList} from 'react-native-gesture-handler';
-import VideoPlayer from '../video-player.component';
+import Video from '../video.component';
 
 const ReviewsAndTestimonials = () => {
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ const ReviewsAndTestimonials = () => {
           {contentData?.content?.reviews?.subheading}
         </Text>
         {/* <Spacer /> */}
-        <View className="h-[200px] w-full overflow-hidden">
+        <View className="w-full overflow-hidden">
           <FlatList
             data={contentData?.reviews}
             keyExtractor={item => item.id}
@@ -56,17 +56,13 @@ const ReviewsAndTestimonials = () => {
             )}
             className="mt-4 rounded overflow-hidden"
             renderItem={({item}) => (
-              <View
-                className={`h-[180px] w-[130px]  rounded ${
-                  darkMode ? 'bg-gray-800' : 'bg-gray-200'
-                }`}></View>
-              //   <VideoPlayer
-              //     key={item.id}
-              //     uri={item.uri}
-              //     poster={item.poster}
-              //     thumbnailText={item?.thumbnailText}
-              //     aspectRatio={9 / 16}
-              //   />
+              <Video
+                key={item.id}
+                uri={item.uri}
+                poster={item.poster}
+                thumbnailText={item?.thumbnailText}
+                aspectRatio={9 / 16}
+              />
             )}
           />
         </View>
@@ -107,17 +103,13 @@ const ReviewsAndTestimonials = () => {
           className="mt-4"
           ItemSeparatorComponent={() => <View style={{marginHorizontal: 4}} />}
           renderItem={({item}) => (
-            <View
-              className={`h-[180px] w-[130px]  rounded ${
-                darkMode ? 'bg-gray-800' : 'bg-gray-200'
-              }`}></View>
-            // <VideoPlayer
-            //   key={item.id.toString()}
-            //   uri={item.uri}
-            //   poster={item.poster}
-            //   thumbnailText={item?.thumbnailText}
-            //   aspectRatio={9 / 16}
-            // />
+            <Video
+              key={item.id}
+              uri={item.uri}
+              poster={item.poster}
+              thumbnailText={item?.thumbnailText}
+              aspectRatio={9 / 16}
+            />
           )}
         />
       </View>

@@ -5,7 +5,6 @@ import {
   fetchBookingStatusSuccess,
   setErrorMessage,
   getCoursesForWelcomeScreen,
-  setLoading,
   getCoursesForWelcomeScreenFailed,
   getCoursesForWelcomeScreenSuccess,
   startGetAllBookings,
@@ -14,11 +13,11 @@ import {
   startFetchingUserOrders,
   userOrderFetchingSuccess,
   userOrdersLoadingFailed,
-  setSelectedUserOrder,
   setIsFirstTimeUser,
+  setCustomer,
 } from './reducer';
 
-import {createLead, fetchBookingDetailsFromPhone} from '../../utils/api/yl.api';
+import {createLead} from '../../utils/api/yl.api';
 import {
   fetchAllBookinsFromPhone,
   fetchAllOrdersFromLeadId,
@@ -26,21 +25,14 @@ import {
 } from '../../utils/api/welcome.screen.apis';
 import {isValidNumber} from '../../utils/isValidNumber';
 
-import {navigate, replace} from '../../navigationRef';
+import {replace} from '../../navigationRef';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
-import {
-  localStorage,
-  setCountryCallingCodeAsync,
-} from '../../utils/storage/storage-provider';
+import {localStorage} from '../../utils/storage/storage-provider';
 
-import {setCurrentNetworkState} from '../network/reducer';
-import {ERROR_MESSAGES} from '../../utils/constants/messages';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import DeviceInfo from 'react-native-device-info';
-import {setBookingDetailSuccess} from '../join-demo/join-demo.reducer';
-import {fetchDemoDetailsFromPhone} from '../join-demo/join-demo.saga';
 
 /**
  * @author Shobhit
@@ -68,19 +60,6 @@ function* handleBookingStatus({payload: {phone}}) {
       return;
     }
 
-    // Get booking data
-    // const response = yield fetchBookingDetailsFromPhone(phone);
-    // // const data = yield response.json();
-
-    localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
-    localStorage.set(
-      LOCAL_KEYS.LOGINDETAILS,
-      JSON.stringify({
-        loginType: 'whatsAppNumber',
-        phone,
-      }),
-    );
-
     const deviceId = yield getCurrentDeviceId();
     const deviceUID = yield DeviceInfo.getAndroidId();
     const countryCode = 91;
@@ -95,10 +74,22 @@ function* handleBookingStatus({payload: {phone}}) {
     });
     const leadData = yield leadRes.json();
 
-    // yield call(fetchDemoDetailsFromPhone);
+    if (leadData.customer === 'yes') {
+      yield put(setCustomer('yes'));
+      return;
+    }
+
+    localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
+    localStorage.set(
+      LOCAL_KEYS.LOGINDETAILS,
+      JSON.stringify({
+        loginType: 'whatsAppNumber',
+        phone,
+      }),
+    );
+
     yield put(fetchBookingStatusSuccess(''));
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
-    // }
   } catch (error) {
     console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR_SAGA 4', error.message);
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {

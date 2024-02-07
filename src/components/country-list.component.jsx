@@ -27,7 +27,7 @@ const CountryList = ({visible, onClose, onSelect}) => {
         });
         const data = await response.json();
 
-        const countries = data.map(country => {
+        let countries = data.map(country => {
           return {
             name: country.name,
             flags: country.flags,
@@ -37,6 +37,10 @@ const CountryList = ({visible, onClose, onSelect}) => {
               cca3: country.cca3,
             },
           };
+        });
+
+        countries = countries.sort(function (a, b) {
+          return a.name.common.localeCompare(b.name.common);
         });
 
         setCountryData(countries);
@@ -65,7 +69,16 @@ const CountryList = ({visible, onClose, onSelect}) => {
       <View style={styles.container}>
         <View style={styles.header}>
           <TextWrapper fs={18}>Select country</TextWrapper>
-          <Pressable style={styles.btnClose} onPress={onClose}>
+          <Pressable
+            style={({pressed}) => [
+              styles.btnClose,
+              {
+                backgroundColor: pressed
+                  ? 'rgba(238, 238, 238, 0.7)'
+                  : 'rgb(238, 238, 238)',
+              },
+            ]}
+            onPress={onClose}>
             <Icon name="close-outline" color={COLORS.black} size={24} />
           </Pressable>
         </View>
@@ -136,10 +149,6 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
   },
-  btnClose: {
-    padding: 4,
-    justifyContent: 'center',
-  },
   search: {
     flex: 1,
     color: COLORS.black,
@@ -151,6 +160,5 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#eee',
   },
 });

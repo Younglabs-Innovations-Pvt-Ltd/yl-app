@@ -19,6 +19,7 @@ const INITIAL_STATE = {
   selectedUserOrder: {},
   currentUserOrders: null,
   isFirstTimeUser: false,
+  customer: '',
 };
 
 const reducer = {
@@ -111,7 +112,11 @@ const reducer = {
   },
   setCurrentUserOrders(state, action) {
     state.currentUserOrders = action.payload;
-  }
+  },
+  setCustomer(state, action) {
+    state.customer = action.payload;
+    state.loading = false;
+  },
 };
 
 const slice = createSlice({
@@ -144,7 +149,8 @@ export const {
   setIsFirstTimeUser,
   getUserOrdersByName,
   getUserOrdersByNameSuccess,
-  setCurrentUserOrders
+  setCurrentUserOrders,
+  setCustomer,
 } = slice.actions;
 
 export const welcomeScreenReducer = slice.reducer;

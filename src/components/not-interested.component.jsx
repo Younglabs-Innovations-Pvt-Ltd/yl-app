@@ -15,6 +15,8 @@ import Collapsible from 'react-native-collapsible';
 import {FONTS} from '../utils/constants/fonts';
 import {markNotInterest} from '../utils/api/yl.api';
 import Snackbar from 'react-native-snackbar';
+import {useDispatch} from 'react-redux';
+import {setAppRemark} from '../store/join-demo/join-demo.reducer';
 
 const faqs = [
   'Did not like class',
@@ -31,7 +33,7 @@ const NotInterested = ({onClose, bookingDetails}) => {
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
 
-  const {leadId, phone, parentName} = bookingDetails;
+  const dispatch = useDispatch();
 
   const onSelectComment = payload => {
     if (payload === 'Other') {
@@ -76,6 +78,7 @@ const NotInterested = ({onClose, bookingDetails}) => {
         });
       }
       setLoading(false);
+      dispatch(setAppRemark(remark));
     } catch (error) {
       console.log('MARK NOT INTERESTED', error.message);
     }

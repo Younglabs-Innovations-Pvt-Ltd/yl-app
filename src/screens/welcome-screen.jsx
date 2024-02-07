@@ -26,6 +26,7 @@ import {
   setCountry,
   setModalVisible,
   fetchBookingStatusStart,
+  setCustomer,
 } from '../store/welcome-screen/reducer';
 
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
@@ -35,9 +36,11 @@ import {networkSelector} from '../store/network/selector';
 import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
-import { Showtoast } from '../utils/toast';
-import { useToast } from 'react-native-toast-notifications';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import {Showtoast} from '../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
+import Icon from '../components/icon.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 const IMAGE_WIDTH = deviceWidth * 0.7;
@@ -47,13 +50,13 @@ const GAP = 54;
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
-  const toast = useToast()
-  const {textColors, colorYlMain} =
-  useSelector(state => state.appTheme);
+  const toast = useToast();
+  const {textColors, colorYlMain} = useSelector(state => state.appTheme);
 
   const {localLang, currentLang} = i18nContext();
 
   const [phone, setPhone] = useState('');
+  const [visible, setVisible] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -61,7 +64,7 @@ const DemoClassScreen = ({navigation}) => {
     networkState: {isConnected, alertAction},
   } = useSelector(networkSelector);
   const {ipData} = useSelector(bookDemoSelector);
-  const {country, modalVisible, loading, message} = useSelector(
+  const {country, modalVisible, loading, message, customer} = useSelector(
     welcomeScreenSelector,
   );
 
@@ -71,12 +74,45 @@ const DemoClassScreen = ({navigation}) => {
     StatusBar.setBarStyle('light-content');
   }, []);
 
+  // show message to customer to login with right credentials (email and password)
+  useEffect(() => {
+    if (customer === 'yes') {
+      Showtoast({
+        text: 'Login with right credentials (email, password)',
+        toast,
+        type: 'danger',
+      });
+
+      dispatch(setCustomer(''));
+    }
+  }, [customer]);
+
+  // fetch ipData
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+
+    if (ipData) {
+      dispatch(
+        setCountry({
+          callingCode: ipData.calling_code,
+          countryCode: {cca2: ipData.country_code2},
+        }),
+      );
+    }
+  }, [ipData]);
+
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
     if (phoneRegex.test(e)) {
       setPhone(e);
     }
   };
+
+  // Show and hide country list
+  const onModalOpen = () => setVisible(true);
+  const onModalClose = () => setVisible(false);
 
   /**
    * @author Shobhit
@@ -87,10 +123,8 @@ const DemoClassScreen = ({navigation}) => {
    * Takes two parameter phone number and country({callingCode, countryCode})
    */
   const handleBookingStatus = async () => {
-    console.log("clicked");
-    
-    if(!phone){
-      Showtoast({text:"Please Enter Whatsapp Number", toast , type:"danger"})
+    if (!phone) {
+      Showtoast({text: 'Please Enter Whatsapp Number', toast, type: 'danger'});
     }
     dispatch(fetchBookingStatusStart({phone}));
   };
@@ -108,7 +142,7 @@ const DemoClassScreen = ({navigation}) => {
         countryCode: {cca2: country.countryCode.cca2},
       }),
     );
-    dispatch(setModalVisible(false));
+    onModalClose();
   };
 
   const onCloseBottomSheet = () => dispatch(setModalVisible(false));
@@ -203,12 +237,13 @@ const DemoClassScreen = ({navigation}) => {
   }, [animatedValues]);
 
   // Check for max length of a phone number according country
-  const maxPhoneLength = useMemo(() => {
-    if (!country?.countryCode) {
-      return 15;
-    }
-    return phoneNumberLength[country.countryCode.cca2];
-  }, [country]);
+  // const maxPhoneLength = useMemo(() => {
+  //   if (!country?.countryCode) {
+  //     return 15;
+  //   }
+
+  //   return phoneNumberLength[country.countryCode.cca2];
+  // }, [country]);
 
   const isTablet = deviceWidth > 540;
   let CONTAINER_STYLE = {};
@@ -231,7 +266,9 @@ const DemoClassScreen = ({navigation}) => {
   return (
     <View style={styles.wrapper}>
       <ImageBackground
-        style={{flex: 1}}
+        style={{
+          flex: 1,
+        }}
         source={require('../assets/images/background2.jpeg')}
         resizeMode="cover">
         {/* <LanguageSelection /> */}
@@ -264,15 +301,18 @@ const DemoClassScreen = ({navigation}) => {
               opacity: animatedButtons,
             },
           ]}>
-          <View style={{}} className="py-6 bg-white px-3 rounded-2xl relative">
-            <View className="absolute p-[2px] rounded-full bg-gray-400 top-1 left-[48%] w-[15%]"></View>
+          <View
+            style={{elevation: 10}}
+            className="py-6 bg-white px-3 rounded-2xl relative">
+            {/* <View className="absolute p-[2px] rounded-full bg-gray-400 top-1 left-[48%] w-[15%]"></View> */}
 
             {/* <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
               Book Free Handwriting Class
             </TextWrapper> */}
-            <View style={styles.row} className="mt-5">
-              <Pressable style={styles.btnCountryCode}>
-                <TextWrapper>{'+91'}</TextWrapper>
+            <View style={styles.row}>
+              <Pressable style={styles.btnCountryCode} onPress={onModalOpen}>
+                <TextWrapper>{country?.callingCode}</TextWrapper>
+                <Icon name="chevron-down" size={20} color={COLORS.black} />
               </Pressable>
               <TextInput
                 placeholder="Enter Whatsapp number"
@@ -282,36 +322,45 @@ const DemoClassScreen = ({navigation}) => {
                 onChangeText={handlePhone}
                 inputMode="numeric"
                 placeholderTextColor={'gray'}
-                maxLength={maxPhoneLength}
+                maxLength={15}
               />
             </View>
             <TouchableOpacity
-              activeOpacity={.8}
+              activeOpacity={0.8}
               style={btnContinueStyle}
               disabled={loading}
               onPress={handleBookingStatus}
-              className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}
-              >
+              className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}>
               <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
                 Log in
               </TextWrapper>
             </TouchableOpacity>
 
-            <View style={{alignItems: 'center', marginTop:28}}>
+            <View style={{alignItems: 'center', marginTop: 28}}>
               <Pressable
                 style={{paddingVertical: 4}}
                 onPress={() => navigation.navigate(SCREEN_NAMES.SIGNUP)}>
-                <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">Don't have WhatsApp</TextWrapper>
+                <TextWrapper
+                  fs={16}
+                  ff={FONTS.primaryFont}
+                  className="text-gray-600">
+                  Don't have WhatsApp
+                </TextWrapper>
               </Pressable>
 
               <View className="my-3 border-t-[.7px] h-[1px] w-[80%] border-gray-400 relative">
-                  <Text className="absolute -top-3 bg-white px-1 left-[48%]">or</Text>
+                <Text className="absolute -top-3 bg-white px-1 left-[48%]">
+                  or
+                </Text>
               </View>
 
               <Pressable
                 style={{paddingVertical: 4}}
                 onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
-                <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">
+                <TextWrapper
+                  fs={16}
+                  ff={FONTS.primaryFont}
+                  className="text-gray-600">
                   Existing user? Login with Email
                 </TextWrapper>
               </Pressable>
@@ -324,8 +373,8 @@ const DemoClassScreen = ({navigation}) => {
           </Center>
         </ModalComponent>
         <CountryList
-          visible={modalVisible}
-          onClose={onCloseBottomSheet}
+          visible={visible}
+          onClose={onModalClose}
           onSelect={handleSelectCountry}
         />
       </ImageBackground>
@@ -340,6 +389,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     position: 'relative',
+    marginTop: deviceWidth * 0.2,
   },
   wrapper: {
     flex: 1,
@@ -432,8 +482,9 @@ const styles = StyleSheet.create({
     height: 220,
   },
   btnCountryCode: {
-    display: 'flex',
+    flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 8,
   },
   btnConfirm: {

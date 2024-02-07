@@ -106,8 +106,6 @@ const MainWelcomeScreen = ({navigation}) => {
   );
   const {currentChild, children} = useSelector(userSelector);
 
-  console.log('children are ', children);
-
   const {selectedChild} = useSelector(welcomeScreenSelector);
 
   const dispatch = useDispatch();
@@ -119,6 +117,8 @@ const MainWelcomeScreen = ({navigation}) => {
     teamUrl,
     isAttended,
     bookingTime,
+    isNmi,
+    appRemark,
   } = useSelector(joinDemoSelector);
 
   // console.log("user is", customer)
@@ -185,29 +185,24 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    // console.log('demo data here is');
-    if (demoData && user?.phone) {
+    console.log('demo data here is');
+    if (demoData && user?.phone && bookingDetails) {
       console.log('dispatching function');
-      dispatch(setDemoData({demoData, phone: user?.phone}));
+      dispatch(setDemoData({demoData, phone: user?.phone, bookingDetails}));
     }
-  }, [demoData, user, isTimeover]);
+  }, [demoData, user, isTimeover, bookingDetails]);
 
   useEffect(() => {
     if (!bookingTime) return;
     const isDemoOver =
-      new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
+      new Date(bookingTime).getTime() + 1000 * 60 * 10 <= Date.now();
     // console.log('demoData is', bookingDetails);
-    if (
-      isDemoOver &&
-      isAttended &&
-      teamUrl &&
-      bookingDetails?.needMoreInfo !== true
-    ) {
+    if (isDemoOver && isAttended && teamUrl && !isNmi && !appRemark) {
       setShowPostActions(true);
     } else {
       setShowPostActions(false);
     }
-  }, [bookingTime, isAttended, teamUrl, bookingDetails]);
+  }, [bookingTime, isAttended, teamUrl, isNmi, appRemark]);
 
   useEffect(() => {
     let timer;
@@ -236,7 +231,7 @@ const MainWelcomeScreen = ({navigation}) => {
 
   // Change Added Child actions
   const onChangeChildSheetOpen = () => {
-    console.log('opening'), setShowChangeChildView(true);
+    setShowChangeChildView(true);
   };
   const onChangeChildSheetClose = () => {
     setShowChangeChildView(false);
