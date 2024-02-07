@@ -9,6 +9,7 @@ const INITIAL_STATE = {
   confirm: null,
   email: '',
   user: null,
+  userFetchLoading: false,
   customer: 'no',
   childAge: 8,
   credits: 980,
@@ -55,8 +56,11 @@ const reducers = {
   setEmail(state, action) {
     state.email = action.payload;
   },
-  fetchUser(state, action) {},
+  fetchUser(state, action) {
+    state.userFetchLoading = true
+  },
   setUser(state, action) {
+    state.userFetchLoading = false;
     state.user = action.payload;
   },
   setIsCustomer(state, action) {

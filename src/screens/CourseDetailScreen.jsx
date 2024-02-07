@@ -9,20 +9,15 @@ import {FlatList} from 'react-native-gesture-handler';
 import {FONTS} from '../utils/constants/fonts';
 
 const BANNER_H = 190;
-const CourseDetailsScreen = ({route, navigation}) => {
-  const {darkMode, textColors, bgColor, colorYlMain} = useSelector(
-    state => state.appTheme,
-  );
+const CourseDetailsScreen = ({navigation, route}) => {
+  // console.log("navigaion is", )
+  const {bgColor, colorYlMain} = useSelector(state => state.appTheme);
   const scrollViewRef = useRef();
   const {courseData} = route.params;
   const {subScreenToShow} = route.params;
   // console.log("courseData", courseData);
   const [selectedTab, setSelectedTab] = useState('courseDetails');
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [contentHeight, setContentHeight] = useState(0);
-  const [scrollViewHeight, setScrollViewHeight] = useState(0);
-  const [buttonToShow, setButtonToShow] = useState('top');
-
   const scrollA = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -34,15 +29,12 @@ const CourseDetailsScreen = ({route, navigation}) => {
   const handleScroll = event => {
     const y = event.nativeEvent.contentOffset.y;
     setScrollPosition(y);
-    // setTimeout(()=>{
-    //   setShowScrollerButton(!showScrollerButton);
-    // })
   };
 
-  const scrollToTop = () => {
-    // console.log('Scrolling functions');
-    scrollViewRef.current.scrollTo({y: 0, animated: true});
-  };
+  // const scrollToTop = () => {
+  //   // console.log('Scrolling functions');
+  //   scrollViewRef.current.scrollTo({y: 0, animated: true});
+  // };
 
   const scrollToBottom = () => {
     // console.log('scrolling to bottom');
@@ -56,43 +48,8 @@ const CourseDetailsScreen = ({route, navigation}) => {
     }
   }, [selectedTab]);
 
-  // set show Button for scrolling up and down
-  // useEffect(() => {
-  //   if (selectedTab !== 'payAndEnroll') {
-  //     // Check if the user is 20% from the top or bottom
-  //     const isTop20Percent = scrollPosition < 0.15 * contentHeight;
-  //     const isBottom20Percent =
-  //       scrollPosition > 0.85 * (contentHeight - scrollViewHeight);
-
-  //     // Perform actions based on scroll position
-  //     if (isTop20Percent) {
-  //       setButtonToShow('bottom');
-  //     } else if (isBottom20Percent) {
-  //       setButtonToShow('top');
-  //     }
-  //   }
-  // }, [scrollPosition, contentHeight, scrollViewHeight, selectedTab]);
-
   return (
     <View className="w-full flex-1" style={{backgroundColor: bgColor}}>
-      {/* Button for scrolling up and down  */}
-      {/* {selectedTab !== 'payAndEnroll' && (
-        <Pressable
-          className="absolute bottom-[80px] right-5 h-12 w-12 z-50 rounded-full items-center justify-center"
-          style={{backgroundColor: textColors.textYlMain}}
-          onPress={() => {
-            buttonToShow == 'top' ? scrollToTop() : scrollToBottom();
-          }}>
-          <View className="items-center justify-center">
-            <MIcon
-              name={buttonToShow === 'top' ? 'arrow-up' : 'arrow-down'}
-              size={30}
-              color="white"
-            />
-          </View>
-        </Pressable>
-      )} */}
-
       <Animated.ScrollView
         onScroll={Animated.event(
           [{nativeEvent: {contentOffset: {y: scrollA}}}],

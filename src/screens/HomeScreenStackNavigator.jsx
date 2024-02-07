@@ -10,7 +10,7 @@ import CourseDetailsScreen from './CourseDetailScreen';
 import ViewAllCourses from './ViewAllCourses';
 import UserProfile from './UserProfile';
 import {useSelector} from 'react-redux';
-import { SCREEN_NAMES } from '../utils/constants/screen-names';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import Payment from './payment.screen';
 
 const Stack = createStackNavigator();
@@ -49,18 +49,6 @@ const HomeScreenStackNavigator = () => {
           options={({route}) => ({
             title: route.params.heading || 'All Courses',
           })}
-        />
-        <Stack.Screen
-          name="UserProfileScreen"
-          component={UserProfile}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={SCREEN_NAMES.PAYMENT}
-          component={Payment}
-          options={{
-            headerTitle: 'Checkout',
-          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

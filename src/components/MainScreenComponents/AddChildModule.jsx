@@ -14,7 +14,6 @@ import {useToast} from 'react-native-toast-notifications';
 import {COLORS} from '../../utils/constants/colors';
 
 export const AddChildModule = ({onClose}) => {
-  console.log('got onClose in sheet', onClose);
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
     useSelector(state => state.appTheme);
   const [childName, setChildName] = useState(null);
@@ -23,7 +22,6 @@ export const AddChildModule = ({onClose}) => {
   const {customer, user} = useSelector(authSelector);
   const {childAddLoading} = useSelector(userSelector);
 
-  console.log('child add loading', childAddLoading);
 
   const dispatch = useDispatch();
   const toast = useToast();

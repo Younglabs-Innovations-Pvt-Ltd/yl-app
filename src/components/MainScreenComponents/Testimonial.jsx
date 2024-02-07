@@ -1,4 +1,4 @@
-import {View, Text, Dimensions} from 'react-native';
+import {View, Text, Dimensions, ImageBackground} from 'react-native';
 import React from 'react';
 import {useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,20 +11,35 @@ const Testimonial = ({data}) => {
     useSelector(state => state.appTheme);
 
   // console.log('data here is', data);
+  {
+    /* {
+    id: 1,
+    name: 'Savita Kolte',
+    review:
+      'Excellent course for anyone who wants to learn or improve on handwriting. The course is very interesting and my son really enjoyed learning.',
+    image:
+      'https://www.younglabs.in/_next/image?url=https%3A%2F%2Flh3.googleusercontent.com%2Fa%2FAEdFTp4UUHXUK1FvZz2x5ao31IUUo9PfnlzL5VNipJNT%3Ds120-c-c0x00000000-cc-rp-mo-br100&w=128&q=75',
+  }, */
+  }
+
   return (
     <View
       className="h-[200px] rounded-md items-center border-gray-100 overflow-hidden"
       style={{
         width: width - 130,
         backgroundColor: darkMode ? bgSecondaryColor : bgColor,
-        borderWidth:darkMode ? 0 : 1
+        borderWidth: darkMode ? 0 : 1,
       }}>
       <View
         className="w-[100%] p-2  flex-row border-gray-200 px-3"
-        style={{backgroundColor: colorYlMain , borderWidth: darkMode? 0 : 1}}>
+        style={{backgroundColor: colorYlMain, borderWidth: darkMode ? 0 : 1}}>
         <View className="items-center justify-center">
           <View className="w-10 h-10 bg-white rounded-full items-center justify-center">
-            <MIcon name="account" size={35} color={colorYlMain} />
+            <ImageBackground
+              source={{uri: data?.image}}
+              className="w-full h-full shadow shadow-gray-400"
+              style={[{resizeMode: 'contain'}]}
+            />
           </View>
         </View>
         <View className="ml-2 justify-center max-w-[80%]">
@@ -33,21 +48,14 @@ const Testimonial = ({data}) => {
             style={[{fontFamily: FONTS.headingFont}]}>
             {data.name}
           </Text>
-          <Text
+          {/* <Text
             className="text-[11px] text-white leading-3"
             style={{fontFamily: FONTS.primaryFont}}>
             Posted on: {data.posted_on}
-          </Text>
+          </Text> */}
         </View>
       </View>
       <View className="relatibve flex-1 w-full h-full px-2">
-        {/* <View className="absolute top-0 left-2 bg-gray-30">
-            <MIcon
-              name="format-quote-open-outline"
-              size={40}
-              color={darkMode ? '#e9dddd7a' : '#2522225c'}
-            />
-          </View> */}
         <View className="absolute bottom-0 right-2 bg-gray-30">
           <MIcon
             name="format-quote-close-outline"
@@ -62,10 +70,10 @@ const Testimonial = ({data}) => {
               FONTS.primary,
               {
                 color: textColors.textSecondary,
-                fontSize:15
+                fontSize: 15,
               },
             ]}>
-            {data?.comment}
+            {data?.review}
           </Text>
         </View>
       </View>

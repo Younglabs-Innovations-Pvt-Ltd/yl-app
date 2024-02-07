@@ -84,21 +84,34 @@ function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
 }
 
 function* fetchUserSaga({payload}) {
+  console.log('in fetchUserSaga', payload);
   try {
     if (!payload) {
       return;
     }
+    console.log('getting response');
     const res = yield getCustomers(payload);
-    // console.log("res is",res)
+    console.log('res status', res.status);
     const data = yield res.json();
+    console.log('got user data', data);
     if (data?.data?.customer === 'yes') {
       console.log('sttin customer');
       yield put(setIsCustomer(true));
     }
 
     if (data?.data?.children && data?.data?.children?.length > 0) {
-      yield put(setCurrentChild(data?.data?.children[0]));
-      yield put(setChildren(data?.data?.children));
+      let arr = data?.data?.children;
+      let objWithBooking = arr.filter(item => item.bookingId);
+      let objWithoutBooking = arr.filter(item => !item.bookingId);
+      let sortedList = objWithBooking.sort((a, b) => b.bookingId - a.bookingId);
+      let finalArray = [...sortedList, ...objWithoutBooking];
+      console.log(
+        'setting current Child',
+        finalArray[0]?.name,
+        finalArray[0].bookingId,
+      );
+      yield put(setCurrentChild(finalArray[0]));
+      yield put(setChildren(finalArray));
     } else {
       yield put(setIsFirstTimeUser(true));
     }
@@ -133,7 +146,7 @@ function* logoutFunc() {
   if (currentUser) {
     yield auth().signOut();
   }
-  navigate(SCREEN_NAMES.WELCOME);
+  // navigate(SCREEN_NAMES.WELCOME);
 }
 
 function* logoutUser() {
@@ -149,7 +162,6 @@ function* fetchUserFormLoginDetailsFunc() {
   if (!loginDetails) {
     yield put(logout());
   }
-
   // console.log('login details is', loginDetails);
   if (loginDetails.loginType === 'whatsAppNumber') {
     console.log('getting user by', loginDetails.phone);

@@ -67,7 +67,7 @@ const MainScreen = ({route}) => {
   // };
 
   return (
-    <Tab.Navigator tabBar={props => <Tabbar {...props} />}>
+    <Tab.Navigator tabBar={props => <Tabbar {...props}  />}>
       <Tab.Screen
         name="Drawer"
         component={DrawerScreen}
@@ -102,7 +102,6 @@ const MainScreen = ({route}) => {
         name={'Account'}
         options={{tabBarLabel: "Account" , headerShown: false}}
         component={UserProfile}
-
       />
     </Tab.Navigator>
   );

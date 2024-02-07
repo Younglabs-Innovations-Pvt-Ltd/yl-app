@@ -30,22 +30,13 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   );
 
   const {
-    selectedChild,
-    userBookings,
     userOrders,
-    selectedUserOrder,
     allBookingsLoding,
     userOrdersLoading,
     allBookingsLoadingFailed,
-    userOrderLoadingFailed,
-    currentUserOrders,
   } = useSelector(welcomeScreenSelector);
-  const {user, customer} = useSelector(authSelector);
+  const {user, customer, userFetchLoading} = useSelector(authSelector);
   const {currentChild} = useSelector(userSelector);
-
-  const changeDarkMode = payload => {
-    dispatch(setDarkMode(payload));
-  };
 
   // useEffect(() => {
   //   console.log('useeffect running 1');
@@ -74,10 +65,6 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
     }
   }, [customer, allBookingsLoding, userOrdersLoading]);
 
-  const handleLogOut = () => {
-    dispatch(logout());
-  };
-
   // setCurrentUsers Orders
   useEffect(() => {
     if (userOrders && currentChild && customer === 'yes') {
@@ -91,29 +78,12 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   return (
     <>
       <View
-        style={tw`flex flex-row justify-between w-[100%] px-2 py-1 bg-[${bgSecondaryColor}]
+        style={tw`flex flex-row justify-between items-center w-[100%] px-2 py-1 bg-[${bgSecondaryColor}]
           }`}>
         <View className="flex-row items-center w-[75%]">
-          {/* <View className="px-2 justify-center">
-            {darkMode ? (
-              <MIcon
-                name="brightness-4"
-                color="white"
-                size={28}
-                onPress={() => changeDarkMode(false)}
-              />
-            ) : (
-              <MIcon
-                name="brightness-6"
-                color="orange"
-                size={28}
-                onPress={() => changeDarkMode(true)}
-              />
-            )}
-          </View> */}
           <View className="relative w-full items-start overflow-hidden pl-3">
             <TouchableOpacity onPress={open}>
-              {ordersOrBookingsLoading ? (
+              {userFetchLoading ? (
                 <ActivityIndicator />
               ) : ordersOrBookingsLoadingFailed ? (
                 <View>
@@ -182,7 +152,12 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
             } rounded-full py-1 px-2`}
             onPress={() => setShowAddChildView(true)}>
             <MIcon name="plus" size={20} color={textColors.textPrimary} />
-            <Text className="text-xs" style={{fontFamily: FONTS.primaryFont}}>
+            <Text
+              className="text-xs"
+              style={{
+                fontFamily: FONTS.primaryFont,
+                color: textColors.textSecondary,
+              }}>
               Add Child
             </Text>
           </Pressable>

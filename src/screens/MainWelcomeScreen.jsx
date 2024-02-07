@@ -19,7 +19,6 @@ import {AddChildModule} from '../components/MainScreenComponents/AddChildModule'
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import SwiperSlide from '../components/MainScreenComponents/SwiperSlide';
 import {authSelector} from '../store/auth/selector';
-import Testimonial from '../components/MainScreenComponents/Testimonial';
 import {FONTS} from '../utils/constants/fonts';
 import BookDemoScreen from './book-demo-form.screen';
 import ShowCourses from '../components/MainScreenComponents/ShowCourses';
@@ -34,12 +33,13 @@ import {
   startFetchBookingDetailsByName,
 } from '../store/user/reducer';
 import {userSelector} from '../store/user/selector';
+import {setDarkMode} from '../store/app-theme/appThemeReducer';
 
 const {width, height} = Dimensions.get('window');
 
 const sectionHeadingStyle = '';
 
-const swiperData = [
+const swiperData1 = [
   {
     name: 'Banner 1',
     coverImage:
@@ -99,16 +99,16 @@ const MainWelcomeScreen = ({navigation}) => {
   const [showBookFreeClassSheet, setShowBookFreeClassSheet] = useState(false);
   const [showRescheduleClassSheet, setShowRescheduleClassSheet] =
     useState(false);
-  // console.log("user children is", user)
+  const dispatch = useDispatch();
+  const [swiperData, setSwiperData] = useState([]);
 
   const {bgColor, textColors, colorYlMain} = useSelector(
     state => state.appTheme,
   );
   const {currentChild, children} = useSelector(userSelector);
 
-  const {selectedChild} = useSelector(welcomeScreenSelector);
+  const {courses} = useSelector(welcomeScreenSelector);
 
-  const dispatch = useDispatch();
   const {
     demoData,
     loading,
@@ -121,13 +121,32 @@ const MainWelcomeScreen = ({navigation}) => {
     appRemark,
   } = useSelector(joinDemoSelector);
 
-  // console.log("user is", customer)
+  // filter courses to show on the banner
+  useEffect(() => {
+    if (courses) {
+      console.log('has courses');
+      let arr = [];
+      const course = courses || {};
+      Object.keys(course).map(key => {
+        arr.push(...course[key]);
+      });
+      const filteredCourse = arr.filter(course => course.id === 'Eng_Hw');
+      setSwiperData(filteredCourse);
+    }
+  }, [courses]);
+
+  // setting apptheme
+  useEffect(() => {
+    const payload = localStorage.getBoolean('darkModeEnabled');
+    console.log('setting darkmode', payload);
+
+    dispatch(setDarkMode(payload));
+  }, []);
 
   // Fetching user details here
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');
     if (!user && loginDetails) {
-      // console.log("gettin user details")
       dispatch(fetchUserFormLoginDetails());
     }
   }, [user]);
@@ -152,6 +171,11 @@ const MainWelcomeScreen = ({navigation}) => {
   useEffect(() => {
     // console.log('running for selectedChild', selectedChild.bookingId);
     if (currentChild) {
+      console.log(
+        'getting booking for ',
+        currentChild?.name,
+        currentChild.bookingId,
+      );
       if (currentChild?.bookingId) {
         setIsFirstTimeUser(false);
         dispatch(setToInitialState());
@@ -159,8 +183,8 @@ const MainWelcomeScreen = ({navigation}) => {
       } else {
         dispatch(setIsFirstTimeUser(true));
       }
-      // dispatch(startFetchBookingDetailsByName({childName :currentChild?.name}))
     } else if (user?.phone) {
+      console.log('getting by phone');
       dispatch(startFetchBookingDetailsFromPhone(user.phone));
     }
   }, [user, currentChild]);
@@ -302,32 +326,6 @@ const MainWelcomeScreen = ({navigation}) => {
         {/* Reviews And Testimonials Here */}
         <Spacer space={12} />
         <ReviewsAndTestimonials />
-
-        {/* Testimonials */}
-        <Spacer space={12} />
-        <View className="w-full">
-          <View>
-            <Text
-              className={`${sectionHeadingStyle}`}
-              style={[FONTS.heading, {color: textColors.textPrimary}]}>
-              What Our Customer Speak
-            </Text>
-          </View>
-          <View className="w-[100%] mt-1">
-            <FlatList
-              data={testimonials}
-              keyExtractor={item => item.name}
-              renderItem={item => {
-                return <Testimonial data={item.item} />;
-              }}
-              showsHorizontalScrollIndicator={false}
-              ItemSeparatorComponent={() => {
-                return <View className="p-1"></View>;
-              }}
-              horizontal
-            />
-          </View>
-        </View>
 
         <Spacer space={16} />
       </ScrollView>
