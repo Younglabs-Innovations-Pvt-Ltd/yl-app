@@ -14,6 +14,7 @@ export const reviews = [
       "Handwriting class taken by Shamee ma'am was excellent, Siya improved a lot thank you ma'am 🙂",
     image:
       'https://www.younglabs.in/_next/image?url=https%3A%2F%2Flh3.googleusercontent.com%2Fa%2FAEdFTp6l_OP6eo_HODiPizvz1mdmWlCRBzJaYMdpIC4Y%3Ds120-c-c0x00000000-cc-rp-mo-br100&w=128&q=75',
+  },
   {
     id: 3,
     name: 'Suganya Sureshkumar',
