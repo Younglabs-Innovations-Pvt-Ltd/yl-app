@@ -46,6 +46,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     step2: true,
     step3: true,
   });
+  
 
   const dispatch = useDispatch();
 

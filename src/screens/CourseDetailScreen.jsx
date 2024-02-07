@@ -10,7 +10,7 @@ import {FONTS} from '../utils/constants/fonts';
 
 const BANNER_H = 190;
 const CourseDetailsScreen = ({navigation, route}) => {
-  // console.log("navigaion is", )
+  // console.log("navigaion is", navigation)
   const {bgColor, colorYlMain} = useSelector(state => state.appTheme);
   const scrollViewRef = useRef();
   const {courseData} = route.params;

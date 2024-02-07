@@ -50,6 +50,13 @@ const HomeScreenStackNavigator = () => {
             title: route.params.heading || 'All Courses',
           })}
         />
+        <Stack.Screen
+          name={SCREEN_NAMES.PAYMENT}
+          component={Payment}
+          options={{
+            headerTitle: 'Checkout',
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

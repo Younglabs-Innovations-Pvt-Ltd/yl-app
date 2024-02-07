@@ -1,5 +1,5 @@
-import {View, Text, Dimensions} from 'react-native';
-import React, {Children, useEffect, useState} from 'react';
+import {View, Dimensions} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import tw from 'twrnc';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import Spacer from '../components/spacer.component';
@@ -19,7 +19,6 @@ import {AddChildModule} from '../components/MainScreenComponents/AddChildModule'
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import SwiperSlide from '../components/MainScreenComponents/SwiperSlide';
 import {authSelector} from '../store/auth/selector';
-import {FONTS} from '../utils/constants/fonts';
 import BookDemoScreen from './book-demo-form.screen';
 import ShowCourses from '../components/MainScreenComponents/ShowCourses';
 import ReviewsAndTestimonials from '../components/MainScreenComponents/ReviewsAndTestimonials';
@@ -28,68 +27,20 @@ import {localStorage} from '../utils/storage/storage-provider';
 import {useToast} from 'react-native-toast-notifications';
 import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
 import auth from '@react-native-firebase/auth';
-import {
-  setIsFirstTimeUser,
-  startFetchBookingDetailsByName,
-} from '../store/user/reducer';
+import {setIsFirstTimeUser} from '../store/user/reducer';
 import {userSelector} from '../store/user/selector';
 import {setDarkMode} from '../store/app-theme/appThemeReducer';
 
+// Shimmer effects
+import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+import LinearGradient from 'react-native-linear-gradient';
+import { Text } from 'react-native-svg';
+
+const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
+
 const {width, height} = Dimensions.get('window');
 
-const sectionHeadingStyle = '';
-
-const swiperData1 = [
-  {
-    name: 'Banner 1',
-    coverImage:
-      'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
-    type: 'course',
-    screenRedirectButton: '',
-    age_max: 14,
-    age_min: 5,
-    alternativeNameOnApp: 'English Handwriting',
-    courseAvailable: true,
-    courseAvailableType: 'both',
-    coverPicture:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
-    demoAvailable: true,
-    demoAvailableType: 'both',
-    duration_minutes: 60,
-    id: 'Eng_Hw',
-    live_classes: 24,
-    subheading:
-      'Handwriting improvement tutoring and fine motor skills practice for children who face problems with handwriting.',
-    title: 'English Cursive Handwriting Course',
-  },
-];
-
-const testimonials = [
-  {
-    name: 'Jhon Doe',
-    posted_on: '12-04-2022',
-    comment:
-      'lorem ipsum d Pellentesque habitant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am',
-    coverPictureLink: null,
-  },
-  {
-    name: 'Harry hess',
-    posted_on: '16-03-2023',
-    comment:
-      'lorementesque habi tant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am lorem ipsum adhf hadfiuh ',
-    coverPictureLink: null,
-  },
-  {
-    name: 'Simon dull',
-    posted_on: '16-03-2023',
-    comment:
-      'lorementesque habi tant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am lorem ipsum adhf hadfiuh ',
-    coverPictureLink: null,
-  },
-];
-
 const MainWelcomeScreen = ({navigation}) => {
-  const toast = useToast();
   const {customer, user} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -272,7 +223,9 @@ const MainWelcomeScreen = ({navigation}) => {
       />
 
       {/* {console.log("showPostactions is", showPostActions)} */}
-      {!loading && (
+      {loading ? (
+        <Text>Loading</Text>
+      ) : (
         <View className="w-full" style={{backgroundColor: colorYlMain}}>
           <Demo
             timeLeft={timeLeft}
