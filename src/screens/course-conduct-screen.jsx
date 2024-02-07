@@ -15,13 +15,27 @@ import Orientation from 'react-native-orientation-locker';
 import debounce from 'lodash/debounce';
 import {Dropdown} from 'react-native-element-dropdown';
 import {FONTS} from '../utils/constants/fonts';
+import {authSelector} from '../store/auth/selector';
+import {useDispatch, useSelector} from 'react-redux';
+import {startFetchServiceRequestClasses} from '../store/handleCourse/reducer';
+import DropdownComponent from '../components/DropdownComponent';
 
 const CourseConductScreen = ({route}) => {
-  // const {videoUrl} = route.params;
-  // console.log('check videoUrl', videoUrl);
+  const {videoUrl, serviceRequestId} = route.params;
+  console.log('check video url', videoUrl);
   const [settings, setSettings] = useState(false);
   const [speed, setSpeed] = useState(1.0);
   const [fullScreen, setFullScreen] = useState(false);
+  const {user} = useSelector(authSelector);
+
+  // useEffect(() => {
+  //   console.log('check object', {
+  //     leadId,
+  //     serviceRequestId,
+  //   });
+  //   // handleCourseClick({serviceRequestId});
+  // }, []);
+
   // const playBackSpeed = [1.0, 1.25, 1.5, 1.75, 2.0];
   const playBackSpeed = [
     {label: 'Normal', value: '1.0'},
@@ -40,46 +54,24 @@ const CourseConductScreen = ({route}) => {
     console.log('check fullscreen', fullScreen);
   }, [fullScreen]);
   return (
-    <View style={{flex: 1, width: '100%', height: '100%'}}>
+    <View style={{flex: 1, width: '100%', height: '100%'}} className="bg-white">
       <NewVideoPlayer
         settings={settings}
         setSettings={setSettings}
         fullScreen={fullScreen}
         setFullScreen={setFullScreen}
         speed={speed}
-        // videoUrl={videoUrl}
+        videoUrl={videoUrl}
       />
       {!fullScreen && settings && (
         <View className="h-[35%]  w-[100%] mt-3 flex flex-col justify-start items-center px-3">
-          <Dropdown
-            style={{
-              width: '100%',
-              paddingLeft: 10,
-              height: 50,
-              borderRadius: 10,
-              borderColor: 'gray',
-              borderWidth: 1,
-            }}
-            placeholder="Select Speed"
-            placeholderStyle={{
-              color: 'black',
-              fontFamily: FONTS.signika_medium,
-            }}
-            itemTextStyle={{color: 'black', fontFamily: FONTS.signika_medium}}
-            selectedTextStyle={{
-              color: 'black',
-            }}
-            containerStyle={{borderColor: '#dfd2d2', borderRadius: 10}}
-            inputSearchStyle={{fontFamily: FONTS.signika_medium}}
+          <DropdownComponent
             data={playBackSpeed}
-            labelField={'label'}
-            valueField={'value'}
-            value={speed}
-            onChange={item => {
-              setSpeed(parseFloat(item.value));
-            }}
+            placeHolder="PlayBack Speed"
+            setSelectedValue={setSpeed}
           />
-          <Dropdown
+
+          {/* <Dropdown
             style={{
               width: '100%',
               paddingLeft: 10,
@@ -107,7 +99,7 @@ const CourseConductScreen = ({route}) => {
             onChange={item => {
               setSpeed(item.value);
             }}
-          />
+          /> */}
         </View>
       )}
     </View>
@@ -122,7 +114,7 @@ export const NewVideoPlayer = ({
   fullScreen,
   setFullScreen,
   speed,
-  // videoUrl,
+  videoUrl,
 }) => {
   const debouncedSeek = debounce(value => {
     ref.current.seek(value);
@@ -145,9 +137,7 @@ export const NewVideoPlayer = ({
       onPress={() => {
         setOpenController(true);
       }}
-      className={`w-[100%] ${
-        fullScreen ? 'h-[100%]' : 'h-[200px]'
-      } relative bg-black`}>
+      className={`w-[100%] ${fullScreen ? 'h-[100%]' : 'h-[200px]'} relative`}>
       <Video
         paused={pause}
         ref={ref}
@@ -164,11 +154,11 @@ export const NewVideoPlayer = ({
           console.log('check on seek', x);
         }}
         source={{
-          uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/Course%20Cover%20Videos%2FENGLISH%20HANDWRITING%20COURSE%20STRUCTURE%20VIDEO.mp4?alt=media&token=8ccbe67d-3655-43da-be89-0fa482b32682',
+          uri: videoUrl,
         }}
         className={`"w-[100%] ${fullScreen ? 'h-[100%]' : 'h-[200px]'}`}
         resizeMode="contain"
-        rate={speed}
+        rate={parseFloat(speed)}
       />
       {openController && (
         <TouchableOpacity
@@ -287,7 +277,7 @@ export const NewVideoPlayer = ({
 
 export const VideoPlayer = () => {
   const [clicked, setClicked] = useState(false);
-  const [puased, setPaused] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(null);
   const [fullScreen, setFullScreen] = useState(false);
   const ref = useRef();
@@ -301,7 +291,6 @@ export const VideoPlayer = () => {
   return (
     <TouchableOpacity
       onPress={() => {
-        console.log('clicking');
         setClicked(true);
       }}
       style={{width: '100%', height: fullScreen ? '100%' : 200}}>
@@ -310,7 +299,7 @@ export const VideoPlayer = () => {
         onProgress={x => {
           setProgress(x);
         }}
-        paused={puased}
+        paused={paused}
         source={{
           uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/Course%20Cover%20Videos%2FENGLISH%20HANDWRITING%20COURSE%20STRUCTURE%20VIDEO.mp4?alt=media&token=8ccbe67d-3655-43da-be89-0fa482b32682',
         }}
@@ -318,7 +307,7 @@ export const VideoPlayer = () => {
         resizeMode="contain"
       />
       {clicked && (
-        <TouchableOpacity className="bg-[rgb(0,0,0,5)] flex justify-center items-center w-[100%] h-[100%] absolute">
+        <TouchableOpacity className=" flex justify-center items-center w-[100%] h-[100%] absolute">
           <View className="flex flex-row">
             <TouchableOpacity
               onPress={() => {
@@ -335,10 +324,10 @@ export const VideoPlayer = () => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                setPaused(!puased);
+                setPaused(!paused);
               }}>
               <Image
-                source={puased ? Play : Pause}
+                source={paused ? Play : Pause}
                 style={{
                   height: 30,
                   width: 30,

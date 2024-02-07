@@ -10,7 +10,10 @@ import {courseReducer} from './course/course.reducer';
 import {paymentReducer} from './payment/reducer';
 import {uploadReducer} from './upload-handwriting/reducer';
 import {contentReducer} from './content/reducer';
-import { appThemeReducer } from './app-theme/appThemeReducer';
+import {appThemeReducer} from './app-theme/appThemeReducer';
+import {handleCourseReducer} from './handleCourse/reducer';
+import {handleHomeWorkReducer} from './homework-submit/reducer';
+import { handleRecordingRequestReducer } from './request-recording/reducer';
 
 const reducer = combineReducers({
   joinDemo: joinDemoReducer,
@@ -23,7 +26,10 @@ const reducer = combineReducers({
   payment: paymentReducer,
   upload: uploadReducer,
   content: contentReducer,
-  appTheme: appThemeReducer
+  appTheme: appThemeReducer,
+  handleCourse: handleCourseReducer,
+  submitHomeWork: handleHomeWorkReducer,
+  requestRecording:handleRecordingRequestReducer
 });
 
 export const rootReducer = (state, action) => {

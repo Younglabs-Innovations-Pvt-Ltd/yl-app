@@ -80,7 +80,7 @@ const FeatureTray = ({
   ];
   useEffect(() => {
     if (enabledFeatures) {
-      const newFeatures = featuresNew?.map(item => {
+      const newFeatures = featuresNew?.filter(item => {
         if (enabledFeatures?.includes(item?.feature)) {
           return item;
         }

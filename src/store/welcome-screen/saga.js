@@ -164,7 +164,7 @@ function* fetchingCourses() {
 // Fetching user's all bookings
 function* fetchAllBookings({payload}) {
   try {
-    if(!payload){
+    if (!payload) {
       return;
     }
     console.log('fetching bookings in api');
@@ -175,9 +175,9 @@ function* fetchAllBookings({payload}) {
       return;
     }
     const data = yield response.json();
-    console.log("data is", data , "for payload" , payload);
+    console.log('data is', data, 'for payload', payload);
 
-    if(data?.message == "bookings not found"){
+    if (data?.message == 'bookings not found') {
       yield put(getAllBookingsSuccess([]));
       yield put(setIsFirstTimeUser(true));
       return;
@@ -211,16 +211,16 @@ function* fetchAllBookingsWithPhone() {
 // fetching user's all orders
 function* fetchAllOrders({payload}) {
   try {
-    console.log('getting payload in' );
+    console.log('getting payload in');
     const response = yield fetchAllOrdersFromLeadId(payload);
-    console.log("got response" , response , " got status", response.status)
+    const data = yield response.json();
+    console.log('got response', data, ' got status', response.status);
     if (response.status !== 200) {
       yield put(userOrdersLoadingFailed('Something went Wrong'));
       return;
     }
 
-    const data = yield response.json();
-    console.log("got data", data)
+    console.log('got data', data);
 
     // console.log('get courses', data, response.status);
 

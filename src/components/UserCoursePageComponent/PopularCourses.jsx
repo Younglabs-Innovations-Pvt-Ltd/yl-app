@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet} from 'react-native';
 import {Image, Text, View} from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 
-const PopularCourses = () => {
+const PopularCourses = ({courses, navigation}) => {
+  const [allCourses, setAllCourses] = useState(courses);
+  const [allCoursesKey, setAllCoursesKey] = useState(Object.keys(courses));
   const moreCourse = [
     {
       name: 'English Cursive',
@@ -47,6 +49,10 @@ const PopularCourses = () => {
         'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2Ftuition_homework%2FthimbnailUrl.png?alt=media&token=19d07140-4a86-4671-88c2-c50003868795',
     },
   ];
+  useEffect(() => {
+    // console.log(allCoursesKey, 'regiheorihgerihgoeirngo');
+    // console.log(allCourses[allCoursesKey[0]][0], 'regiheorihgerihgoeirngo');
+  }, [allCoursesKey]);
   var styles = StyleSheet.create({
     linearGradient: {
       flex: 1,
@@ -66,38 +72,54 @@ const PopularCourses = () => {
   return (
     <View>
       <ScrollView className="w-[96vw] mx-auto">
-        {moreCourse?.map(item => {
-          return (
-            <View
-              key={item.index}
-              className="w-[100%] h-[190px] my-2 mr-2 relative rounded-xl overflow-hidden">
-              <Image
-                className=" w-[100%] h-full object-cover rounded-xl"
-                source={{
-                  uri: item.thumbnailUrl,
-                }}
-              />
-              <LinearGradient
-                className="absolute h-[100%] w-[100%] rounded-xl"
-                start={{x: 0.5, y: -0.3}}
-                colors={['#e9dcdc78', '#161414a2']}>
-                <View className="absolute h-[100%] w-[100%]  rounded-xl flex flex-col justify-end items-start px-3 pb-3">
-                  <Text className="text-white font-semibold text-[22px] mb-2">
-                    {item?.name}
-                  </Text>
-                  <Text className="text-white font-semibold text-[13px] mb-2">
-                    {item?.description}
-                  </Text>
-                  <Pressable className="bg-blue-400 w-[90px]  py-2 rounded-xl flex justify-center items-center">
-                    <Text className="text-white font-semibold text-[12px]">
-                      View Course
-                    </Text>
-                  </Pressable>
-                </View>
-              </LinearGradient>
-            </View>
-          );
-        })}
+        {allCoursesKey &&
+          allCourses &&
+          allCoursesKey.map(key => {
+            console.log(key);
+            return allCourses[key]?.map(item => {
+              return (
+                <Pressable
+                  onPress={() => {
+                    navigation.navigate('CourseDetailScreen', {
+                      courseData: item,
+                    });
+                  }}
+                  key={item.index}
+                  className="w-[100%] h-[190px] my-2 mr-2 relative rounded-xl overflow-hidden">
+                  <Image
+                    className=" w-[100%] h-full object-cover rounded-xl"
+                    source={{
+                      uri: item.coverPicture,
+                    }}
+                  />
+                  <LinearGradient
+                    className="absolute h-[100%] w-[100%] rounded-xl"
+                    start={{x: 0.5, y: -0.3}}
+                    colors={['#e9dcdc78', '#161414a2']}>
+                    <View className="absolute h-[100%] w-[100%]  rounded-xl flex flex-col justify-end items-start px-3 pb-3">
+                      <Text className="text-white font-semibold text-[22px] mb-2">
+                        {item?.alternativeNameOnApp}
+                      </Text>
+                      <Text className="text-white font-semibold text-[13px] mb-2">
+                        {item?.subheading}
+                      </Text>
+                      <Pressable
+                        onPress={() => {
+                          navigation.navigate('CourseDetailScreen', {
+                            courseData: item,
+                          });
+                        }}
+                        className="bg-blue-400 w-[90px]  py-2 rounded-xl flex justify-center items-center">
+                        <Text className="text-white font-semibold text-[12px]">
+                          View Course
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </LinearGradient>
+                </Pressable>
+              );
+            });
+          })}
       </ScrollView>
     </View>
   );

@@ -210,7 +210,7 @@ const MainWelcomeScreen = ({navigation}) => {
     }
     }
   }, [user]);
-  
+
   useEffect(() => {
     // console.log("running for selectedChild", selectedChild.bookingId)
     if (selectedChild?.bookingId) {
