@@ -17,6 +17,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {authSelector} from '../../../store/auth/selector';
 import {handleRequestRecording} from '../../../store/request-recording/selector';
 import {startRecordingRequest} from '../../../store/request-recording/reducer';
+import moment from 'moment';
 
 const PlayRecordingFeature = ({navigation}) => {
   const {user} = useSelector(authSelector);
@@ -64,6 +65,7 @@ export const RecordingsTile = ({
   const [daysToGo, setDaysToGo] = useState(null);
   const dispatch = useDispatch();
   const [clicked, setClicked] = useState(false);
+  const [classDateForRecoeding, setClassDateForRecording] = useState(null);
 
   useEffect(() => {
     const findDaysToGo = () => {
@@ -85,48 +87,64 @@ export const RecordingsTile = ({
       findDaysToGo();
     }
   }, [classData]);
+
+  useEffect(() => {
+    const {_seconds, _nanoseconds} = classData?.classDate;
+    const milliseconds = _seconds * 1000 + Math.floor(_nanoseconds / 1e6);
+    const dateObject = new Date(milliseconds);
+    setClassDateForRecording(moment(dateObject).isBefore(moment()));
+  }, []);
+
   return (
     <View className="w-[100%] flex flex-row justify-between items-center mt-2 px-2 h-[60px] bg-blue-300 border-2 border-gray-300 border-solid rounded-md">
       <Text className="text-black font-semibold text-[20px]">
         Class {classData?.classNumber}
       </Text>
-      {!classData?.hasOwnProperty('recordingRequested') ||
-      classData?.classStatus === 'Upcoming' ? (
-        <Pressable
-          disabled={ClasseRecordingRequestLoading}
-          onPress={() => {
-            setClicked(true);
-            dispatch(
-              startRecordingRequest({
-                leadId: user?.leadId,
-                classId: classData?.classId,
-              }),
-            );
-          }}
-          className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1 bg-[#55D400]  rounded-md">
-          <Text className="font-semibold text-white">Request Recording</Text>
-          {(ClasseRecordingRequestLoading || serviceReqClassesLoading) &&
-            clicked && (
-              <ActivityIndicator color={'white'} style={{width: 40}} />
+      {classDateForRecoeding ? (
+        !classData?.hasOwnProperty('recordingRequested') ||
+        classData?.classStatus === 'Upcoming' ? (
+          <Pressable
+            disabled={ClasseRecordingRequestLoading}
+            onPress={() => {
+              setClicked(true);
+              dispatch(
+                startRecordingRequest({
+                  leadId: user?.leadId,
+                  classId: classData?.classId,
+                }),
+              );
+            }}
+            className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1 bg-[#55D400]  rounded-md">
+            <Text className="font-semibold text-white">Request Recording</Text>
+            {(ClasseRecordingRequestLoading || serviceReqClassesLoading) &&
+              clicked && (
+                <ActivityIndicator color={'white'} style={{width: 40}} />
+              )}
+          </Pressable>
+        ) : classData.videoUrl !== 'expired' ? (
+          <Pressable
+            onPress={() => {
+              navigation.navigate(SCREEN_NAMES.COURSE_CONDUCT_PAGE, {
+                videoUrl: classData?.videoUrl,
+              });
+            }}
+            className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1  rounded-md">
+            {classData?.recordingRequestedAt && (
+              <Text className="text-black">{daysToGo} days left</Text>
             )}
-        </Pressable>
-      ) : classData.videoUrl !== 'expired' ? (
-        <Pressable
-          onPress={() => {
-            navigation.navigate(SCREEN_NAMES.COURSE_CONDUCT_PAGE, {
-              videoUrl: classData?.videoUrl,
-            });
-          }}
-          className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1  rounded-md">
-          {classData?.recordingRequestedAt && (
-            <Text className="text-black">{daysToGo} days left</Text>
-          )}
-          <Image source={RecordingPlay} className="h-[45px] w-[45px] ml-3" />
-        </Pressable>
+            <Image source={RecordingPlay} className="h-[45px] w-[45px] ml-3" />
+          </Pressable>
+        ) : (
+          <View>
+            <Text>Recording Expired</Text>
+          </View>
+        )
       ) : (
-        <View>
-          <Text>Recording Expired</Text>
-        </View>
+        <Pressable
+          disabled={true}
+          className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1 bg-[#85e94271]  rounded-md">
+          <Text className="font-semibold text-white">Request Recording</Text>
+        </Pressable>
       )}
     </View>
   );
