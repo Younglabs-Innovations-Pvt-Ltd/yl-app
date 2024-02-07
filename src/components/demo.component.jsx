@@ -67,6 +67,7 @@ const Demo = ({
   } = useSelector(joinDemoSelector);
 
   const {isFirstTimeUser} = useSelector(userSelector);
+
   /**
    * @author Shobhit
    * @since 07/08/2023
@@ -183,36 +184,36 @@ const Demo = ({
     // </TextWrapper>
   }, [cn, childName, message]);
 
-  const NEW_BOOKING = useMemo(() => {
-    if (isFirstTimeUser) {
-      return (
-        <View style={{padding: 4}} className="flex-row justify-between">
-          <View>
-            <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
-              Improve your child's handwriting
-            </TextWrapper>
-            <TextWrapper fs={16} color={COLORS.white}>
-              Book your first free Handwriting Class.
-            </TextWrapper>
-          </View>
-          <View className="h-full items-center justify-center">
-            <Pressable
-              // onPress={()=>{openBottomSheet}}
-              onPress={() => sheetOpen()}
-              className="bg-white text-blue-500 py-2 px-3 rounded-md">
-              <Text
-                className="font-semibold"
-                style={{color: textColors.textYlMain}}>
-                Book Now
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      );
-    } else {
-      return null;
-    }
-  }, [demoData, onOpenForm]);
+  // const NEW_BOOKING = useMemo(() => {
+  //   if (isFirstTimeUser) {
+  //     return (
+  //       <View style={{padding: 4}} className="flex-row justify-between">
+  //         <View>
+  //           <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
+  //             Improve your child's handwriting
+  //           </TextWrapper>
+  //           <TextWrapper fs={16} color={COLORS.white}>
+  //             Book your first free Handwriting Class.
+  //           </TextWrapper>
+  //         </View>
+  //         <View className="h-full items-center justify-center">
+  //           <Pressable
+  //             // onPress={()=>{openBottomSheet}}
+  //             onPress={() => sheetOpen()}
+  //             className="bg-white text-blue-500 py-2 px-3 rounded-md">
+  //             <Text
+  //               className="font-semibold"
+  //               style={{color: textColors.textYlMain}}>
+  //               Book Now
+  //             </Text>
+  //           </Pressable>
+  //         </View>
+  //       </View>
+  //     );
+  //   } else {
+  //     return null;
+  //   }
+  // }, [demoData, onOpenForm]);
 
   // post actions
   const POST_ACTIONS = useMemo(() => {
@@ -235,7 +236,7 @@ const Demo = ({
     <ScrollView
       style={styles.contentWrapper}
       showsVerticalScrollIndicator={false}>
-      {NEW_BOOKING}
+      {/* {NEW_BOOKING} */}
       {/* Timer */}
       {SHOW_TIMER && !isClassOngoing && <DemoWaiting timeLeft={timeLeft} />}
       {/* Show join button */}
