@@ -41,8 +41,10 @@ export const generateOffering = currentCourse => {
       batchArr = [batch1];
     }
 
-    let courseLevel =
-      batchArr.length > 1 ? 'combo' : `level${currentCourse.level}`;
+    // let courseLevel =
+    //   batchArr.length > 1 ? 'combo' : `level${currentCourse.level}`;
+
+    let courseLevel = `level_${currentCourse.level}`;
 
     const offeringName = `${currentCourse.courseId} ${currentCourse.ageGroup} ${courseLevel} ${currentCourse.price}`;
     const offeringObj = {

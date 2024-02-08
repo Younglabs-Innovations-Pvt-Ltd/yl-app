@@ -46,6 +46,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     step2: true,
     step3: true,
   });
+  
 
   const dispatch = useDispatch();
 
@@ -65,10 +66,11 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     state => state.appTheme,
   );
   const [selectedCourseTypeToBuy, setSelectedCourseTypeToBuy] =
-    useState('group');
+    useState('solo');
   const [isOneToOneCourseAvailable, setIsOneToOneCourseAvailable] =
     useState(false);
   const [isGroupCourseAvailable, setIsGroupCourseAvailable] = useState(false);
+  const [showPriceType, setShowPriceType] = useState('');
 
   // console.log('course Data is', courseData);
   // Save current screen name
@@ -82,32 +84,36 @@ const BatchFeeDetails = ({navigation, courseData}) => {
   // }, [navigation]);
 
   useEffect(() => {
+    if (!courseDetails || courseDetails?.courseId !== courseData.id) {
+      dispatch(
+        fetchCourseStart({
+          courseId: courseData.id,
+          country: ipData?.country_name || 'india',
+        }),
+      );
+    }
+  }, [courseData, ipData]);
+
+  useEffect(() => {
     if (courseData?.courseAvailable) {
-      console.log('course Available', courseData.courseAvailableType);
-      if (courseData?.courseAvailableType === 'both') {
+      if (courseData?.courseTypeAvailable === 'both') {
         setIsGroupCourseAvailable(true);
         setIsOneToOneCourseAvailable(true);
         setSelectedCourseTypeToBuy('group');
-      } else if (courseData?.courseAvailableType === 'solo') {
+      } else if (courseData?.courseTypeAvailable === 'solo') {
         console.log('i am here');
         setIsGroupCourseAvailable(false);
         setIsOneToOneCourseAvailable(true);
         setSelectedCourseTypeToBuy('solo');
-      } else if (courseData?.courseAvailableType === 'group') {
+      } else if (courseData?.courseTypeAvailable === 'group') {
         setIsGroupCourseAvailable(true);
         setIsOneToOneCourseAvailable(false);
         setSelectedCourseTypeToBuy('group');
       }
     }
-  }, [courseData]);
-
-  useEffect(() => {
-    dispatch(
-      fetchCourseStart({
-        courseId: courseData.id,
-        country: ipData?.country_name || 'india',
-      }),
-    );
+    if (courseData?.showPriceType) {
+      setShowPriceType(courseData.showPriceType);
+    }
   }, [courseData]);
 
   useEffect(() => {
@@ -123,10 +129,6 @@ const BatchFeeDetails = ({navigation, courseData}) => {
 
     return unsubscribe;
   }, [navigation]);
-
-  // useEffect(() => {
-  //   dispatch(fetchCourseStart({courseId: courseData.courseId}));
-  // }, []);
 
   useEffect(() => {
     if (!courseVideos) {
@@ -242,20 +244,24 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         </View>
       </View>
 
-      {console.log("selectedCourseTypeToBuy" , selectedCourseTypeToBuy)}
       {selectedCourseTypeToBuy === 'solo' ? (
-        <View className="mt-7" style={{backgroundColor:bgColor}}>
-          <SoloBatchPayment
-            courseData={courseData}
-            ipData={ipData}
-            timezone={timezone}
-            prices={prices?.prices}
-            navigation={navigation}
-            ageGroups={ageGroups}
-          />
-          <Text>solo batch</Text>
-        </View>
-      ) : (
+        showPriceType === 'solo' || showPriceType === 'both' ? (
+          <View className="mt-7" style={{backgroundColor: bgColor}}>
+            <SoloBatchPayment
+              courseData={courseData}
+              ipData={ipData}
+              timezone={timezone}
+              prices={prices?.prices}
+              navigation={navigation}
+              ageGroups={ageGroups}
+              levelNames={courseDetails?.levelNames}
+              course_type={courseDetails?.course_type}
+            />
+          </View>
+        ) : (
+          <ShowPriceFalseView />
+        )
+      ) : showPriceType === 'group' || showPriceType === 'both' ? (
         <View style={{flex: 1}}>
           {loading ? (
             <View style={{flex: 1, justifyContent: 'center'}}>
@@ -360,6 +366,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
 
                 {/* {console.log('prices are', prices)}
                 {console.log('prices are', prices)} */}
+                {/* {console.log("filtered batches are", filteredBatches)} */}
                 {filteredBatches.length > 0 && (
                   <View style={{paddingTop: 8}}>
                     <Collapsible collapsed={steps.step2} duration={450}>
@@ -375,8 +382,11 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         currentAgeGroup={currentAgeGroup}
                         currentSelectedBatch={currentSelectedBatch}
                         levelText={levelText}
+                        course_type={courseDetails?.course_type}
+                        levelNames={courseDetails?.levelNames}
                       />
-                      <Spacer space={4} />
+
+                      <Spacer space={4} /> 
                       <BatchCard
                         ipData={ipData}
                         ageGroups={ageGroups}
@@ -389,6 +399,8 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         currentAgeGroup={currentAgeGroup}
                         currentSelectedBatch={currentSelectedBatch}
                         levelText={levelText}
+                        course_type={courseDetails?.course_type}
+                        levelNames={courseDetails?.levelNames}
                       />
                       <Spacer space={4} />
                       <BatchCard
@@ -403,6 +415,8 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         currentAgeGroup={currentAgeGroup}
                         currentSelectedBatch={currentSelectedBatch}
                         levelText={levelText}
+                        course_type={courseDetails?.course_type}
+                        levelNames={courseDetails?.levelNames}
                       />
                     </Collapsible>
                   </View>
@@ -467,6 +481,8 @@ const BatchFeeDetails = ({navigation, courseData}) => {
             <NoBatchesModule courseData={courseData} />
           )}
         </View>
+      ) : (
+        <ShowPriceFalseView />
       )}
     </>
   );
@@ -515,6 +531,34 @@ const AgeSelector = ({
           </TextWrapper>
         </Pressable>
       ))}
+    </View>
+  );
+};
+
+const ShowPriceFalseView = () => {
+  const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
+
+  return (
+    <View className="flex-1 mt-3 p-2">
+      <View className="items-center">
+        <Text
+          className="text-2xl font-semibold capitalize text-center"
+          style={{color: textColors.textSecondary}}>
+          Contact Us For Prices of This Batch.
+        </Text>
+        <View className="w-full flex-row justify-center gap-3 mt-4">
+          <Pressable
+            className="py-2 w-[45%] rounded-full items-center"
+            style={{backgroundColor: textColors?.textYlGreen}}>
+            <Text className="text-white">Contact Us</Text>
+          </Pressable>
+          <Pressable
+            className="py-2 w-[45%] rounded-full items-center"
+            style={{backgroundColor: textColors?.textYlOrange}}>
+            <Text className="text-white">Call Us</Text>
+          </Pressable>
+        </View>
+      </View>
     </View>
   );
 };

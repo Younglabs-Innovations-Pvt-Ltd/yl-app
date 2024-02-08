@@ -312,34 +312,39 @@ function* makeSoloPaymentSaga({payload}) {
   try {
     const body = payload.body;
     const ipData = payload.ipData;
+    const paymentMethod = payload.paymentMethod;
 
-    const payOn = 'tazapay';
+    let classesSold;
+    if (body.classesSold && body.classesSold > 0) {
+      classesSold = body.classesSold;
+    } else {
+      classesSold = body.level === 1 || body.level === 2 ? 12 : 24;
+    }
 
     console.log('body hre is=');
     const batch = {
       ageGroup: body.ageGroup,
       batchType: body.batchType,
-      classCount: body.level === 1 || body.level === 2 ? 12 : 24,
+      classCount: classesSold,
       courseId: body.courseId,
       level: body.level,
       price: parseInt(body.discountedPrice || body.price),
     };
 
     const offeringBody = generateOffering(batch);
-
     body.offeringData = offeringBody;
 
     // console.log("getting token", token)
 
-    if (payOn === 'tazapay') {
+    if (paymentMethod === 'tazapay') {
       yield payOnTazapay({body, ipData});
       return;
     }
 
     const token = yield auth().currentUser.getIdToken();
-    const url =
-      'https://e5f0-2401-4900-1c5b-4c3d-19f0-20dc-706b-4aae.ngrok-free.app';
-    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
+    const url = 'https://7327-2401-4900-1c5b-64c3-7032-1d6d-9a5b-9f8d.ngrok-free.app';
+    console.log('calling api');
+    const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -347,6 +352,8 @@ function* makeSoloPaymentSaga({payload}) {
       },
       body: JSON.stringify(body),
     });
+
+    // console.log('res is', response.status);
 
     const data = yield response.json();
 
@@ -358,10 +365,10 @@ function* makeSoloPaymentSaga({payload}) {
       return;
     }
 
-    console.log('i am here finnaly');
+    console.log('i am here finnaly' , data);
     const {amount, id: order_id, currency} = data.order;
 
-    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
+    const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -398,18 +405,6 @@ function* makeSoloPaymentSaga({payload}) {
 
     console.log('i am her 3');
 
-    // yield payOnTazapay({
-    //   ipData,
-    //   orderData: orderRes,
-    //   email: body.email,
-    //   authToken: token,
-    //   phone: body.phone,
-    //   fullName: body.fullName,
-    //   toPay: amount || 1999,
-    // });
-    // console.log('here 4');
-    // return;
-
     const options = {
       key: 'rzp_test_0cYlLVRMEaCUDx',
       currency,
@@ -424,7 +419,7 @@ function* makeSoloPaymentSaga({payload}) {
     const rzRes = yield RazorpayCheckout.open(options);
     console.log('rzRes=', rzRes);
   } catch (error) {
-    console.log(error);
+    console.log('getting err', error.message);
   }
 }
 

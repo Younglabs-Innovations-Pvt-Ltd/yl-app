@@ -9,11 +9,13 @@ import {
 } from './reducer';
 import {BASE_URL} from '@env';
 import {setUserManually} from '../auth/reducer';
+import Snackbar from 'react-native-snackbar';
 
 export function* userSaga() {
   function* addChildSaga({payload}) {
     try {
-      console.log('base url is', payload);
+      const onClose = payload.onClose;
+      delete payload.onClose;
       const res = yield fetch(`${BASE_URL}/admin/app/addChildName`, {
         method: 'POST',
         headers: {
@@ -35,6 +37,12 @@ export function* userSaga() {
 
       yield put(setChildren(data?.data?.children));
       yield put(childAdded(true));
+      Snackbar.show({
+        text: 'Child Added Successfully',
+        textColor: 'white',
+        duration: Snackbar.LENGTH_LONG,
+      });
+      onClose();
       console.log('Child added successfully', data);
     } catch (error) {
       console.log('error in adding Child', error.message);
@@ -42,7 +50,21 @@ export function* userSaga() {
   }
 
   function* fetchBookingByName({payload}) {
-    console.log('fetching by name', payload);
+    // console.log('fetching by name', payload);
+    // const response = yield put(fetchBookingDetails(payload));
+    // const data = yield response.json();
+    // const detailsResponse = yield call(fetchBookingDetils, {
+    //   bookingId: payload,
+    // });
+    // const bookingDetails = yield detailsResponse.json();
+    // // set id to local storage
+    // // const bookingIdFromAsync = yield AsyncStorage.getItem(
+    // //   LOCAL_KEYS.BOOKING_ID,
+    // // );
+    // // if (!bookingIdFromAsync) {
+    // //   yield AsyncStorage.setItem(LOCAL_KEYS.BOOKING_ID, payload);
+    // // }
+    // yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   }
 
   function* startAddingChildListner() {

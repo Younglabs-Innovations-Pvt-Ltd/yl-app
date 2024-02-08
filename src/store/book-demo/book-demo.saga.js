@@ -19,10 +19,12 @@ import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
 
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makeNewBooking, addNewSoloBooking} from '../../utils/api/yl.api';
-import {LOCAL_KEYS} from '../../utils/constants/local-keys';
-import {ERROR_MESSAGES} from '../../utils/constants/messages';
-import {setCurrentNetworkState} from '../network/reducer';
-import {localStorage} from '../../utils/storage/storage-provider';
+// import {LOCAL_KEYS} from '../../utils/constants/local-keys';
+// import {ERROR_MESSAGES} from '../../utils/constants/messages';
+// import {setCurrentNetworkState} from '../network/reducer';
+// import {localStorage} from '../../utils/storage/storage-provider';
+import {fetchUserFormLoginDetails} from '../auth/reducer';
+import Snackbar from 'react-native-snackbar';
 
 /**
  * @author Shobhit
@@ -52,7 +54,7 @@ function* fetchIpData() {
  * @description Fetch booking slots calling from BookDemoSlots Screen
  */
 function* fetchBookingSlots({payload}) {
-  console.log('Fetch booking slots', payload.courseId);
+  console.log('Fetch booking slots', payload);
   try {
     const response = yield fetch(`${BASE_URL}${GET_SLOTS_API}`, {
       method: 'POST',
@@ -62,7 +64,9 @@ function* fetchBookingSlots({payload}) {
       body: JSON.stringify(payload),
     });
 
+    console.log("response is", response.status)
     const slotsData = yield response.json();
+    console.log('data is', slotsData);
     yield put(fetchBookingSlotsSuccess(slotsData));
   } catch (error) {
     console.log('Slots error', error);
@@ -95,6 +99,12 @@ function* handleNewBooking({payload: {data, ipData}}) {
 
       yield put(setNewBookingSuccess());
       yield put(changebookingCreatedSuccessfully(true));
+      Snackbar.show({
+        text: 'Booking Created Successfully.',
+        textColor: 'white',
+        duration: Snackbar.LENGTH_LONG,
+      });
+      yield put(fetchUserFormLoginDetails());
     } else if (response.status === 400) {
       yield put(setIsBookingLimitExceeded(true));
     }
@@ -132,6 +142,12 @@ function* handleNewOneToOneBooking({payload}) {
 
     if (response.status == 200) {
       yield put(setOneToOneBookingSuccess());
+      yield put(fetchUserFormLoginDetails());
+      Snackbar.show({
+        text: 'Booking Created Successfully.',
+        textColor: 'white',
+        duration: Snackbar.LENGTH_LONG,
+      });
     }
   } catch (error) {
     console.log('eror', error.message);

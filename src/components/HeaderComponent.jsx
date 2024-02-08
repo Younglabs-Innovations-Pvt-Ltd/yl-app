@@ -30,22 +30,13 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   );
 
   const {
-    selectedChild,
-    userBookings,
     userOrders,
-    selectedUserOrder,
     allBookingsLoding,
     userOrdersLoading,
     allBookingsLoadingFailed,
-    userOrderLoadingFailed,
-    currentUserOrders,
   } = useSelector(welcomeScreenSelector);
-  const {user, customer} = useSelector(authSelector);
+  const {user, customer, userFetchLoading} = useSelector(authSelector);
   const {currentChild} = useSelector(userSelector);
-
-  const changeDarkMode = payload => {
-    dispatch(setDarkMode(payload));
-  };
 
   // useEffect(() => {
   //   console.log('useeffect running 1');
@@ -74,10 +65,6 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
     }
   }, [customer, allBookingsLoding, userOrdersLoading]);
 
-  const handleLogOut = () => {
-    dispatch(logout());
-  };
-
   // setCurrentUsers Orders
   useEffect(() => {
     if (userOrders && currentChild && customer === 'yes') {
@@ -91,30 +78,12 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   return (
     <>
       <View
-        style={tw`flex flex-row justify-between w-[100%] px-2 py-1 bg-[${bgSecondaryColor}]
+        style={tw`flex flex-row justify-between items-center w-[100%] px-2 py-1 bg-[${bgSecondaryColor}]
           }`}>
-        <View className="flex-row items-center">
-          <View className="px-2 justify-center">
-            {darkMode ? (
-              <MIcon
-                name="brightness-4"
-                color="white"
-                size={28}
-                onPress={() => changeDarkMode(false)}
-              />
-            ) : (
-              <MIcon
-                name="brightness-6"
-                color="orange"
-                size={28}
-                onPress={() => changeDarkMode(true)}
-              />
-            )}
-          </View>
-
-          <View className="relative">
+        <View className="flex-row items-center w-[75%]">
+          <View className="relative w-full items-start overflow-hidden pl-3">
             <TouchableOpacity onPress={open}>
-              {ordersOrBookingsLoading ? (
+              {userFetchLoading ? (
                 <ActivityIndicator />
               ) : ordersOrBookingsLoadingFailed ? (
                 <View>
@@ -174,25 +143,24 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
               )}
             </TouchableOpacity>
           </View>
-
-          <View className="ml-5">
-            <Pressable
-              className={`${
-                darkMode ? 'bg-gray-500' : 'bg-gray-200'
-              } rounded-full p-1`}
-              onPress={() => setShowAddChildView(true)}>
-              <MIcon name="plus" size={25} color={textColors.textPrimary} />
-            </Pressable>
-          </View>
         </View>
 
-        <View style={tw`w-[20%]  flex-row gap-2 items-center justify-end`}>
-          <MIcon
-            name="logout"
-            size={30}
-            color={textColors.textYlMain}
-            onPress={handleLogOut}
-          />
+        <View className="w-[25%]">
+          <Pressable
+            className={` flex-row items-center justify-center ${
+              darkMode ? 'bg-gray-500' : 'bg-blue-200'
+            } rounded-full py-1 px-2`}
+            onPress={() => setShowAddChildView(true)}>
+            <MIcon name="plus" size={20} color={textColors.textPrimary} />
+            <Text
+              className="text-xs"
+              style={{
+                fontFamily: FONTS.primaryFont,
+                color: textColors.textSecondary,
+              }}>
+              Add Child
+            </Text>
+          </Pressable>
         </View>
       </View>
     </>
@@ -209,7 +177,7 @@ export const ChangeAddedChild = ({close}) => {
     state => state.appTheme,
   );
   const dispatch = useDispatch();
-  const {currentChild , children} = useSelector(userSelector);
+  const {currentChild, children} = useSelector(userSelector);
 
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');

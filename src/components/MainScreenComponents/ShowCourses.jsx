@@ -23,7 +23,7 @@ const ShowCourses = ({navigation}) => {
     handwriting: 'English Handwriting Courses',
     learning: 'English Learning',
     mathematics: 'Mathematics Courses',
-    others: 'Other Acedemic Courses',
+    others: 'Other Academic Courses',
   };
 
   const dispatch = useDispatch();
@@ -80,7 +80,7 @@ const ShowCourses = ({navigation}) => {
         </View>
       ) : (
         Object.keys(courses)?.map(key => {
-          return (
+          return courses[key]?.length > 0 ? (
             <View className="py-1 w-[100%]" key={key}>
               <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
                 <Text
@@ -107,11 +107,61 @@ const ShowCourses = ({navigation}) => {
                 style={{paddingTop: 4}}
               />
             </View>
-          );
+          ) : null;
         })
       )}
+    </View>
+  );
+};
 
-      {/* <View className="py-1 w-[100%]">
+export default ShowCourses;
+
+const CourseItemRender = ({data, navigation}) => {
+  const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
+  return (
+    <>
+      <Pressable
+        onPress={() => {
+          navigation.navigate('CourseDetailScreen', {
+            courseData: data,
+          });
+        }}>
+        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[110px]">
+          <ImageBackground
+            source={{
+              uri:
+                data.coverPicture ||
+                'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEng_Tuitions_5-14%2FthimbnailUrl.jpeg?alt=media&token=be2b7b32-311d-4951-8e47-61ab5fbfc529',
+            }}
+            style={[{flex: 1, resizeMode: 'cover'}]}
+            className="w-[100%] rounded h-full justify-center items-center">
+            <LinearGradient
+              colors={['#00000014', '#000000db']}
+              className="w-full"
+              start={{x: 0.5, y: 0.5}}>
+              <View className="h-[20%] justify-center items-center"></View>
+              <View className="h-[80%] items-start justify-end p-1">
+                {data?.alternativeNameOnApp?.split(' ').map((item, index) => {
+                  return (
+                    <Text
+                      key={index}
+                      style={[{lineHeight: 20, fontFamily: FONTS.headingFont}]}
+                      className="flex-wrap text-white text-[18px] font-semibold">
+                      {item}
+                    </Text>
+                  );
+                })}
+              </View>
+            </LinearGradient>
+          </ImageBackground>
+        </View>
+      </Pressable>
+    </>
+  );
+};
+
+{
+  /* <View className="py-1 w-[100%]">
         <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
           <Text
             className={`w-[80%] p-0`}
@@ -175,53 +225,5 @@ const ShowCourses = ({navigation}) => {
             style={{paddingTop: 4}}
           />
         )}
-      </View> */}
-    </View>
-  );
-};
-
-export default ShowCourses;
-
-const CourseItemRender = ({data, navigation}) => {
-  const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
-  return (
-    <>
-      <Pressable
-        onPress={() => {
-          navigation.navigate('CourseDetailScreen', {
-            courseData: data,
-          });
-        }}>
-        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[110px]">
-          <ImageBackground
-            source={{
-              uri:
-                data.coverPicture ||
-                'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEng_Tuitions_5-14%2FthimbnailUrl.jpeg?alt=media&token=be2b7b32-311d-4951-8e47-61ab5fbfc529',
-            }}
-            style={[{flex: 1, resizeMode: 'cover'}]}
-            className="w-[100%] rounded h-full justify-center items-center">
-            <LinearGradient
-              colors={['#00000014', '#000000db']}
-              className="w-full"
-              start={{x: 0.5, y: 0.5}}>
-              <View className="h-[20%] justify-center items-center"></View>
-              <View className="h-[80%] items-start justify-end p-1">
-                {data?.alternativeNameOnApp?.split(' ').map((item, index) => {
-                  return (
-                    <Text
-                      key={index}
-                      style={[{lineHeight: 20, fontFamily: FONTS.headingFont}]}
-                      className="flex-wrap text-white text-[18px] font-semibold">
-                      {item}
-                    </Text>
-                  );
-                })}
-              </View>
-            </LinearGradient>
-          </ImageBackground>
-        </View>
-      </Pressable>
-    </>
-  );
-};
+      </View> */
+}

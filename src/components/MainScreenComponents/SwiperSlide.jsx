@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import tw from 'twrnc';
-import { FONTS } from '../../utils/constants/fonts';
+import {FONTS} from '../../utils/constants/fonts';
 
 const {width, height} = Dimensions.get('window');
 
@@ -25,35 +25,13 @@ const SwiperSlide = ({item, navigation}) => {
   };
   animate();
 
-  //   {
-  //     name: 'Banner 1',
-  //     coverImage: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
-  //     type: 'course',
-  //     screenRedirectButton: '',
-  //     age_max: 14,
-  //     age_min: 5,
-  //     alternativeNameOnApp: 'English Handwriting',
-  //     courseAvailable: true,
-  //     courseAvailableType: 'both',
-  //     coverPicture:
-  //       'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
-  //     demoAvailable: true,
-  //     demoAvailableType: 'both',
-  //     duration_minutes: 60,
-  //     id: 'Eng_Hw',
-  //     live_classes: 24,
-  //     subheading:
-  //       'Handwriting improvement tutoring and fine motor skills practice for children who face problems with handwriting.',
-  //     title: 'English Cursive Handwriting Course',
-  //   },
-
   return (
     <View
       style={[tw`h-full flex justify-center  items-center`, {width: width}]}>
       <View style={[tw`rounded-md h-[100%] w-[95%]`, , {overflow: 'hidden'}]}>
         <ImageBackground
           source={{
-            uri: item.coverImage,
+            uri: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
           }}
           style={[
             tw`w-[100%] rounded h-full justify-center items-center`,
@@ -71,39 +49,76 @@ const SwiperSlide = ({item, navigation}) => {
               ]}>
               <Animated.View
                 style={{marginBottom: marginBottom, opacity: opacity}}>
-                <Text className="text-[30px] text-white font-semibold" style={{fontFamily:FONTS.headingFont}}>
+                <Text
+                  className="text-[30px] text-white font-semibold"
+                  style={{fontFamily: FONTS.headingFont}}>
                   {item.title}
                 </Text>
-                <Text className="text-base text-gray-300" style={{fontFamily:FONTS.primaryFont}}>
+                <Text
+                  className="text-base text-gray-300"
+                  style={{fontFamily: FONTS.primaryFont}}>
                   {item.subheading}
                 </Text>
-                <View className="flex-row gap-2 mt-1 justify-center">
+                <View className="flex-row mt-3 justify-center flex-wrap">
+                  
                   <Pressable
-                    className="flex-row rounded-full py-2 px-3 justify-center items-center mt-3 border "
-                    style={{borderColor: textColors.textYlMain}}>
+                    className="flex-row rounded-full py-2 px-3 justify-center items-center border"
+                    style={{borderColor: textColors.textYlMain}}
+                    onPress={() =>
+                      navigation.navigate('CourseDetailScreen', {
+                        courseData: item,
+                        subScreenToShow: 'courseDetails',
+                      })
+                    }>
                     {/* <MIcon name="whatsapp" size={30} color="white" /> */}
                     <Text
-                      className="text-base font-semibold"
-                      style={{color: textColors.textYlMain , fontFamily:FONTS.primaryFont}}>
-                      Connect with us
+                      className="text-[14px] font-semibold"
+                      style={{
+                        color: textColors.textYlMain,
+                        fontFamily: FONTS.primaryFont,
+                      }}>
+                      Course Details
                     </Text>
                   </Pressable>
                   <Pressable
-                    className="flex-row rounded-full py-2 px-3 justify-center items-center mt-3 border"
+                    className="ml-2 flex-row rounded-full py-2 px-3 justify-center items-center border"
                     style={{borderColor: textColors.textYlMain}}
-                    onPress={() => {
+                    onPress={() =>
+                      navigation.navigate('CourseDetailScreen', {
+                        courseData: item,
+                        subScreenToShow: 'bookFreeClass',
+                      })
+                    }>
+                    {/* <MIcon name="whatsapp" size={30} color="white" /> */}
+                    <Text
+                      className="text-[14px] font-semibold"
+                      style={{
+                        color: textColors.textYlMain,
+                        fontFamily: FONTS.primaryFont,
+                      }}>
+                      Book Demo
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    className="ml-2 flex-row rounded-full py-2 px-3 justify-center items-center border"
+                    style={{borderColor: textColors.textYlMain}}
+                    onPress={() =>
                       navigation.navigate('CourseDetailScreen', {
                         courseData: item,
                         subScreenToShow: 'payAndEnroll',
-                      });
-                    }}>
+                      })
+                    }>
                     {/* <MIcon name="whatsapp" size={30} color="white" /> */}
                     <Text
-                      className="text-base font-semibold"
-                      style={{color: textColors.textYlMain , fontFamily:FONTS.primaryFont}}>
-                      Pay And Enroll
+                      className="text-[14px] font-semibold"
+                      style={{
+                        color: textColors.textYlMain,
+                        fontFamily: FONTS.primaryFont,
+                      }}>
+                      Pay and Enroll
                     </Text>
                   </Pressable>
+
                 </View>
               </Animated.View>
             </View>

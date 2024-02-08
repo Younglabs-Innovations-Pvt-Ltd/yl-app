@@ -7,6 +7,8 @@ import TextWrapper from '../text-wrapper.component';
 import {FONTS} from '../../utils/constants/fonts';
 import {FlatList} from 'react-native-gesture-handler';
 import Video from '../video.component';
+import Testimonial from './Testimonial';
+import {reviews} from '../../assets/data/reviews';
 
 const ReviewsAndTestimonials = () => {
   const dispatch = useDispatch();
@@ -112,6 +114,31 @@ const ReviewsAndTestimonials = () => {
             />
           )}
         />
+      </View>
+
+      {/* Testimonials */}
+      <View className="w-full mt-5">
+        <View>
+          <Text
+            className={``}
+            style={[FONTS.heading, {color: textColors.textPrimary}]}>
+            What Our Customer Speak
+          </Text>
+        </View>
+        <View className="w-[100%] mt-1">
+          <FlatList
+            data={reviews}
+            keyExtractor={item => item.id}
+            renderItem={item => {
+              return <Testimonial data={item.item} />;
+            }}
+            showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => {
+              return <View className="p-1"></View>;
+            }}
+            horizontal
+          />
+        </View>
       </View>
     </View>
   );

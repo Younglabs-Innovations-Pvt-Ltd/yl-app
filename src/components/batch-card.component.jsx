@@ -17,33 +17,58 @@ const BatchCard = ({
   currentAgeGroup,
   currentSelectedBatch,
   levelText,
+  course_type,
+  levelNames,
 }) => {
   const {currentLevel} = useSelector(courseSelector);
   const [price, setPrice] = useState(0);
   const [strikeThroughPrice, setStrikeThroughPrice] = useState(0);
-  const {bgSecondaryColor , textColors , darkMode} = useSelector(state => state.appTheme);
-
+  const {bgSecondaryColor, textColors, darkMode} = useSelector(
+    state => state.appTheme,
+  );
 
   useEffect(() => {
     if (prices && ipData) {
-      const batchPrices = prices.prices["group"];
-      // const country = batchPrices?.find(
-      //   item => item.countryCode === ipData.country_code2,
-      // );
+      const batchPrices = prices.prices['group'];
 
       if (level === 1) {
-        setPrice(batchPrices?.level1?.offer);
-        setStrikeThroughPrice(batchPrices?.level2?.price);
+        setPrice(batchPrices[`level_${level}`]?.offer);
+        setStrikeThroughPrice(batchPrices[`level_${level}`]?.price);
       } else if (level === 2) {
-        setPrice(batchPrices?.level2?.offer);
-        setStrikeThroughPrice(batchPrices?.level2?.price);
+        setPrice(batchPrices[`level_${level}`]?.offer);
+        setStrikeThroughPrice(batchPrices[`level_${level}`]?.price);
       } else {
-        setPrice(batchPrices?.combo?.offer);
-        setStrikeThroughPrice(batchPrices?.combo?.price);
+        setPrice(batchPrices[`level_${level}`]?.offer);
+        setStrikeThroughPrice(batchPrices[`level_${level}`]?.price);
       }
     }
   }, [ipData, prices, level]);
 
+  const getLevelName = level => {
+    if (course_type === 'curriculum') {
+      switch (level) {
+        case 1:
+          return levelNames?.level1Name;
+
+        case 2:
+          return levelNames?.level2Name;
+
+        case 3:
+          return levelNames?.level3Name;
+      }
+    } else {
+      switch (level) {
+        case 1:
+          return 'Foundation';
+
+        case 2:
+          return 'Advanced';
+
+        case 3:
+          return 'Foundation + Advanced';
+      }
+    }
+  };
 
   return (
     <View
@@ -51,7 +76,7 @@ const BatchCard = ({
         width: '100%',
         maxWidth: 380,
         alignSelf: 'center',
-        backgroundColor:darkMode ? bgSecondaryColor : "white"
+        backgroundColor: darkMode ? bgSecondaryColor : 'white',
       }}>
       <View
         style={{
@@ -71,18 +96,25 @@ const BatchCard = ({
           }}>
           <View style={{flex: 1}}>
             <TextWrapper
-              fs={24}
+              fs={20}
               fw="700"
-              color={level === 1 ? textColors.textYlBlue : textColors.textYlOrange}>
-              {level === 1
-                ? 'Foundation'
-                : level === 2
-                ? 'Advanced'
-                : 'Foundation + Advanced'}
+              color={
+                level === 1
+                  ? textColors.textYlBlue
+                  : level == 2
+                  ? textColors.textYlOrange
+                  : textColors.textYlRed
+              }>
+              {getLevelName(level)}
             </TextWrapper>
-            <TextWrapper fs={16} ff={FONTS.signika_medium} color={textColors.textSecondary}>
-              {level === 1 || level === 2 ? '(12 classes)' : '(24 classes)'}
-            </TextWrapper>
+            {course_type !== 'curriculum' && (
+              <TextWrapper
+                fs={16}
+                ff={FONTS.signika_medium}
+                color={textColors.textPrimary}>
+                {level === 1 || level === 2 ? '(12 classes)' : '(24 classes)'}
+              </TextWrapper>
+            )}
           </View>
           <View
             style={{
@@ -93,13 +125,19 @@ const BatchCard = ({
               gap: 4,
             }}>
             <TextWrapper
-              fs={23} color={textColors.textSecondary}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
+              fs={23}
+              className="font-semibold text-[28px]"
+              style={{color: textColors.textPrimary}}
+              color={
+                textColors.primary
+              }>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
             <TextWrapper
               styles={{textDecorationLine: 'line-through'}}
-              fs={
-                17
-              }
-              color={textColors.textSecondary}>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
+              fs={17}
+              className="mr-3 line-through"
+              color={
+                textColors.textSecondary
+              }>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
           </View>
         </View>
         <Spacer />
@@ -116,11 +154,16 @@ const BatchCard = ({
         </View>
         <Spacer /> */}
 
-        <TextWrapper fs={20} color={COLORS.pgreen}>
+        <TextWrapper fs={16} color={COLORS.pgreen}>
           Select batch start date and time
         </TextWrapper>
         <ScrollView
-          contentContainerStyle={{gap: 6, paddingTop: 4, paddingBottom: 6, alignItems:"center"}}>
+          contentContainerStyle={{
+            gap: 6,
+            paddingTop: 4,
+            paddingBottom: 6,
+            alignItems: 'center',
+          }}>
           {batchOptions.length > 0 &&
             batchOptions.map((batch, index) => {
               return (

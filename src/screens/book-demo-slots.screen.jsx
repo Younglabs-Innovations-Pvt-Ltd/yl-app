@@ -39,7 +39,8 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
   const {textColors} = useSelector(state => state.appTheme);
-  const {childAge, parentName: name, phone, childName} = formData;
+  const {childAge, phone} = formData;
+  console.log("child age in group demo slots: " + childAge)
   const dispatch = useDispatch();
 
   const {
@@ -342,11 +343,11 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
       {/* show popup */}
       {/* {popup && <Popup onHandlePopup={handlePopup} onClose={onClose} />} */}
       {/* Loading spinner */}
-      <Modal visible={bookingLoading}>
+      {/* <Modal visible={bookingLoading}>
         <Center bg="rgba(0,0,0,0.2)">
           <Spinner />
         </Center>
-      </Modal>
+      </Modal> */}
     </>
   ) : (
     <NoDemoSlotsScreen />

@@ -6792,6 +6792,11 @@ react-native-share@^9.2.3:
   resolved "https://registry.npmjs.org/react-native-share/-/react-native-share-9.2.3.tgz"
   integrity sha512-y6ju4HS6ydJoPVoacZ/Hp3i47AfI9W4e76Jv00r01dVbr6SCCcuqk37kIbn+kYivdTxOW77UGEbhtBHHtXnhzg==
 
+react-native-shimmer-placeholder@^2.0.9:
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/react-native-shimmer-placeholder/-/react-native-shimmer-placeholder-2.0.9.tgz#0096932289bd9ec5747cd4f1c9d15f91ba02157a"
+  integrity sha512-s2pfAAO6uaybREYM2KcaxP3c2XlZvLfHfzmhMlGEoOhSKaoM92KpA1Hx0BeC75yilkliJuowqO/hFzvLB0h7hg==
+
 react-native-snackbar@^2.6.2:
   version "2.6.2"
   resolved "https://registry.npmjs.org/react-native-snackbar/-/react-native-snackbar-2.6.2.tgz"

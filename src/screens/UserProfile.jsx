@@ -23,7 +23,11 @@ import MyTicketsView from './MyTicketsView';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {authSelector} from '../store/auth/selector';
 import {userSelector} from '../store/user/selector';
-import { logout } from '../store/auth/reducer';
+import {logout} from '../store/auth/reducer';
+import {FONTS} from '../utils/constants/fonts';
+import {localStorage} from '../utils/storage/storage-provider';
+import {CommonActions} from '@react-navigation/native';
+
 
 const {width, height} = Dimensions.get('window');
 
@@ -63,19 +67,81 @@ const UserProfile = ({navigation}) => {
     state => state.appTheme,
   );
   const dispatch = useDispatch();
-  const changeDarkMode = () => {
-    // console.log('changing dark mode to ', );
-    dispatch(setDarkMode(dark));
-    setdark(!dark);
-  };
-
   const openBottomSheet = component => {
     setBottomSheetOpen(true);
     setSelectedBottomSheetComponent(component);
   };
 
+  const changeDarkMode = payload => {
+    localStorage.set('darkModeEnabled', payload);
+    dispatch(setDarkMode(payload));
+  };
+
   return (
     <>
+      <View
+        className="justify-end w-full py-2 px-4 flex-row"
+        style={{backgroundColor: bgColor}}>
+        <View className="px-2 justify-center">
+          {darkMode ? (
+            <Pressable
+              onPress={() => changeDarkMode(false)}
+              className="flex-row items-center py-1 px-3 border rounded-full border-gray-300">
+              <Text
+                className="text-xs mr-1"
+                style={{
+                  fontFamily: FONTS.primaryFont,
+                  color: textColors.textSecondary,
+                }}>
+                Dark mode
+              </Text>
+              <MIcon
+                name="brightness-4"
+                color="white"
+                size={20}
+                onPress={() => changeDarkMode(true)}
+              />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => changeDarkMode(true)}
+              className="flex-row items-center py-1 px-3 border rounded-full border-gray-300">
+              <Text
+                className="text-xs mr-1"
+                style={{
+                  fontFamily: FONTS.primaryFont,
+                  color: textColors.textSecondary,
+                }}>
+                Light mode
+              </Text>
+              <MIcon
+                name="brightness-6"
+                color="orange"
+                size={20}
+                onPress={() => changeDarkMode(true)}
+              />
+            </Pressable>
+          )}
+        </View>
+
+        <Pressable
+          className="flex-row items-center px-3 py-1  border rounded-full"
+          style={{borderColor: textColors?.textYlMain}}
+          onPress={() => {
+            const resetAction = CommonActions.reset({
+              index: 0,
+              routes: [{name: 'Welcome'}],
+            });
+
+            navigation.dispatch(resetAction);
+            dispatch(logout());
+          }}>
+          <MIcon name="logout" size={20} color={textColors.textYlMain} />
+          <Text className="text-[14px]" style={{color: textColors?.textYlMain}}>
+            Signout
+          </Text>
+        </Pressable>
+      </View>
       {customer === 'yes' ? (
         <>
           <ScrollView
@@ -312,34 +378,16 @@ const CourseItemShow = ({data, navigation}) => {
 };
 
 const NotACustomerProfilePage = () => {
+  const dispatch = useDispatch();
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
   const {user} = useSelector(authSelector);
   const {currentChild} = useSelector(userSelector);
 
-  console.log('user is', user);
-
-  const dispatch = useDispatch()
   return (
     <>
       <View className="flex-1 items-center" style={{backgroundColor: bgColor}}>
-        <View className="items-end w-full px-4 mt-3">
-          <Pressable
-            className="flex-row items-center px-3 py-1  border rounded-full"
-            style={{borderColor: textColors?.textYlMain}}
-            onPress={()=>{
-              dispatch(logout())
-            }}
-            >
-            <MIcon name="logout" size={20} color={textColors.textYlMain} />
-            <Text
-              className="text-[14px]"
-              style={{color: textColors?.textYlMain}}>
-              Signout
-            </Text>
-          </Pressable>
-        </View>
         <View
           className="w-[95%] px-2 py-5 mt-3 rounded-md flex-row justify-between"
           style={{backgroundColor: bgSecondaryColor}}>

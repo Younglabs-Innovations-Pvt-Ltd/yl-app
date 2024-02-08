@@ -42,6 +42,7 @@ import ModalComponent from '../components/modal.component';
 import {Button} from 'react-native-share';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 import {userSelector} from '../store/user/selector';
+import {useNavigation} from '@react-navigation/native';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -65,7 +66,7 @@ const bookingSteps = [
   },
 ];
 
-const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
+const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
   const toast = useToast();
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
@@ -78,6 +79,8 @@ const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
   const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
     state => state.appTheme,
   );
+
+  const navigation = useNavigation();
   const {
     timezone,
     selectedSlot,
@@ -93,15 +96,7 @@ const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
   const {user} = useSelector(authSelector);
 
   const phone = user?.phone;
-  // console.log("ChildData is", childData)
   const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   if (user?.fullName && fields) {
-  //     console.log('setting');
-  //     setFields(preVal => ({...preVal, parentName: user?.fullName}));
-  //   }
-  // }, [user]);
 
   useEffect(() => {
     if (!ipData) {
@@ -109,60 +104,10 @@ const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
     }
   }, [ipData]);
 
-  // console.log('fields are', fields);
-
-  // useEffect(() => {
-  //   if (fields.childName && fields.parentName) {
-  //     console.log('Changing 2');
-  //     setCurrentStep(2);
-  //   }
-  // }, []);
-
   useEffect(() => {
     setIsCurrentStepDataFilled(false);
   }, [currentStep]);
 
-  // useEffect(() => {
-  //   console.log('running useEffect');
-  //   if (currentStep === 1) {
-  //     if (fields.childName.length > 2 && fields.parentName.length > 2) {
-  //       setIsCurrentStepDataFilled(true);
-  //     } else {
-  //       setIsCurrentStepDataFilled(false);
-  //     }
-  //   } else if (currentStep === 2) {
-  //     if (selectedDemoType === 'solo') {
-  //       if (
-  //         selectedOneToOneDemoTime &&
-  //         selectedOneToOneDemoTime !== '' &&
-  //         selectedOneToOneDemoTime !== undefined &&
-  //         selectedOneToOneDemoTime !== 'undefined'
-  //       ) {
-  //         console.log('condition running', selectedOneToOneDemoTime);
-  //         setIsCurrentStepDataFilled(true);
-  //         return;
-  //       } else {
-  //         setIsCurrentStepDataFilled(false);
-  //       }
-  //     }
-
-  //     if (selectedDemoType === 'group' && selectedSlot) {
-  //       setIsCurrentStepDataFilled(true);
-  //     }
-  //   }
-  // }, [
-  //   fields,
-  //   selectedSlot,
-  //   selectedDemoType,
-  //   selectedOneToOneDemoTime,
-  //   currentStep,
-  //   dispatch,
-  // ]);
-
-  // console.log('Current Step is', currentStep);
-  /**
-   * Check if any field is not empty
-   */
   const isActive = useMemo(() => {
     if (!fields.parentName || !fields.childName || !childAge) {
       return false;
@@ -183,13 +128,6 @@ const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
     }
   };
 
-  const handleOnClose = () => setOpen(false);
-
-  const handleDemoSlots = async () => {
-    const formFields = {...fields, phone, childAge};
-    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
-  };
-
   const handleChildAge = childAge => {
     setChildAge(childAge);
   };
@@ -205,8 +143,6 @@ const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
   ];
 
   const checkFirstStepData = () => {
-    console.log('Child data', fields, childAge);
-
     if (!fields?.childName?.length || fields?.childName?.length < 3) {
       Showtoast({text: 'Enter Valid Child name', toast});
       return false;
@@ -243,88 +179,28 @@ const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
     }
   };
 
-  const handleNextBtnClick = () => {
-    if (currentStep === 1) {
-      if (!checkFirstStepData()) {
-        return;
-      }
-      setCurrentStep(currentStep + 1);
-      dispatch(
-        setChildData({
-          childName: fields.childName,
-          parentName: fields.parentName,
-          childAge: 7,
-        }),
-      );
-    } else if (currentStep === 2) {
-      if (!checkSecondStepData()) {
-        return;
-      }
-      if (selectedDemoType === 'solo') {
-        handleBookOneToOneDemo();
-        return;
-      }
-      // dispatch(changebookingCreatedSuccessfully(true));
-      handleBookNow();
-    } else {
-      console.log('Changing 4');
-      setCurrentStep(1);
-    }
-  };
-
-  useEffect(() => {
-    if (currentStep == 1 && childData) {
-      setFields({
-        parentName: childData.parentName,
-        childName: childData.childName,
-      });
-      setChildAge(childData.childAge);
-      console.log('Changing 1');
-      setCurrentStep(2);
-    }
-    if (bookingCreatedSuccessfully) {
-      Showtoast({text: 'Booking Created Successfully', toast, type: 'success'});
-      // dispatch(startGetAllBookings(user?.phone));
-      setCurrentStep(3);
-    }
-  }, [childData, bookingCreatedSuccessfully]);
-
-  handleBookNow = () => {
-    console.log('running handleBook');
+  const handleBookNow = () => {
+    console.log('field are in group', fields);
     const bodyData = {
       name: fields.parentName,
-      childAge: childAge || 7,
+      childAge: childAge,
       phone,
       childName: fields.childName,
       timeZone: timezone,
       demoDate: selectedSlot.demoDate,
       bookingType: 'direct',
       source: 'app',
-      course: 'Eng_Hw',
+      course: courseId,
       digits: 'na',
       slotId: selectedSlot.slotId,
       country: ipData.country_name.toUpperCase(),
       countryCode: ipData.calling_code,
     };
-    // console.log('body data is', bodyData);
     dispatch(setNewBookingStart({data: bodyData}));
   };
 
   const handleBookOneToOneDemo = () => {
-    //   {
-    //     "demoDate": "2024-01-17T14:00:43.098Z",
-    //     "childAge": 5,
-    //     "childName": "abc",
-    //     "courseId": "Eng_Hw",
-    //     "parentName": "test",
-    //     "phone": 7983068672,
-    //     "countryCode": 91,
-    //     "timeZone": 5.5,
-    //     "leadId": 105099,
-    //     "country": "India",
-    //     "source": "app"
-    // }
-
+    console.log('fields are in solo', fields);
     let countryCode = ipData?.calling_code;
     if (countryCode?.charAt(0) == '+') {
       countryCode = countryCode.slice(1);
@@ -346,11 +222,55 @@ const BookDemoScreen = ({navigation, courseId, setSelectedTab, place}) => {
       leadId: 105107,
     };
 
-    console.log('dispatching func');
     dispatch(setNewOneToOneBookingStart(body));
   };
 
-  // console.log('selectedOneToOneDemoTime in form is', selectedOneToOneDemoTime);
+  const handleNextBtnClick = () => {
+    if (currentStep === 1) {
+      if (!checkFirstStepData()) {
+        return;
+      }
+      setCurrentStep(currentStep + 1);
+      dispatch(
+        setChildData({
+          childName: fields.childName,
+          parentName: fields.parentName,
+          childAge,
+        }),
+      );
+    } else if (currentStep === 2) {
+      if (!checkSecondStepData()) {
+        return;
+      }
+      console.log('fields in 2nd step: ', fields);
+      if (selectedDemoType === 'solo') {
+        handleBookOneToOneDemo();
+        return;
+      }
+      handleBookNow();
+    } else {
+      console.log('Changing 4');
+      setCurrentStep(1);
+    }
+  };
+
+  useEffect(() => {
+    // if (currentStep == 1 && childData) {
+    //   setFields({
+    //     parentName: childData.parentName,
+    //     childName: childData.childName,
+    //   });
+    //   setChildAge(childData.childAge);
+    //   console.log('Changing 1');
+    //   setCurrentStep(2);
+    // }
+    if (bookingCreatedSuccessfully) {
+      setCurrentStep(3);
+      setTimeout(() => {
+        navigation.navigate('MainWelcomeScreen');
+      }, 1000);
+    }
+  }, [bookingCreatedSuccessfully]);
 
   const stepPress = step => {
     console.log('step pressed', step);

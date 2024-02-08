@@ -23,11 +23,9 @@ const BatchDateAndTime = ({
   strikeThroughPrice,
 }) => {
   if (!batch) return null;
-
   const date = new Date(batch.startDate._seconds * 1000);
   const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
   const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
-
 
   const dispatch = useDispatch();
 
@@ -46,6 +44,13 @@ const BatchDateAndTime = ({
       ? COLORS.pblue
       : 'transparent';
 
+  const TEXT_COLOR =
+    levelText === option &&
+    currentSelectedBatch &&
+    currentSelectedBatch.batchId === batch.batchId
+      ? 'white'
+      : textColors.textPrimary;
+
   return (
     <Pressable
       style={{
@@ -60,8 +65,10 @@ const BatchDateAndTime = ({
       className="w-full"
       onPress={handleBatch}>
       <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-        <MIcon name="calendar-month" size={24} color={textColors.textSecondary} />
-        <TextWrapper fs={17} color={textColors.textSecondary}>{dateAndTime}</TextWrapper>
+        <MIcon name="calendar-month" size={24} color={TEXT_COLOR} />
+        <TextWrapper fs={17} color={TEXT_COLOR}>
+          {dateAndTime}
+        </TextWrapper>
       </View>
       <View
         style={{
@@ -71,7 +78,7 @@ const BatchDateAndTime = ({
           marginTop: 8,
         }}>
         {batch.daysArr.split(',').map((item, index) => (
-          <TextWrapper key={index} color={textColors.textSecondary}>
+          <TextWrapper key={index} color={TEXT_COLOR}>
             {item}
           </TextWrapper>
         ))}
