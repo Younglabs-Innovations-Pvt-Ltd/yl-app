@@ -468,6 +468,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                     onPress={() =>
                       navigation.navigate(SCREEN_NAMES.PAYMENT, {
                         paymentBatchType: 'group',
+                        paymentMethod:courseData?.paymentMethod || "tazapay"
                       })
                     }>
                     <TextWrapper fs={18} fw="700" color={COLORS.white}>

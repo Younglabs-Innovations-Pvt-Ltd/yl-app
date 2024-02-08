@@ -28,7 +28,6 @@ const BatchDateAndTime = ({
   const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
 
   const dispatch = useDispatch();
-
   const handleBatch = () => {
     dispatch(setCurrentSelectedBatch(batch));
     dispatch(setLevelText(option));

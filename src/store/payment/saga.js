@@ -20,60 +20,6 @@ import {useEffect} from 'react';
 import {startFetchingIpData} from '../book-demo/book-demo.reducer';
 import {err} from 'react-native-svg';
 
-// useEffect(() => {
-//   if (!ipData) {
-//     dispatch(startFetchingIpData());
-//   }
-// }, [ipData]);
-
-// const BASE_URL =
-//   'https://ab9e-2401-4900-1f39-499e-170-a19-6bdb-716d.ngrok-free.app';
-
-// function* payOnTazapay({ipData, email, authToken, phone, fullName, toPay}) {
-//   try {
-//     console.log('in tazapay');
-//     const url =
-//       'https://ccc4-2401-4900-1c5b-8195-d1cb-a442-478b-1655.ngrok-free.app';
-//     const response = yield fetch(`${url}/payments/tp/createCheckoutsession`, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         Authorization: 'Bearer ' + authToken,
-//       },
-//       body: JSON.stringify({
-//         buyer: {
-//           email: email,
-//           contact_code: ipData.calling_code,
-//           contact_number: phone,
-//           country: ipData.country_code2,
-//           ind_bus_type: 'Individual',
-//           business_name: 'Younglabs Innovations',
-//           first_name: fullName,
-//           last_name: 'test',
-//         },
-//         fee_paid_by: 'buyer',
-//         fee_percentage: 100,
-//         invoice_currency: ipData.currency.code,
-//         invoice_amount: toPay,
-//         txn_description: '',
-//         callback_url: 'https://www.younglabs.in/paymentSuccess',
-//         complete_url: 'https://www.younglabs.in/paymentSuccess',
-//         error_url: 'https://google.com',
-//       }),
-//     });
-//     console.log('got res');
-
-//     const data = yield response.json();
-//     console.log('got res', data);
-//     const token = data.body.data.token;
-//     const txn_no = data.body.data.txn_no;
-
-//     console.log('we get token', token);
-//   } catch (error) {
-//     console.log('error in tazapay', error.message);
-//   }
-// }
-
 function* payOnTazapay({body, ipData}) {
   try {
     // console.log('got body', body);
@@ -87,7 +33,10 @@ function* payOnTazapay({body, ipData}) {
     // return;
 
     // Getting bag Id
-    const addToBagRes = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
+    console.log('in tazapay session');
+    const url =
+      'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
+    const addToBagRes = yield fetch(`${url}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -97,7 +46,7 @@ function* payOnTazapay({body, ipData}) {
         leadId: body?.leadId,
       }),
     });
-    console.log('got response');
+    console.log('got addToBagRes', addToBagRes.status);
 
     if (addToBagRes.status !== 200) {
       console.log('did not get response');
@@ -106,22 +55,22 @@ function* payOnTazapay({body, ipData}) {
 
     const {bagId} = yield addToBagRes.json();
 
-    const currency = body.FCY.split(' ')[0];
+    // const currency = body.FCY.split(' ')[0];
     // getting checkOutSession token
     const createCheckoutSessionBody = {
-      email: body.email,
-      invoiceCurrency: 'QAR', //change with currency
-      name: body.fullName,
+      // email: body.email,
+      // invoiceCurrency: 'QAR', //change with currency
+      // name: body.fullName,
       country: 'QA', //ipData.country_code2 change with country
-      phone: body.phone,
-      callingCode: body.countryCode,
-      amount: body.price,
+      // phone: body.phone,
+      // callingCode: body.countryCode,
+      // amount: body.price,
       bagId,
     };
     console.log('callingCheckOutSession with body', createCheckoutSessionBody);
 
     const checkOutSessionRes = yield fetch(
-      `${BASE_URL}/payments/tazapay/createCheckoutSession`,
+      `${url}/payments/tazapay/createCheckoutSession`,
       {
         method: 'POST',
         headers: {
@@ -130,7 +79,7 @@ function* payOnTazapay({body, ipData}) {
         body: JSON.stringify(createCheckoutSessionBody),
       },
     );
-    console.log('got checkOutSession res');
+    console.log('got checkOutSession res', checkOutSessionRes.status);
 
     if (checkOutSessionRes.status !== 200) {
       console.log('can not generate checkOutSession token');
@@ -158,12 +107,13 @@ function* makePaymentSaga({payload}) {
       email,
       childData,
       credits,
+      paymentMethod,
     } = payload;
 
     let selectBatch = {...currentSelectedBatch};
+
     selectBatch.price = parseInt(price);
     selectBatch.strikeThroughPrice = parseInt(strikeThroughPrice);
-    // selectBatch.offeringId = offeringId;
     selectBatch.levelText = levelText;
     selectBatch.courseType = courseDetails?.course_type;
 
@@ -184,6 +134,7 @@ function* makePaymentSaga({payload}) {
     const daysArrString = selectBatch?.daysArr.split(',').join('');
 
     // console.log("selected Batch is" , selectBatch)
+
     const body = {
       courseType: selectBatch?.groupType,
       leadId: bookingDetails?.leadId,
@@ -195,13 +146,14 @@ function* makePaymentSaga({payload}) {
       phone: bookingDetails.phone,
       fullName: bookingDetails.fullName,
       batchId: selectBatch?.batchId,
-      childName: childData?.childName,
+      childName: childData?.name,
       email,
-      childAge: childData?.childAge,
+      childAge: childData?.age,
       timezone,
       countryCode,
       source: 'app',
       credits: credits || 0,
+      country: 'QA', // need to replace with ipdata country
     };
 
     if (payload?.offerCode) {
@@ -225,10 +177,18 @@ function* makePaymentSaga({payload}) {
 
     body.offeringData = offeringBody;
 
+    console.log('paying on ', paymentMethod);
+    if (paymentMethod === 'tazapay') {
+      yield payOnTazapay({body, ipData});
+      return;
+    }
+
     const token = yield auth().currentUser.getIdToken();
     console.log('body=', body);
 
-    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
+    const url =
+      'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
+    const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -242,17 +202,15 @@ function* makePaymentSaga({payload}) {
       return;
     }
 
-    console.log('here 1', response);
+    console.log('here 1', response.status);
 
     const data = yield response.json();
 
     console.log('here 2');
 
-    // console.log('order data=', data);
-
     const {amount, id: order_id, currency} = data.order;
 
-    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
+    const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -286,7 +244,7 @@ function* makePaymentSaga({payload}) {
     };
 
     const options = {
-      key: RP_KEY,
+      key: 'rzp_test_0cYlLVRMEaCUDx',
       currency,
       amount: amount?.toString(),
       order_id,
@@ -342,7 +300,8 @@ function* makeSoloPaymentSaga({payload}) {
     }
 
     const token = yield auth().currentUser.getIdToken();
-    const url = 'https://7327-2401-4900-1c5b-64c3-7032-1d6d-9a5b-9f8d.ngrok-free.app';
+    const url =
+      'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
     console.log('calling api');
     const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
       method: 'POST',
@@ -365,7 +324,7 @@ function* makeSoloPaymentSaga({payload}) {
       return;
     }
 
-    console.log('i am here finnaly' , data);
+    console.log('i am here finnaly', data);
     const {amount, id: order_id, currency} = data.order;
 
     const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {

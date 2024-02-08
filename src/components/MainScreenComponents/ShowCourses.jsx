@@ -4,6 +4,7 @@ import {
   Pressable,
   ActivityIndicator,
   ImageBackground,
+  Dimensions,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {FONTS} from '../../utils/constants/fonts';
@@ -17,7 +18,11 @@ import {startFetchingIpData} from '../../store/book-demo/book-demo.reducer';
 import {getCoursesForWelcomeScreen} from '../../store/welcome-screen/reducer';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {authSelector} from '../../store/auth/selector';
+// Shimmer effects
+import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
+const {height, width} = Dimensions.get('window');
 const ShowCourses = ({navigation}) => {
   const coursesNameByCategory = {
     handwriting: 'English Handwriting Courses',
@@ -28,7 +33,7 @@ const ShowCourses = ({navigation}) => {
 
   const dispatch = useDispatch();
   const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
-  const {courses, coursesLoading, coursesLoadingFailed} = useSelector(
+  const {courses, coursesLoadingFailed, coursesLoading} = useSelector(
     welcomeScreenSelector,
   );
   const {ipData} = useSelector(bookDemoSelector);
@@ -59,9 +64,7 @@ const ShowCourses = ({navigation}) => {
   return (
     <View className="w-full">
       {coursesLoading ? (
-        <View className="w-full items-center">
-          <ActivityIndicator />
-        </View>
+        <CoursesLoadingEffect />
       ) : coursesLoadingFailed ? (
         <View className="w-full items-center h-[80px] justify-center">
           <Text
@@ -157,6 +160,27 @@ const CourseItemRender = ({data, navigation}) => {
         </View>
       </Pressable>
     </>
+  );
+};
+
+const CoursesLoadingEffect = () => {
+  return (
+    <View className="py-4">
+      <View className="">
+        <ShimmerPlaceholder className="h-6 rounded w-[250px]"></ShimmerPlaceholder>
+      </View>
+      <View className="flex-row justify-start mt-3">
+        <FlatList
+          data={[1, 2, 3]}
+          keyExtractor={item => item}
+          renderItem={() => (
+            <ShimmerPlaceholder className="h-[160px] w-[110px] mr-3 rounded"></ShimmerPlaceholder>
+          )}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+    </View>
   );
 };
 

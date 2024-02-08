@@ -32,7 +32,6 @@ import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
 import {TextInput} from 'react-native-gesture-handler';
-import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {userSelector} from '../store/user/selector';
 
 const {height: deviceHeight} = Dimensions.get('window');
