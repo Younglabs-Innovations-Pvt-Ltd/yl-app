@@ -144,12 +144,10 @@ const Payment = ({navigation, route}) => {
     strikeThroughPrice,
     courseDetails,
   } = useSelector(courseSelector);
-
-  const {loading, payment, message} = useSelector(paymentSelector);
+  console.log("levelText here in payment screen",levelText)
+  const {loading, payment} = useSelector(paymentSelector);
   const confettiRef = useRef();
   const cannonWrapperRef = useRef();
-  const {bookingDetails} = useSelector(joinDemoSelector);
-  const {selectedChild, userBookings} = useSelector(welcomeScreenSelector);
   const {ipData} = useSelector(bookDemoSelector);
   const {customer} = useSelector(authSelector);
   const dispatch = useDispatch();
@@ -212,6 +210,8 @@ const Payment = ({navigation, route}) => {
       bookingDetails: user,
       courseDetails,
       email,
+      paymentMethod,
+      currentLevel
     };
 
     if (selectedCoupon) {
@@ -234,7 +234,6 @@ const Payment = ({navigation, route}) => {
 
     // console.log('giving body', body);
     dispatch(startMakePayment(body));
-
     setEmailErr('');
   };
 
@@ -496,7 +495,15 @@ const Payment = ({navigation, route}) => {
           price: price,
         }),
       });
+      console.log('body is', {
+        currency: ipData?.currency?.code,
+        credits: user.credits,
+        leadId: user?.leadId,
+        price: price,
+      });
+
       const creditsToCurrency = await res.json();
+      console.log('credits to currency', creditsToCurrency);
       const {price: convertedCredits, remainingCredits} = creditsToCurrency;
       // const finalValue = amount - convertedCredits;
       const utelizedCredits = user?.credits - remainingCredits;
@@ -904,8 +911,6 @@ const Payment = ({navigation, route}) => {
         }
         snapPoint={['40%', '75%']}
       />
-
-      {console.log('childrens here are ', children)}
 
       <BottomSheetComponent
         isOpen={openAddChildSheet}

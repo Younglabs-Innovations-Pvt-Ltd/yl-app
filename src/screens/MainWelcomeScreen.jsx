@@ -1,7 +1,11 @@
-import {View, Dimensions} from 'react-native';
+import {View, Dimensions, Text} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import tw from 'twrnc';
-import {FlatList, ScrollView} from 'react-native-gesture-handler';
+import {
+  FlatList,
+  RefreshControl,
+  ScrollView,
+} from 'react-native-gesture-handler';
 import Spacer from '../components/spacer.component';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import {useDispatch, useSelector} from 'react-redux';
@@ -34,8 +38,6 @@ import {setDarkMode} from '../store/app-theme/appThemeReducer';
 // Shimmer effects
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
-import { Text } from 'react-native-svg';
-
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
@@ -57,8 +59,9 @@ const MainWelcomeScreen = ({navigation}) => {
     state => state.appTheme,
   );
   const {currentChild, children} = useSelector(userSelector);
+  const {courses, coursesLoading} = useSelector(welcomeScreenSelector);
 
-  const {courses} = useSelector(welcomeScreenSelector);
+  const [refresh, setRefresh] = useState(false);
 
   const {
     demoData,
@@ -212,7 +215,14 @@ const MainWelcomeScreen = ({navigation}) => {
     setShowChangeChildView(false);
   };
 
-  // ---------
+  // ---------Referesh
+  const pullMe = () => {
+    setRefresh(true);
+    // dispatch(fetchUserFormLoginDetails())
+    setTimeout(() => {
+      setRefresh(false);
+    }, 3000);
+  };
 
   return (
     <View style={[tw`items-center flex-1 `, {backgroundColor: bgColor}]}>
@@ -221,10 +231,15 @@ const MainWelcomeScreen = ({navigation}) => {
         setShowAddChildView={setShowAddChildView}
         open={onChangeChildSheetOpen}
       />
-
-      {/* {console.log("showPostactions is", showPostActions)} */}
       {loading ? (
-        <Text>Loading</Text>
+        <View>
+          <ShimmerPlaceholder
+            style={{
+              width: width,
+              height: 80,
+              borderRadius: 8,
+            }}></ShimmerPlaceholder>
+        </View>
       ) : (
         <View className="w-full" style={{backgroundColor: colorYlMain}}>
           <Demo
@@ -244,35 +259,47 @@ const MainWelcomeScreen = ({navigation}) => {
           flex: 1,
           width: width,
         }}
-        contentContainerStyle={{alignItems: 'center'}}>
-        {/* <TapeTimer timeLeft={timeLeft} isTimeover={isTimeover} /> */}
-
-        <SwiperFlatList
-          autoplay
-          autoplayDelay={9}
-          autoplayLoopKeepAnimation={true}
-          autoplayLoop
-          index={0}
-          showPagination={swiperData.length > 1}
-          className="relative"
-          paginationStyle={[tw`absolute`, {top: height - height / 3 - 40}]}
-          paginationStyleItem={tw`h-[4px] bg-gray-500`}
-          paginationActiveColor={'#000'}
-          paginationStyleItemActive={{backgroundColor: textColors.textYlMain}}
-          paginationStyleItemInactive={{backgroundColor: 'gray'}}
-          data={swiperData}
-          style={[
-            {
-              width: width,
-              position: 'relative',
-              height: height - height / 3 - 40,
-            },
-          ]}
-          contentContainerStyle={{overflow: 'hidden'}}
-          renderItem={item => (
-            <SwiperSlide item={item.item} navigation={navigation} />
-          )}
-        />
+        contentContainerStyle={{alignItems: 'center'}}
+        refreshControl={
+          <RefreshControl refreshing={refresh} onRefresh={() => pullMe} />
+        }>
+        {coursesLoading ? (
+          <View className="rounded-md p-2 items-center">
+            <ShimmerPlaceholder
+              style={{
+                borderRadius: 8,
+                width: width - 30,
+                height: height - height / 3 - 30,
+              }}></ShimmerPlaceholder>
+          </View>
+        ) : (
+          <SwiperFlatList
+            autoplay
+            autoplayDelay={9}
+            autoplayLoopKeepAnimation={true}
+            autoplayLoop
+            index={0}
+            showPagination={swiperData.length > 1}
+            className="relative"
+            paginationStyle={[tw`absolute`, {top: height - height / 3 - 40}]}
+            paginationStyleItem={tw`h-[4px] bg-gray-500`}
+            paginationActiveColor={'#000'}
+            paginationStyleItemActive={{backgroundColor: textColors.textYlMain}}
+            paginationStyleItemInactive={{backgroundColor: 'gray'}}
+            data={swiperData}
+            style={[
+              {
+                width: width,
+                position: 'relative',
+                height: height - height / 3 - 40,
+              },
+            ]}
+            contentContainerStyle={{overflow: 'hidden'}}
+            renderItem={item => (
+              <SwiperSlide item={item.item} navigation={navigation} />
+            )}
+          />
+        )}
 
         <Spacer space={8} />
         <ShowCourses navigation={navigation} />

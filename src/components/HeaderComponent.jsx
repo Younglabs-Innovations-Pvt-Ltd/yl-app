@@ -147,16 +147,15 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
 
         <View className="w-[25%]">
           <Pressable
-            className={` flex-row items-center justify-center ${
-              darkMode ? 'bg-gray-500' : 'bg-blue-200'
-            } rounded-full py-1 px-2`}
-            onPress={() => setShowAddChildView(true)}>
-            <MIcon name="plus" size={20} color={textColors.textPrimary} />
+            className={` flex-row items-center justify-center rounded-full py-1 px-2`}
+            onPress={() => setShowAddChildView(true)}
+            style={{backgroundColor:textColors.textYlGreen}}
+            >
+            <MIcon name="plus" size={20} color={"white"} />
             <Text
-              className="text-xs"
+              className="text-xs text-white"
               style={{
                 fontFamily: FONTS.primaryFont,
-                color: textColors.textSecondary,
               }}>
               Add Child
             </Text>
@@ -170,9 +169,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
 export default HeaderComponent;
 
 export const ChangeAddedChild = ({close}) => {
-  const {selectedChild, userBookings, userOrders, selectedUserOrder} =
-    useSelector(welcomeScreenSelector);
-  const {childName, childAge, user, customer} = useSelector(authSelector);
+  const {user, customer} = useSelector(authSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -191,8 +188,6 @@ export const ChangeAddedChild = ({close}) => {
     close();
   };
 
-  const courses = ['course 1', 'course 2', 'course 3', 'course 4'];
-
   return (
     <View className="w-full items-center">
       <Text
@@ -203,12 +198,6 @@ export const ChangeAddedChild = ({close}) => {
           : 'Select Child To See Booking'}
       </Text>
       <View className="w-[90%] mt-3">
-        {/* {customer === 'yes' ? (
-          <RenderCustomerOrder />
-        ) : (
-          userBookings?.map(booking => { */}
-        {/* return ( */}
-
         {children?.map((child, key) => {
           return (
             <Pressable
@@ -252,7 +241,7 @@ export const ChangeAddedChild = ({close}) => {
                   </Text>
                 </View>
 
-                {/* {selectedChild?.bookingId == booking.bookingId && (
+                {currentChild?.name == child.name && (
                   <View
                     className="absolute -top-3 -right-3"
                     style={{backgroundColor: bgColor}}>
@@ -262,7 +251,8 @@ export const ChangeAddedChild = ({close}) => {
                       color={textColors.textYlMain}
                     />
                   </View>
-                )} */}
+                )}
+
               </View>
               <View className="w-full p-2 flex flex-row items-center">
                 {/* <Text className="text-gray-500 font-semibold text-[14px]">Courses Bought: </Text> */}
