@@ -92,24 +92,11 @@ function* handleBookingStatus({payload: {phone}}) {
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
   } catch (error) {
     console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR_SAGA 4', error.message);
-    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
-    //   yield put(setLoading(false));
-    //   yield put(
-    //     setCurrentNetworkState(fetchBookingStatusStart({phone, country})),
-    //   );
-    // } else {
-    //   yield put(fetchBookingStatusFailed('Something went wrong'));
-    // }
 
     yield put(fetchBookingStatusFailed('Something went wrong'));
   }
 }
 
-/**
- * Listener functions that call when dispatch a related action
- */
-
-// Set booking status
 function* startBookingStatus() {
   yield takeLatest(fetchBookingStatusStart.type, handleBookingStatus);
 }
@@ -216,24 +203,7 @@ function* fetchAllOrders({payload}) {
     } else {
       yield put(userOrderFetchingSuccess([]));
     }
-    // console.log('get courses', data, response.status);
-
-    // if (data?.orderData) {
-    //   const formattedOrders = {};
-    //   data?.orderData?.forEach(obj => {
-    //     const {childName} = obj;
-    //     if (!formattedOrders[childName]) {
-    //       formattedOrders[childName] = [];
-    //     }
-    //     formattedOrders[childName].push(obj);
-    //   });
-    //   const initialKey = Object.keys(formattedOrders)[0];
-    //   const initialValue = Object.values(formattedOrders)[0];
-    //   yield put(setSelectedUserOrder({[initialKey]: initialValue}));
-    //   yield put(userOrderFetchingSuccess(formattedOrders));
-    // } else {
-    //   console.log('not data in order');
-    // }
+    
   } catch (error) {
     console.log('fetch_all_order_err', error.message);
     yield put(userOrdersLoadingFailed('Something went Wrong'));
