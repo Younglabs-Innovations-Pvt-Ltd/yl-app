@@ -37,6 +37,8 @@ import {setDarkMode} from '../store/app-theme/appThemeReducer';
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {navigate} from '../navigationRef';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');

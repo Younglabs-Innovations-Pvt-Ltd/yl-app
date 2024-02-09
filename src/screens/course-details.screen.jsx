@@ -65,7 +65,7 @@ const CourseDetails = ({navigation, courseData}) => {
       dispatch(
         fetchCourseStart({
           courseId: courseData.id,
-          country: 'India',
+          country: 'qatar',
         }),
       );
     }
@@ -203,10 +203,10 @@ const CourseDetails = ({navigation, courseData}) => {
           More About Course
         </Text>
         <Spacer />
-        <VideoPlayer
+        {/* <VideoPlayer
           uri={courseVideos?.videoUri}
           // poster={courseVideos?.coursePoster}
-        />
+        /> */}
         <Spacer />
         {loading ? (
           <ActivityIndicator

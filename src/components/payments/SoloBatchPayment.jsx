@@ -53,6 +53,7 @@ const SoloBatchPayment = ({
   const {courseDetails} = useSelector(courseSelector);
 
   console.log('total classes are', classCount);
+  console.log('total classes are', classCount);
 
   useEffect(() => {
     if (prices?.solo) {
@@ -179,11 +180,11 @@ const SoloBatchPayment = ({
     console.log('i am here', courseDetails?.course_type);
     if (courseDetails?.course_type == 'curriculum') {
       let classes = levelText.split(' ')[0];
-      classes = parseInt(classes);
-      if (isNaN(classes)) {
+      classes = parseInt(classes);;
+      if  (isNaN(classes))  {
         return;
-      } else {
-        setClassCount(classes);
+      }  else  {
+        setClassCount(classes);;
       }
     }
   };

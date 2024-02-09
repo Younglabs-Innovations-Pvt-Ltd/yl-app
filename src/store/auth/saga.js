@@ -21,13 +21,12 @@ import {createLead, getCustomers} from '../../utils/api/yl.api';
 import {localStorage} from '../../utils/storage/storage-provider';
 import DeviceInfo from 'react-native-device-info';
 import {getCurrentDeviceId} from '../../utils/deviceId';
-import {navigate} from '../../navigationRef';
+import {navigate, resetNavigation} from '../../navigationRef';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 import {setIsFirstTimeUser} from '../welcome-screen/reducer';
 
 function* phoneAuthentication({payload: {phone}}) {
   try {
-    console.log('authPhone', phone);
     if (!phone) {
       yield put(phoneAuthFailed('Enter phone number'));
       return;
@@ -44,7 +43,6 @@ function* phoneAuthentication({payload: {phone}}) {
     localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
     localStorage.set(LOCAL_KEYS.CALLING_CODE, '+91');
     const confirmation = yield auth().signInWithPhoneNumber(`+91${phone}`);
-    console.log(confirmation);
     yield put(setConfirm(confirmation));
   } catch (error) {
     console.log(error);
@@ -146,11 +144,13 @@ function* logoutFunc() {
   if (currentUser) {
     yield auth().signOut();
   }
+
+  resetNavigation();
   // navigate(SCREEN_NAMES.WELCOME);
 }
 
 function* logoutUser() {
-  yield takeLatest(logout, logoutFunc);
+  yield takeLatest(logout.type, logoutFunc);
 }
 
 function* fetchUserFormLoginDetailsFunc() {

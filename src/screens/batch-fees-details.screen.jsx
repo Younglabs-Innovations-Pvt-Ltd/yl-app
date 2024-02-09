@@ -57,6 +57,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     currentAgeGroup,
     courseVideos,
   } = useSelector(courseSelector);
+
   const {ipData, timezone} = useSelector(bookDemoSelector);
   const {bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
