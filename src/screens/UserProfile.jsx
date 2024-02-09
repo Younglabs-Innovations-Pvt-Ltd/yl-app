@@ -28,7 +28,6 @@ import {FONTS} from '../utils/constants/fonts';
 import {localStorage} from '../utils/storage/storage-provider';
 import {CommonActions} from '@react-navigation/native';
 
-
 const {width, height} = Dimensions.get('window');
 
 const boughtCourses = [
@@ -268,7 +267,7 @@ const UserProfile = ({navigation}) => {
                 {boughtCourses?.map((data, index) => {
                   return (
                     <CourseItemShow
-                      key={index}
+                      key={Math.random()}
                       data={data}
                       navigation={navigation}
                     />
@@ -308,7 +307,7 @@ const MyTransactionsView = () => {
   );
 };
 
-const CourseItemShow = ({data, navigation}) => {
+const CourseItemShow = ({data, navigation, key}) => {
   //   console.log('we have data', data);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
@@ -331,7 +330,8 @@ const CourseItemShow = ({data, navigation}) => {
       //   });
       // }}
       className="w-full"
-      style={{elevation: 1.2}}>
+      style={{elevation: 1.2}}
+      key={key}>
       <View
         className="w-full overflow-hidden mt-3 h-[180px] rounded-xl"
         style={{backgroundColor: bgSecondaryColor}}>

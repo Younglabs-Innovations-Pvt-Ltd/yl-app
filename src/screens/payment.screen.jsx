@@ -80,7 +80,8 @@ const Payment = ({navigation, route}) => {
   const [leadDataFormVisible, setLeadDataFormVisible] = useState(false);
   const [openAddChildSheet, setOpenAddChildSheet] = useState(false);
   const [classCount, setClassCount] = useState(null);
-  const [couponApplyLoading, setCouponApplyLoading] = useState(false);
+  const [defCouponApplyLoading, setDefCouponApplyLoading] = useState(false);
+  const [couponApplyLoading, setCouponApllyLoading] = useState(false);
   const {textColors, bgColor, darkMode, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -301,6 +302,7 @@ const Payment = ({navigation, route}) => {
       const refData = await res.json();
       if (refData.message == 'Referral code not valid') {
         setCouponMsg('Referral code not valid');
+        setCouponApllyLoading(false);
         return;
       }
 
@@ -312,8 +314,10 @@ const Payment = ({navigation, route}) => {
         setCouponApplied(true);
         setSelectedCoupon(null);
         setSelectedReferralCode(couponCode);
+        setCouponApllyLoading(false);
       }
     } catch (error) {
+      setCouponApllyLoading(false);
       console.log('referral err', error.messsage);
     }
   };
@@ -322,6 +326,7 @@ const Payment = ({navigation, route}) => {
     if (!couponCode || couponApplied) {
       return;
     }
+    setCouponApllyLoading(true);
 
     console.log('coupon codeis', couponCode);
     if (
@@ -361,12 +366,9 @@ const Payment = ({navigation, route}) => {
       }
 
       setCouponMsg('');
-      // if (confettiRef.current) {
-      //   confettiRef.current.start();
-      //   setFadeOut(true);
-      //   setVisibleCongratulations(true);
-      // }
+      setCouponApllyLoading(false);
     } else {
+      setCouponApllyLoading(false);
       setSelectedCoupon(null);
       setCouponMsg('Coupon Not Found');
       console.log('item not found');
@@ -390,14 +392,14 @@ const Payment = ({navigation, route}) => {
 
   const clearAppliedCode = () => {
     console.log('removing code');
-    setCouponApplyLoading(true);
+    setDefCouponApplyLoading(true);
     setCouponApplied(false);
     setSelectedCoupon(null);
     setCouponCode('');
     setCouponDisCount(0);
     setReferralDiscount(0);
     setSelectedReferralCode(null);
-    setCouponApplyLoading(false);
+    setDefCouponApplyLoading(false);
   };
 
   // console.log('selectedCoupon', selectedCoupon);
@@ -413,7 +415,7 @@ const Payment = ({navigation, route}) => {
   const applyDefaultCode = () => {
     console.log('applying code');
 
-    setCouponApplyLoading(true);
+    setDefCouponApplyLoading(true);
     let discountValue = price * (10 / 100);
     setAmount(parseInt(amount - discountValue));
     setCouponApplied(true);
@@ -426,7 +428,7 @@ const Payment = ({navigation, route}) => {
       validAbove: 1500,
     });
     setCouponDisCount(discountValue);
-    setCouponApplyLoading(false);
+    setDefCouponApplyLoading(false);
     // if (confettiRef.current) {
     //   confettiRef.current.start();
     //   setFadeOut(true);
@@ -710,7 +712,7 @@ const Payment = ({navigation, route}) => {
               <TextWrapper ff={FONTS.signika_semiBold} color="white">
                 {couponApplied ? 'Remove Coupon' : 'Apply Coupon YLAPP10'}
               </TextWrapper>
-              {couponApplyLoading && (
+              {defCouponApplyLoading && (
                 <ActivityIndicator
                   size={'small'}
                   color={'white'}
@@ -754,14 +756,17 @@ const Payment = ({navigation, route}) => {
                   borderWidth: StyleSheet.hairlineWidth,
                   borderRadius: 4,
                   borderColor: 'gray',
-                  backgroundColor: couponApplied
-                    ? 'transparent'
-                    : textColors.textYlGreen,
+                  backgroundColor: textColors.textYlGreen,
+                  flexDirection:"row"
                 }}
                 onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
                 <TextWrapper fs={18} color={'white'}>
                   {couponApplied ? 'Clear' : 'Apply'}
                 </TextWrapper>
+
+                {couponApplyLoading && (
+                  <ActivityIndicator size={'small'} color={'white'} className="ml-1" />
+                )}
               </Pressable>
             </View>
           </View>

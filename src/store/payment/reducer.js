@@ -29,7 +29,9 @@ const reducers = {
     state.paymentMessage = action.payload;
     state.payment = '';
   },
-  makeSoloPayment(state, action) {},
+  makeSoloPayment(state, action) {
+    state.loading = true;
+  },
 };
 
 const paymentSlice = createSlice({

@@ -5,13 +5,11 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Input from '../CustomInputComponent';
 import {TextInput} from 'react-native-gesture-handler';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { Showtoast } from '../../utils/toast';
+import {Showtoast} from '../../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
 
-
-
 const RedeemPointsView = () => {
-  const toast = useToast()
+  const toast = useToast();
   const {bgColor, textColors, colorYlMain, darkMode} = useSelector(
     state => state.appTheme,
   );
@@ -37,10 +35,10 @@ const RedeemPointsView = () => {
     },
   ];
 
-  const copyToClipBoard = (string)=>{
+  const copyToClipBoard = string => {
     Clipboard.setString(string);
-    Showtoast({text:"Referrel Code Copied Successfully", toast})
-  }
+    Showtoast({text: 'Referrel Code Copied Successfully', toast});
+  };
   return (
     <View className="flex-1 px-3 w-full pb-6">
       <Text
@@ -63,7 +61,9 @@ const RedeemPointsView = () => {
         {referralSteps?.map((item, index) => {
           return (
             <>
-              <View className="w-[25%] items-center justify-start" key={index}>
+              <View
+                className="w-[25%] items-center justify-start"
+                key={index}>
                 <View className="w-full items-center justify-center">
                   <MIcon name={item.icon} color={item.color} size={55} />
                 </View>
@@ -83,7 +83,7 @@ const RedeemPointsView = () => {
               </View>
 
               {item.step !== 3 && (
-                <View className="w-[8%] ">
+                <View className="w-[8%] " key={Math.random()}>
                   <View className="h-[60%] justify-center">
                     <MIcon name="arrow-right-thin" color={'gray'} size={35} />
                   </View>
@@ -114,7 +114,7 @@ const RedeemPointsView = () => {
             name="content-copy"
             color={textColors.textSecondary}
             size={25}
-            onPress={()=>copyToClipBoard("this is Text")}
+            onPress={() => copyToClipBoard('this is Text')}
           />
         </View>
       </View>
@@ -124,9 +124,7 @@ const RedeemPointsView = () => {
           className="flex-row rounded-full w-[45%] py-2 px-3 justify-center items-center mt-3 "
           style={{backgroundColor: textColors.textYlMain}}>
           {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-          <Text
-            className="text-base font-semibold"
-            style={{color: "white"}}>
+          <Text className="text-base font-semibold" style={{color: 'white'}}>
             Use Points
           </Text>
         </Pressable>
@@ -134,9 +132,7 @@ const RedeemPointsView = () => {
           className="flex-row rounded-full w-[45%] py-2 px-3 justify-center items-center mt-3 "
           style={{backgroundColor: textColors.textYlGreen}}>
           {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-          <Text
-            className="text-base font-semibold"
-            style={{color: "white"}}>
+          <Text className="text-base font-semibold" style={{color: 'white'}}>
             Share Referrals
           </Text>
         </Pressable>

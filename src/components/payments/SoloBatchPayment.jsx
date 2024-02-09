@@ -52,7 +52,7 @@ const SoloBatchPayment = ({
   const [classCount, setClassCount] = useState(0);
   const {courseDetails} = useSelector(courseSelector);
 
-  console.log("total classes are" , classCount)
+  console.log('total classes are', classCount);
 
   useEffect(() => {
     if (prices?.solo) {
@@ -166,7 +166,7 @@ const SoloBatchPayment = ({
     navigation.navigate('Payment', {
       paymentBatchType: 'solo',
       paymentMethod: courseData?.paymentMethod,
-      classesSold:classCount || null,
+      classesSold: classCount || null,
     });
   };
 
@@ -179,13 +179,12 @@ const SoloBatchPayment = ({
     console.log('i am here', courseDetails?.course_type);
     if (courseDetails?.course_type == 'curriculum') {
       let classes = levelText.split(' ')[0];
-      classes = parseInt(classes)
-      if(isNaN(classes)){
+      classes = parseInt(classes);
+      if (isNaN(classes)) {
         return;
-      }else{
-        setClassCount(classes)
+      } else {
+        setClassCount(classes);
       }
-      
     }
   };
 
@@ -281,13 +280,18 @@ const SoloBatchPayment = ({
                             level: obj.level,
                             price: obj?.offer,
                           });
-                      }}>
+                      }}
+                      key={key}
+                      >
                       <View className="items-center justify-center flex-1">
                         <Text
                           className="font-semibold text-[18px] text-center"
                           style={{
                             fontFamily: FONTS.headingFont,
-                            color:  selectedLevelToBuy?.level == obj.level ? "white" :textColors.textYlMain,
+                            color:
+                              selectedLevelToBuy?.level == obj.level
+                                ? 'white'
+                                : textColors.textYlMain,
                           }}>
                           {getLevelName(obj.level)}
                         </Text>

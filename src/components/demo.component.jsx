@@ -209,17 +209,21 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
       {SHOW_TIMER && !isClassOngoing && <DemoWaiting timeLeft={timeLeft} />}
       {/* Show join button */}
       {isClassOngoing && (
-        <View style={{paddingHorizontal: 16, paddingTop: 12}}>
+        <View style={{paddingHorizontal: 16, paddingVertical: 6}}>
           {IS_CHILD_NAME}
           <View className="w-full p-1 px-3">
-            <Text className="text-white font-semibold text-base ml-3 ">
-              Your free handwriting class is going on
+            <Text
+              className="text-white font-semibold text-base ml-3"
+              style={{fontFamily: FONTS.primaryFont}}>
+              Your Demo class is going on
             </Text>
             <View className="w-full">
               <Pressable
                 className="p-2 w-full rounded-full bg-white mt-2 flex-row justify-center"
                 onPress={handleJoinClass}>
-                <Text className="text-base font-semibold text-gray-700 text-center flex-row">
+                <Text
+                  className="text-base font-semibold text-gray-700 text-center flex-row"
+                  style={{fontFamily: FONTS.primaryFont}}>
                   Enter Class{' '}
                 </Text>
                 {joinClassLoading && (

@@ -273,6 +273,7 @@ function* makeSoloPaymentSaga({payload}) {
       classesSold = body.level === 1 || body.level === 2 ? 12 : 24;
     }
 
+    delete body.classesSold;
     console.log('body hre is=');
     const batch = {
       ageGroup: body.ageGroup,
@@ -286,8 +287,6 @@ function* makeSoloPaymentSaga({payload}) {
     const offeringBody = generateOffering(batch);
     body.offeringData = offeringBody;
 
-    // console.log("getting token", token)
-
     if (paymentMethod === 'tazapay') {
       yield payOnTazapay({body, ipData});
       return;
@@ -295,9 +294,9 @@ function* makeSoloPaymentSaga({payload}) {
 
     const token = yield auth().currentUser.getIdToken();
     const url =
-      'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
+      'https://307b-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
     console.log('calling api');
-    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
+    const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -314,14 +313,15 @@ function* makeSoloPaymentSaga({payload}) {
 
     if (response.status === 403) {
       // yield put(setLoading(false));
-      console.log('errror happeded here');
+      console.error('errror happeded here');
+      yield put(setLoading(false));
       return;
     }
 
     console.log('i am here finnaly', data);
     const {amount, id: order_id, currency} = data.order;
 
-    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
+    const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -371,8 +371,10 @@ function* makeSoloPaymentSaga({payload}) {
 
     const rzRes = yield RazorpayCheckout.open(options);
     console.log('rzRes=', rzRes);
+    yield put(setLoading(false));
   } catch (error) {
-    console.log('getting err', error.message);
+    console.log('getting err', error);
+    yield put(setLoading(false));
   }
 }
 
