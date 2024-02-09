@@ -25,10 +25,7 @@ import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import Spinner from '../components/spinner.component';
 
 import {setCurrentAgeGroup} from '../store/course/course.reducer';
-import VideoMediaPlayer from '../components/video-player.component';
 import {FONTS} from '../utils/constants/fonts';
-import {localStorage} from '../utils/storage/storage-provider';
-import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import NoBatchesModule from '../components/NoBatchesModule';
 import SoloBatchPayment from '../components/payments/SoloBatchPayment';
@@ -46,7 +43,6 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     step2: true,
     step3: true,
   });
-  
 
   const dispatch = useDispatch();
 
@@ -62,7 +58,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     courseVideos,
   } = useSelector(courseSelector);
   const {ipData, timezone} = useSelector(bookDemoSelector);
-  const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
+  const {bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
   const [selectedCourseTypeToBuy, setSelectedCourseTypeToBuy] =
@@ -71,17 +67,6 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     useState(false);
   const [isGroupCourseAvailable, setIsGroupCourseAvailable] = useState(false);
   const [showPriceType, setShowPriceType] = useState('');
-
-  // console.log('course Data is', courseData);
-  // Save current screen name
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     console.log('batch focused..');
-  //     localStorage.set(LOCAL_KEYS.CURRENT_SCREEN, 'batch');
-  //   });
-
-  //   return unsubscribe;
-  // }, [navigation]);
 
   useEffect(() => {
     if (!courseDetails || courseDetails?.courseId !== courseData.id) {
@@ -92,7 +77,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         }),
       );
     }
-  }, [courseData, ipData]);
+  }, [courseData, ipData, courseDetails]);
 
   useEffect(() => {
     if (courseData?.courseAvailable) {
@@ -181,7 +166,32 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     dispatch(setCurrentAgeGroup(group));
   };
 
-  // console.log("courseData is", courseData)
+  const btnStyle = type => {
+    if (selectedCourseTypeToBuy === type) {
+      return {
+        borderColor: textColors.textYlMain,
+        backgroundColor: textColors.textYlMain,
+      };
+    } else {
+      return {
+        borderColor: textColors.textSecondary,
+        backgroundColor: bgColor,
+      };
+    }
+  };
+
+  const btnTextStyle = type => {
+    if (selectedCourseTypeToBuy === type) {
+      return {
+        color: 'white',
+      };
+    } else {
+      return {
+        color: textColors.textSecondary,
+      };
+    }
+  };
+
   return (
     <>
       <View className="items-center">
@@ -190,24 +200,8 @@ const BatchFeeDetails = ({navigation, courseData}) => {
             <Pressable onPress={() => setSelectedCourseTypeToBuy('group')}>
               <View
                 className="border rounded py-2 px-4 items-center"
-                style={{
-                  borderColor:
-                    selectedCourseTypeToBuy === 'group'
-                      ? textColors.textYlMain
-                      : textColors.textSecondary,
-                  backgroundColor:
-                    selectedCourseTypeToBuy === 'group'
-                      ? textColors.textYlMain
-                      : bgColor,
-                }}>
-                <Text
-                  className=""
-                  style={{
-                    color:
-                      selectedCourseTypeToBuy === 'group'
-                        ? 'white'
-                        : textColors.textSecondary,
-                  }}>
+                style={btnStyle('group')}>
+                <Text className="" style={btnTextStyle('group')}>
                   Group Course
                 </Text>
               </View>
@@ -218,24 +212,8 @@ const BatchFeeDetails = ({navigation, courseData}) => {
             <Pressable onPress={() => setSelectedCourseTypeToBuy('solo')}>
               <View
                 className="border rounded py-2 px-4 items-center ml-2"
-                style={{
-                  borderColor:
-                    selectedCourseTypeToBuy === 'solo'
-                      ? textColors.textYlMain
-                      : textColors.textSecondary,
-                  backgroundColor:
-                    selectedCourseTypeToBuy === 'solo'
-                      ? textColors.textYlMain
-                      : bgColor,
-                }}>
-                <Text
-                  className=""
-                  style={{
-                    color:
-                      selectedCourseTypeToBuy === 'solo'
-                        ? 'white'
-                        : textColors.textSecondary,
-                  }}>
+                style={btnStyle('solo')}>
+                <Text className="" style={btnTextStyle('solo')}>
                   Solo Course
                 </Text>
               </View>
@@ -386,7 +364,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         levelNames={courseDetails?.levelNames}
                       />
 
-                      <Spacer space={4} /> 
+                      <Spacer space={4} />
                       <BatchCard
                         ipData={ipData}
                         ageGroups={ageGroups}
@@ -468,7 +446,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                     onPress={() =>
                       navigation.navigate(SCREEN_NAMES.PAYMENT, {
                         paymentBatchType: 'group',
-                        paymentMethod:courseData?.paymentMethod || "tazapay"
+                        paymentMethod: courseData?.paymentMethod || 'tazapay',
                       })
                     }>
                     <TextWrapper fs={18} fw="700" color={COLORS.white}>

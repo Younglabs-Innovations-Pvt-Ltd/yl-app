@@ -116,7 +116,7 @@ function* startBookingStatus() {
 
 function* startFetchingCoursesForLandingPage({payload}) {
   try {
-    const country = payload.country;
+    const country = payload.country?.toLowerCase();
     console.log('country: ', country);
 
     const res = yield fetchCoursesForWelcomeScreen(country);
@@ -130,18 +130,16 @@ function* startFetchingCoursesForLandingPage({payload}) {
       };
       data?.forEach(obj => {
         const {category} = obj;
-
         if (category === 'handwriting') {
           formattedCourses['handwriting'].push(obj);
         } else {
           formattedCourses['others'].push(obj);
         }
       });
-      // console.log("Formatted Course is", formattedCourses)
       yield put(getCoursesForWelcomeScreenSuccess(formattedCourses));
     }
   } catch (error) {
-    console.log('fetch courses error', error.message);
+    console.log('fetch courses error', error.message , " payload was" , payload);
     yield put(getCoursesForWelcomeScreenFailed());
   }
 }

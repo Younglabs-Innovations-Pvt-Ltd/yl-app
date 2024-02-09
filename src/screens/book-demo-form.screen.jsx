@@ -92,11 +92,17 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
     bookingFailReason,
     oneToOneBookingFailed,
   } = useSelector(bookDemoSelector);
-
   const {user} = useSelector(authSelector);
 
   const phone = user?.phone;
   const dispatch = useDispatch();
+
+  // Set parent name from lead
+  useEffect(() => {
+    if (user?.fullName && user?.fullName?.length > 2) {
+      setFields(preVal => ({...preVal, parentName: user?.fullName}));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!ipData) {
@@ -238,6 +244,12 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
           childAge,
         }),
       );
+
+      console.log('child data is', {
+        childName: fields.childName,
+        parentName: fields.parentName,
+        childAge,
+      });
     } else if (currentStep === 2) {
       if (!checkSecondStepData()) {
         return;
@@ -517,12 +529,11 @@ const FirstStepDetails = ({
   setFields,
   setShowAddChildView,
 }) => {
-  const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
-    state => state.appTheme,
-  );
-  const {user} = useSelector(authSelector);
-  const {children} = useSelector(userSelector);
+  const {textColors, bgColor} = useSelector(state => state.appTheme);
+  const {children, currentChild} = useSelector(userSelector);
+
   const [childList, setChildList] = useState([]);
+  const [defaultChild, setDefaultChild] = useState([]);
 
   useEffect(() => {
     if (children?.length > 0) {
@@ -535,6 +546,16 @@ const FirstStepDetails = ({
       setChildList([{label: 'No Child added. Add One', value: 'addChild'}]);
     }
   }, [children]);
+
+  useEffect(() => {
+    if (currentChild) {
+      const elem = [{label: currentChild.name, value: currentChild}];
+      const {name, age} = currentChild;
+      setFields(pre => ({...pre, childName: name}));
+      handleChildAge(age);
+      setDefaultChild(name);
+    }
+  }, [currentChild]);
 
   const ageArray = [
     {label: '5', value: 5},
@@ -565,6 +586,10 @@ const FirstStepDetails = ({
     handleChildAge(age);
   };
 
+  useEffect(() => {
+    console.log('default child is', defaultChild);
+  }, [defaultChild]);
+
   return (
     <>
       <View className="relative w-[100%] border border-gray-400 mt-4 rounded-[10px] py-3 flex-row justify-between px-2 items-center">
@@ -589,6 +614,7 @@ const FirstStepDetails = ({
           data={childList}
           placeHolder="Select Child"
           setSelectedValue={handleSelectChild}
+          defaultValue={defaultChild}
         />
       )}
 

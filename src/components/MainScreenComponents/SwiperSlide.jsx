@@ -1,5 +1,5 @@
 import {View, Text, ImageBackground, Pressable, Dimensions} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import Animated, {
   useSharedValue,
@@ -23,7 +23,13 @@ const SwiperSlide = ({item, navigation}) => {
     marginBottom.value = withDelay(500, withSpring(20));
     opacity.value = withDelay(500, withSpring(1));
   };
-  animate();
+  useEffect(() => {
+    animate();
+  }, []);
+
+  const swiperBtnStyle =
+    'flex-row rounded-full py-[5px] px-2 justify-center items-center mr-2 mt-2';
+  const swiperBtnTextStyle = 'text-[13px] font-semibold';
 
   return (
     <View
@@ -39,7 +45,7 @@ const SwiperSlide = ({item, navigation}) => {
           ]}
           resizeMode="cover">
           <LinearGradient
-            colors={['#00000014', '#000000db']}
+            colors={['#00000014', '#000']}
             className="w-full"
             start={{x: 0.5, y: 0.1}}>
             <View
@@ -60,10 +66,10 @@ const SwiperSlide = ({item, navigation}) => {
                   {item.subheading}
                 </Text>
                 <View className="flex-row mt-3 justify-center flex-wrap">
-                  
+                  {/* {console.log("item is", item)} */}
                   <Pressable
-                    className="flex-row rounded-full py-2 px-3 justify-center items-center border"
-                    style={{borderColor: textColors.textYlMain}}
+                    className={`${swiperBtnStyle}`}
+                    style={{borderWidth: 1, borderColor: textColors.textYlMain}}
                     onPress={() =>
                       navigation.navigate('CourseDetailScreen', {
                         courseData: item,
@@ -72,7 +78,7 @@ const SwiperSlide = ({item, navigation}) => {
                     }>
                     {/* <MIcon name="whatsapp" size={30} color="white" /> */}
                     <Text
-                      className="text-[14px] font-semibold"
+                      className={`${swiperBtnTextStyle}`}
                       style={{
                         color: textColors.textYlMain,
                         fontFamily: FONTS.primaryFont,
@@ -80,45 +86,56 @@ const SwiperSlide = ({item, navigation}) => {
                       Course Details
                     </Text>
                   </Pressable>
-                  <Pressable
-                    className="ml-2 flex-row rounded-full py-2 px-3 justify-center items-center border"
-                    style={{borderColor: textColors.textYlMain}}
-                    onPress={() =>
-                      navigation.navigate('CourseDetailScreen', {
-                        courseData: item,
-                        subScreenToShow: 'bookFreeClass',
-                      })
-                    }>
-                    {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-                    <Text
-                      className="text-[14px] font-semibold"
-                      style={{
-                        color: textColors.textYlMain,
-                        fontFamily: FONTS.primaryFont,
-                      }}>
-                      Book Demo
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    className="ml-2 flex-row rounded-full py-2 px-3 justify-center items-center border"
-                    style={{borderColor: textColors.textYlMain}}
-                    onPress={() =>
-                      navigation.navigate('CourseDetailScreen', {
-                        courseData: item,
-                        subScreenToShow: 'payAndEnroll',
-                      })
-                    }>
-                    {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-                    <Text
-                      className="text-[14px] font-semibold"
-                      style={{
-                        color: textColors.textYlMain,
-                        fontFamily: FONTS.primaryFont,
-                      }}>
-                      Pay and Enroll
-                    </Text>
-                  </Pressable>
 
+                  {item?.demoAvailable && (
+                    <Pressable
+                      className={`${swiperBtnStyle}`}
+                      style={{
+                        borderWidth: 1,
+                        borderColor: textColors.textYlMain,
+                      }}
+                      onPress={() =>
+                        navigation.navigate('CourseDetailScreen', {
+                          courseData: item,
+                          subScreenToShow: 'bookFreeClass',
+                        })
+                      }>
+                      {/* <MIcon name="whatsapp" size={30} color="white" /> */}
+                      <Text
+                        className={`${swiperBtnTextStyle}`}
+                        style={{
+                          color: textColors.textYlMain,
+                          fontFamily: FONTS.primaryFont,
+                        }}>
+                        Book Demo
+                      </Text>
+                    </Pressable>
+                  )}
+
+                  {item?.courseAvailable && (
+                    <Pressable
+                      className={`${swiperBtnStyle}`}
+                      style={{
+                        borderWidth: 1,
+                        borderColor: textColors.textYlMain,
+                      }}
+                      onPress={() =>
+                        navigation.navigate('CourseDetailScreen', {
+                          courseData: item,
+                          subScreenToShow: 'payAndEnroll',
+                        })
+                      }>
+                      {/* <MIcon name="whatsapp" size={30} color="white" /> */}
+                      <Text
+                        className={`${swiperBtnTextStyle}`}
+                        style={{
+                          color: textColors.textYlMain,
+                          fontFamily: FONTS.primaryFont,
+                        }}>
+                        Pay and Enroll
+                      </Text>
+                    </Pressable>
+                  )}
                 </View>
               </Animated.View>
             </View>

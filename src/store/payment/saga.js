@@ -16,9 +16,6 @@ import {setEmail} from '../auth/reducer';
 import {BASE_URL, RP_KEY} from '@env';
 import {localStorage} from '../../utils/storage/storage-provider';
 import auth from '@react-native-firebase/auth';
-import {useEffect} from 'react';
-import {startFetchingIpData} from '../book-demo/book-demo.reducer';
-import {err} from 'react-native-svg';
 
 function* payOnTazapay({body, ipData}) {
   try {
@@ -36,7 +33,7 @@ function* payOnTazapay({body, ipData}) {
     console.log('in tazapay session');
     const url =
       'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
-    const addToBagRes = yield fetch(`${url}/shop/orderhandler/addToBag`, {
+    const addToBagRes = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +58,7 @@ function* payOnTazapay({body, ipData}) {
       // email: body.email,
       // invoiceCurrency: 'QAR', //change with currency
       // name: body.fullName,
-      country: 'QA', //ipData.country_code2 change with country
+      country: ipData?.country_code2, //ipData.country_code2 change with country
       // phone: body.phone,
       // callingCode: body.countryCode,
       // amount: body.price,
@@ -70,7 +67,7 @@ function* payOnTazapay({body, ipData}) {
     console.log('callingCheckOutSession with body', createCheckoutSessionBody);
 
     const checkOutSessionRes = yield fetch(
-      `${url}/payments/tazapay/createCheckoutSession`,
+      `${BASE_URL}/payments/tazapay/createCheckoutSession`,
       {
         method: 'POST',
         headers: {
@@ -153,7 +150,7 @@ function* makePaymentSaga({payload}) {
       countryCode,
       source: 'app',
       credits: credits || 0,
-      country: 'QA', // need to replace with ipdata country
+      country: ipData?.country_code2, // need to replace with ipdata country
     };
 
     if (payload?.offerCode) {
@@ -172,11 +169,8 @@ function* makePaymentSaga({payload}) {
 
     // Save email to local storage
     localStorage.set(LOCAL_KEYS.EMAIL, body.email);
-
     const offeringBody = generateOffering(selectBatch);
-
     body.offeringData = offeringBody;
-
     console.log('paying on ', paymentMethod);
     if (paymentMethod === 'tazapay') {
       yield payOnTazapay({body, ipData});
@@ -187,7 +181,7 @@ function* makePaymentSaga({payload}) {
     console.log('body=', body);
 
     const url =
-      'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
+      'https://307b-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
     const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
@@ -303,7 +297,7 @@ function* makeSoloPaymentSaga({payload}) {
     const url =
       'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
     console.log('calling api');
-    const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
+    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -327,7 +321,7 @@ function* makeSoloPaymentSaga({payload}) {
     console.log('i am here finnaly', data);
     const {amount, id: order_id, currency} = data.order;
 
-    const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
+    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

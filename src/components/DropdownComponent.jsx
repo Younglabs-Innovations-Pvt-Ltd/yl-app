@@ -5,12 +5,29 @@ import {useSelector} from 'react-redux';
 import {FONTS} from '../utils/constants/fonts';
 // import AntDesign from '@expo/vector-icons/AntDesign';
 
-const DropdownComponent = ({data, placeHolder, setSelectedValue}) => {
+const DropdownComponent = ({
+  data,
+  placeHolder,
+  setSelectedValue,
+  defaultValue,
+}) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
     useSelector(state => state.appTheme);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
+  // useEffect(() => {
+  //   console.log('value is', value);
+  // }, [value]);
+
+  useEffect(() => {
+    if (defaultValue && data) {
+      console.log("default value is", defaultValue);
+      const filtered = data?.filter(item => item.label === defaultValue);
+      console.log('filtered', filtered);
+      setValue(filtered[0]);
+    }
+  }, [defaultValue, data]);
 
   const renderLabel = () => {
     if (value || isFocus) {
@@ -27,7 +44,6 @@ const DropdownComponent = ({data, placeHolder, setSelectedValue}) => {
     }
     return null;
   };
-
 
   return (
     <View style={styles.container} className="">

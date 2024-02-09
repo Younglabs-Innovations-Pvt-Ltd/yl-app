@@ -10,11 +10,8 @@ import {
   Text,
 } from 'react-native';
 import DemoWaiting from './join-demo-class-screen/demo-waiting.component';
-// import Button from './button.component';
-import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
 import PostDemoAction from './join-demo-class-screen/post-demo-actions.component';
-import Input from './input.component';
 import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -26,7 +23,6 @@ import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {i18nContext} from '../context/lang.context';
 import Modal from './modal.component';
 import BookDemoSlots from '../screens/book-demo-slots.screen';
-import TwoStepForm from './two-step-form.component';
 import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
@@ -36,24 +32,15 @@ import {userSelector} from '../store/user/selector';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
-const Demo = ({
-  isTimeover,
-  timeLeft,
-  showPostActions,
-  sheetOpen,
-  openResheduleSheet,
-  closeResheduleSheet,
-}) => {
+const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
   const [childName, setChildName] = useState('');
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [params, setParams] = useState(null);
   const [cn, setCn] = useState(false);
 
-  const {localLang} = i18nContext();
   const dispatch = useDispatch();
-  const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
-    useSelector(state => state.appTheme);
+  const {textColors} = useSelector(state => state.appTheme);
 
   const {
     demoData,
@@ -212,23 +199,6 @@ const Demo = ({
       return null;
     }
   }, [demoData, onOpenForm]);
-
-  // post actions
-  const POST_ACTIONS = useMemo(() => {
-    if (!bookingTime) return null;
-
-    return moment().isAfter(moment(bookingTime).add(1, 'hours')) ? (
-      <PostDemoAction rescheduleClass={onOpen} />
-    ) : null;
-  }, [bookingTime, onOpen]);
-
-  const navigation = useNavigation();
-
-  const courseDetails = () => {
-    navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
-  };
-
-  // console.log('isClass Ongoing', isClassOngoing, 'Show TImer is', SHOW_TIMER);
 
   return (
     <ScrollView

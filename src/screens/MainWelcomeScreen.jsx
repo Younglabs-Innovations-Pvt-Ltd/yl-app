@@ -1,11 +1,7 @@
-import {View, Dimensions, Text} from 'react-native';
+import {View, Dimensions} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import tw from 'twrnc';
-import {
-  FlatList,
-  RefreshControl,
-  ScrollView,
-} from 'react-native-gesture-handler';
+import {RefreshControl, ScrollView} from 'react-native-gesture-handler';
 import Spacer from '../components/spacer.component';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import {useDispatch, useSelector} from 'react-redux';
@@ -26,10 +22,12 @@ import {authSelector} from '../store/auth/selector';
 import BookDemoScreen from './book-demo-form.screen';
 import ShowCourses from '../components/MainScreenComponents/ShowCourses';
 import ReviewsAndTestimonials from '../components/MainScreenComponents/ReviewsAndTestimonials';
-import {fetchUser, fetchUserFormLoginDetails} from '../store/auth/reducer';
+import {fetchUserFormLoginDetails} from '../store/auth/reducer';
 import {localStorage} from '../utils/storage/storage-provider';
-import {useToast} from 'react-native-toast-notifications';
-import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
+import {
+  getCoursesForWelcomeScreen,
+  startFetchingUserOrders,
+} from '../store/welcome-screen/reducer';
 import auth from '@react-native-firebase/auth';
 import {setIsFirstTimeUser} from '../store/user/reducer';
 import {userSelector} from '../store/user/selector';
@@ -38,6 +36,7 @@ import {setDarkMode} from '../store/app-theme/appThemeReducer';
 // Shimmer effects
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
+import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
@@ -58,7 +57,7 @@ const MainWelcomeScreen = ({navigation}) => {
   const {bgColor, textColors, colorYlMain} = useSelector(
     state => state.appTheme,
   );
-  const {currentChild, children} = useSelector(userSelector);
+  const {currentChild} = useSelector(userSelector);
   const {courses, coursesLoading} = useSelector(welcomeScreenSelector);
 
   const [refresh, setRefresh] = useState(false);
@@ -74,6 +73,7 @@ const MainWelcomeScreen = ({navigation}) => {
     isNmi,
     appRemark,
   } = useSelector(joinDemoSelector);
+  const {ipData} = useSelector(bookDemoSelector);
 
   // filter courses to show on the banner
   useEffect(() => {
@@ -218,7 +218,12 @@ const MainWelcomeScreen = ({navigation}) => {
   // ---------Referesh
   const pullMe = () => {
     setRefresh(true);
-    // dispatch(fetchUserFormLoginDetails())
+    console.log('dispating refresh');
+    dispatch(fetchUserFormLoginDetails());
+    dispatch(
+      getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
+    );
+    dispatch;
     setTimeout(() => {
       setRefresh(false);
     }, 3000);
@@ -234,6 +239,7 @@ const MainWelcomeScreen = ({navigation}) => {
       {loading ? (
         <View>
           <ShimmerPlaceholder
+            shimmerWidthPercent={0.4}
             style={{
               width: width,
               height: 80,
@@ -260,12 +266,14 @@ const MainWelcomeScreen = ({navigation}) => {
           width: width,
         }}
         contentContainerStyle={{alignItems: 'center'}}
-        refreshControl={
-          <RefreshControl refreshing={refresh} onRefresh={() => pullMe} />
-        }>
+        // refreshControl={
+        //   <RefreshControl refreshing={refresh} onRefresh={() => pullMe()} />
+        // }
+      >
         {coursesLoading ? (
           <View className="rounded-md p-2 items-center">
             <ShimmerPlaceholder
+              shimmerWidthPercent={0.4}
               style={{
                 borderRadius: 8,
                 width: width - 30,

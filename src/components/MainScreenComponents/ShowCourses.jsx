@@ -167,14 +167,18 @@ const CoursesLoadingEffect = () => {
   return (
     <View className="py-4">
       <View className="">
-        <ShimmerPlaceholder className="h-6 rounded w-[250px]"></ShimmerPlaceholder>
+        <ShimmerPlaceholder
+          className="h-6 rounded w-[250px]"
+          shimmerWidthPercent={0.4}></ShimmerPlaceholder>
       </View>
       <View className="flex-row justify-start mt-3">
         <FlatList
           data={[1, 2, 3]}
           keyExtractor={item => item}
           renderItem={() => (
-            <ShimmerPlaceholder className="h-[160px] w-[110px] mr-3 rounded"></ShimmerPlaceholder>
+            <ShimmerPlaceholder
+              shimmerWidthPercent={0.4}
+              className="h-[160px] w-[110px] mr-3 rounded"></ShimmerPlaceholder>
           )}
           horizontal
           showsHorizontalScrollIndicator={false}

@@ -17,7 +17,6 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 
 import {courseSelector} from '../store/course/course.selector';
-import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {
   makeSoloPayment,
@@ -31,16 +30,12 @@ import Icon from '../components/icon.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {resetCourseDetails} from '../store/course/course.reducer';
 import {getOfferCode} from '../utils/api/yl.api';
-import {localStorage} from '../utils/storage/storage-provider';
-import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {FONTS} from '../utils/constants/fonts';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {authSelector} from '../store/auth/selector';
 import {BASE_URL} from '@env';
-import {welcomeScreenSelector} from '../store/welcome-screen/selector';
-import DropdownComponent from '../components/DropdownComponent';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
@@ -66,7 +61,6 @@ const Payment = ({navigation, route}) => {
   const [couponCode, setCouponCode] = useState('');
   const [amount, setAmount] = useState(0);
   const [couponMsg, setCouponMsg] = useState('');
-  const [fadeOut, setFadeOut] = useState(false);
   const [visibleCongratulations, setVisibleCongratulations] = useState(false);
   const [authVisible, setAuthVisible] = useState(false);
   // reducers values
@@ -86,6 +80,26 @@ const Payment = ({navigation, route}) => {
   const [leadDataFormVisible, setLeadDataFormVisible] = useState(false);
   const [openAddChildSheet, setOpenAddChildSheet] = useState(false);
   const [classCount, setClassCount] = useState(null);
+  const [couponApplyLoading, setCouponApplyLoading] = useState(false);
+  const {textColors, bgColor, darkMode, bgSecondaryColor} = useSelector(
+    state => state.appTheme,
+  );
+  const {loading, payment} = useSelector(paymentSelector);
+  const confettiRef = useRef();
+  const cannonWrapperRef = useRef();
+  const {ipData} = useSelector(bookDemoSelector);
+  const {customer} = useSelector(authSelector);
+  const dispatch = useDispatch();
+  const {children} = useSelector(userSelector);
+  const {
+    currentAgeGroup,
+    currentSelectedBatch,
+    levelText,
+    currentLevel,
+    price,
+    strikeThroughPrice,
+    courseDetails,
+  } = useSelector(courseSelector);
 
   useEffect(() => {
     let classesSolds;
@@ -98,16 +112,23 @@ const Payment = ({navigation, route}) => {
     setClassCount(classesSolds);
   }, [classesSold, currentLevel]);
 
-  console.log('selected Child for order', selectedChildForOrder);
-
-  const [totalDiscounts, setTotalDiscounts] = useState();
-  const {userOrders} = useSelector(welcomeScreenSelector);
-
   // code to get user details if something is missing in user lead
   useEffect(() => {
     if (!user?.fullName || user.fullName === '') {
       setLeadDataFormVisible(false);
     }
+    setTotalCredits(user?.credits || 0);
+
+    const fetchOfferCodes = async () => {
+      console.log('fetching offers');
+      if (user) {
+        const response = await getOfferCode({phone: user?.phone});
+
+        const codes = await response.json();
+        setOfferCodes(codes?.offerCodes);
+      }
+    };
+    fetchOfferCodes();
   }, [user]);
 
   useEffect(() => {
@@ -117,10 +138,6 @@ const Payment = ({navigation, route}) => {
   }, [dropdownData]);
 
   // console.log('total discounts are', totalDiscounts);
-
-  useEffect(() => {
-    setTotalCredits(user?.credits || 0);
-  }, [user]);
 
   useEffect(() => {
     if (currentSelectedBatch) {
@@ -135,24 +152,6 @@ const Payment = ({navigation, route}) => {
     }
   }, [currentSelectedBatch]);
 
-  const {
-    currentAgeGroup,
-    currentSelectedBatch,
-    levelText,
-    currentLevel,
-    price,
-    strikeThroughPrice,
-    courseDetails,
-  } = useSelector(courseSelector);
-  console.log("levelText here in payment screen",levelText)
-  const {loading, payment} = useSelector(paymentSelector);
-  const confettiRef = useRef();
-  const cannonWrapperRef = useRef();
-  const {ipData} = useSelector(bookDemoSelector);
-  const {customer} = useSelector(authSelector);
-  const dispatch = useDispatch();
-  const {children} = useSelector(userSelector);
-
   useEffect(() => {
     setAmount(price);
   }, [price]);
@@ -163,21 +162,6 @@ const Payment = ({navigation, route}) => {
     const finalPrice = price - totalDiscounts;
     setAmount(finalPrice);
   }, [couponDiscount, creditsValueApplied, price, referralDiscount]);
-
-  // console.log('user is', user);
-  useEffect(() => {
-    const fetchOfferCodes = async () => {
-      console.log('fetching offers');
-      if (user) {
-        const response = await getOfferCode({phone: user?.phone});
-
-        const codes = await response.json();
-        setOfferCodes(codes?.offerCodes);
-      }
-    };
-
-    fetchOfferCodes();
-  }, [user]);
 
   useEffect(() => {
     if (payment === MESSAGES.PAYMENT_SUCCESS) {
@@ -211,7 +195,7 @@ const Payment = ({navigation, route}) => {
       courseDetails,
       email,
       paymentMethod,
-      currentLevel
+      currentLevel,
     };
 
     if (selectedCoupon) {
@@ -405,12 +389,15 @@ const Payment = ({navigation, route}) => {
   }, [visibleCongratulations]);
 
   const clearAppliedCode = () => {
+    console.log('removing code');
+    setCouponApplyLoading(true);
     setCouponApplied(false);
     setSelectedCoupon(null);
     setCouponCode('');
     setCouponDisCount(0);
     setReferralDiscount(0);
     setSelectedReferralCode(null);
+    setCouponApplyLoading(false);
   };
 
   // console.log('selectedCoupon', selectedCoupon);
@@ -424,14 +411,9 @@ const Payment = ({navigation, route}) => {
   };
 
   const applyDefaultCode = () => {
-    // if (cannonWrapperRef.current) {
-    //   // console.log('cannonWrapperRef.current', cannonWrapperRef.current);
-    //   cannonWrapperRef.current.setNativeProps({
-    //     style: {
-    //       opacity: 1,
-    //     },
-    //   });
-    // }
+    console.log('applying code');
+
+    setCouponApplyLoading(true);
     let discountValue = price * (10 / 100);
     setAmount(parseInt(amount - discountValue));
     setCouponApplied(true);
@@ -444,6 +426,7 @@ const Payment = ({navigation, route}) => {
       validAbove: 1500,
     });
     setCouponDisCount(discountValue);
+    setCouponApplyLoading(false);
     // if (confettiRef.current) {
     //   confettiRef.current.start();
     //   setFadeOut(true);
@@ -482,7 +465,7 @@ const Payment = ({navigation, route}) => {
       if (user.credits == 0) {
         return;
       }
-
+      console.log('redeemin credits');
       const res = await fetch(`${BASE_URL}/admin/referrals/convertCredits`, {
         method: 'POST',
         headers: {
@@ -499,7 +482,7 @@ const Payment = ({navigation, route}) => {
         currency: ipData?.currency?.code,
         credits: user.credits,
         leadId: user?.leadId,
-        price: price,
+        price: amount || price,
       });
 
       const creditsToCurrency = await res.json();
@@ -523,35 +506,65 @@ const Payment = ({navigation, route}) => {
   }, [children]);
 
   return (
-    <View style={{flex: 1, backgroundColor: '#f4f4f4'}}>
+    <View style={{flex: 1, backgroundColor: bgColor}}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{flex: 1}}
         contentContainerStyle={{padding: 12}}>
-        <View style={styles.card}>
-          <TextWrapper fs={18} fw="700" styles={{textTransform: 'capitalize'}}>
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
+          <TextWrapper
+            fs={18}
+            fw="700"
+            styles={{textTransform: 'capitalize'}}
+            color={textColors.textPrimary}>
             {user?.fullName}
           </TextWrapper>
 
           <Spacer space={2} />
-          <TextWrapper>{user?.phone}</TextWrapper>
+          <TextWrapper color={textColors.textSecondary}>
+            {user?.phone}
+          </TextWrapper>
 
           <View>
-            <Text className="font-semibold text-[18px] mt-3">Order For</Text>
+            <Text
+              className="font-semibold text-[18px] mt-3"
+              style={{color: textColors.textPrimary}}>
+              Order For
+            </Text>
 
             {dropdownData && dropdownData.length > 1 ? (
               <View className="flex-row justify-start w-full mt-3">
                 <View className="w-[40%]">
-                  <Text className="font-semibold">Child Name</Text>
-                  <Text className="mt-1">{selectedChildForOrder?.name}</Text>
+                  <Text
+                    className="font-semibold"
+                    style={{color: textColors.textPrimary}}>
+                    Child Name
+                  </Text>
+                  <Text
+                    className="mt-1"
+                    style={{color: textColors.textSecondary}}>
+                    {selectedChildForOrder?.name}
+                  </Text>
                 </View>
                 <View className="w-[25%]">
-                  <Text className="font-semibold">Child Age</Text>
-                  <Text className="mt-1">{selectedChildForOrder?.age}</Text>
+                  <Text
+                    className="font-semibold "
+                    style={{color: textColors.textPrimary}}>
+                    Child Age
+                  </Text>
+                  <Text
+                    className="mt-1"
+                    style={{color: textColors.textSecondary}}>
+                    {selectedChildForOrder?.age}
+                  </Text>
                 </View>
                 <View className="flex justify-end ml-3">
                   <Pressable
-                    className="p-1 bg-blue-500 rounded items-end "
+                    className="py-[6px] px-2 bg-blue-500 rounded items-end "
                     onPress={() => setShowChangeChildSheet(true)}>
                     <Text className="text-white font-semibold">Change</Text>
                   </Pressable>
@@ -561,7 +574,9 @@ const Payment = ({navigation, route}) => {
               <>
                 <View className="w-full">
                   <View className="w-full flex-row items-center">
-                    <Text className="text-base text-red-500">
+                    <Text
+                      className="text-base text-red-500"
+                      style={{color: textColors.textSecondary}}>
                       You Don't have added Any Child
                     </Text>
                     <Pressable
@@ -571,120 +586,81 @@ const Payment = ({navigation, route}) => {
                       <Text className="text-white font-semibold">Add one</Text>
                     </Pressable>
                   </View>
-                  {/* <View className="w-full mt-5 flex-row justify-between">
-                    <View className="w-[55%]">
-                      <Text className="font-semibold ">Enter Child Name:</Text>
-                      <TextInput
-                        value={selectedChildForOrder?.childName}
-                        onChangeText={e =>
-                          setSelectedChildForOrder(pre => {
-                            return {...pre, childName: e};
-                          })
-                        }
-                        className=" mt-1 border-b border-gray-400 p-1 text-base w-full text-[15px] bg-gray-100"
-                      />
-                    </View>
-
-                    <View className="w-[40%]">
-                      <Text className="font-semibold ">Enter Child Age:</Text>
-                      <TextInput
-                        value={selectedChildForOrder?.childAge}
-                        keyboardType="phone-pad"
-                        onChangeText={e =>
-                          setSelectedChildForOrder(pre => {
-                            return {...pre, childAge: parseInt(e)};
-                          })
-                        }
-                        className=" mt-1 border-b border-gray-400 p-1 text-base w-full text-[15px] bg-gray-100"
-                      />
-                    </View>
-                  </View> */}
                 </View>
               </>
             )}
-
-            {/* {selectedChildForOrder === 'addAnother' ? (
-              <View className="flex-row justify-between w-full mt-3">
-                <View className="w-[55%]">
-                  <Text>Child Name</Text>
-                  <TextInput
-                    placeholder=""
-                    value={orderChildData?.childName}
-                    onChangeText={e =>
-                      setOrderChildData(pre => {
-                        return {...pre, childName: e};
-                      })
-                    }
-                    className="border-b border-gray-400 p-1 text-base w-full"
-                  />
-                </View>
-                <View className="w-[40%]">
-                  <Text>Child Age</Text>
-                  <TextInput
-                    placeholder=""
-                    value={orderChildData?.childAge}
-                    keyboardType="phone-pad"
-                    onChangeText={e =>
-                      setOrderChildData(pre => {
-                        return {...pre, childAge: parseInt(e)};
-                      })
-                    }
-                    className="border-b border-gray-400 p-1 text-base w-full"
-                  />
-                </View>
-              </View>
-            ) : (
-              <DropdownComponent
-                data={dropdownData}
-                placeHolder="Select Child Age"
-                setSelectedValue={setSelectedChildForOrder}
-                // defaultSelectedItem={dropdownData[0]}
-              />
-            )} */}
           </View>
         </View>
+
         <Spacer space={6} />
-        <TextWrapper fs={20} fw="700">
+        <TextWrapper fs={20} fw="700" color={textColors.textPrimary}>
           Course Details
         </TextWrapper>
         <Spacer space={4} />
-        <View style={styles.card}>
-          <TextWrapper fs={18} fw="700">
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
+          <TextWrapper fs={18} fw="700" color={textColors.textPrimary}>
             Name:{' '}
-            <TextWrapper fs={18} fw="600">
+            <TextWrapper fs={18} fw="600" color={textColors.textPrimary}>
               {courseDetails?.alternativeNameOnApp}
             </TextWrapper>
           </TextWrapper>
           <Spacer space={6} />
-          <TextWrapper fs={18} fw="700">
+          <TextWrapper fs={18} fw="700" color={textColors.textPrimary}>
             Level:{' '}
-            <TextWrapper fs={18} fw="600">
+            <TextWrapper fs={18} fw="600" color={textColors.textPrimary}>
               {levelText}
             </TextWrapper>
           </TextWrapper>
           <Spacer space={6} />
           {classCount && (
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-              <MIcon name="book-variant" size={26} color={COLORS.black} />
-              <TextWrapper fs={18}>Total Classes: {classCount}</TextWrapper>
+              <MIcon
+                name="book-variant"
+                size={26}
+                color={textColors.textPrimary}
+              />
+              <TextWrapper fs={18} color={textColors.textPrimary}>
+                Total Classes: {classCount}
+              </TextWrapper>
             </View>
           )}
           <Spacer space={6} />
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <MIcon name="cake-variant" size={26} color={COLORS.black} />
-            <TextWrapper fs={18}>For Ages: {currentAgeGroup}</TextWrapper>
+            <MIcon
+              name="cake-variant"
+              size={26}
+              color={textColors.textPrimary}
+            />
+            <TextWrapper fs={18} color={textColors.textPrimary}>
+              For Ages: {currentAgeGroup}
+            </TextWrapper>
           </View>
           <Spacer space={6} />
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <MIcon name="calendar-month" size={26} color={COLORS.black} />
-            <TextWrapper fs={18}>Start date: {dateTime}</TextWrapper>
+            <MIcon
+              name="calendar-month"
+              size={26}
+              color={textColors.textPrimary}
+            />
+            <TextWrapper fs={18} color={textColors.textPrimary}>
+              Start date: {dateTime}
+            </TextWrapper>
           </View>
         </View>
+
         <Spacer space={4} />
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
           <TextInput
             placeholder="Enter email"
-            style={styles.emailInput}
+            style={[styles.emailInput, {color: textColors.textPrimary}]}
             textContentType="emailAddress"
             autoCorrect={false}
             autoCapitalize="none"
@@ -692,8 +668,8 @@ const Payment = ({navigation, route}) => {
             keyboardType="email-address"
             value={email}
             onChangeText={e => setEmail(e)}
-            selectionColor={COLORS.black}
-            placeholderTextColor={'gray'}
+            selectionColor={textColors.textYlMain}
+            placeholderTextColor={textColors.textSecondary}
           />
           {emailErr && (
             <TextWrapper fs={14} color={COLORS.pred}>
@@ -702,7 +678,11 @@ const Payment = ({navigation, route}) => {
           )}
         </View>
         <Spacer space={4} />
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
           <View
             style={{
               flexDirection: 'row',
@@ -714,25 +694,35 @@ const Payment = ({navigation, route}) => {
               fs={14}
               color={COLORS.pgreen}
               styles={{textAlign: 'left', opacity: couponApplied ? 1 : 0}}>
-              Applied
+              Coupon Applied
             </TextWrapper>
             <Pressable
+              className="flex-row"
               style={{
                 paddingHorizontal: 12,
                 paddingVertical: 8,
                 alignSelf: 'flex-end',
-                backgroundColor: '#eee',
-                borderRadius: 4,
+                backgroundColor: textColors.textYlMain,
+                borderRadius: 50,
                 marginBottom: 8,
               }}
               onPress={couponApplied ? clearAppliedCode : applyDefaultCode}>
-              <TextWrapper ff={FONTS.signika_semiBold}>
-                Apply Coupon YLAPP10
+              <TextWrapper ff={FONTS.signika_semiBold} color="white">
+                {couponApplied ? 'Remove Coupon' : 'Apply Coupon YLAPP10'}
               </TextWrapper>
+              {couponApplyLoading && (
+                <ActivityIndicator
+                  size={'small'}
+                  color={'white'}
+                  className="ml-1"
+                />
+              )}
             </Pressable>
           </View>
           <View>
-            <TextWrapper styles={{marginBottom: 6}}>
+            <TextWrapper
+              styles={{marginBottom: 6}}
+              color={textColors.textPrimary}>
               Have another code?
             </TextWrapper>
             <View
@@ -742,26 +732,34 @@ const Payment = ({navigation, route}) => {
               }}>
               <TextInput
                 placeholder="Enter here"
-                style={[styles.emailInput, {flex: 1}]}
+                style={[
+                  styles.emailInput,
+                  {flex: 1},
+                  {color: textColors.textPrimary},
+                ]}
                 autoCorrect={false}
                 autoCapitalize="characters"
                 keyboardType="default"
                 value={couponCode}
                 onChangeText={e => setCouponCode(e)}
-                selectionColor={COLORS.black}
+                selectionColor={textColors.textYlMain}
                 placeholderTextColor={'gray'}
               />
               <Pressable
                 style={{
-                  padding: 4,
+                  paddingHorizontal: 14,
+                  paddingVertical: 5,
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderWidth: StyleSheet.hairlineWidth,
                   borderRadius: 4,
                   borderColor: 'gray',
+                  backgroundColor: couponApplied
+                    ? 'transparent'
+                    : textColors.textYlGreen,
                 }}
                 onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
-                <TextWrapper fs={18}>
+                <TextWrapper fs={18} color={'white'}>
                   {couponApplied ? 'Clear' : 'Apply'}
                 </TextWrapper>
               </Pressable>
@@ -770,9 +768,19 @@ const Payment = ({navigation, route}) => {
 
           {customer === 'yes' && (
             <View className="flex-row justify-between items-center my-4 pt-1">
-              <Text>{totalCredits} Redeem Points Available</Text>
+              <Text
+                style={{
+                  color: textColors.textPrimary,
+                  fontFamily: FONTS.primaryFont,
+                }}>
+                {totalCredits} Redeem Points Available
+              </Text>
               <Pressable onPress={redeemCredits} disabled={totalCredits == 0}>
-                <Text className="text-blue-600">Reddem Now</Text>
+                <Text
+                  className="font-semibold underline"
+                  style={{color: textColors.textYlMain}}>
+                  Redeem Now
+                </Text>
               </Pressable>
             </View>
           )}
@@ -785,7 +793,7 @@ const Payment = ({navigation, route}) => {
         </View>
       </ScrollView>
       <View style={{padding: 12}}>
-        <View style={styles.card}>
+        <View style={[styles.card, {backgroundColor: '#fff'}]}>
           <View
             style={{
               flexDirection: 'row',
@@ -822,7 +830,7 @@ const Payment = ({navigation, route}) => {
                   <View className="w-[85%] justify-between flex-row">
                     <Text className="text-[16px] text-black">Redeem Value</Text>
                     <Text className="text-[16px] text-black">
-                      {creditsValueApplied}
+                      -{creditsValueApplied}
                     </Text>
                   </View>
                 )}
@@ -832,7 +840,7 @@ const Payment = ({navigation, route}) => {
                       Referral Discount
                     </Text>
                     <Text className="text-[16px] text-black">
-                      {referralDiscount}
+                      -{referralDiscount?.toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -891,7 +899,6 @@ const Payment = ({navigation, route}) => {
             count={200}
             origin={{x: 0, y: 0}}
             autoStart={false}
-            fadeOut={fadeOut}
             fallSpeed={1800}
             explosionSpeed={450}
           />
@@ -1046,28 +1053,6 @@ const Payment = ({navigation, route}) => {
 };
 
 const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
-  // const [orderChildData, setOrderChildData] = useState({
-  //   childName: '',
-  //   childAge: '',
-  // });
-  // const toast = useToast();
-
-  // const addAnotherChild = () => {
-  //   if (!orderChildData?.childName || orderChildData?.childName?.length < 3) {
-  //     Showtoast({text: 'Enter child name', toast, type: 'danger'});
-  //     return;
-  //   } else if (
-  //     !orderChildData?.childAge ||
-  //     orderChildData?.childAge < 5 ||
-  //     orderChildData?.childAge > 14
-  //   ) {
-  //     Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
-  //     return;
-  //   } else {
-  //     setChild(orderChildData);
-  //     closeSheet();
-  //   }
-  // };
   return (
     <View className="w-full items-center">
       <Text
@@ -1075,54 +1060,6 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
         style={{fontFamily: FONTS.headingFont}}>
         change child
       </Text>
-
-      {/* <View className="p-2  w-[100%] mt-3 bg-gray-100 rounded">
-        <Text
-          className="text-base font-semibold"
-          style={{fontFamily: FONTS.primaryFont}}>
-          Buying for another child?
-        </Text>
-
-        <View className="w-full flex-row justify-between mt-3">
-          <View className="w-[40%]">
-            <TextInput
-              placeholder="Child Name"
-              value={orderChildData?.childName}
-              onChangeText={e =>
-                setOrderChildData(pre => {
-                  return {...pre, childName: e};
-                })
-              }
-              className="border-b border-gray-400 p-1 text-[15px] w-full"
-            />
-          </View>
-          <View className="w-[30%]">
-            <TextInput
-              placeholder="Child Age"
-              value={orderChildData?.childAge}
-              keyboardType="phone-pad"
-              onChangeText={e =>
-                setOrderChildData(pre => {
-                  return {...pre, childAge: parseInt(e)};
-                })
-              }
-              className="border-b border-gray-400 p-1 text-base w-full text-[15px]"
-            />
-          </View>
-
-          <View className="items-end justify-end w-[23%]">
-            <Pressable
-              className="rounded items-center justify-center h-[30px] px-2"
-              style={{backgroundColor: COLORS.pblue}}
-              onPress={() => addAnotherChild()}>
-              <Text className="text-white text-xs font-semobold ">
-                Continue
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </View> */}
-
       <View className="w-full items-center mt-4">
         {data?.map((child, i) => {
           return (
@@ -1263,40 +1200,6 @@ const LeadDataForm = ({setChild, child, close}) => {
   );
 };
 
-// const SetChildDataModule = ({setChild}) => {
-//   const [orderChildData, setOrderChildData] = useState({
-//     childName: '',
-//     childAge: null,
-//   });
-
-//   const toast = useToast();
-
-//   // const handleSetChild = () => {
-//   //   if (!orderChildData?.childName || orderChildData?.childName?.length < 3) {
-//   //     Showtoast({text: 'Enter child name', toast, type: 'danger'});
-//   //     return;
-//   //   } else if (
-//   //     !orderChildData?.childAge ||
-//   //     orderChildData?.childAge < 5 ||
-//   //     orderChildData?.childAge > 14
-//   //   ) {
-//   //     Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
-//   //     return;
-//   //   } else {
-//   //     setChild(orderChildData);
-//   //     // closeSheet();
-//   //   }
-//   // };
-
-//   useEffect(() => {
-//     setChild(setOrderChildData);
-//   }, [orderChildData]);
-
-//   return (
-
-//   );
-// };
-
 export default Payment;
 
 const styles = StyleSheet.create({
@@ -1304,7 +1207,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 16,
     borderRadius: 4,
-    backgroundColor: COLORS.white,
     elevation: 1,
   },
   row: {
@@ -1317,7 +1219,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#eee',
-    color: COLORS.black,
   },
   btnCheckout: {
     padding: 12,

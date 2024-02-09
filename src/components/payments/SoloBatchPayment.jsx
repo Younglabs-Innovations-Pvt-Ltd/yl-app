@@ -268,12 +268,12 @@ const SoloBatchPayment = ({
                 {Object.entries(filteredBatches).map(([key, obj]) => {
                   return (
                     <Pressable
-                      className="p-1 border-2 rounded px-3 max-w-[32%] items-center"
+                      className="py-2 rounded px-3 max-w-[32%] items-center"
                       style={{
-                        borderColor:
+                        backgroundColor:
                           selectedLevelToBuy?.level == obj.level
                             ? textColors.textYlMain
-                            : textColors.textSecondary,
+                            : bgSecondaryColor,
                       }}
                       onPress={() => {
                         handleBatchSelect(obj.level, obj?.offer, obj?.price),
@@ -287,7 +287,7 @@ const SoloBatchPayment = ({
                           className="font-semibold text-[18px] text-center"
                           style={{
                             fontFamily: FONTS.headingFont,
-                            color: textColors.textYlMain,
+                            color:  selectedLevelToBuy?.level == obj.level ? "white" :textColors.textYlMain,
                           }}>
                           {getLevelName(obj.level)}
                         </Text>
