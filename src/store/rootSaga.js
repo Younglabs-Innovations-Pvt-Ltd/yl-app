@@ -23,7 +23,7 @@ export function* rootSaga() {
     call(courseSagas),
     call(paymentSaga),
     call(contentSaga),
-    call(userSaga)
+    call(userSaga),
     call(handleCourseSaga),
     call(handleClassesHomeWorkSubmitSaga),
     call(handleClasseRecordingRequestSaga),
