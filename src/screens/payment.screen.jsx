@@ -144,7 +144,7 @@ const Payment = ({navigation, route}) => {
     strikeThroughPrice,
     courseDetails,
   } = useSelector(courseSelector);
-  console.log("levelText here in payment screen",levelText)
+  console.log('levelText here in payment screen', levelText);
   const {loading, payment} = useSelector(paymentSelector);
   const confettiRef = useRef();
   const cannonWrapperRef = useRef();
@@ -211,7 +211,7 @@ const Payment = ({navigation, route}) => {
       courseDetails,
       email,
       paymentMethod,
-      currentLevel
+      currentLevel,
     };
 
     if (selectedCoupon) {
@@ -260,7 +260,8 @@ const Payment = ({navigation, route}) => {
       leadId: user?.leadId,
       ageGroup: currentAgeGroup,
       courseId: courseDetails.courseId,
-      FCY: `${ipData?.currency?.code} ${price}`,
+      FCY: `QAR ${price}`,
+      // FCY: `${ipData?.currency?.code} ${price}`,
       promisedStartDate: startDateTime,
       promisedBatchFrequency: null,
       phone: user?.phone,

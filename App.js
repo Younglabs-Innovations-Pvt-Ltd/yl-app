@@ -40,7 +40,7 @@ import Payment from './src/screens/payment.screen';
 import BatchFeeDetails from './src/screens/batch-fees-details.screen';
 
 import * as Sentry from '@sentry/react-native';
-import {navigationRef} from './src/navigationRef';
+import {navigate, navigationRef} from './src/navigationRef';
 
 import {COLORS} from './src/utils/constants/colors';
 import {NetworkProvider} from './src/context/network.state';
@@ -60,6 +60,7 @@ import {initialize} from 'react-native-clarity';
 import Signup from './src/screens/signup-screen';
 import VerifyCode from './src/screens/verify-code.screen';
 import EmailLogin from './src/screens/email-login-screen';
+import PaymentSuccess from './src/screens/payment-success';
 
 initialize('kdg30i0fnc');
 
@@ -149,30 +150,22 @@ function App() {
     }
   }, []);
 
+  const handlePaymentDeepLink = ({url}) => {
+    const route = url.replace(/.*?:\/\//g, '');
+
+    const paymentLink = 'redirect.com.younglabs.android';
+    if (route === paymentLink) {
+      navigate(SCREEN_NAMES.PAYMENT_SUCCESS);
+    }
+  };
 
   // Handle redirect url (Deep Link)
-  // useEffect(() => {
-  //   const handleRedirectUrl = url => {
-  //     if (!url) {
-  //       return;
-  //     }
+  useEffect(() => {
+    // Handle deep linking
+    const unsubscribe = Linking.addEventListener('url', handlePaymentDeepLink);
 
-  //     const parseUrl = url.split('?')[1];
-  //     const parseBookingId = parseUrl.split('=')[1];
-  //     const bookingId = parseBookingId.replace(/#/g, '');
-
-  //     setBookingId(bookingId);
-  //   };
-
-  //   Linking.getInitialURL()
-  //     .then(handleRedirectUrl)
-  //     .catch(err => console.log(err));
-  // }, []);
-
-  // Request for Notification permission
-  // useEffect(() => {
-  //   requestPermissions();
-  // }, []);
+    return () => unsubscribe.remove();
+  }, []);
 
   // Request for Notifications permission to above android 13 or above
   const requestPermissions = async () => {
@@ -235,8 +228,6 @@ function App() {
       />
     );
   };
-
-  console.log('notificationRef', notificationRef.current);
 
   return (
     // Provider for language
@@ -352,6 +343,14 @@ function App() {
                   component={Payment}
                   options={{
                     headerTitle: 'Checkout',
+                  }}
+                />
+
+                <Stack.Screen
+                  name={SCREEN_NAMES.PAYMENT_SUCCESS}
+                  component={PaymentSuccess}
+                  options={{
+                    headerTitle: 'Success',
                   }}
                 />
               </Stack.Navigator>

@@ -46,7 +46,6 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     step2: true,
     step3: true,
   });
-  
 
   const dispatch = useDispatch();
 
@@ -61,6 +60,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
     currentAgeGroup,
     courseVideos,
   } = useSelector(courseSelector);
+
   const {ipData, timezone} = useSelector(bookDemoSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
@@ -386,7 +386,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         levelNames={courseDetails?.levelNames}
                       />
 
-                      <Spacer space={4} /> 
+                      <Spacer space={4} />
                       <BatchCard
                         ipData={ipData}
                         ageGroups={ageGroups}
@@ -468,7 +468,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                     onPress={() =>
                       navigation.navigate(SCREEN_NAMES.PAYMENT, {
                         paymentBatchType: 'group',
-                        paymentMethod:courseData?.paymentMethod || "tazapay"
+                        paymentMethod: courseData?.paymentMethod || 'tazapay',
                       })
                     }>
                     <TextWrapper fs={18} fw="700" color={COLORS.white}>
