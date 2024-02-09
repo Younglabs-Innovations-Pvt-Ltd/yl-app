@@ -1,17 +1,55 @@
-import React from 'react';
-import {Dimensions, Pressable} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ActivityIndicator, Dimensions, Pressable} from 'react-native';
 import {Text, View} from 'react-native-animatable';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Carousel from 'react-native-reanimated-carousel';
 import {Image} from 'react-native-animatable';
+import {
+  SetHomeWorkSubmit,
+  startSubmittingClasseHomeWork,
+} from '../../../../store/homework-submit/reducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {authSelector} from '../../../../store/auth/selector';
+import {handleClassesHomeWork} from '../../../../store/homework-submit/selector';
+import {startFetchServiceRequestClasses} from '../../../../store/handleCourse/reducer';
 
 const SubmitHomeWork = ({
   setSelectedClass,
   selectedClass,
-  selecteImages,
-  setSelectedImages,
+  setSheetOpen,
+  serviceRequestId,
+  serviceReqClassesLoading,
 }) => {
+  const dispatch = useDispatch();
+  const {user} = useSelector(authSelector);
+  const [selecteImages, setSelectedImages] = useState([]);
+  const [imgSrcUpload, setImgSrcUpload] = useState(null);
+  const {
+    ClassesHomeWorkSubmitLoading,
+    ClassesHomeWorkSubmitData,
+    ClassesHomeWorkHomeWorkFailed,
+  } = useSelector(handleClassesHomeWork);
+
+  const handleSubmitHomeWorkClick = () => {
+    const leadId = user.leadId;
+    dispatch(
+      startSubmittingClasseHomeWork({
+        classId: selectedClass?.classId,
+        leadId,
+        type: 'homework',
+        allImages: selecteImages,
+        serviceRequestId,
+      }),
+    );
+  };
+
+  useEffect(() => {
+    if (serviceReqClassesLoading) {
+      setSelectedClass(null);
+    }
+  }, [serviceReqClassesLoading]);
+
   const pickFile = async () => {
     try {
       setSelectedImages([]);
@@ -56,6 +94,7 @@ const SubmitHomeWork = ({
             data={selecteImages}
             scrollAnimationDuration={1000}
             renderItem={({item}) => {
+              console.log('check item in carousel...', item);
               return (
                 <View
                   style={{
@@ -97,14 +136,41 @@ const SubmitHomeWork = ({
           Please DO NOT upload PDF
         </Text>
       </View>
-      <Pressable
-        onPress={pickFile}
-        className="flex flex-row justify-center items-center w-[90%] py-2 rounded-md mx-auto bg-blue-300">
-        <MIcon name="image-multiple" className="mt-2" size={35} color="white" />
-        <Text className="text-white font-semibold text-[20px] ml-2">
-          Select images to upload
-        </Text>
-      </Pressable>
+      {selecteImages?.length > 0 ? (
+        <Pressable
+          onPress={() => {
+            handleSubmitHomeWorkClick();
+          }}
+          disabled={ClassesHomeWorkSubmitLoading}
+          className="flex flex-row justify-center items-center w-[90%] py-2 rounded-md mx-auto bg-blue-300">
+          <MIcon
+            name="image-multiple"
+            className="mt-2"
+            size={35}
+            color="white"
+          />
+          <Text className="text-white font-semibold text-[20px] ml-2">
+            Submit
+          </Text>
+          {(ClassesHomeWorkSubmitLoading || serviceReqClassesLoading) && (
+            <ActivityIndicator color={'white'} style={{width: 40}} />
+          )}
+        </Pressable>
+      ) : (
+        <Pressable
+          onPress={pickFile}
+          className="flex flex-row justify-center items-center w-[90%] py-2 rounded-md mx-auto bg-blue-300">
+          <MIcon
+            name="image-multiple"
+            className="mt-2"
+            size={35}
+            color="white"
+          />
+          <Text className="text-white font-semibold text-[20px] ml-2">
+            Select images to upload
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 };

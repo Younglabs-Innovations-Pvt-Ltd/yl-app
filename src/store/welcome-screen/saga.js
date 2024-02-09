@@ -154,7 +154,7 @@ function* fetchingCourses() {
 // Fetching user's all bookings
 function* fetchAllBookings({payload}) {
   try {
-    if (!payload) {
+    if  (!payload)  {
       return;
     }
     console.log('fetching bookings in api');

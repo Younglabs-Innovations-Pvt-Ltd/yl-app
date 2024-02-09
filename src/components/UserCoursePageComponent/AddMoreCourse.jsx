@@ -8,6 +8,8 @@ const AddMoreCourse = ({
   addMoreCourseCardbgColor,
   darkMode,
   bgSecondaryColor,
+  courses,
+  navigation
 }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const styles = StyleSheet.create({
@@ -39,8 +41,9 @@ const AddMoreCourse = ({
         <MIcon name="plus-circle" size={30} color="gray" />
       </Pressable>
       <BottomSheetComponent
+
         isOpen={sheetOpen}
-        Children={PopularCourses}
+        Children={<PopularCourses courses={courses} navigation={navigation}/>}
         onClose={() => setSheetOpen(false)}
         snapPoint={['50%', '75%']}
       />

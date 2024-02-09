@@ -9,6 +9,9 @@ import {courseSagas} from './course/course.saga';
 import {paymentSaga} from './payment/saga';
 import {contentSaga} from './content/saga';
 import { userSaga } from './user/saga';
+import {handleCourseSaga} from './handleCourse/saga';
+import {handleClassesHomeWorkSubmitSaga} from './homework-submit/saga';
+import {handleClasseRecordingRequestSaga} from './request-recording/saga';
 
 export function* rootSaga() {
   yield all([
@@ -21,5 +24,8 @@ export function* rootSaga() {
     call(paymentSaga),
     call(contentSaga),
     call(userSaga)
+    call(handleCourseSaga),
+    call(handleClassesHomeWorkSubmitSaga),
+    call(handleClasseRecordingRequestSaga),
   ]);
 }

@@ -3,6 +3,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useSelector} from 'react-redux';
 import {FONTS} from '../utils/constants/fonts';
+import {FONTS} from '../utils/constants/fonts';
 // import AntDesign from '@expo/vector-icons/AntDesign';
 
 const DropdownComponent = ({

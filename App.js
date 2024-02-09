@@ -61,6 +61,7 @@ import Signup from './src/screens/signup-screen';
 import VerifyCode from './src/screens/verify-code.screen';
 import EmailLogin from './src/screens/email-login-screen';
 import PaymentSuccess from './src/screens/payment-success';
+import CourseConductScreen from './src/screens/course-conduct-screen';
 
 initialize('kdg30i0fnc');
 
@@ -286,6 +287,11 @@ function App() {
                   component={MainScreen}
                   options={{headerShown: false}}
                   initialParams={{data: notificationRef.current}}
+                />
+                <Stack.Screen
+                  name="CourseConductScreen"
+                  component={CourseConductScreen}
+                  options={{headerShown: false}}
                 />
 
                 {/* <Stack.Screen

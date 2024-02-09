@@ -1,36 +1,92 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {View, Animated} from 'react-native';
-import {useSelector} from 'react-redux';
+import {View, Animated, ActivityIndicator, Modal} from 'react-native';
 import allClassData from './classesDummyData.json';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import FeatureTray from '../components/CourseLevelScreenComponent/FeatureTray';
 import SubmitHomeworkFeature from '../components/CourseLevelScreenComponent/features/SubmitHomeWork/submit-homework-feature';
 import PlayRecordingFeature from '../components/CourseLevelScreenComponent/features/play-recordings-feature';
-import DownloadWorksheetsFeature from '../components/CourseLevelScreenComponent/features/download-worksheets-feature';
-import DownloadCertificateFeature from '../components/CourseLevelScreenComponent/features/download-certificate-feature';
+import DownloadWorksheetsFeature, {
+  downloadWorksheet,
+} from '../components/CourseLevelScreenComponent/features/download-worksheets-feature';
+import DownloadCertificateFeature, {
+  downloadCertificate,
+} from '../components/CourseLevelScreenComponent/features/download-certificate-feature';
 import ClassWiseHomeWorkFeature from '../components/CourseLevelScreenComponent/features/class-wise-homework-feature';
 import CustomerSupportFeature from '../components/CourseLevelScreenComponent/features/customer-support-feature';
 import SnakeLevels from '../components/CourseLevelScreenComponent/SnakeLevels';
+import {startFetchServiceRequestClasses} from '../store/handleCourse/reducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {authSelector} from '../store/auth/selector';
+import {handleCourseSelector} from '../store/handleCourse/selector';
+import {SetHomeWorkSubmit} from '../store/homework-submit/reducer';
+import {handleClassesHomeWork} from '../store/homework-submit/selector';
+import {handleRequestRecording} from '../store/request-recording/selector';
+import {SetRecordingRequest} from '../store/request-recording/reducer';
+import AskPreClassRating from '../components/CourseLevelScreenComponent/AskPreClassRating';
 
-const CourseLevelScreen = ({navigation}) => {
+const CourseLevelScreen = ({navigation, route}) => {
+  const {serviceRequestId} = route.params;
   const [allClasses, setAllClasses] = useState([]);
   const [enabledFeatures, setEnabledFeatures] = useState([]);
   const [features, setFeatures] = useState([]);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [askForRating, setAskForRating] = useState(false);
   const [displayFeature, setDisplayFeature] = useState('submit_homework');
+  const [previousClassData, setPreviousClassData] = useState(null);
+  const dispatch = useDispatch();
+  const {user} = useSelector(authSelector);
+  const {
+    serviceReqClassesLoading,
+    serviceReqClassesData,
+    serviceReqClassesDataFailed,
+  } = useSelector(handleCourseSelector);
+  const {homeworksubmittedsuccessfully} = useSelector(handleClassesHomeWork);
+  const {requestRecordingSuccessfully} = useSelector(handleRequestRecording);
+  const handleCourseClick = ({serviceRequestId}) => {
+    const leadId = user.leadId;
+    dispatch(startFetchServiceRequestClasses({leadId, serviceRequestId}));
+  };
+
   useEffect(() => {
-    if (allClassData?.classes?.length > 1) {
-      setAllClasses(allClassData.classes);
+    console.log('homeworksubmittedsuccessfully', homeworksubmittedsuccessfully);
+    if (homeworksubmittedsuccessfully || requestRecordingSuccessfully) {
+      const leadId = user.leadId;
+      dispatch(startFetchServiceRequestClasses({leadId, serviceRequestId}));
+      dispatch(SetHomeWorkSubmit());
+      dispatch(SetRecordingRequest());
     }
-    if (allClassData?.features?.length > 0) {
-      setEnabledFeatures(allClassData?.features);
+  }, [homeworksubmittedsuccessfully, requestRecordingSuccessfully]);
+
+  useEffect(() => {
+    handleCourseClick({serviceRequestId});
+  }, [user]);
+
+  useEffect(() => {
+    // console.log('orifbhoergherih', serviceReqClassesData?.classes);
+    if (serviceReqClassesData?.classes) {
+      setAllClasses(serviceReqClassesData?.classes);
     }
-  }, [allClassData]);
+    if (serviceReqClassesData?.features?.length > 0) {
+      setEnabledFeatures(serviceReqClassesData?.features);
+    }
+  }, [serviceReqClassesData]);
 
   const {bgColor, bgSecondaryColor, darkMode} = useSelector(
     state => state.appTheme,
   );
   const scrollA = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (displayFeature === 'download_worksheets') {
+      downloadWorksheet();
+    }
+    if (displayFeature === 'course_certificate') {
+      const leadId = user.leadId;
+      downloadCertificate({
+        leadId,
+        serviceRequestId,
+      });
+    }
+  }, [displayFeature]);
 
   return (
     <>
@@ -56,19 +112,41 @@ const CourseLevelScreen = ({navigation}) => {
               setDisplayFeature={setDisplayFeature}
             />
           </View>
-          <View className="h-[100%] relative">
-            <SnakeLevels
-              navigation={navigation}
-              darkMode={darkMode}
-              allClasses={allClasses}
-            />
-          </View>
+          {!serviceReqClassesLoading && (
+            <View className="h-[100%] relative">
+              <SnakeLevels
+                navigation={navigation}
+                darkMode={darkMode}
+                allClasses={allClasses}
+                setAskForRating={setAskForRating}
+                askForRating={askForRating}
+                setPreviousClassData={setPreviousClassData}
+              />
+            </View>
+          )}
         </Animated.ScrollView>
+        {serviceReqClassesLoading && (
+          <View className="h-[70%] w-full flex flex-row justify-center items-center">
+            <ActivityIndicator color={'white'} size={30} />
+          </View>
+        )}
+
+        {askForRating && (
+          <AskPreClassRating
+            previousClassData={previousClassData}
+            setAskForRating={setAskForRating}
+          />
+        )}
       </View>
       {displayFeature === 'submit_homework' ? (
         <BottomSheetComponent
           isOpen={sheetOpen}
-          Children={SubmitHomeworkFeature}
+          Children={
+            <SubmitHomeworkFeature
+              setSheetOpen={setSheetOpen}
+              serviceRequestId={serviceRequestId}
+            />
+          }
           onClose={() => setSheetOpen(false)}
           snapPoint={['65%', '72%']}
         />
@@ -77,36 +155,50 @@ const CourseLevelScreen = ({navigation}) => {
           isOpen={sheetOpen}
           Children={<PlayRecordingFeature navigation={navigation} />}
           onClose={() => setSheetOpen(false)}
-          snapPoint={['50%', '72%']}
+          snapPoint={['65%', '72%']}
         />
-      ) : displayFeature === 'download_worksheets' ? (
+      ) : // displayFeature === 'download_worksheets' ? (
+      // downloadWorksheet()
+      // <BottomSheetComponent
+      //   isOpen={sheetOpen}
+      //   Children={DownloadWorksheetsFeature}
+      //   onClose={() => setSheetOpen(false)}
+      //   snapPoint={['65%', '72%']}
+      // />
+      // ) :
+      // displayFeature === 'course_certificate' ? (
+      //   <BottomSheetComponent
+      //     isOpen={sheetOpen}
+      //     Children={DownloadCertificateFeature}
+      //     onClose={() => setSheetOpen(false)}
+      //     snapPoint={['65%', '72%']}
+      //   />
+      // ) :
+      displayFeature === 'view_class_wise_homework' ? (
         <BottomSheetComponent
           isOpen={sheetOpen}
-          Children={DownloadWorksheetsFeature}
+          Children={
+            <ClassWiseHomeWorkFeature
+              serviceReqClassesData={serviceReqClassesData}
+            />
+          }
           onClose={() => setSheetOpen(false)}
-          snapPoint={['50%', '72%']}
-        />
-      ) : displayFeature === 'course_certificate' ? (
-        <BottomSheetComponent
-          isOpen={sheetOpen}
-          Children={DownloadCertificateFeature}
-          onClose={() => setSheetOpen(false)}
-          snapPoint={['50%', '72%']}
-        />
-      ) : displayFeature === 'view_class_wise_homework' ? (
-        <BottomSheetComponent
-          isOpen={sheetOpen}
-          Children={ClassWiseHomeWorkFeature}
-          onClose={() => setSheetOpen(false)}
-          snapPoint={['50%', '72%']}
+          snapPoint={['65%', '72%']}
         />
       ) : (
-        <BottomSheetComponent
-          isOpen={sheetOpen}
-          Children={CustomerSupportFeature}
-          onClose={() => setSheetOpen(false)}
-          snapPoint={['50%', '65%']}
-        />
+        displayFeature === 'customer_support' && (
+          <BottomSheetComponent
+            isOpen={sheetOpen}
+            Children={
+              <CustomerSupportFeature
+                setSheetOpen={setSheetOpen}
+                serviceReqClassesData={serviceReqClassesData}
+              />
+            }
+            onClose={() => setSheetOpen(false)}
+            snapPoint={['65%', '72%']}
+          />
+        )
       )}
     </>
   );

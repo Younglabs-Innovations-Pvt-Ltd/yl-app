@@ -80,7 +80,7 @@ const FeatureTray = ({
   ];
   useEffect(() => {
     if (enabledFeatures) {
-      const newFeatures = featuresNew?.map(item => {
+      const newFeatures = featuresNew?.filter(item => {
         if (enabledFeatures?.includes(item?.feature)) {
           return item;
         }
@@ -100,7 +100,7 @@ const FeatureTray = ({
         renderItem={item => {
           return (
             <Pressable
-              key={item?.item?.featureName}
+              key={item?.item?.feature}
               onPress={() => {
                 setDisplayFeature(item.item?.feature);
                 setSheetOpen(true);
