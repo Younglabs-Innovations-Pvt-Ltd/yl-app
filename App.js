@@ -60,6 +60,7 @@ import {initialize} from 'react-native-clarity';
 import Signup from './src/screens/signup-screen';
 import VerifyCode from './src/screens/verify-code.screen';
 import EmailLogin from './src/screens/email-login-screen';
+import CourseConductScreen from './src/screens/course-conduct-screen';
 
 initialize('kdg30i0fnc');
 
@@ -148,7 +149,6 @@ function App() {
       setLoading(false);
     }
   }, []);
-
 
   // Handle redirect url (Deep Link)
   // useEffect(() => {
@@ -295,6 +295,11 @@ function App() {
                   component={MainScreen}
                   options={{headerShown: false}}
                   initialParams={{data: notificationRef.current}}
+                />
+                <Stack.Screen
+                  name="CourseConductScreen"
+                  component={CourseConductScreen}
+                  options={{headerShown: false}}
                 />
 
                 {/* <Stack.Screen

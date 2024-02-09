@@ -37,7 +37,6 @@ const SubmitHomeworkFeature = ({setSheetOpen, serviceRequestId}) => {
           {allClassesHomeWork?.map(classData => {
             return (
               <SubmitHomeWorkTile
-                key={classData?.classNumber}
                 classData={classData}
                 setSelectedClass={setSelectedClass}
                 selectedClass={selectedClass}

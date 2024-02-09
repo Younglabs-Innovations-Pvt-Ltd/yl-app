@@ -235,7 +235,7 @@ const SnakeLevels = ({
               count = count >= marginleftcustom.length - 1 ? 0 : count + 1;
               return (
                 <View
-                  key={level?.classNumber}
+                  key={level?.classId}
                   className="w-[100%] my-3 bg-transparent">
                   <View
                     style={[

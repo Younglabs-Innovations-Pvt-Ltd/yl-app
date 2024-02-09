@@ -10,29 +10,26 @@ import CourseDetailsScreen from './CourseDetailScreen';
 const CourseScreenNavigator = () => {
   const Stack = createStackNavigator();
   return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName={'userCourse'}>
-        <Stack.Screen
-          name="userCourse"
-          component={UserCoursesPage}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="CourseLevelPage"
-          component={CourseLevelScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
+    // <NavigationContainer independent={true}>
+    <Stack.Navigator initialRouteName={'userCourse'}>
+      <Stack.Screen
+        name="userCourse"
+        component={UserCoursesPage}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CourseLevelPage"
+        component={CourseLevelScreen}
+        options={{headerShown: false}}
+      />
+      {/* <Stack.Screen
           name="CourseConductScreen"
           component={CourseConductScreen}
           options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="CourseDetailScreen"
-          component={CourseDetailsScreen}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+        /> */}
+      <Stack.Screen name="CourseDetailScreen" component={CourseDetailsScreen} />
+    </Stack.Navigator>
+    // </NavigationContainer>
   );
 };
 

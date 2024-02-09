@@ -18,6 +18,7 @@ import {authSelector} from '../../../store/auth/selector';
 import {handleRequestRecording} from '../../../store/request-recording/selector';
 import {startRecordingRequest} from '../../../store/request-recording/reducer';
 import moment from 'moment';
+import {navigate} from '../../../navigationRef';
 
 const PlayRecordingFeature = ({navigation}) => {
   const {user} = useSelector(authSelector);
@@ -96,7 +97,9 @@ export const RecordingsTile = ({
   }, []);
 
   return (
-    <View className="w-[100%] flex flex-row justify-between items-center mt-2 px-2 h-[60px] bg-blue-300 border-2 border-gray-300 border-solid rounded-md">
+    <View
+      key={classData?.classNumber}
+      className="w-[100%] flex flex-row justify-between items-center mt-2 px-2 h-[60px] bg-blue-300 border-2 border-gray-300 border-solid rounded-md">
       <Text className="text-black font-semibold text-[20px]">
         Class {classData?.classNumber}
       </Text>
@@ -124,9 +127,12 @@ export const RecordingsTile = ({
         ) : classData.videoUrl !== 'expired' ? (
           <Pressable
             onPress={() => {
-              navigation.navigate(SCREEN_NAMES.COURSE_CONDUCT_PAGE, {
+              navigate(SCREEN_NAMES.COURSE_CONDUCT_PAGE, {
                 videoUrl: classData?.videoUrl,
               });
+              // navigation.navigate(SCREEN_NAMES.COURSE_CONDUCT_PAGE, {
+              //   videoUrl: classData?.videoUrl,
+              // });
             }}
             className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1  rounded-md">
             {classData?.recordingRequestedAt && (

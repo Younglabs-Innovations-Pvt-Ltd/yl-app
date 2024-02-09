@@ -31,6 +31,46 @@ const AskPreClassRating = ({previousClassData, setAskForRating}) => {
     {label: 'Other', value: 'Other'},
   ];
 
+  const createTicket = async () => {
+    const token = await auth().currentUser.getIdToken();
+    const API_URL = `${BASE_URL}/admin/tickets/createticketcustomer`;
+    const body = {
+      leadId: user?.leadId,
+      customerName: user?.fullName,
+      details:
+        feedBack === '' || feedBack == null
+          ? 'none'
+          : feedBack == 'Other'
+          ? message
+          : feedBack,
+      creatorEmail: user?.email,
+      category: 'Class Feedback',
+      rating,
+      courseId: previousClassData?.classNumber,
+      classInfo: {
+        classNumber: previousClassData?.classNumber,
+        classDate: previousClassData?.classDate,
+        teacherName: previousClassData?.partnerName,
+        rating: previousClassData?.rating ? previousClassData?.rating : 'null',
+        attended: previousClassData?.attendance,
+        batchId: previousClassData?.batchId,
+      },
+    };
+    console.log('check ticket body', body, API_URL, token);
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+      body: JSON.stringify(body),
+    });
+    console.log('ticket response', response.status, response.statusText);
+    if (response.status === 200) {
+      console.log('ticket raised successfully');
+    }
+  };
+
   const handleFeedback = async () => {
     if (rating !== 0) {
       setLoading(true);
@@ -51,7 +91,10 @@ const AskPreClassRating = ({previousClassData, setAskForRating}) => {
         teacherName: previousClassData?.partnerName,
         phone: user?.phone,
       };
-      console.log('check body:', body);
+      // console.log('check body:', body);
+      if (rating <= 3 && feedBack !== 'Class was good') {
+        createTicket();
+      }
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
@@ -60,7 +103,6 @@ const AskPreClassRating = ({previousClassData, setAskForRating}) => {
         },
         body: JSON.stringify(body),
       });
-      console.log(response?.status);
       if (response.status === 200) {
         Showtoast({
           text: 'Thanks for your feedback',

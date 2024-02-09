@@ -100,7 +100,7 @@ const FeatureTray = ({
         renderItem={item => {
           return (
             <Pressable
-              key={item?.item?.featureName}
+              key={item?.item?.feature}
               onPress={() => {
                 setDisplayFeature(item.item?.feature);
                 setSheetOpen(true);

@@ -20,7 +20,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {startFetchServiceRequestClasses} from '../store/handleCourse/reducer';
 import DropdownComponent from '../components/DropdownComponent';
 
-const CourseConductScreen = ({route}) => {
+const CourseConductScreen = ({route, navigation}) => {
   const {videoUrl, serviceRequestId} = route.params;
   console.log('check video url', videoUrl);
   const [settings, setSettings] = useState(false);
@@ -37,6 +37,26 @@ const CourseConductScreen = ({route}) => {
   // }, []);
 
   // const playBackSpeed = [1.0, 1.25, 1.5, 1.75, 2.0];
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', e => {
+      // Prevent default behavior to avoid going back in landscape mode
+      e.preventDefault();
+
+      // Lock to portrait before navigating back
+      Orientation.lockToPortrait();
+      setFullScreen(false);
+
+      // Continue with the navigation
+      setTimeout(() => {
+        navigation.dispatch(e.data.action);
+      }, 800);
+    });
+
+    // Cleanup the listener when the component is unmounted
+    return unsubscribe;
+  }, []);
+
   const playBackSpeed = [
     {label: 'Normal', value: '1.0'},
     {label: '1.25', value: '1.25'},
@@ -70,36 +90,6 @@ const CourseConductScreen = ({route}) => {
             placeHolder="PlayBack Speed"
             setSelectedValue={setSpeed}
           />
-
-          {/* <Dropdown
-            style={{
-              width: '100%',
-              paddingLeft: 10,
-              height: 50,
-              borderRadius: 10,
-              borderColor: 'gray',
-              borderWidth: 1,
-              marginTop: 10,
-            }}
-            placeholder="Select Quality"
-            placeholderStyle={{
-              color: 'black',
-              fontFamily: FONTS.signika_medium,
-            }}
-            itemTextStyle={{color: 'black', fontFamily: FONTS.signika_medium}}
-            selectedTextStyle={{
-              color: 'black',
-            }}
-            containerStyle={{borderColor: '#dfd2d2', borderRadius: 10}}
-            inputSearchStyle={{fontFamily: FONTS.signika_medium}}
-            data={Quality}
-            labelField={'label'}
-            valueField={'value'}
-            value={speed}
-            onChange={item => {
-              setSpeed(item.value);
-            }}
-          /> */}
         </View>
       )}
     </View>

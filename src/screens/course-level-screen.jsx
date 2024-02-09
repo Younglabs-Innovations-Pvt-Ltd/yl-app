@@ -91,32 +91,28 @@ const CourseLevelScreen = ({navigation, route}) => {
   return (
     <>
       <View style={{backgroundColor: darkMode ? bgColor : '#76C8F2'}}>
-        {serviceReqClassesLoading ? (
-          <View className="h-full w-full flex flex-row justify-center items-center">
-            <ActivityIndicator color={'white'} size={30} />
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+            [{nativeEvent: {contentOffset: {y: scrollA}}}],
+            {useNativeDriver: true},
+          )}
+          scrollEventThrottle={16}>
+          <View style={styles.bannerContainer}>
+            <FeatureTray
+              scrollA={scrollA}
+              bgSecondaryColor={bgSecondaryColor}
+              darkMode={darkMode}
+              enabledFeatures={enabledFeatures}
+              features={features}
+              setFeatures={setFeatures}
+              sheetOpen={sheetOpen}
+              setSheetOpen={setSheetOpen}
+              displayFeature={displayFeature}
+              setDisplayFeature={setDisplayFeature}
+            />
           </View>
-        ) : (
-          <Animated.ScrollView
-            showsVerticalScrollIndicator={false}
-            onScroll={Animated.event(
-              [{nativeEvent: {contentOffset: {y: scrollA}}}],
-              {useNativeDriver: true},
-            )}
-            scrollEventThrottle={16}>
-            <View style={styles.bannerContainer}>
-              <FeatureTray
-                scrollA={scrollA}
-                bgSecondaryColor={bgSecondaryColor}
-                darkMode={darkMode}
-                enabledFeatures={enabledFeatures}
-                features={features}
-                setFeatures={setFeatures}
-                sheetOpen={sheetOpen}
-                setSheetOpen={setSheetOpen}
-                displayFeature={displayFeature}
-                setDisplayFeature={setDisplayFeature}
-              />
-            </View>
+          {!serviceReqClassesLoading && (
             <View className="h-[100%] relative">
               <SnakeLevels
                 navigation={navigation}
@@ -127,8 +123,14 @@ const CourseLevelScreen = ({navigation, route}) => {
                 setPreviousClassData={setPreviousClassData}
               />
             </View>
-          </Animated.ScrollView>
+          )}
+        </Animated.ScrollView>
+        {serviceReqClassesLoading && (
+          <View className="h-[70%] w-full flex flex-row justify-center items-center">
+            <ActivityIndicator color={'white'} size={30} />
+          </View>
         )}
+
         {askForRating && (
           <AskPreClassRating
             previousClassData={previousClassData}

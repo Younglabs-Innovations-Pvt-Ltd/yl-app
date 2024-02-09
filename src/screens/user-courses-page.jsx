@@ -57,7 +57,7 @@ const UserCoursesPage = ({navigation}) => {
           {userCourseData?.map(course => {
             return (
               <CourseCard
-                key={course?.orderId}
+                
                 course={course}
                 navigation={navigation}
               />
