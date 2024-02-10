@@ -20,6 +20,7 @@ const CustomerTickets = ({setShowMyTickets}) => {
   const {user} = useSelector(authSelector);
   const [myTickets, ssetMyTickets] = useState(null);
   const [loading, setLoading] = useState(false);
+  const {bgSecondaryColor, textColors} = useSelector(state => state.appTheme);
   const toast = useToast();
   const fetchCustomerTickets = async () => {
     setLoading(true);
@@ -63,10 +64,12 @@ const CustomerTickets = ({setShowMyTickets}) => {
               name="arrow-left-bold-circle"
               className="mt-2"
               size={35}
-              color="gray"
+              color={textColors?.textPrimary}
             />
           </Pressable>
-          <Text className="text-black font-semibold text-[20px]">
+          <Text
+            style={{color: textColors?.textPrimary}}
+            className="font-semibold text-[20px]">
             My Tickets
           </Text>
         </View>
@@ -89,6 +92,8 @@ const CustomerTickets = ({setShowMyTickets}) => {
                   ticketId={ticket?.ticketId}
                   creatorEmail={ticket?.creatorEmail}
                   fetchCustomerTickets={fetchCustomerTickets}
+                  bgSecondaryColor={bgSecondaryColor}
+                  textColors={textColors}
                 />
               );
             })}
@@ -109,6 +114,8 @@ export const TicketTile = ({
   creatorEmail,
   ticketId,
   fetchCustomerTickets,
+  bgSecondaryColor,
+  textColors,
 }) => {
   const [ticketStatusColor, setTicketStatusColor] = useState(null);
   const [ticketCreatedAt, setTicketCreatedAt] = useState(null);
@@ -116,6 +123,7 @@ export const TicketTile = ({
   const [showComments, setShowComments] = useState(false);
   const [reopenMessage, setReopenMessage] = useState(null);
   const [showReopen, setShowReopen] = useState(false);
+
   useEffect(() => {
     if (comments) {
       let commentsList = [];
@@ -161,15 +169,23 @@ export const TicketTile = ({
   }, [createdAt]);
 
   return (
-    <View className="w-[100%] flex flex-1 flex-col justify-between items-center mt-2 border-2 border-black rounded-md mx-auto">
+    <View className="w-[100%] flex flex-1 flex-col justify-between items-center mt-2 border-2 border-gray-200 rounded-md mx-auto">
       <View className="w-[100%] flex flex-row justify-between items-start px-2 pt-1">
-        <Text className="text-black text-[16px] font-semibold">{category}</Text>
-        <Text className="text-black  text-[14px] font-semibold">
+        <Text
+          style={{color: textColors?.textPrimary}}
+          className="text-[16px] font-semibold">
+          {category}
+        </Text>
+        <Text
+          style={{color: textColors?.textSecondary}}
+          className="text-[14px] font-semibold">
           {ticketCreatedAt}
         </Text>
       </View>
       <View className="w-[100%] flex flex-row justify-start items-end px-2 pb-1 mt-2">
-        <Text className="text-black  font-semibold">{details}</Text>
+        <Text style={{color: textColors}} className="font-semibold">
+          {details}
+        </Text>
       </View>
       <View className="w-[100%] flex flex-row justify-end items-center mr-2 my-2">
         {(allComments?.length === 0 || allComments == undefined) &&

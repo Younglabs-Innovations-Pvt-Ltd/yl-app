@@ -65,6 +65,7 @@ export const RecordingsTile = ({
 }) => {
   const [daysToGo, setDaysToGo] = useState(null);
   const dispatch = useDispatch();
+  const {bgSecondaryColor, textColors} = useSelector(state => state.appTheme);
   const [clicked, setClicked] = useState(false);
   const [classDateForRecoeding, setClassDateForRecording] = useState(null);
 
@@ -99,8 +100,11 @@ export const RecordingsTile = ({
   return (
     <View
       key={classData?.classNumber}
+      style={{backgroundColor: bgSecondaryColor}}
       className="w-[100%] flex flex-row justify-between items-center mt-2 px-2 h-[60px] bg-blue-300 border-2 border-gray-300 border-solid rounded-md">
-      <Text className="text-black font-semibold text-[20px]">
+      <Text
+        style={{color: textColors?.textPrimary}}
+        className=" font-semibold text-[20px]">
         Class {classData?.classNumber}
       </Text>
       {classDateForRecoeding ? (
@@ -136,7 +140,9 @@ export const RecordingsTile = ({
             }}
             className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1  rounded-md">
             {classData?.recordingRequestedAt && (
-              <Text className="text-black">{daysToGo} days left</Text>
+              <Text style={{color: textColors?.textSecondary}}>
+                {daysToGo} days left
+              </Text>
             )}
             <Image source={RecordingPlay} className="h-[45px] w-[45px] ml-3" />
           </Pressable>
