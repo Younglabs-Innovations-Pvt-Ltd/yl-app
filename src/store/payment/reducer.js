@@ -13,6 +13,7 @@ const reducers = {
   },
   startMakePayment(state) {
     state.loading = true;
+    state.message = '';
   },
   makePaymentSuccess(state, action) {
     state.loading = false;
@@ -31,6 +32,10 @@ const reducers = {
   },
   makeSoloPayment(state, action) {
     state.loading = true;
+    state.message = '';
+  },
+  setMessage(state, action) {
+    state.message = action.payload;
   },
 };
 
@@ -48,6 +53,7 @@ export const {
   setPayment,
   setPaymentMessage,
   makeSoloPayment,
+  setMessage,
 } = paymentSlice.actions;
 
 export const paymentReducer = paymentSlice.reducer;

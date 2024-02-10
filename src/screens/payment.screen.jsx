@@ -20,6 +20,7 @@ import {courseSelector} from '../store/course/course.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {
   makeSoloPayment,
+  setMessage,
   setPaymentMessage,
   startMakePayment,
 } from '../store/payment/reducer';
@@ -41,6 +42,7 @@ import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
 import {userSelector} from '../store/user/selector';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
+import Snackbar from 'react-native-snackbar';
 
 GoogleSignin.configure({
   webClientId:
@@ -85,7 +87,7 @@ const Payment = ({navigation, route}) => {
   const {textColors, bgColor, darkMode, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
-  const {loading, payment} = useSelector(paymentSelector);
+  const {loading, payment, message} = useSelector(paymentSelector);
   const confettiRef = useRef();
   const cannonWrapperRef = useRef();
   const {ipData} = useSelector(bookDemoSelector);
@@ -126,6 +128,7 @@ const Payment = ({navigation, route}) => {
         const response = await getOfferCode({phone: user?.phone});
 
         const codes = await response.json();
+
         setOfferCodes(codes?.offerCodes);
       }
     };
@@ -138,7 +141,13 @@ const Payment = ({navigation, route}) => {
     }
   }, [dropdownData]);
 
-  // console.log('total discounts are', totalDiscounts);
+  // Show payment failed message
+  useEffect(() => {
+    if (message) {
+      Snackbar.show({text: message, textColor: COLORS.white});
+      dispatch(setMessage(''));
+    }
+  }, [message]);
 
   useEffect(() => {
     if (currentSelectedBatch) {
@@ -178,13 +187,10 @@ const Payment = ({navigation, route}) => {
 
     const currentUser = auth().currentUser;
 
-    // console.log('currentuser is', currentUser);
-
     if (!currentUser) {
       setAuthVisible(true);
       return;
     }
-    // console.log('selected child here', selectedChild);
 
     const body = {
       price,
@@ -245,8 +251,7 @@ const Payment = ({navigation, route}) => {
       leadId: user?.leadId,
       ageGroup: currentAgeGroup,
       courseId: courseDetails.courseId,
-      FCY: `QAR ${price}`,
-      // FCY: `${ipData?.currency?.code} ${price}`,
+      FCY: `${ipData?.currency?.code} ${price}`,
       promisedStartDate: startDateTime,
       promisedBatchFrequency: null,
       phone: user?.phone,
@@ -430,11 +435,6 @@ const Payment = ({navigation, route}) => {
     });
     setCouponDisCount(discountValue);
     setDefCouponApplyLoading(false);
-    // if (confettiRef.current) {
-    //   confettiRef.current.start();
-    //   setFadeOut(true);
-    //   setVisibleCongratulations(true);
-    // }
   };
 
   async function onGoogleButtonPress() {
@@ -450,6 +450,11 @@ const Payment = ({navigation, route}) => {
       // Sign-in the user with the credential
       await auth().signInWithCredential(googleCredential);
       setAuthVisible(false);
+      if (paymentBatchType === 'solo') {
+        handleSoloBatchCheckOut();
+      } else {
+        handleCheckout();
+      }
     } catch (error) {
       console.log('GoogleAuthenticationError', error.message);
     }
@@ -758,7 +763,7 @@ const Payment = ({navigation, route}) => {
                   borderRadius: 4,
                   borderColor: 'gray',
                   backgroundColor: textColors.textYlGreen,
-                  flexDirection:"row"
+                  flexDirection: 'row',
                 }}
                 onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
                 <TextWrapper fs={18} color={'white'}>
@@ -766,7 +771,11 @@ const Payment = ({navigation, route}) => {
                 </TextWrapper>
 
                 {couponApplyLoading && (
-                  <ActivityIndicator size={'small'} color={'white'} className="ml-1" />
+                  <ActivityIndicator
+                    size={'small'}
+                    color={'white'}
+                    className="ml-1"
+                  />
                 )}
               </Pressable>
             </View>

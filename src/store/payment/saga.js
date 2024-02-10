@@ -20,22 +20,12 @@ import {Linking} from 'react-native';
 
 function* payOnTazapay({body, ipData}) {
   try {
-    // console.log('got body', body);
-
     // 1:- addToBag => get bagid
     // 2: - use bagid in createCheckout session
     // 3: - Get token from createCheckout session
     // 4: -send token to tazapay sdk on web
 
-    // console.log('calling add to bag' , body , " ipdata", ipData);
-    // return;
-
-    // Getting bag Id
-    console.log('in tazapay session');
-    console.log('tpBody', body);
-    const url =
-      'https://307b-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
-    const addToBagRes = yield fetch(`${url}/shop/orderhandler/addToBag`, {
+    const addToBagRes = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,28 +35,20 @@ function* payOnTazapay({body, ipData}) {
         leadId: body?.leadId,
       }),
     });
-    console.log('got addToBagRes', addToBagRes.status);
 
     if (addToBagRes.status !== 200) {
       console.log('did not get response');
+      yield put(makePaymentFailed('Something went wrong'));
       return;
     }
 
     const {bagId} = yield addToBagRes.json();
 
-    // const currency = body.FCY.split(' ')[0];
-    // getting checkOutSession token
     const createCheckoutSessionBody = {
-      // email: body.email,
-      // invoiceCurrency: 'QAR', //change with currency
-      // name: body.fullName,
-      country: ipData?.country_code2, //ipData.country_code2 change with country
-      // phone: body.phone,
-      // callingCode: body.countryCode,
-      // amount: body.price,
+      // country: ipData?.country_code2, //ipData.country_code2 change with country
+      country: 'QA',
       bagId,
     };
-    console.log('callingCheckOutSession with body', createCheckoutSessionBody);
 
     const checkOutSessionRes = yield fetch(
       `${BASE_URL}/payments/tazapay/createCheckoutSession`,
@@ -78,10 +60,10 @@ function* payOnTazapay({body, ipData}) {
         body: JSON.stringify(createCheckoutSessionBody),
       },
     );
-    console.log('got checkOutSession res', checkOutSessionRes.status);
 
     if (checkOutSessionRes.status !== 200) {
       console.log('can not generate checkOutSession token');
+      yield put(makePaymentFailed('Something went wrong'));
       return;
     }
 
@@ -90,9 +72,11 @@ function* payOnTazapay({body, ipData}) {
     const redirectUrl = `https://younglabsdev1.vercel.app/yl_app/tazapay?token=${token}`;
     console.log('redirectUrl', redirectUrl);
 
+    yield put(setLoading(false));
     yield Linking.openURL(redirectUrl);
   } catch (error) {
     console.log('error in tazapay', error.message);
+    yield put(makePaymentFailed('Something went wrong'));
   }
 }
 
@@ -166,17 +150,11 @@ function* makePaymentSaga({payload}) {
       body.discountedPrice = payload.discountedPrice;
     }
 
-    // const isEmail = yield AsyncStorage.getItem(LOCAL_KEYS.EMAIL);
-    // if (!isEmail) {
-    //   yield AsyncStorage.setItem(LOCAL_KEYS.EMAIL, body.email);
-    // }
-    // }
-
     // Save email to local storage
     localStorage.set(LOCAL_KEYS.EMAIL, body.email);
     const offeringBody = generateOffering(selectBatch);
     body.offeringData = offeringBody;
-    console.log('paying on ', paymentMethod);
+
     if (paymentMethod === 'tazapay') {
       body.FCY = `QAR ${selectBatch?.price}`;
       yield payOnTazapay({body, ipData});
@@ -185,9 +163,6 @@ function* makePaymentSaga({payload}) {
 
     const token = yield auth().currentUser.getIdToken();
     console.log('body=', body);
-
-    const url =
-      'https://5963-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
     const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
@@ -198,7 +173,7 @@ function* makePaymentSaga({payload}) {
     });
 
     if (response.status === 403) {
-      yield put(setLoading(false));
+      yield put(makePaymentFailed('Something went wrong'));
       return;
     }
 
@@ -301,89 +276,80 @@ function* makeSoloPaymentSaga({payload}) {
       console.log('tpBody', body);
 
       yield payOnTazapay({body, ipData});
-      return;
-    }
+    } else {
+      const token = yield auth().currentUser.getIdToken();
+      const url =
+        'https://f55b-2401-4900-1c5c-3da3-1964-c1bc-473e-5467.ngrok-free.app';
+      const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+        body: JSON.stringify(body),
+      });
 
-    const token = yield auth().currentUser.getIdToken();
-    const url =
-      'https://307b-2401-4900-1c5c-3da3-d51-cedb-e809-a72b.ngrok-free.app';
-    console.log('calling api');
-    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
-      },
-      body: JSON.stringify(body),
-    });
+      const data = yield response.json();
 
-    // console.log('res is', response.status);
+      if (data.order.status === 'failed') {
+        yield put(makePaymentFailed('Something went wrong'));
+        return;
+      }
 
-    const data = yield response.json();
+      const {amount, id: order_id, currency} = data.order;
 
-    console.log('order data=', data);
+      const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bagDetails: {...body, rpOrderId: order_id, type: 'order'},
+          leadId: body?.leadId,
+        }),
+      });
 
-    if (response.status === 403) {
-      // yield put(setLoading(false));
-      console.error('errror happeded here');
-      yield put(setLoading(false));
-      return;
-    }
+      const orderRes = yield orderResp.json();
+      console.log('i am here 2');
 
-    console.log('i am here finnaly', data);
-    const {amount, id: order_id, currency} = data.order;
+      // console.log('orderRes=', orderRes);
 
-    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        bagDetails: {...body, rpOrderId: order_id, type: 'order'},
-        leadId: body?.leadId,
-      }),
-    });
-
-    const orderRes = yield orderResp.json();
-    console.log('i am here 2');
-
-    // console.log('orderRes=', orderRes);
-
-    let config = {
-      display: {
-        blocks: {
-          banks: {
-            name: 'Pay via UPI',
-            instruments: [
-              {
-                method: 'upi',
-              },
-            ],
+      let config = {
+        display: {
+          blocks: {
+            banks: {
+              name: 'Pay via UPI',
+              instruments: [
+                {
+                  method: 'upi',
+                },
+              ],
+            },
+          },
+          sequence: ['block.banks'],
+          preferences: {
+            show_default_blocks: false,
           },
         },
-        sequence: ['block.banks'],
-        preferences: {
-          show_default_blocks: false,
-        },
-      },
-    };
+      };
 
-    console.log('i am her 3');
+      console.log('i am her 3');
 
-    const options = {
-      key: 'rzp_test_0cYlLVRMEaCUDx',
-      currency,
-      amount: amount?.toString(),
-      order_id,
-      name: 'Younglabs',
-      description: 'Younglabs Innovations',
-    };
+      const options = {
+        key: 'rzp_test_0cYlLVRMEaCUDx',
+        currency,
+        amount: amount?.toString(),
+        order_id,
+        name: 'Younglabs',
+        description: 'Younglabs Innovations',
+      };
 
-    console.log('options=', options);
+      console.log('options=', options);
 
-    const rzRes = yield RazorpayCheckout.open(options);
-    console.log('rzRes=', rzRes);
-    yield put(setLoading(false));
+      const rzRes = yield RazorpayCheckout.open(options);
+      console.log('rzRes=', rzRes);
+      yield put(setLoading(false));
+    }
   } catch (error) {
     console.log('getting err', error);
     yield put(setLoading(false));
