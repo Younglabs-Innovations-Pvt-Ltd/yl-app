@@ -1,16 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {View, Animated, ActivityIndicator, Modal} from 'react-native';
-import allClassData from './classesDummyData.json';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import FeatureTray from '../components/CourseLevelScreenComponent/FeatureTray';
 import SubmitHomeworkFeature from '../components/CourseLevelScreenComponent/features/SubmitHomeWork/submit-homework-feature';
 import PlayRecordingFeature from '../components/CourseLevelScreenComponent/features/play-recordings-feature';
-import DownloadWorksheetsFeature, {
-  downloadWorksheet,
-} from '../components/CourseLevelScreenComponent/features/download-worksheets-feature';
-import DownloadCertificateFeature, {
-  downloadCertificate,
-} from '../components/CourseLevelScreenComponent/features/download-certificate-feature';
+import {downloadWorksheet} from '../components/CourseLevelScreenComponent/features/download-worksheets-feature';
+import {downloadCertificate} from '../components/CourseLevelScreenComponent/features/download-certificate-feature';
 import ClassWiseHomeWorkFeature from '../components/CourseLevelScreenComponent/features/class-wise-homework-feature';
 import CustomerSupportFeature from '../components/CourseLevelScreenComponent/features/customer-support-feature';
 import SnakeLevels from '../components/CourseLevelScreenComponent/SnakeLevels';
@@ -35,11 +30,8 @@ const CourseLevelScreen = ({navigation, route}) => {
   const [previousClassData, setPreviousClassData] = useState(null);
   const dispatch = useDispatch();
   const {user} = useSelector(authSelector);
-  const {
-    serviceReqClassesLoading,
-    serviceReqClassesData,
-    serviceReqClassesDataFailed,
-  } = useSelector(handleCourseSelector);
+  const {serviceReqClassesLoading, serviceReqClassesData} =
+    useSelector(handleCourseSelector);
   const {homeworksubmittedsuccessfully} = useSelector(handleClassesHomeWork);
   const {requestRecordingSuccessfully} = useSelector(handleRequestRecording);
   const handleCourseClick = ({serviceRequestId}) => {

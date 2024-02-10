@@ -1,7 +1,6 @@
 import {View, ScrollView} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import OrderRequestData from './orderDummyData.json';
 import AppBar from '../components/UserCoursePageComponent/AppBar';
 import CourseCard from '../components/UserCoursePageComponent/CourseCard';
 import AddMoreCourse from '../components/UserCoursePageComponent/AddMoreCourse';
