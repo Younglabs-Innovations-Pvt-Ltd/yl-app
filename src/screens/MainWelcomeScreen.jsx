@@ -142,7 +142,7 @@ const MainWelcomeScreen = ({navigation}) => {
       }
     } else if (user?.phone) {
       console.log('getting by phone');
-      dispatch(startFetchBookingDetailsFromPhone(user.phone));
+      dispatch(startFetchBookingDetailsFromPhone());
     }
   }, [user, currentChild]);
 
