@@ -192,7 +192,7 @@ function* fetchAllOrders({payload}) {
   try {
     const response = yield fetchAllOrdersFromLeadId(payload);
     // console.log('got response', response, ' got status', response.status);
-    console.log('got response', response.status , payload);
+
     if (response.status !== 200) {
       yield put(userOrdersLoadingFailed('Something went Wrong'));
       return;
@@ -207,7 +207,7 @@ function* fetchAllOrders({payload}) {
     }
   } catch (error) {
     console.log('fetch_all_order_err', error.message);
-    yield put(userOrdersLoadingFailed('Something went Wrong'));
+    yield put(userOrdersLoadingFailed('Something went Wrong', payload));
   }
 }
 

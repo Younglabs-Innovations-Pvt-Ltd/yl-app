@@ -28,8 +28,8 @@ const SwiperSlide = ({item, navigation}) => {
   }, []);
 
   const swiperBtnStyle =
-    'flex-row rounded-full py-[5px] px-2 justify-center items-center mr-2 mt-2';
-  const swiperBtnTextStyle = 'text-[13px] font-semibold';
+    'flex-row rounded-full w-[48%] py-[7px] mr-[6px] px-[6px] justify-center items-center mt-2';
+  const swiperBtnTextStyle = 'text-[15px] font-semibold';
 
   return (
     <View
@@ -66,29 +66,8 @@ const SwiperSlide = ({item, navigation}) => {
                   style={{fontFamily: FONTS.primaryFont}}>
                   {item.subheading}
                 </Text>
-                <View className="flex-row mt-3 justify-center flex-wrap w-full">
-                  {/* {console.log("item is", item)} */}
-                  <Pressable
-                    className={`${swiperBtnStyle}`}
-                    style={{borderWidth: 1, borderColor: textColors.textYlMain}}
-                    onPress={() =>
-                      navigation.navigate('CourseDetailScreen', {
-                        courseData: item,
-                        subScreenToShow: 'courseDetails',
-                      })
-                    }>
-                    {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-                    <Text
-                      className={`${swiperBtnTextStyle}`}
-                      style={{
-                        color: textColors.textYlMain,
-                        fontFamily: FONTS.primaryFont,
-                      }}>
-                      Course Details
-                    </Text>
-                  </Pressable>
-
-                  {item?.demoAvailable && (
+                <View className="w-full items-center">
+                  <View className="flex-row mt-3 justify-center flex-wrap w-[95%]">
                     <Pressable
                       className={`${swiperBtnStyle}`}
                       style={{
@@ -98,7 +77,7 @@ const SwiperSlide = ({item, navigation}) => {
                       onPress={() =>
                         navigation.navigate('CourseDetailScreen', {
                           courseData: item,
-                          subScreenToShow: 'bookFreeClass',
+                          subScreenToShow: 'courseDetails',
                         })
                       }>
                       {/* <MIcon name="whatsapp" size={30} color="white" /> */}
@@ -108,35 +87,62 @@ const SwiperSlide = ({item, navigation}) => {
                           color: textColors.textYlMain,
                           fontFamily: FONTS.primaryFont,
                         }}>
-                        Book Demo
+                        Course Details
                       </Text>
                     </Pressable>
-                  )}
+                    {item?.courseAvailable && (
+                      <Pressable
+                        className={`${swiperBtnStyle}`}
+                        style={{
+                          borderWidth: 1,
+                          borderColor: textColors.textYlMain,
+                        }}
+                        onPress={() =>
+                          navigation.navigate('CourseDetailScreen', {
+                            courseData: item,
+                            subScreenToShow: 'payAndEnroll',
+                          })
+                        }>
+                        {/* <MIcon name="whatsapp" size={30} color="white" /> */}
+                        <Text
+                          className={`${swiperBtnTextStyle}`}
+                          style={{
+                            color: textColors.textYlMain,
+                            fontFamily: FONTS.primaryFont,
+                          }}>
+                          Pay and Enroll
+                        </Text>
+                      </Pressable>
+                    )}
+                  </View>
 
-                  {item?.courseAvailable && (
-                    <Pressable
-                      className={`${swiperBtnStyle}`}
-                      style={{
-                        borderWidth: 1,
-                        borderColor: textColors.textYlMain,
-                      }}
-                      onPress={() =>
-                        navigation.navigate('CourseDetailScreen', {
-                          courseData: item,
-                          subScreenToShow: 'payAndEnroll',
-                        })
-                      }>
-                      {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-                      <Text
-                        className={`${swiperBtnTextStyle}`}
+                  <View className="mt-3 w-[95%] items-center">
+                    {item?.demoAvailable && (
+                      <Pressable
+                        className={`${swiperBtnStyle} w-[100%]`}
                         style={{
-                          color: textColors.textYlMain,
-                          fontFamily: FONTS.primaryFont,
-                        }}>
-                        Pay and Enroll
-                      </Text>
-                    </Pressable>
-                  )}
+                          borderWidth: 1,
+                          borderColor: textColors.textYlMain,
+                          backgroundColor: textColors.textYlMain,
+                        }}
+                        onPress={() =>
+                          navigation.navigate('CourseDetailScreen', {
+                            courseData: item,
+                            subScreenToShow: 'bookFreeClass',
+                          })
+                        }>
+                        {/* <MIcon name="whatsapp" size={30} color="white" /> */}
+                        <Text
+                          className={`${swiperBtnTextStyle} text-[18px]`}
+                          style={{
+                            color: 'white',
+                            fontFamily: FONTS.primaryFont,
+                          }}>
+                          Book Free Class
+                        </Text>
+                      </Pressable>
+                    )}
+                  </View>
                 </View>
               </Animated.View>
             </View>

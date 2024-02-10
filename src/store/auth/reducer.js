@@ -14,7 +14,9 @@ const INITIAL_STATE = {
   childAge: 8,
   credits: 980,
   logoutLoading: false,
-  userFetchFailed:false,
+  userFetchFailed: false,
+  referralCode: '',
+  referralCodeGenerationFailed: false,
 };
 
 const reducers = {
@@ -58,7 +60,7 @@ const reducers = {
     state.email = action.payload;
   },
   fetchUser(state, action) {
-    state.userFetchLoading = true
+    state.userFetchLoading = true;
   },
   setUser(state, action) {
     state.userFetchLoading = false;
@@ -72,10 +74,20 @@ const reducers = {
     }
   },
   logout() {},
-  fetchUserFormLoginDetails(){},
-  setUserManually(state ,action){
+  fetchUserFormLoginDetails() {},
+  setUserManually(state, action) {
     state.user = action.payload;
-  }
+  },
+  fetchReferralCode(state) {
+    state.referralCodeGenerationFailed = false;
+  },
+  fetchReferralCodeSuccess(state, action) {
+    state.referralCodeGenerationFailed = false;
+    state.referralCode = action.payload;
+  },
+  fetchReferralCodeFailed(state, action) {
+    state.referralCodeGenerationFailed = action.payload;
+  },
 };
 
 const authSlice = createSlice({
@@ -100,7 +112,10 @@ export const {
   logout,
   setIsCustomer,
   fetchUserFormLoginDetails,
-  setUserManually
+  setUserManually,
+  fetchReferralCode,
+  fetchReferralCodeSuccess,
+  fetchReferralCodeFailed,
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

@@ -59,6 +59,7 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
    * @since 07/08/2023
    * @description Update child name if child name not exist or contains your child text
    */
+  
   useEffect(() => {
     if (demoData && bookingDetails) {
       const isCN = !bookingDetails.childName

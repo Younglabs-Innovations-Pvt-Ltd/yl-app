@@ -30,17 +30,24 @@ import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { FONTS } from '../utils/constants/fonts';
+import {FONTS} from '../utils/constants/fonts';
 import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
 import {fetchDemoDetailsFromPhone} from '../store/join-demo/join-demo.saga';
+import {getWhatsappRedirectUrl} from '../utils/redirect-whatsapp';
 
-const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoType}) => {
+const BookDemoSlots = ({
+  navigation,
+  formData,
+  onClose,
+  courseId,
+  courseData,
+}) => {
   const [currentSlotDate, setCurrentSlotDate] = useState('');
   const [currentSlotTime, setCurrentSlotTime] = useState('');
   const [slotsTime, setSlotsTime] = useState(null);
   const {textColors} = useSelector(state => state.appTheme);
   const {childAge, phone} = formData;
-  console.log("child age in group demo slots: " + childAge)
+  console.log('child age in group demo slots: ' + childAge);
   const dispatch = useDispatch();
 
   const {
@@ -188,7 +195,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
           ]}
           key={slot.showDate}
           onPress={() => handleCurrentSlotDate(slot.showDate)}>
-            {console.log("showdate is", slot.showDate)}
+          {console.log('showdate is', slot.showDate)}
           <TextWrapper
             color={
               currentSlotDate === slot.showDate ? COLORS.white : COLORS.black
@@ -228,31 +235,40 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
     });
   }, [slotsTime, currentSlotDate, currentSlotTime]);
 
-
-
   const NoDemoSlotsScreen = () => {
     const {textColors} = useSelector(state => state.appTheme);
+
+    const reqBatchonWhatsapp = async () => {
+      const message = `I Found ${courseData?.alternativeNameOnApp} very usefull.`;
+      const whatsappRedLink = getWhatsappRedirectUrl(message);
+      console.log('WhatsappRedLink', whatsappRedLink);
+    };
 
     return (
       <View className="w-full mt-4 items-center pb-4">
         <View className="items-center w-[95%]">
           <Text
             className="text-center w-full"
-            style={[FONTS.heading , {color: textColors.textPrimary}]}>
+            style={[FONTS.heading, {color: textColors.textPrimary}]}>
             No Demo Slots Created
           </Text>
           <Text
             className="text-center w-full text-base mt-3"
-            style={[FONTS.primary  ,{color: textColors.textSecondary}]}>
+            style={[FONTS.primary, {color: textColors.textSecondary}]}>
             Contact with us on Whatsapp to book your free class.
           </Text>
         </View>
         <View className="flex-row justify-around">
           <Pressable
             className="flex-row w-[90%] rounded-full py-2 justify-center items-center mt-3"
-            style={{backgroundColor: textColors.textYlGreen}}>
+            style={{backgroundColor: textColors.textYlGreen}}
+            onPress={reqBatchonWhatsapp}>
             <MIcon name="whatsapp" size={30} color="white" />
-            <Text className="text-white text-base ml-2" style={[{fontFamily:FONTS.primaryFont}]}>Whatsapp us</Text>
+            <Text
+              className="text-white text-base ml-2"
+              style={[{fontFamily: FONTS.primaryFont}]}>
+              Whatsapp us
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -285,7 +301,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
     <Spinner style={{alignSelf: 'center'}} />
   ) : bookingSlots && bookingSlots.length > 0 ? (
     <>
-    {/* {console.log("i am here")} */}
+      {/* {console.log("i am here")} */}
       <View className=" w-full px-2 mt-5">
         <View className="p-1 bg-gray-300 rounded-md my-3">
           <Text className="text-gray-700 ml-3 ">
@@ -297,9 +313,7 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
           <TextWrapper fs={20} color={textColors.textPrimary} fw="bold">
             Select date:
           </TextWrapper>
-          <View style={styles.slotDateList}>
-            {SLOT_DATES}
-            </View>
+          <View style={styles.slotDateList}>{SLOT_DATES}</View>
         </View>
 
         <Spacer />
@@ -320,7 +334,9 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
                   <Icon name="close-outline" size={24} color={COLORS.black} />
                 </Pressable>
               </View>
-              <TextWrapper color={COLORS.black} className="text-center text-xl font-semibold w-full">
+              <TextWrapper
+                color={COLORS.black}
+                className="text-center text-xl font-semibold w-full">
                 Your booking limit exceeded, Contact us to book again.
               </TextWrapper>
               <Spacer space={16} />
@@ -340,14 +356,6 @@ const BookDemoSlots = ({navigation, formData, onClose, courseId, selectedDemoTyp
         </Modal>
       </View>
       <View style={styles.footer}></View>
-      {/* show popup */}
-      {/* {popup && <Popup onHandlePopup={handlePopup} onClose={onClose} />} */}
-      {/* Loading spinner */}
-      {/* <Modal visible={bookingLoading}>
-        <Center bg="rgba(0,0,0,0.2)">
-          <Spinner />
-        </Center>
-      </Modal> */}
     </>
   ) : (
     <NoDemoSlotsScreen />
@@ -391,8 +399,6 @@ const Popup = ({onHandlePopup, popup, onClose}) => {
     </View>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {

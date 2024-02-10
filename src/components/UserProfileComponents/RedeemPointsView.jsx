@@ -1,19 +1,18 @@
 import {View, Text, Pressable} from 'react-native';
-import React from 'react';
-import {useSelector} from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Input from '../CustomInputComponent';
-import {TextInput} from 'react-native-gesture-handler';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {Showtoast} from '../../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
+import Share from 'react-native-share';
+import {authSelector} from '../../store/auth/selector';
+import {fetchReferralCode} from '../../store/auth/reducer';
 
 const RedeemPointsView = () => {
+  const dispatch = useDispatch();
   const toast = useToast();
-  const {bgColor, textColors, colorYlMain, darkMode} = useSelector(
-    state => state.appTheme,
-  );
-
+  const {bgColor, textColors, darkMode} = useSelector(state => state.appTheme);
   const referralSteps = [
     {
       step: 1,
@@ -34,13 +33,41 @@ const RedeemPointsView = () => {
       color: '#9f109f',
     },
   ];
+  const [refreshReferralCode, setRefreshReferralCode] = useState({});
+
+  const {user, referralCode, referralCodeGenerationFailed} =
+    useSelector(authSelector);
+
+  useEffect(() => {
+    if (user?.leadId) {
+      dispatch(fetchReferralCode({leadId: user?.leadId}));
+    }
+  }, [user, refreshReferralCode]);
 
   const copyToClipBoard = string => {
     Clipboard.setString(string);
-    Showtoast({text: 'Referrel Code Copied Successfully', toast});
+    Showtoast({
+      text: 'Referrel Code Copied Successfully',
+      toast,
+      type: 'success',
+    });
   };
+
+  const shareToFriends = async () => {
+    const message =
+      'I Found Younglabs Handwriting and Learning Courses Usefull';
+    try {
+      await Share.open({
+        title: 'Younglabs',
+        message: `${message} use my referral code ${referralCode} `,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <View className="flex-1 px-3 w-full pb-6">
+    <View className="flex-1 px-3 w-full mt-6">
       <Text
         className="text-center font-bold text-2xl capitalize"
         style={{color: textColors.textYlMain}}>
@@ -55,15 +82,13 @@ const RedeemPointsView = () => {
       </Text>
 
       <View
-        className={`flex-1 flex-row justify-between w-full mt-8 p-1 rounded-md ${
+        className={`flex-1 flex-row justify-between w-full mt-4 p-1 rounded-md ${
           darkMode ? 'bg-gray-800' : 'bg-gray-100'
         }`}>
         {referralSteps?.map((item, index) => {
           return (
             <>
-              <View
-                className="w-[25%] items-center justify-start"
-                key={index}>
+              <View className="w-[25%] items-center justify-start" key={index}>
                 <View className="w-full items-center justify-center">
                   <MIcon name={item.icon} color={item.color} size={55} />
                 </View>
@@ -95,12 +120,6 @@ const RedeemPointsView = () => {
       </View>
 
       <View className="w-full flex-1 mt-5">
-        <Text
-          className="text-[14px] font-semibold"
-          style={{color: textColors.textSecondary}}>
-          Your Total Earned Points : 960
-        </Text>
-
         <View className="relative w-[100%] border border-gray-300 mt-4 rounded-md p-2 flex-row justify-between px-3 items-center">
           <Text
             className="absolute text-[11px] py-1 px-1 -top-3 left-2"
@@ -108,32 +127,33 @@ const RedeemPointsView = () => {
             Your Referral Code
           </Text>
           <Text className="text-base" style={{color: textColors.textPrimary}}>
-            rfr34kdh
+            {referralCode}
           </Text>
-          <MIcon
-            name="content-copy"
-            color={textColors.textSecondary}
-            size={25}
-            onPress={() => copyToClipBoard('this is Text')}
-          />
+          {referralCodeGenerationFailed ? (
+            <MIcon
+              name="refresh"
+              color={textColors.textSecondary}
+              size={25}
+              onPress={() => setRefreshReferralCode({})}
+            />
+          ) : (
+            <MIcon
+              name="content-copy"
+              color={textColors.textSecondary}
+              size={25}
+              onPress={() => copyToClipBoard(referralCode)}
+            />
+          )}
         </View>
       </View>
 
       <View className="w-full justify-around flex-row mt-7">
         <Pressable
-          className="flex-row rounded-full w-[45%] py-2 px-3 justify-center items-center mt-3 "
-          style={{backgroundColor: textColors.textYlMain}}>
-          {/* <MIcon name="whatsapp" size={30} color="white" /> */}
+          className="flex-row rounded-full w-[100%] py-2 px-3 justify-center items-center mt-3 "
+          style={{backgroundColor: textColors.textYlMain}}
+          onPress={shareToFriends}>
           <Text className="text-base font-semibold" style={{color: 'white'}}>
-            Use Points
-          </Text>
-        </Pressable>
-        <Pressable
-          className="flex-row rounded-full w-[45%] py-2 px-3 justify-center items-center mt-3 "
-          style={{backgroundColor: textColors.textYlGreen}}>
-          {/* <MIcon name="whatsapp" size={30} color="white" /> */}
-          <Text className="text-base font-semibold" style={{color: 'white'}}>
-            Share Referrals
+            Share With Your Friends
           </Text>
         </Pressable>
       </View>

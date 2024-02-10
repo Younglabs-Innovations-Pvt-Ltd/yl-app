@@ -12,6 +12,9 @@ import {
   setIsCustomer,
   logout,
   fetchUserFormLoginDetails,
+  fetchReferralCode,
+  fetchReferralCodeSuccess,
+  fetchReferralCodeFailed,
 } from './reducer';
 import {setChildren, setCurrentChild} from '../user/reducer';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,6 +27,7 @@ import {getCurrentDeviceId} from '../../utils/deviceId';
 import {navigate, resetNavigation} from '../../navigationRef';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 import {setIsFirstTimeUser} from '../welcome-screen/reducer';
+import {BASE_URL} from '@env';
 
 function* phoneAuthentication({payload: {phone}}) {
   try {
@@ -149,6 +153,45 @@ function* logoutFunc() {
   // navigate(SCREEN_NAMES.WELCOME);
 }
 
+function* getReferralcode({payload}) {
+  try {
+    console.log('calling api', payload);
+    const response = yield fetch(
+      `${BASE_URL}/admin/referrals/getreferralCode`,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      },
+    );
+
+    if (response.status !== 200) {
+      console.error('Error did not get response', response.status);
+      yield put(fetchReferralCodeFailed(true));
+      return;
+    }
+
+    const data = yield response.json();
+
+    if (data?.referralCode) {
+      yield put(fetchReferralCodeSuccess(data.referralCode));
+      return;
+    }
+
+    yield put(fetchReferralCodeFailed(true));
+  } catch (error) {
+    yield put(fetchReferralCodeFailed(true));
+
+    console.error('Error getting refercode', error.message);
+  }
+}
+
+function* getUserReferralCode() {
+  yield takeLatest(fetchReferralCode.type, getReferralcode);
+}
+
 function* logoutUser() {
   yield takeLatest(logout.type, logoutFunc);
 }
@@ -183,5 +226,6 @@ export function* authSaga() {
     call(fetchUserListener),
     call(logoutUser),
     call(fetchUserFormLoginDetailsListner),
+    call(getUserReferralCode),
   ]);
 }

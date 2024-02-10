@@ -758,7 +758,7 @@ const Payment = ({navigation, route}) => {
                   borderRadius: 4,
                   borderColor: 'gray',
                   backgroundColor: textColors.textYlGreen,
-                  flexDirection:"row"
+                  flexDirection: 'row',
                 }}
                 onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
                 <TextWrapper fs={18} color={'white'}>
@@ -766,7 +766,11 @@ const Payment = ({navigation, route}) => {
                 </TextWrapper>
 
                 {couponApplyLoading && (
-                  <ActivityIndicator size={'small'} color={'white'} className="ml-1" />
+                  <ActivityIndicator
+                    size={'small'}
+                    color={'white'}
+                    className="ml-1"
+                  />
                 )}
               </Pressable>
             </View>
@@ -1059,33 +1063,36 @@ const Payment = ({navigation, route}) => {
 };
 
 const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
+  const {textColors , bgColor} = useSelector(state => state.appTheme);
   return (
     <View className="w-full items-center">
       <Text
         className="font-semibold text-3xl"
-        style={{fontFamily: FONTS.headingFont}}>
+        style={{fontFamily: FONTS.headingFont, color: textColors.textYlMain}}>
         change child
       </Text>
       <View className="w-full items-center mt-4">
         {data?.map((child, i) => {
           return (
             <Pressable
-              className="w-[90%] realtive mt-2"
+              className="w-[90%] realtive mt-4"
               onPress={() => {
                 setChild(child), closeSheet();
               }}
               key={i}>
               <View
                 className="flex-row p-2 border border-gray-400 rounded"
-                style={
+                style={[
+                  ,
                   selectChild?.name === child?.name
                     ? {borderColor: COLORS.pblue}
-                    : {}
-                }>
+                    : {},
+                ]}>
                 {selectChild?.name === child?.name && (
                   <View
-                    className="absolute -top-2 -right-2 bg-white"
-                    style={{}}>
+                    className="absolute -top-2 -right-2"
+                    style={{backgroundColor:bgColor}}
+                    >
                     <MIcon
                       name="check-circle-outline"
                       size={25}
@@ -1097,12 +1104,12 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
                 <View className="ml-3">
                   <Text
                     className="text-xl font-semibold"
-                    style={{fontFamily: FONTS.primaryFont}}>
+                    style={{fontFamily: FONTS.primaryFont , color:textColors.textYlMain}}>
                     {child.name}
                   </Text>
                   <Text
                     className="mt-1"
-                    style={{fontFamily: FONTS.primaryFont}}>
+                    style={{fontFamily: FONTS.primaryFont ,color:textColors.textSecondary}}>
                     Age: {child.age}
                   </Text>
                 </View>

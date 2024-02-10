@@ -66,7 +66,7 @@ const bookingSteps = [
   },
 ];
 
-const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
+const BookDemoScreen = ({courseId, setSelectedTab, place , courseData}) => {
   const toast = useToast();
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
@@ -97,7 +97,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
   const phone = user?.phone;
   const dispatch = useDispatch();
 
-  // Set parent name from lead
   useEffect(() => {
     if (user?.fullName && user?.fullName?.length > 2) {
       setFields(preVal => ({...preVal, parentName: user?.fullName}));
@@ -114,18 +113,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
     setIsCurrentStepDataFilled(false);
   }, [currentStep]);
 
-  const isActive = useMemo(() => {
-    if (!fields.parentName || !fields.childName || !childAge) {
-      return false;
-    }
-
-    return true;
-  }, [fields.childName, fields.parentName, childAge]);
-
-  const onLayoutChange = event => {
-    setGutter(event.nativeEvent.layout.y + event.nativeEvent.layout.height);
-  };
-
   const handleChangeValue = e => {
     const {name, value} = e;
     const regex = /^[A-Za-z\s]*$/;
@@ -137,16 +124,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
   const handleChildAge = childAge => {
     setChildAge(childAge);
   };
-
-  const onChangeOpen = () => setOpen(true);
-
-  const btnNextStyle = ({pressed}) => [
-    styles.btnNext,
-    {
-      opacity: pressed ? 0.8 : 1,
-      backgroundColor: !isActive ? '#eaeaea' : COLORS.pgreen,
-    },
-  ];
 
   const checkFirstStepData = () => {
     if (!fields?.childName?.length || fields?.childName?.length < 3) {
@@ -301,7 +278,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
   };
 
   const {width, height} = Dimensions.get('window');
-  // console.log('place is', place);
 
   return (
     <View
@@ -450,6 +426,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
                 formData={{...fields, phone, childAge}}
                 courseId={courseId}
                 selectedDemoType={selectedDemoType}
+                courseData={courseData}
               />
             )
           ) : currentStep === 3 ? (
@@ -557,19 +534,6 @@ const FirstStepDetails = ({
     }
   }, [currentChild]);
 
-  const ageArray = [
-    {label: '5', value: 5},
-    {label: '6', value: 6},
-    {label: '7', value: 7},
-    {label: '8', value: 8},
-    {label: '9', value: 9},
-    {label: '10', value: 10},
-    {label: '11', value: 11},
-    {label: '12', value: 12},
-    {label: '13', value: 13},
-    {label: '14', value: 14},
-  ];
-
   const handleSelectChild = child => {
     if (!child) {
       return;
@@ -579,16 +543,11 @@ const FirstStepDetails = ({
       return;
     }
     const {name, age} = child;
-    // const parentName = user?.fullName || 'unknown';
     console.log(name, age);
 
     setFields(pre => ({...pre, childName: name}));
     handleChildAge(age);
   };
-
-  useEffect(() => {
-    console.log('default child is', defaultChild);
-  }, [defaultChild]);
 
   return (
     <>
@@ -618,16 +577,6 @@ const FirstStepDetails = ({
         />
       )}
 
-      {/* <Input
-        placeHolder="Enter Your Child Name"
-        setValue={e => {
-          handleChangeValue({name: 'childName', value: e});
-        }}
-        value={fields.childName}
-      />
-      <View className="my-1"></View>
-    */}
-
       <Input
         placeHolder="Enter Parent Name"
         setValue={e => {
@@ -635,12 +584,6 @@ const FirstStepDetails = ({
         }}
         value={fields.parentName}
       />
-
-      {/* <DropdownComponent
-        data={ageArray}
-        placeHolder="Select Child Age"
-        setSelectedValue={handleChildAge}
-      /> */}
     </>
   );
 };
@@ -720,237 +663,3 @@ const ThirdStpDetails = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 8,
-    paddingVertical: 18,
-  },
-  footer: {
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
-  },
-  row: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    gap: 8,
-  },
-  input: {
-    flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderColor: '#000',
-    fontSize: 18,
-    letterSpacing: 1.15,
-    borderBottomWidth: 1,
-    color: COLORS.black,
-  },
-  btnNext: {
-    width: '100%',
-    height: 48,
-    paddingVertical: 6,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  btnCallingCode: {
-    display: 'flex',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.black,
-  },
-  phoneBox: {
-    width: '100%',
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 4,
-  },
-});
-
-// <KeyboardAvoidingView>
-
-{
-  /* <View className="w-full p-2">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Your Phone number
-          </Text>
-        </View>
-        <Text
-          placeholder="Phone Number"
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textSecondary,
-          }}>
-          {`${country.callingCode} ${phone}`}
-        </Text>
-        {/* <TextInput placeholder="Phone Number" value={} className="border-b p-1 mt-1" style={{borderColor:textColors.textSecondary}}/> */
-}
-{
-  /* </View> */
-}
-
-{
-  /* <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Parent Name
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textPrimary,
-          }}
-          value={fields.parentName}
-          onChangeText={e => handleChangeValue({name: 'parentName', value: e})}
-        />
-      </View>
-
-      <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Child Name
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textPrimary,
-          }}
-          value={fields.childName}
-          onChangeText={e => handleChangeValue({name: 'childName', value: e})}
-        />
-      </View>
-
-      <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Select Child Age
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{borderColor: textColors.textSecondary}}
-        />
-      </View> */
-}
-
-{
-  /* <ScrollView
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-        style={{height: '100%'}}
-        contentContainerStyle={{paddingBottom: 40}}>
-        <View style={styles.container}>
-          <View className="">
-            <Text className={`text-center font-semibold text-2xl py-2`} style={{color:textColors.textYlMain}}>Book free group demo</Text>
-            <View style={styles.row} className="mt-2">
-              <View style={styles.phoneBox} className="flex-row gap-2 items-center">
-                <MIcon name="phone" size={25} color={textColors.textPrimary}/>
-                <Text
-                  className="text-[20px]"
-                  styles={{letterSpacing: 1}}
-                  color={textColors.textSecondary}>{`${country.callingCode} ${phone}`}</Text>
-              </View>
-            </View>
-            <Spacer />
-            <Input
-              inputMode="text"
-              placeholder="Enter parent name"
-              value={fields.parentName}
-              onChangeText={e =>
-                handleChangeValue({name: 'parentName', value: e})
-              }
-              color={textColors.textSecondary}
-            />
-            <Spacer />
-            <Input
-              inputMode="text"
-              placeholder="Enter child name"
-              value={fields.childName}
-              onChangeText={e =>
-                handleChangeValue({name: 'childName', value: e})
-              }
-            />
-            <Spacer />
-            <Dropdown
-              defaultValue="Select child age"
-              value={childAge}
-              onPress={onChangeOpen}
-              open={open}
-              onLayout={onLayoutChange}
-            />
-          </View>
-        </View>
-      </ScrollView>
-      <View style={styles.footer}>
-        <Pressable
-          style={btnNextStyle}
-          disabled={!isActive}
-          onPress={handleDemoSlots}>
-          <TextWrapper
-            color={COLORS.white}
-            fw="700"
-            styles={{letterSpacing: 1.1}}>
-            Next
-          </TextWrapper>
-        </Pressable>
-      </View>
-      {open && (
-        <DropdownList
-          data={ageList}
-          gutter={gutter}
-          currentValue={childAge}
-          onClose={handleOnClose}
-          onChange={handleChildAge}
-        />
-      )} */
-}
-
-// </KeyboardAvoidingView>

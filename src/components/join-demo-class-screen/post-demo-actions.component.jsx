@@ -33,7 +33,6 @@ const {width: deviceWidth} = Dimensions.get('window');
 
 const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
-  const [visible, setVisible] = useState(false);
 
   const sliderRef = useRef();
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);

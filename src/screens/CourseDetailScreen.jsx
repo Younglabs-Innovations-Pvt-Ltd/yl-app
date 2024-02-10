@@ -31,18 +31,12 @@ const CourseDetailsScreen = ({navigation, route}) => {
     setScrollPosition(y);
   };
 
-  // const scrollToTop = () => {
-  //   // console.log('Scrolling functions');
-  //   scrollViewRef.current.scrollTo({y: 0, animated: true});
-  // };
-
   const scrollToBottom = () => {
     // console.log('scrolling to bottom');
     scrollViewRef.current.scrollToEnd({animated: true});
   };
 
   useEffect(() => {
-    // console.log('scrolling useEffect...');
     if (selectedTab === 'bookFreeClass') {
       scrollToBottom();
     }
@@ -80,6 +74,7 @@ const CourseDetailsScreen = ({navigation, route}) => {
                 courseId={courseData.id}
                 setSelectedTab={setSelectedTab}
                 demoAvailableType={courseData?.demoAvailableType}
+                courseData={courseData}
               />
             ) : selectedTab === 'payAndEnroll' ? (
               <BatchFeeDetails
@@ -142,11 +137,11 @@ export const FeatureTray = ({
   const FeatureItem = ({feature}) => {
     return (
       <Pressable
-        className="w-[120px] ml-2"
+        className="w-[115px] ml-2 items-center"
         onPress={() => setSelectedTab(feature.value)}
         key={feature?.value}>
         <View
-          className={`py-1 rounded overflow-hidden px-1 items-center w-full bg-white justify-between h-[90%]`}
+          className={`py-1 rounded overflow-hidden px-1 items-center w-full bg-white justify-between`}
           style={{
             backgroundColor: selectedTab === feature?.value ? 'white' : 'white',
           }}>
@@ -154,14 +149,14 @@ export const FeatureTray = ({
             source={feature.imgPath}
             style={{
               width: 100,
-              height: 80,
+              height: 75,
               resizeMode: 'cover',
               borderRadius: 10,
             }}
             // className="h-15 w-15 bg-cover"
           />
           <Text
-            className="text-[18px] text-center font-semibold"
+            className="text-[17px] text-center font-semibold"
             style={{
               color:
                 selectedTab === feature?.value ? textColors.textYlMain : 'gray',
@@ -170,6 +165,10 @@ export const FeatureTray = ({
             {feature.label}
           </Text>
         </View>
+
+        {selectedTab === feature?.value && (
+          <View className="w-[100px] py-1 rounded-full bg-white mt-1"></View>
+        )}
       </Pressable>
     );
   };
@@ -184,7 +183,7 @@ export const FeatureTray = ({
           // console.log('feature: ')
           return <FeatureItem feature={item.item} />;
         }}
-        className=""
+        className=""mess
         contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}
         showsHorizontalScrollIndicator={false}
         horizontal

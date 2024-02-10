@@ -23,7 +23,7 @@ export function* userSaga() {
         },
         body: JSON.stringify(payload),
       });
-      console.log('got response');
+      // console.log('got response');
       if (res.status !== 200 && res.status !== 400) {
         console.log('adding child failed', res.status);
         yield put(childAdded(false));
