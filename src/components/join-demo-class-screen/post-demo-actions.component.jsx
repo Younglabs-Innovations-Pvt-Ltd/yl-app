@@ -70,15 +70,21 @@ const PostDemoAction = ({rescheduleClass}) => {
     setCurrentSlideIndex(scrollToX / deviceWidth);
   };
 
+  // useEffect(() => {
+  //   if (isAttended && !isRated) {
+  //     scrollSlider(deviceWidth);
+  //   } else if (isRated && !isNmi) {
+  //     scrollSlider(deviceWidth * 2);
+  //   } else if (isNmi) {
+  //     scrollSlider(deviceWidth * 3);
+  //   }
+  // }, [isAttended, isRated, isNmi]);
+
   useEffect(() => {
-    if (isAttended && !isRated) {
-      scrollSlider(deviceWidth);
-    } else if (isRated && !isNmi) {
+    if (isRated && !isNmi) {
       scrollSlider(deviceWidth * 2);
-    } else if (isNmi) {
-      scrollSlider(deviceWidth * 3);
     }
-  }, [isAttended, isRated, isNmi]);
+  }, [isRated, isNmi]);
 
   // Save rating of user
   // Dispatch an action to reducer
@@ -203,7 +209,7 @@ const PostDemoAction = ({rescheduleClass}) => {
         scrollEnabled={false}
         pagingEnabled>
         {/* {!attended && !isRated && ( */}
-        <View style={styles.container}>
+        {/* <View style={styles.container}>
           {ATTENDED_TEXT}
           <Spacer space={4} />
           <View style={styles.paButtons}>
@@ -221,7 +227,7 @@ const PostDemoAction = ({rescheduleClass}) => {
               </TextWrapper>
             </Pressable>
           </View>
-        </View>
+        </View> */}
         {/* )} */}
         {/* {!isRated && attended && ( */}
         <View style={styles.container}>
@@ -280,47 +286,6 @@ const PostDemoAction = ({rescheduleClass}) => {
             </Pressable>
           </View>
         </View>
-        {/* )} */}
-        {/* {isNmi && ( */}
-        {/* <View style={styles.container}>
-          <TextWrapper color={COLORS.white} fs={18}>
-            Give your child a gift of beautiful handwriting today!
-          </TextWrapper>
-          <Spacer space={6} />
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              gap: 8,
-              // backgroundColor: COLORS.pblue,
-            }}>
-            <Pressable
-              style={({pressed}) => [
-                styles.ctaButton,
-                {flex: 1, opacity: pressed ? 0.8 : 1},
-              ]}
-              onPress={courseDetails}>
-              <TextWrapper
-                ff={FONTS.primaryFont}
-                styles={{color: COLORS.pblue}}>
-                Course details
-              </TextWrapper>
-            </Pressable>
-            <Pressable
-              style={({pressed}) => [
-                styles.ctaButton,
-                {flex: 1, opacity: pressed ? 0.8 : 1},
-              ]}
-              onPress={batchDetails}>
-              <TextWrapper
-                ff={FONTS.primaryFont}
-                styles={{color: COLORS.pblue}}>
-                Batch/Fee details
-              </TextWrapper>
-            </Pressable>
-          </View>
-        </View> */}
-        {/* )} */}
       </ScrollView>
       <View
         style={{
@@ -334,7 +299,7 @@ const PostDemoAction = ({rescheduleClass}) => {
             paddingTop: 8,
             gap: 8,
           }}>
-          {Array.from({length: 3}, (_, i) => {
+          {Array.from({length: 2}, (_, i) => {
             return (
               <View
                 style={[

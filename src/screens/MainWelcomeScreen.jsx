@@ -39,6 +39,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {navigate} from '../navigationRef';
+import {redirectToCourse} from '../utils/redirectToCourse';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
@@ -176,7 +177,6 @@ const MainWelcomeScreen = ({navigation}) => {
     if (!bookingTime) return;
     const isDemoOver =
       new Date(bookingTime).getTime() + 1000 * 60 * 10 <= Date.now();
-    // console.log('demoData is', bookingDetails);
     if (isDemoOver && isAttended && teamUrl && !isNmi && !appRemark) {
       setShowPostActions(true);
     } else {
@@ -231,6 +231,19 @@ const MainWelcomeScreen = ({navigation}) => {
     }, 3000);
   };
 
+  const rescheduleClass = () => {
+    if (bookingDetails) {
+      const courseId = bookingDetails.courseId;
+      const subScreen = 'bookFreeClass';
+      redirectToCourse({
+        navigate: navigation.navigate,
+        courseId,
+        courses,
+        subScreen,
+      });
+    }
+  };
+
   return (
     <View style={[tw`items-center flex-1 `, {backgroundColor: bgColor}]}>
       <HeaderComponent
@@ -255,7 +268,7 @@ const MainWelcomeScreen = ({navigation}) => {
             isTimeover={isTimeover}
             showPostActions={showPostActions}
             sheetOpen={() => setShowBookFreeClassSheet(true)}
-            openResheduleSheet={() => setShowRescheduleClassSheet(true)}
+            rescheduleClass={rescheduleClass}
             closeResheduleSheet={() => setShowRescheduleClassSheet(false)}
           />
         </View>

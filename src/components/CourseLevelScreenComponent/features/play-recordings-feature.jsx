@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import ClassesDummyData from '../../../screens/classesDummyData.json';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RecordingPlay from '../../../assets/images/recordingPlay.png';
 import {Image} from 'react-native-animatable';

@@ -1,7 +1,7 @@
 import Snackbar from 'react-native-snackbar';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 
-const ShowSnackbar = ({text, action}) => {
+const ShowSnackbar = ({text}) => {
   const {textColors} = useSelector(state => state.appTheme);
   Snackbar.show({
     text,
