@@ -102,17 +102,6 @@ export function* fetchDemoDetailsFromPhone() {
     const reviews = cData.filter(item => item.type === 'review');
     const tips = cData.filter(item => item.type === 'tips');
 
-    // lead email
-    // const leadEmailResponse = yield call(getLeadEmail, bookingDetails.leadId);
-    // if (leadEmailResponse.status === 200) {
-    //   const leadEmail = yield leadEmailResponse.json();
-    //   yield put(setEmail(leadEmail.email));
-    // }
-
-    // if (response.status === 200) {
-    //   console.log('booking found');
-    //   yield call(onSetDemoData, {demoData: data, phone});
-    // }
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
     yield put(setContentData({improvements, reviews, tips, content}));
   } catch (error) {
@@ -139,22 +128,19 @@ export function* fetchDemoDetailsFromPhone() {
 function* fetchDemoDetailsFromBookingId({payload}) {
   try {
     console.log('payload is for getting details', payload);
-    const response = yield call(fetchBookingDetailsFromBookingId, payload);
+    const token = yield getCurrentDeviceId();
+
+    const response = yield call(
+      fetchBookingDetailsFromBookingId,
+      payload,
+      token,
+    );
     const data = yield response.json();
 
     const detailsResponse = yield call(fetchBookingDetils, {
       bookingId: payload,
     });
     const bookingDetails = yield detailsResponse.json();
-
-    // set id to local storage
-    // const bookingIdFromAsync = yield AsyncStorage.getItem(
-    //   LOCAL_KEYS.BOOKING_ID,
-    // );
-
-    // if (!bookingIdFromAsync) {
-    //   yield AsyncStorage.setItem(LOCAL_KEYS.BOOKING_ID, payload);
-    // }
 
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
@@ -190,50 +176,9 @@ function* getPhoneFromStorage() {
  */
 function* onSetDemoData({payload: {demoData, bookingDetails}}) {
   try {
-    // const {
-    //   demoDate: {_seconds},
-    //   attendedOrNot,
-    //   bookingId,
-    //   teamUrl: meetingLink,
-    // } = demoData;
-
-    // const demoTime = _seconds * 1000;
-
-    // const demodate = new Date(demoTime);
-    // const today = new Date().getDate();
-
-    // // Mark attendence
-    // // if (demodate.getDate() === today) {
-    // //   if (!attendedOrNot) {
-    // //     const markAttendenceResponse = yield call(markAttendance, {bookingId});
-
-    // //     if (markAttendenceResponse.status === 200) {
-    // //       console.log('attendance marked.');
-    // //     }
-    // //   }
-    // // }
-
-    // const timeover = demoTime < Date.now();
-    // const afterOneHour = demoTime + 1000 * 60 * 60 > Date.now();
-
-    // // if (timeover && afterOneHour) {
-    // //   yield put(joinDemo({bookingId, phone}));
-    // // }
-
-    // if (meetingLink) {
-    //   yield put(setTeamUrl(meetingLink));
-    //   yield put(setShowJoinButton(true));
-    //   yield put(setIsAttended(attendedOrNot));
-    // }
-
-    // // Set booking time for timer
-    // if (_seconds) yield put(setBookingTime(demoTime + 1000 * 60));
-
     const demoTime = demoData?.demoDate?._seconds * 1000;
 
     if (demoTime) {
-      // localStorage.set(LOCAL_KEYS.DEMO_TIME, parseInt(demoTime));
-
       const isClassOngoing =
         moment().isAfter(moment(demoTime)) &&
         moment().isBefore(moment(demoTime).add(10, 'minutes'));

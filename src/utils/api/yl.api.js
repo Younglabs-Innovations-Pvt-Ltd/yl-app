@@ -76,7 +76,7 @@ export const fetchBookingDetailsFromPhone = async (phone, deviceId) => {
  * @param bookingId booking id of demo class
  * @description Fetch booking details by phone number
  */
-export const fetchBookingDetailsFromBookingId = async bookingId => {
+export const fetchBookingDetailsFromBookingId = async (bookingId, deviceId) => {
   console.log('booking id is', bookingId);
 
   return await fetch(`${BASE_URL}${BOOKING_URL}`, {
@@ -84,7 +84,7 @@ export const fetchBookingDetailsFromBookingId = async bookingId => {
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({bId: bookingId, source: SOURCE}),
+    body: JSON.stringify({bId: bookingId, source: SOURCE, deviceId}),
   });
 };
 
