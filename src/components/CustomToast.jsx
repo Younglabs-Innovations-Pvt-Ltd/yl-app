@@ -23,7 +23,7 @@ const CustomToast = ({toast}) => {
 
   return (
     <View
-      className={`flex-wrap bg-white shadow-md shadow-gray-500 p-4 items-center rounded-xl flex-row`}
+      className={`flex-wrap justify-center bg-white shadow-md shadow-gray-500 p-4 items-center rounded-xl flex-row`}
       style={{maxWidth: width - 40}}>
       {toast.type !== 'normal' && (
         <MIcon name={icon} size={25} color={pColor} />

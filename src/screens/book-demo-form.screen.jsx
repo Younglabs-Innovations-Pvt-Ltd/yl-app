@@ -1,25 +1,17 @@
-import React, {useState, useMemo, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  StyleSheet,
   View,
-  KeyboardAvoidingView,
-  ScrollView,
   Pressable,
   Text,
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import {COLORS} from '../utils/constants/colors';
 import CheckBox from '@react-native-community/checkbox';
 import Input from '../components/CustomInputComponent';
-import TextWrapper from '../components/text-wrapper.component';
-import Spacer from '../components/spacer.component';
-import {Dropdown, DropdownList} from '../components/dropdown.component';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
+
 import {useDispatch, useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {TextInput} from 'react-native-gesture-handler';
 import BookDemoSlots from './book-demo-slots.screen';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {
@@ -28,7 +20,6 @@ import {
   setNewBookingStart,
   setNewOneToOneBookingStart,
   startFetchingIpData,
-  setOneToOneBookingFailed2,
 } from '../store/book-demo/book-demo.reducer';
 import {current} from '@reduxjs/toolkit';
 import DropdownComponent from '../components/DropdownComponent';
@@ -280,7 +271,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place , courseData}) => {
   return (
     <View
       className="flex-1 items-center justify-center w-full h-full"
-      style={{height: place ? height - 190 : height - 70}}>
+      style={{height: place ? height - 190 : height - 130}}>
       <View
         className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]"
         // style={{backgroundColor: darkMode ? bgSecondaryColor : '#b0b6ef30'}}

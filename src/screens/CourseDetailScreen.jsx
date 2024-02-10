@@ -176,7 +176,7 @@ export const FeatureTray = ({
         </View>
 
         {selectedTab === feature?.value && (
-          <View className="w-[100px] py-1 rounded-full bg-white mt-1"></View>
+          <View className="w-[100px] py-[1px] rounded-full bg-white mt-1"></View>
         )}
       </Pressable>
     );
@@ -192,7 +192,8 @@ export const FeatureTray = ({
           // console.log('feature: ')
           return <FeatureItem feature={item.item} />;
         }}
-        className=""mess
+        className=""
+        mess
         contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}
         showsHorizontalScrollIndicator={false}
         horizontal

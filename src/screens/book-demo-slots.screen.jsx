@@ -34,6 +34,8 @@ import {FONTS} from '../utils/constants/fonts';
 import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
 import {fetchDemoDetailsFromPhone} from '../store/join-demo/join-demo.saga';
 import {getWhatsappRedirectUrl} from '../utils/redirect-whatsapp';
+import {Showtoast} from '../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
 
 const BookDemoSlots = ({
   navigation,
@@ -48,7 +50,9 @@ const BookDemoSlots = ({
   const {textColors} = useSelector(state => state.appTheme);
   const {childAge, phone} = formData;
   console.log('child age in group demo slots: ' + childAge);
+
   const dispatch = useDispatch();
+  const toast = useToast();
 
   const {
     bookingSlots,
@@ -239,9 +243,18 @@ const BookDemoSlots = ({
     const {textColors} = useSelector(state => state.appTheme);
 
     const reqBatchonWhatsapp = async () => {
-      const message = `I Found ${courseData?.alternativeNameOnApp} very usefull.`;
-      const whatsappRedLink = getWhatsappRedirectUrl(message);
-      console.log('WhatsappRedLink', whatsappRedLink);
+      try {
+        const message = `Hi! i would love to take a Demo of ${courseData?.alternativeNameOnApp}.`;
+        const whatsappRedLink = getWhatsappRedirectUrl(message);
+        await Linking.openURL(whatsappRedLink);
+      } catch (error) {
+        console.log('error in sending whatsapp for demo', error.message);
+        Showtoast({
+          text: "Couldn't Complete the Request, Please ensure you have Whatsapp app and try again",
+          toast,
+          type: 'danger',
+        });
+      }
     };
 
     return (
