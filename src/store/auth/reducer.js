@@ -14,6 +14,7 @@ const INITIAL_STATE = {
   childAge: 8,
   credits: 980,
   logoutLoading: false,
+  userFetchFailed:false,
 };
 
 const reducers = {

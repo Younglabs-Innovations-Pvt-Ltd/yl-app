@@ -38,14 +38,6 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   const {user, customer, userFetchLoading} = useSelector(authSelector);
   const {currentChild} = useSelector(userSelector);
 
-  // useEffect(() => {
-  //   console.log('useeffect running 1');
-  //   if (customer !== 'yes') {
-  //     console.log('if 2', user?.phone);
-  //     dispatch(startGetAllBookings(user?.phone));
-  //   }
-  // }, [user, customer]);
-
   useEffect(() => {
     console.log('current child is', currentChild);
     if (currentChild) {
@@ -149,9 +141,8 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
           <Pressable
             className={` flex-row items-center justify-center rounded-full py-1 px-2`}
             onPress={() => setShowAddChildView(true)}
-            style={{backgroundColor:textColors.textYlGreen}}
-            >
-            <MIcon name="plus" size={20} color={"white"} />
+            style={{backgroundColor: textColors.textYlGreen}}>
+            <MIcon name="plus" size={20} color={'white'} />
             <Text
               className="text-xs text-white"
               style={{
@@ -252,25 +243,28 @@ export const ChangeAddedChild = ({close}) => {
                     />
                   </View>
                 )}
-
               </View>
-              <View className="w-full p-2 flex flex-row items-center">
-                {/* <Text className="text-gray-500 font-semibold text-[14px]">Courses Bought: </Text> */}
-                <FlatList
-                  data={child?.courses}
-                  keyExtractor={course => course}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={({item}) => {
-                    return (
-                      <View className="py-[2px] px-2 border border-gray-200 rounded-full items-center justify-center">
-                        <Text className="text-[12px]">{item}</Text>
-                      </View>
-                    );
-                  }}
-                  ItemSeparatorComponent={() => <View className="ml-2"></View>}
-                />
-              </View>
+              {child?.courses?.length > 0 && (
+                <View className="w-full p-2 flex flex-row items-center">
+                  {/* <Text className="text-gray-500 font-semibold text-[14px]">Courses Bought: </Text> */}
+                  <FlatList
+                    data={child?.courses}
+                    keyExtractor={course => course}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({item}) => {
+                      return (
+                        <View className="py-[2px] px-2 border border-gray-200 rounded-full items-center justify-center">
+                          <Text className="text-[12px]" style={{color:textColors.textSecondary}}>{item}</Text>
+                        </View>
+                      );
+                    }}
+                    ItemSeparatorComponent={() => (
+                      <View className="ml-2"></View>
+                    )}
+                  />
+                </View>
+              )}
             </Pressable>
           );
         })}
