@@ -37,11 +37,10 @@ const AddMoreCourse = ({
           styles.innerBorder,
           {backgroundColor: darkMode ? bgSecondaryColor : '#d8d5d5'},
         ]}
-        className="w-[95vw] h-[150px] rounded-lg  mt-3 flex justify-center items-center">
+        className="w-[95vw] h-full rounded-lg  mt-3 flex justify-center items-center">
         <MIcon name="plus-circle" size={30} color="gray" />
       </Pressable>
       <BottomSheetComponent
-
         isOpen={sheetOpen}
         Children={<PopularCourses courses={courses} navigation={navigation}/>}
         onClose={() => setSheetOpen(false)}

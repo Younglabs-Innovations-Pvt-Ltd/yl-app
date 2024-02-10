@@ -24,6 +24,7 @@ import VideoPlayer from '../components/video-player.component';
 import {FONTS} from '../utils/constants/fonts';
 import {localStorage} from '../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import { bookDemoSelector } from '../store/book-demo/book-demo.selector';
 
 const levels = ['Foundation', 'Advanced', 'Foundation+Advanced'];
 const AGE_GROUPS = ['5-7', '8-10', '11-14'];
@@ -57,6 +58,7 @@ const CourseDetails = ({navigation, courseData}) => {
 
   const {courseDetails, ageGroups, courseVideos, loading} =
     useSelector(courseSelector);
+  const {ipData} = useSelector(bookDemoSelector)
 
   // console.log("About course array is", aboutCourseArr[0].objArray[0].content)
 
@@ -65,7 +67,7 @@ const CourseDetails = ({navigation, courseData}) => {
       dispatch(
         fetchCourseStart({
           courseId: courseData.id,
-          country: 'qatar',
+          country: ipData?.country_name,
         }),
       );
     }

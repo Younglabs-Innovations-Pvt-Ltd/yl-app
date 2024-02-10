@@ -339,23 +339,6 @@ const DemoClassScreen = ({navigation}) => {
             <View style={{alignItems: 'center', marginTop: 28}}>
               <Pressable
                 style={{paddingVertical: 4}}
-                onPress={() => navigation.navigate(SCREEN_NAMES.SIGNUP)}>
-                <TextWrapper
-                  fs={16}
-                  ff={FONTS.primaryFont}
-                  className="text-gray-600">
-                  Don't have WhatsApp
-                </TextWrapper>
-              </Pressable>
-
-              <View className="my-3 border-t-[.7px] h-[1px] w-[80%] border-gray-400 relative">
-                <Text className="absolute -top-3 bg-white px-1 left-[48%]">
-                  or
-                </Text>
-              </View>
-
-              <Pressable
-                style={{paddingVertical: 4}}
                 onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
                 <TextWrapper
                   fs={16}

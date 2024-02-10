@@ -282,11 +282,11 @@ const SoloBatchPayment = ({
                             price: obj?.offer,
                           });
                       }}
-                      key={key}
+                      key={Math.random()}
                       >
                       <View className="items-center justify-center flex-1">
                         <Text
-                          className="font-semibold text-[18px] text-center"
+                          className="font-semibold text-[16px] leading-[18px] text-center"
                           style={{
                             fontFamily: FONTS.headingFont,
                             color:

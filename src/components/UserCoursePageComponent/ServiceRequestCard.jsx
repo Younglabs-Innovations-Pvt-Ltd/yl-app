@@ -12,15 +12,16 @@ const ServiceRequestCard = ({course, navigation}) => {
   useEffect(() => {
     console.log(course?.serviceRequestId);
   }, [course]);
-  useEffect(() => {
-    // console.log('check service request', course);
-    const {_seconds, _nanoseconds} = course?.promisedStartDate;
-    const milliseconds = _seconds * 1000 + Math.floor(_nanoseconds / 1e6);
-    const dateObject = new Date(milliseconds);
-    console.log('before', dateObject);
-    const date = moment(dateObject).format('dddd, MMM D');
-    setStartDate(date);
-  }, [course]);
+
+  // useEffect(() => {
+  //   // console.log('check service request', course);
+  //   const {_seconds, _nanoseconds} = course?.promisedStartDate;
+  //   const milliseconds = _seconds * 1000 + Math.floor(_nanoseconds / 1e6);
+  //   const dateObject = new Date(milliseconds);
+  //   console.log('before', dateObject);
+  //   const date = moment(dateObject).format('dddd, MMM D');
+  //   setStartDate(date);
+  // }, [course]);
 
   return (
     <View className="overflow-hidden rounded-xl relative mt-[6px] border border-solid border-gray-200">
@@ -50,7 +51,7 @@ const ServiceRequestCard = ({course, navigation}) => {
                   </Text>
 
                   <Text className="text-[25px] text-white font-semibold">
-                    {startDate}
+                    {/* {startDate} */} 09-02-2024
                   </Text>
                   <Text className="text-[25px] text-white font-semibold">
                     Sessions : {course?.classCount}

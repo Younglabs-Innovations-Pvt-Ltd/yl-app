@@ -109,17 +109,6 @@ export const AddChildModule = ({onClose}) => {
             )}
           </Pressable>
         </View>
-        {/* </>
-        ) : (
-          <BookDemoScreen
-            navigation={''}
-            data={{country: {callingCode: 91}, phone: 7668983758}}
-            courseId={'Eng_Hw'}
-            setSelectedTab={''}
-            demoAvailableType={'both'}
-            place={'addChildModal'}
-          />
-        )} */}
       </View>
     </>
   );

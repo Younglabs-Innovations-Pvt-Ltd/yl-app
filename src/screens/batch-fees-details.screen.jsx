@@ -74,7 +74,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
       dispatch(
         fetchCourseStart({
           courseId: courseData.id,
-          country: ipData?.country_name || 'india',
+          country: ipData?.country_name,
         }),
       );
     }

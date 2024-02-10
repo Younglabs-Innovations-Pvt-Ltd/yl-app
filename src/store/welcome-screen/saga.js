@@ -33,6 +33,7 @@ import {localStorage} from '../../utils/storage/storage-provider';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import DeviceInfo from 'react-native-device-info';
+import {fetchUserFormLoginDetails} from '../auth/reducer';
 
 /**
  * @author Shobhit
@@ -88,6 +89,7 @@ function* handleBookingStatus({payload: {phone}}) {
       }),
     );
 
+    yield put(fetchUserFormLoginDetails());
     yield put(fetchBookingStatusSuccess(''));
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
   } catch (error) {
@@ -126,7 +128,7 @@ function* startFetchingCoursesForLandingPage({payload}) {
       yield put(getCoursesForWelcomeScreenSuccess(formattedCourses));
     }
   } catch (error) {
-    console.log('fetch courses error', error.message , " payload was" , payload);
+    console.log('fetch courses error', error.message, ' payload was', payload);
     yield put(getCoursesForWelcomeScreenFailed());
   }
 }
@@ -141,7 +143,7 @@ function* fetchingCourses() {
 // Fetching user's all bookings
 function* fetchAllBookings({payload}) {
   try {
-    if  (!payload)  {
+    if (!payload) {
       return;
     }
     console.log('fetching bookings in api');
@@ -203,7 +205,6 @@ function* fetchAllOrders({payload}) {
     } else {
       yield put(userOrderFetchingSuccess([]));
     }
-    
   } catch (error) {
     console.log('fetch_all_order_err', error.message);
     yield put(userOrdersLoadingFailed('Something went Wrong'));

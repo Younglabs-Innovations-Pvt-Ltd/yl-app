@@ -7,31 +7,31 @@ import CourseCard from '../components/UserCoursePageComponent/CourseCard';
 import AddMoreCourse from '../components/UserCoursePageComponent/AddMoreCourse';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {handleCourseSelector} from '../store/handleCourse/selector';
+import {userSelector} from '../store/user/selector';
+import {Text} from 'react-native-animatable';
 
 const UserCoursesPage = ({navigation}) => {
   const {courses} = useSelector(welcomeScreenSelector);
   const [userCourseData, setUserCourseData] = useState(null);
   const [userName, setUserName] = useState(null);
-
-  const {selectedUserOrder} = useSelector(welcomeScreenSelector);
-
+  const {selectedUserOrder, userOrders} = useSelector(welcomeScreenSelector);
   const {serviceReqClassesLoading} = useSelector(handleCourseSelector);
+  const {currentChild} = useSelector(userSelector);
 
   useEffect(() => {
     console.log('serviceReqClassesLoading', serviceReqClassesLoading);
   }, [serviceReqClassesLoading]);
 
   useEffect(() => {
-    if (selectedUserOrder) {
-      const selectedUserKey = Object.keys(selectedUserOrder);
-      if (selectedUserOrder[selectedUserKey]?.length > 0) {
-        const newData = selectedUserOrder[selectedUserKey];
-        console.log('of user', newData);
-        setUserName(selectedUserKey);
-        setUserCourseData(newData);
-      }
+    if (userOrders?.length > 0 && currentChild) {
+      const filteredOrders = userOrders?.filter(
+        item => item.childName === currentChild?.name,
+      );
+      console.log('filtered orders are:', filteredOrders);
+      setUserCourseData(filteredOrders);
+      setUserName(currentChild.name);
     }
-  }, [selectedUserOrder]);
+  }, [selectedUserOrder, currentChild]);
   const {
     bgColor,
     bgSecondaryColor,
@@ -52,19 +52,22 @@ const UserCoursesPage = ({navigation}) => {
         darkMode={darkMode}
         bgSecondaryColor={bgSecondaryColor}
       />
-      <View className="mt-2 flex flex-col justify-center items-center min-h-[20%] max-h-[48%] w-[100vw]">
-        <ScrollView className="" showsVerticalScrollIndicator={false}>
-          {userCourseData?.map(course => {
-            return (
-              <CourseCard
-                
-                course={course}
-                navigation={navigation}
-              />
-            );
-          })}
-        </ScrollView>
-      </View>
+      {userCourseData?.length > 0 ? (
+        <View className="mt-2 flex flex-col justify-center items-center min-h-[20%] max-h-[60%] w-[100vw]">
+          <ScrollView className="" showsVerticalScrollIndicator={false}>
+            {userCourseData?.map(course => {
+              return <CourseCard course={course} navigation={navigation} />;
+            })}
+          </ScrollView>
+        </View>
+      ) : (
+        <View className="mt-2 flex flex-col justify-center items-center min-h-[20%] max-h-[60%] w-[100vw]">
+          <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4">
+            {userName} Doesn't Have Any Course
+          </Text>
+        </View>
+      )}
+
       <AddMoreCourse
         addMoreCourseCardbgColor={addMoreCourseCardbgColor}
         darkMode={darkMode}
