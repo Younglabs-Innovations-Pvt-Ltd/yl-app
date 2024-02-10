@@ -17,48 +17,41 @@ const Stack = createStackNavigator();
 const HomeScreenStackNavigator = () => {
   const {bgColor, textColors} = useSelector(state => state.appTheme);
   return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator
-        initialRouteName="MainWelcomeScreen"
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: bgColor,
-            borderBottomWidth: 1,
-            borderColor: textColors.textSecondary,
-            elevation: 1.12,
-          },
-          headerTintColor: textColors.textSecondary,
-          headerTitleStyle: {
-            fontWeight: '500',
-            fontSize: 18,
-          },
-        }}>
-        <Stack.Screen
-          name="MainWelcomeScreen"
-          component={MainWelcomeScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="CourseDetailScreen"
-          component={CourseDetailsScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="AllCoursesScreen"
-          component={ViewAllCourses}
-          options={({route}) => ({
-            title: route.params.heading || 'All Courses',
-          })}
-        />
-        <Stack.Screen
-          name={SCREEN_NAMES.PAYMENT}
-          component={Payment}
-          options={{
-            headerTitle: 'Checkout',
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator
+      initialRouteName="MainWelcomeScreen"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: bgColor,
+          borderColor: textColors.textSecondary,
+          elevation: 1.12,
+        },
+        headerTintColor: textColors.textSecondary,
+        headerTitleStyle: {
+          fontWeight: '500',
+          fontSize: 18,
+        },
+      }}>
+      <Stack.Screen
+        name="MainWelcomeScreen"
+        component={MainWelcomeScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen name="CourseDetailScreen" component={CourseDetailsScreen} />
+      <Stack.Screen
+        name="AllCoursesScreen"
+        component={ViewAllCourses}
+        options={({route}) => ({
+          title: route.params.heading || 'All Courses',
+        })}
+      />
+      <Stack.Screen
+        name={SCREEN_NAMES.PAYMENT}
+        component={Payment}
+        options={{
+          headerTitle: 'Checkout',
+        }}
+      />
+    </Stack.Navigator>
   );
 };
 

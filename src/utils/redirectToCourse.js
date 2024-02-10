@@ -1,4 +1,4 @@
-export const redirectToCourse = ({navigate, courses, courseId}) => {
+export const redirectToCourse = ({navigate, courses, courseId, subScreen}) => {
   let courseValues = Object.values(courses);
 
   const all = [];
@@ -8,7 +8,13 @@ export const redirectToCourse = ({navigate, courses, courseId}) => {
 
   const filteredCourse = all.filter(course => course.id === courseId)[0];
 
-  return navigate('CourseDetailScreen', {
+  const params = {
     courseData: filteredCourse,
-  });
+  };
+
+  if (subScreen) {
+    params.subScreenToShow = subScreen;
+  }
+
+  return navigate('CourseDetailScreen', params);
 };

@@ -1,5 +1,5 @@
 import {View, Text, Pressable, Image} from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 import CourseDetails from './course-details.screen';
 import BookDemoScreen from './book-demo-form.screen';
@@ -25,6 +25,15 @@ const CourseDetailsScreen = ({navigation, route}) => {
       setSelectedTab(subScreenToShow || 'courseDetails');
     }
   }, [subScreenToShow]);
+
+  // Change header title
+  useLayoutEffect(() => {
+    if (courseData) {
+      navigation.setOptions({
+        title: courseData?.alternativeNameOnApp || 'Course Details',
+      });
+    }
+  }, [navigation, courseData]);
 
   const handleScroll = event => {
     const y = event.nativeEvent.contentOffset.y;

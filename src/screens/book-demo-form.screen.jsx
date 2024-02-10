@@ -85,13 +85,11 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
     timezone,
     selectedSlot,
     ipData,
-    childData,
     bookingCreatedSuccessfully,
     loading,
     selectedOneToOneDemoTime,
-    bookingFailReason,
-    oneToOneBookingFailed,
   } = useSelector(bookDemoSelector);
+
   const {user} = useSelector(authSelector);
 
   const phone = user?.phone;
@@ -301,7 +299,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
   };
 
   const {width, height} = Dimensions.get('window');
-  // console.log('place is', place);
 
   return (
     <View
@@ -311,13 +308,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
         className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]"
         // style={{backgroundColor: darkMode ? bgSecondaryColor : '#b0b6ef30'}}
       >
-        <Text
-          className={`font-semibold text-center w-full p-2 justify-center`}
-          // style={{backgroundColor: textColors.textYlMain, color: 'white'}}
-          style={[FONTS.heading, {color: textColors.textYlMain}]}>
-          Book free Handwriting Class
-        </Text>
-
         <View
           className="p-2 my-2 w-full items-start rounded-md"
           style={{backgroundColor: bgSecondaryColor}}>
