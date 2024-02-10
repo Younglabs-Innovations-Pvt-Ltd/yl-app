@@ -17,9 +17,12 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 
 import {courseSelector} from '../store/course/course.selector';
-import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {setPaymentMessage, startMakePayment} from '../store/payment/reducer';
+import {
+  makeSoloPayment,
+  setPaymentMessage,
+  startMakePayment,
+} from '../store/payment/reducer';
 import {paymentSelector} from '../store/payment/selector';
 import {MESSAGES} from '../utils/constants/messages';
 import ModalComponent from '../components/modal.component';
@@ -27,19 +30,17 @@ import Icon from '../components/icon.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {resetCourseDetails} from '../store/course/course.reducer';
 import {getOfferCode} from '../utils/api/yl.api';
-import {localStorage} from '../utils/storage/storage-provider';
-import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {FONTS} from '../utils/constants/fonts';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {authSelector} from '../store/auth/selector';
 import {BASE_URL} from '@env';
-import {welcomeScreenSelector} from '../store/welcome-screen/selector';
-import DropdownComponent from '../components/DropdownComponent';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
+import {userSelector} from '../store/user/selector';
+import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 
 GoogleSignin.configure({
   webClientId:
@@ -48,23 +49,22 @@ GoogleSignin.configure({
 
 const {width: deviceWidth} = Dimensions.get('window');
 
-const Payment = ({navigation}) => {
+const Payment = ({navigation, route}) => {
+  const {paymentBatchType} = route.params;
+  const {paymentMethod} = route.params;
+  const {classesSold} = route.params;
   const [email, setEmail] = useState('');
   const [emailErr, setEmailErr] = useState('');
   const [dateTime, setDateTime] = useState('');
   const [visible, setVisible] = useState(false);
   const [offerCodes, setOfferCodes] = useState([]);
   const [couponCode, setCouponCode] = useState('');
-
   const [amount, setAmount] = useState(0);
   const [couponMsg, setCouponMsg] = useState('');
-  const [fadeOut, setFadeOut] = useState(false);
   const [visibleCongratulations, setVisibleCongratulations] = useState(false);
   const [authVisible, setAuthVisible] = useState(false);
-
   // reducers values
   const {user} = useSelector(authSelector);
-
   // referral and coupon handle
   const [totalCredits, setTotalCredits] = useState(0);
   const [totalCreditsUsed, setTotalCreditsUsed] = useState(0);
@@ -78,16 +78,58 @@ const Payment = ({navigation}) => {
   const [selectedChildForOrder, setSelectedChildForOrder] = useState(null);
   const [showChangeChildSheet, setShowChangeChildSheet] = useState(false);
   const [leadDataFormVisible, setLeadDataFormVisible] = useState(false);
-  console.log('selected Child for order', selectedChildForOrder);
+  const [openAddChildSheet, setOpenAddChildSheet] = useState(false);
+  const [classCount, setClassCount] = useState(null);
+  const [defCouponApplyLoading, setDefCouponApplyLoading] = useState(false);
+  const [couponApplyLoading, setCouponApllyLoading] = useState(false);
+  const {textColors, bgColor, darkMode, bgSecondaryColor} = useSelector(
+    state => state.appTheme,
+  );
+  const {loading, payment} = useSelector(paymentSelector);
+  const confettiRef = useRef();
+  const cannonWrapperRef = useRef();
+  const {ipData} = useSelector(bookDemoSelector);
+  const {customer} = useSelector(authSelector);
+  const dispatch = useDispatch();
+  const {children} = useSelector(userSelector);
+  const {
+    currentAgeGroup,
+    currentSelectedBatch,
+    levelText,
+    currentLevel,
+    price,
+    strikeThroughPrice,
+    courseDetails,
+  } = useSelector(courseSelector);
 
-  const [totalDiscounts, setTotalDiscounts] = useState();
-  const {userOrders} = useSelector(welcomeScreenSelector);
+  useEffect(() => {
+    let classesSolds;
+    if (classesSold && classesSold > 0) {
+      classesSolds = classesSold;
+    } else {
+      classesSolds = currentLevel === 1 || currentLevel === 2 ? 12 : 24;
+    }
+
+    setClassCount(classesSolds);
+  }, [classesSold, currentLevel]);
 
   // code to get user details if something is missing in user lead
   useEffect(() => {
     if (!user?.fullName || user.fullName === '') {
       setLeadDataFormVisible(false);
     }
+    setTotalCredits(user?.credits || 0);
+
+    const fetchOfferCodes = async () => {
+      console.log('fetching offers');
+      if (user) {
+        const response = await getOfferCode({phone: user?.phone});
+
+        const codes = await response.json();
+        setOfferCodes(codes?.offerCodes);
+      }
+    };
+    fetchOfferCodes();
   }, [user]);
 
   useEffect(() => {
@@ -99,43 +141,17 @@ const Payment = ({navigation}) => {
   // console.log('total discounts are', totalDiscounts);
 
   useEffect(() => {
-    setTotalCredits(user?.credits || 0);
-  }, [user]);
-
-  useEffect(() => {
     if (currentSelectedBatch) {
-      const date = new Date(currentSelectedBatch.startDate._seconds * 1000);
+      if (currentSelectedBatch?.type === 'solo') {
+        const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
+        setDateTime(dateAndTime);
+        return;
+      }
+      const date = new Date(currentSelectedBatch?.startDate._seconds * 1000);
       const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
       setDateTime(dateAndTime);
     }
   }, [currentSelectedBatch]);
-
-  const {
-    currentAgeGroup,
-    currentSelectedBatch,
-    levelText,
-    currentLevel,
-    price,
-    strikeThroughPrice,
-    courseDetails,
-  } = useSelector(courseSelector);
-
-  // console.log("current seelcted batch is " , currentSelectedBatch)
-
-  const {loading, payment, message} = useSelector(paymentSelector);
-  const confettiRef = useRef();
-  const cannonWrapperRef = useRef();
-  const {bookingDetails} = useSelector(joinDemoSelector);
-  const {selectedChild, userBookings} = useSelector(welcomeScreenSelector);
-  const {ipData} = useSelector(bookDemoSelector);
-
-  const {customer} = useSelector(authSelector);
-  const dispatch = useDispatch();
-
-  // console.log("selected child is", selectedChild);
-  // console.log("offer codes are", offerCodes);
-
-  // Set current screen name
 
   useEffect(() => {
     setAmount(price);
@@ -147,21 +163,6 @@ const Payment = ({navigation}) => {
     const finalPrice = price - totalDiscounts;
     setAmount(finalPrice);
   }, [couponDiscount, creditsValueApplied, price, referralDiscount]);
-
-  // console.log('user is', user);
-  useEffect(() => {
-    const fetchOfferCodes = async () => {
-      console.log('fetching offers');
-      if (user) {
-        const response = await getOfferCode({phone: user?.phone});
-
-        const codes = await response.json();
-        setOfferCodes(codes?.offerCodes);
-      }
-    };
-
-    fetchOfferCodes();
-  }, [user]);
 
   useEffect(() => {
     if (payment === MESSAGES.PAYMENT_SUCCESS) {
@@ -183,7 +184,6 @@ const Payment = ({navigation}) => {
       setAuthVisible(true);
       return;
     }
-
     // console.log('selected child here', selectedChild);
 
     const body = {
@@ -195,6 +195,8 @@ const Payment = ({navigation}) => {
       bookingDetails: user,
       courseDetails,
       email,
+      paymentMethod,
+      currentLevel,
     };
 
     if (selectedCoupon) {
@@ -217,8 +219,71 @@ const Payment = ({navigation}) => {
 
     // console.log('giving body', body);
     dispatch(startMakePayment(body));
-
     setEmailErr('');
+  };
+
+  const handleSoloBatchCheckOut = () => {
+    console.log('user is');
+    if (!email) {
+      setEmailErr('Enter your email address.');
+      return;
+    }
+
+    const currentUser = auth().currentUser;
+
+    // console.log('currentuser is', courseDetails);
+
+    if (!currentUser) {
+      setAuthVisible(true);
+      return;
+    }
+
+    const startDateTime = currentSelectedBatch?.startDate;
+
+    const body = {
+      courseType: 'solo',
+      leadId: user?.leadId,
+      ageGroup: currentAgeGroup,
+      courseId: courseDetails.courseId,
+      FCY: `QAR ${price}`,
+      // FCY: `${ipData?.currency?.code} ${price}`,
+      promisedStartDate: startDateTime,
+      promisedBatchFrequency: null,
+      phone: user?.phone,
+      fullName: user?.fullName || 'unknown', // TODO: this should be from user
+      batchId: null,
+      childName: selectedChildForOrder.name,
+      email: email,
+      childAge: selectedChildForOrder.age,
+      timezone: user?.timezone,
+      countryCode: user?.countryCode, // TODO: this should be from user
+      source: 'app',
+      batchType: 'unhandled',
+      startDate: startDateTime,
+      price: price,
+      level: currentLevel,
+      classesSold: classesSold || null,
+    };
+
+    if (selectedCoupon) {
+      body.offerCode = selectedCoupon.offerCode;
+    }
+
+    if (selectedReferralCode) {
+      body.offerCode = selectedReferralCode;
+    }
+
+    if (couponApplied) {
+      body.discountedPrice = amount;
+    }
+
+    if (totalCreditsUsed > 0) {
+      body.credits = totalCreditsUsed;
+    }
+
+    // console.log('body  giving is =', body);
+    console.log('i am here');
+    dispatch(makeSoloPayment({body, ipData, paymentMethod}));
   };
 
   const handleRefferalApply = async () => {
@@ -238,6 +303,7 @@ const Payment = ({navigation}) => {
       const refData = await res.json();
       if (refData.message == 'Referral code not valid') {
         setCouponMsg('Referral code not valid');
+        setCouponApllyLoading(false);
         return;
       }
 
@@ -249,8 +315,10 @@ const Payment = ({navigation}) => {
         setCouponApplied(true);
         setSelectedCoupon(null);
         setSelectedReferralCode(couponCode);
+        setCouponApllyLoading(false);
       }
     } catch (error) {
+      setCouponApllyLoading(false);
       console.log('referral err', error.messsage);
     }
   };
@@ -259,6 +327,7 @@ const Payment = ({navigation}) => {
     if (!couponCode || couponApplied) {
       return;
     }
+    setCouponApllyLoading(true);
 
     console.log('coupon codeis', couponCode);
     if (
@@ -298,12 +367,9 @@ const Payment = ({navigation}) => {
       }
 
       setCouponMsg('');
-      // if (confettiRef.current) {
-      //   confettiRef.current.start();
-      //   setFadeOut(true);
-      //   setVisibleCongratulations(true);
-      // }
+      setCouponApllyLoading(false);
     } else {
+      setCouponApllyLoading(false);
       setSelectedCoupon(null);
       setCouponMsg('Coupon Not Found');
       console.log('item not found');
@@ -326,12 +392,15 @@ const Payment = ({navigation}) => {
   }, [visibleCongratulations]);
 
   const clearAppliedCode = () => {
+    console.log('removing code');
+    setDefCouponApplyLoading(true);
     setCouponApplied(false);
     setSelectedCoupon(null);
     setCouponCode('');
     setCouponDisCount(0);
     setReferralDiscount(0);
     setSelectedReferralCode(null);
+    setDefCouponApplyLoading(false);
   };
 
   // console.log('selectedCoupon', selectedCoupon);
@@ -345,14 +414,9 @@ const Payment = ({navigation}) => {
   };
 
   const applyDefaultCode = () => {
-    // if (cannonWrapperRef.current) {
-    //   // console.log('cannonWrapperRef.current', cannonWrapperRef.current);
-    //   cannonWrapperRef.current.setNativeProps({
-    //     style: {
-    //       opacity: 1,
-    //     },
-    //   });
-    // }
+    console.log('applying code');
+
+    setDefCouponApplyLoading(true);
     let discountValue = price * (10 / 100);
     setAmount(parseInt(amount - discountValue));
     setCouponApplied(true);
@@ -365,6 +429,7 @@ const Payment = ({navigation}) => {
       validAbove: 1500,
     });
     setCouponDisCount(discountValue);
+    setDefCouponApplyLoading(false);
     // if (confettiRef.current) {
     //   confettiRef.current.start();
     //   setFadeOut(true);
@@ -403,7 +468,7 @@ const Payment = ({navigation}) => {
       if (user.credits == 0) {
         return;
       }
-
+      console.log('redeemin credits');
       const res = await fetch(`${BASE_URL}/admin/referrals/convertCredits`, {
         method: 'POST',
         headers: {
@@ -416,7 +481,15 @@ const Payment = ({navigation}) => {
           price: price,
         }),
       });
+      console.log('body is', {
+        currency: ipData?.currency?.code,
+        credits: user.credits,
+        leadId: user?.leadId,
+        price: amount || price,
+      });
+
       const creditsToCurrency = await res.json();
+      console.log('credits to currency', creditsToCurrency);
       const {price: convertedCredits, remainingCredits} = creditsToCurrency;
       // const finalValue = amount - convertedCredits;
       const utelizedCredits = user?.credits - remainingCredits;
@@ -430,72 +503,71 @@ const Payment = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (customer === 'yes') {
-      let dataToStore = [];
-      if (typeof userOrders === 'object') {
-        Object.keys(userOrders).map((key, i) => {
-          userOrders[key].map((item, i) => {
-            dataToStore.push({
-              childName: item.childName,
-              childAge: item.childAge,
-            });
-          });
-        });
-      }
-      setSelectedChildForOrder(dataToStore[0]);
-      setDropDownData(dataToStore);
-    } else {
-      let dataToStore = [];
-      // console.log("userBookings",userBookings);
-
-      if (userBookings?.length > 0) {
-        userBookings.map((item, i) => {
-          dataToStore.push({
-            childName: item.childName,
-            childAge: item.childAge,
-          });
-          // return;
-        });
-
-        setDropDownData(dataToStore);
-      }
+    if (children) {
+      setDropDownData(children);
     }
-  }, [userOrders, userBookings]);
+  }, [children]);
 
   return (
-    <View style={{flex: 1, backgroundColor: '#f4f4f4'}}>
+    <View style={{flex: 1, backgroundColor: bgColor}}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{flex: 1}}
         contentContainerStyle={{padding: 12}}>
-        <View style={styles.card}>
-          <TextWrapper fs={18} fw="700" styles={{textTransform: 'capitalize'}}>
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
+          <TextWrapper
+            fs={18}
+            fw="700"
+            styles={{textTransform: 'capitalize'}}
+            color={textColors.textPrimary}>
             {user?.fullName}
           </TextWrapper>
 
           <Spacer space={2} />
-          <TextWrapper>{user?.phone}</TextWrapper>
+          <TextWrapper color={textColors.textSecondary}>
+            {user?.phone}
+          </TextWrapper>
 
           <View>
-            <Text className="font-semibold text-[18px] mt-3">Order For</Text>
+            <Text
+              className="font-semibold text-[18px] mt-3"
+              style={{color: textColors.textPrimary}}>
+              Order For
+            </Text>
 
-            {dropdownData && dropdownData.length > 0 ? (
+            {dropdownData && dropdownData.length > 1 ? (
               <View className="flex-row justify-start w-full mt-3">
                 <View className="w-[40%]">
-                  <Text className="font-semibold">Child Name</Text>
-                  <Text className="mt-1">
-                    {selectedChildForOrder?.childName}
+                  <Text
+                    className="font-semibold"
+                    style={{color: textColors.textPrimary}}>
+                    Child Name
+                  </Text>
+                  <Text
+                    className="mt-1"
+                    style={{color: textColors.textSecondary}}>
+                    {selectedChildForOrder?.name}
                   </Text>
                 </View>
                 <View className="w-[25%]">
-                  <Text className="font-semibold">Child Age</Text>
-                  <Text className="mt-1">
-                    {selectedChildForOrder?.childAge}
+                  <Text
+                    className="font-semibold "
+                    style={{color: textColors.textPrimary}}>
+                    Child Age
+                  </Text>
+                  <Text
+                    className="mt-1"
+                    style={{color: textColors.textSecondary}}>
+                    {selectedChildForOrder?.age}
                   </Text>
                 </View>
                 <View className="flex justify-end ml-3">
                   <Pressable
-                    className="p-1 bg-blue-500 rounded items-end "
+                    className="py-[6px] px-2 bg-blue-500 rounded items-end "
                     onPress={() => setShowChangeChildSheet(true)}>
                     <Text className="text-white font-semibold">Change</Text>
                   </Pressable>
@@ -504,121 +576,94 @@ const Payment = ({navigation}) => {
             ) : (
               <>
                 <View className="w-full">
-                  <View className="w-full mt-5 flex-row justify-between">
-                    <View className="w-[55%]">
-                      <Text className="font-semibold ">Enter Child Name:</Text>
-                      <TextInput
-                        value={selectedChildForOrder?.childName}
-                        onChangeText={e =>
-                          setSelectedChildForOrder(pre => {
-                            return {...pre, childName: e};
-                          })
-                        }
-                        className=" mt-1 border-b border-gray-400 p-1 text-base w-full text-[15px] bg-gray-100"
-                      />
-                    </View>
-
-                    <View className="w-[40%]">
-                      <Text className="font-semibold ">Enter Child Age:</Text>
-                      <TextInput
-                        value={selectedChildForOrder?.childAge}
-                        keyboardType="phone-pad"
-                        onChangeText={e =>
-                          setSelectedChildForOrder(pre => {
-                            return {...pre, childAge: parseInt(e)};
-                          })
-                        }
-                        className=" mt-1 border-b border-gray-400 p-1 text-base w-full text-[15px] bg-gray-100"
-                      />
-                    </View>
+                  <View className="w-full flex-row items-center">
+                    <Text
+                      className="text-base text-red-500"
+                      style={{color: textColors.textSecondary}}>
+                      You Don't have added Any Child
+                    </Text>
+                    <Pressable
+                      className="py-1 px-3 rounded-full items-center ml-3"
+                      style={{backgroundColor: COLORS.pblue}}
+                      onPress={() => setOpenAddChildSheet(true)}>
+                      <Text className="text-white font-semibold">Add one</Text>
+                    </Pressable>
                   </View>
                 </View>
               </>
             )}
-
-            {/* {selectedChildForOrder === 'addAnother' ? (
-              <View className="flex-row justify-between w-full mt-3">
-                <View className="w-[55%]">
-                  <Text>Child Name</Text>
-                  <TextInput
-                    placeholder=""
-                    value={orderChildData?.childName}
-                    onChangeText={e =>
-                      setOrderChildData(pre => {
-                        return {...pre, childName: e};
-                      })
-                    }
-                    className="border-b border-gray-400 p-1 text-base w-full"
-                  />
-                </View>
-                <View className="w-[40%]">
-                  <Text>Child Age</Text>
-                  <TextInput
-                    placeholder=""
-                    value={orderChildData?.childAge}
-                    keyboardType="phone-pad"
-                    onChangeText={e =>
-                      setOrderChildData(pre => {
-                        return {...pre, childAge: parseInt(e)};
-                      })
-                    }
-                    className="border-b border-gray-400 p-1 text-base w-full"
-                  />
-                </View>
-              </View>
-            ) : (
-              <DropdownComponent
-                data={dropdownData}
-                placeHolder="Select Child Age"
-                setSelectedValue={setSelectedChildForOrder}
-                // defaultSelectedItem={dropdownData[0]}
-              />
-            )} */}
           </View>
         </View>
+
         <Spacer space={6} />
-        <TextWrapper fs={20} fw="700">
-          Course Detailss
+        <TextWrapper fs={20} fw="700" color={textColors.textPrimary}>
+          Course Details
         </TextWrapper>
         <Spacer space={4} />
-        <View style={styles.card}>
-          <TextWrapper fs={18} fw="700">
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
+          <TextWrapper fs={18} fw="700" color={textColors.textPrimary}>
             Name:{' '}
-            <TextWrapper fs={18} fw="600">
+            <TextWrapper fs={18} fw="600" color={textColors.textPrimary}>
               {courseDetails?.alternativeNameOnApp}
             </TextWrapper>
           </TextWrapper>
           <Spacer space={6} />
-          <TextWrapper fs={18} fw="700">
+          <TextWrapper fs={18} fw="700" color={textColors.textPrimary}>
             Level:{' '}
-            <TextWrapper fs={18} fw="600">
+            <TextWrapper fs={18} fw="600" color={textColors.textPrimary}>
               {levelText}
             </TextWrapper>
           </TextWrapper>
           <Spacer space={6} />
+          {classCount && (
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+              <MIcon
+                name="book-variant"
+                size={26}
+                color={textColors.textPrimary}
+              />
+              <TextWrapper fs={18} color={textColors.textPrimary}>
+                Total Classes: {classCount}
+              </TextWrapper>
+            </View>
+          )}
+          <Spacer space={6} />
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <MIcon name="book-variant" size={26} color={COLORS.black} />
-            <TextWrapper fs={18}>
-              Total Classes:{' '}
-              {currentLevel === 1 || currentLevel === 2 ? 12 : 24}
+            <MIcon
+              name="cake-variant"
+              size={26}
+              color={textColors.textPrimary}
+            />
+            <TextWrapper fs={18} color={textColors.textPrimary}>
+              For Ages: {currentAgeGroup}
             </TextWrapper>
           </View>
           <Spacer space={6} />
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <MIcon name="cake-variant" size={26} color={COLORS.black} />
-            <TextWrapper fs={18}>For Ages: {currentAgeGroup}</TextWrapper>
-          </View>
-          <Spacer space={6} />
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <MIcon name="calendar-month" size={26} color={COLORS.black} />
-            <TextWrapper fs={18}>Start date: {dateTime}</TextWrapper>
+            <MIcon
+              name="calendar-month"
+              size={26}
+              color={textColors.textPrimary}
+            />
+            <TextWrapper fs={18} color={textColors.textPrimary}>
+              Start date: {dateTime}
+            </TextWrapper>
           </View>
         </View>
+
         <Spacer space={4} />
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
           <TextInput
             placeholder="Enter email"
-            style={styles.emailInput}
+            style={[styles.emailInput, {color: textColors.textPrimary}]}
             textContentType="emailAddress"
             autoCorrect={false}
             autoCapitalize="none"
@@ -626,8 +671,8 @@ const Payment = ({navigation}) => {
             keyboardType="email-address"
             value={email}
             onChangeText={e => setEmail(e)}
-            selectionColor={COLORS.black}
-            placeholderTextColor={'gray'}
+            selectionColor={textColors.textYlMain}
+            placeholderTextColor={textColors.textSecondary}
           />
           {emailErr && (
             <TextWrapper fs={14} color={COLORS.pred}>
@@ -636,7 +681,11 @@ const Payment = ({navigation}) => {
           )}
         </View>
         <Spacer space={4} />
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
+          ]}>
           <View
             style={{
               flexDirection: 'row',
@@ -648,25 +697,35 @@ const Payment = ({navigation}) => {
               fs={14}
               color={COLORS.pgreen}
               styles={{textAlign: 'left', opacity: couponApplied ? 1 : 0}}>
-              Applied
+              Coupon Applied
             </TextWrapper>
             <Pressable
+              className="flex-row"
               style={{
                 paddingHorizontal: 12,
                 paddingVertical: 8,
                 alignSelf: 'flex-end',
-                backgroundColor: '#eee',
-                borderRadius: 4,
+                backgroundColor: textColors.textYlMain,
+                borderRadius: 50,
                 marginBottom: 8,
               }}
               onPress={couponApplied ? clearAppliedCode : applyDefaultCode}>
-              <TextWrapper ff={FONTS.signika_semiBold}>
-                Apply Coupon YLAPP10
+              <TextWrapper ff={FONTS.signika_semiBold} color="white">
+                {couponApplied ? 'Remove Coupon' : 'Apply Coupon YLAPP10'}
               </TextWrapper>
+              {defCouponApplyLoading && (
+                <ActivityIndicator
+                  size={'small'}
+                  color={'white'}
+                  className="ml-1"
+                />
+              )}
             </Pressable>
           </View>
           <View>
-            <TextWrapper styles={{marginBottom: 6}}>
+            <TextWrapper
+              styles={{marginBottom: 6}}
+              color={textColors.textPrimary}>
               Have another code?
             </TextWrapper>
             <View
@@ -676,38 +735,61 @@ const Payment = ({navigation}) => {
               }}>
               <TextInput
                 placeholder="Enter here"
-                style={[styles.emailInput, {flex: 1}]}
+                style={[
+                  styles.emailInput,
+                  {flex: 1},
+                  {color: textColors.textPrimary},
+                ]}
                 autoCorrect={false}
                 autoCapitalize="characters"
                 keyboardType="default"
                 value={couponCode}
                 onChangeText={e => setCouponCode(e)}
-                selectionColor={COLORS.black}
+                selectionColor={textColors.textYlMain}
                 placeholderTextColor={'gray'}
               />
               <Pressable
                 style={{
-                  padding: 4,
+                  paddingHorizontal: 14,
+                  paddingVertical: 5,
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderWidth: StyleSheet.hairlineWidth,
                   borderRadius: 4,
                   borderColor: 'gray',
+                  backgroundColor: textColors.textYlGreen,
+                  flexDirection:"row"
                 }}
                 onPress={couponApplied ? clearAppliedCode : applyCouponCode}>
-                <TextWrapper fs={18}>
+                <TextWrapper fs={18} color={'white'}>
                   {couponApplied ? 'Clear' : 'Apply'}
                 </TextWrapper>
+
+                {couponApplyLoading && (
+                  <ActivityIndicator size={'small'} color={'white'} className="ml-1" />
+                )}
               </Pressable>
             </View>
           </View>
 
-          <View className="flex-row justify-between items-center my-4 pt-1">
-            <Text>{totalCredits} Redeem Points Available</Text>
-            <Pressable onPress={redeemCredits} disabled={totalCredits == 0}>
-              <Text className="text-blue-600">Reddem Now</Text>
-            </Pressable>
-          </View>
+          {customer === 'yes' && (
+            <View className="flex-row justify-between items-center my-4 pt-1">
+              <Text
+                style={{
+                  color: textColors.textPrimary,
+                  fontFamily: FONTS.primaryFont,
+                }}>
+                {totalCredits} Redeem Points Available
+              </Text>
+              <Pressable onPress={redeemCredits} disabled={totalCredits == 0}>
+                <Text
+                  className="font-semibold underline"
+                  style={{color: textColors.textYlMain}}>
+                  Redeem Now
+                </Text>
+              </Pressable>
+            </View>
+          )}
 
           {couponMsg && (
             <TextWrapper fs={14} color={COLORS.pred}>
@@ -717,7 +799,7 @@ const Payment = ({navigation}) => {
         </View>
       </ScrollView>
       <View style={{padding: 12}}>
-        <View style={styles.card}>
+        <View style={[styles.card, {backgroundColor: '#fff'}]}>
           <View
             style={{
               flexDirection: 'row',
@@ -754,7 +836,7 @@ const Payment = ({navigation}) => {
                   <View className="w-[85%] justify-between flex-row">
                     <Text className="text-[16px] text-black">Redeem Value</Text>
                     <Text className="text-[16px] text-black">
-                      {creditsValueApplied}
+                      -{creditsValueApplied}
                     </Text>
                   </View>
                 )}
@@ -764,7 +846,7 @@ const Payment = ({navigation}) => {
                       Referral Discount
                     </Text>
                     <Text className="text-[16px] text-black">
-                      {referralDiscount}
+                      -{referralDiscount?.toFixed(2)}
                     </Text>
                   </View>
                 )}
@@ -784,7 +866,11 @@ const Payment = ({navigation}) => {
 
           <Spacer space={4} />
           <Pressable
-            onPress={handleCheckout}
+            onPress={
+              paymentBatchType && paymentBatchType === 'solo'
+                ? handleSoloBatchCheckOut
+                : handleCheckout
+            }
             style={({pressed}) => [
               styles.btnCheckout,
               {
@@ -819,7 +905,6 @@ const Payment = ({navigation}) => {
             count={200}
             origin={{x: 0, y: 0}}
             autoStart={false}
-            fadeOut={fadeOut}
             fallSpeed={1800}
             explosionSpeed={450}
           />
@@ -838,6 +923,15 @@ const Payment = ({navigation}) => {
           />
         }
         snapPoint={['40%', '75%']}
+      />
+
+      <BottomSheetComponent
+        isOpen={openAddChildSheet}
+        onClose={() => setOpenAddChildSheet(false)}
+        Children={
+          <AddChildModule onClose={() => setOpenAddChildSheet(false)} />
+        }
+        snapPoint={['50%']}
       />
 
       <ModalComponent
@@ -965,28 +1059,6 @@ const Payment = ({navigation}) => {
 };
 
 const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
-  const [orderChildData, setOrderChildData] = useState({
-    childName: '',
-    childAge: '',
-  });
-  const toast = useToast();
-
-  const addAnotherChild = () => {
-    if (!orderChildData?.childName || orderChildData?.childName?.length < 3) {
-      Showtoast({text: 'Enter child name', toast, type: 'danger'});
-      return;
-    } else if (
-      !orderChildData?.childAge ||
-      orderChildData?.childAge < 5 ||
-      orderChildData?.childAge > 14
-    ) {
-      Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
-      return;
-    } else {
-      setChild(orderChildData);
-      closeSheet();
-    }
-  };
   return (
     <View className="w-full items-center">
       <Text
@@ -994,54 +1066,6 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
         style={{fontFamily: FONTS.headingFont}}>
         change child
       </Text>
-
-      <View className="p-2  w-[100%] mt-3 bg-gray-100 rounded">
-        <Text
-          className="text-base font-semibold"
-          style={{fontFamily: FONTS.primaryFont}}>
-          Buying for another child?
-        </Text>
-
-        <View className="w-full flex-row justify-between mt-3">
-          <View className="w-[40%]">
-            <TextInput
-              placeholder="Child Name"
-              value={orderChildData?.childName}
-              onChangeText={e =>
-                setOrderChildData(pre => {
-                  return {...pre, childName: e};
-                })
-              }
-              className="border-b border-gray-400 p-1 text-[15px] w-full"
-            />
-          </View>
-          <View className="w-[30%]">
-            <TextInput
-              placeholder="Child Age"
-              value={orderChildData?.childAge}
-              keyboardType="phone-pad"
-              onChangeText={e =>
-                setOrderChildData(pre => {
-                  return {...pre, childAge: parseInt(e)};
-                })
-              }
-              className="border-b border-gray-400 p-1 text-base w-full text-[15px]"
-            />
-          </View>
-
-          <View className="items-end justify-end w-[23%]">
-            <Pressable
-              className="rounded items-center justify-center h-[30px] px-2"
-              style={{backgroundColor: COLORS.pblue}}
-              onPress={() => addAnotherChild()}>
-              <Text className="text-white text-xs font-semobold ">
-                Continue
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </View>
-
       <View className="w-full items-center mt-4">
         {data?.map((child, i) => {
           return (
@@ -1054,11 +1078,11 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
               <View
                 className="flex-row p-2 border border-gray-400 rounded"
                 style={
-                  selectChild?.childName === child?.childName
+                  selectChild?.name === child?.name
                     ? {borderColor: COLORS.pblue}
                     : {}
                 }>
-                {selectChild?.childName === child?.childName && (
+                {selectChild?.name === child?.name && (
                   <View
                     className="absolute -top-2 -right-2 bg-white"
                     style={{}}>
@@ -1074,12 +1098,12 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
                   <Text
                     className="text-xl font-semibold"
                     style={{fontFamily: FONTS.primaryFont}}>
-                    {child.childName}
+                    {child.name}
                   </Text>
                   <Text
                     className="mt-1"
                     style={{fontFamily: FONTS.primaryFont}}>
-                    Age: {child.childAge}
+                    Age: {child.age}
                   </Text>
                 </View>
               </View>
@@ -1111,7 +1135,10 @@ const LeadDataForm = ({setChild, child, close}) => {
       Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
       return;
     } else {
-      setChild(orderChildData);
+      setChild({
+        name: orderChildData?.childName,
+        age: orderChildData?.childAge,
+      });
       close();
       // closeSheet();
     }
@@ -1179,40 +1206,6 @@ const LeadDataForm = ({setChild, child, close}) => {
   );
 };
 
-// const SetChildDataModule = ({setChild}) => {
-//   const [orderChildData, setOrderChildData] = useState({
-//     childName: '',
-//     childAge: null,
-//   });
-
-//   const toast = useToast();
-
-//   // const handleSetChild = () => {
-//   //   if (!orderChildData?.childName || orderChildData?.childName?.length < 3) {
-//   //     Showtoast({text: 'Enter child name', toast, type: 'danger'});
-//   //     return;
-//   //   } else if (
-//   //     !orderChildData?.childAge ||
-//   //     orderChildData?.childAge < 5 ||
-//   //     orderChildData?.childAge > 14
-//   //   ) {
-//   //     Showtoast({text: 'Enter Childage between 5-14', toast, type: 'danger'});
-//   //     return;
-//   //   } else {
-//   //     setChild(orderChildData);
-//   //     // closeSheet();
-//   //   }
-//   // };
-
-//   useEffect(() => {
-//     setChild(setOrderChildData);
-//   }, [orderChildData]);
-
-//   return (
-
-//   );
-// };
-
 export default Payment;
 
 const styles = StyleSheet.create({
@@ -1220,7 +1213,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 16,
     borderRadius: 4,
-    backgroundColor: COLORS.white,
     elevation: 1,
   },
   row: {
@@ -1233,7 +1225,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#eee',
-    color: COLORS.black,
   },
   btnCheckout: {
     padding: 12,

@@ -38,6 +38,11 @@ import {useToast} from 'react-native-toast-notifications';
 import {FONTS} from '../utils/constants/fonts';
 import {authSelector} from '../store/auth/selector';
 import {startGetAllBookings} from '../store/welcome-screen/reducer';
+import ModalComponent from '../components/modal.component';
+import {Button} from 'react-native-share';
+import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
+import {userSelector} from '../store/user/selector';
+import {useNavigation} from '@react-navigation/native';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -61,13 +66,7 @@ const bookingSteps = [
   },
 ];
 
-const BookDemoScreen = ({
-  data,
-  navigation,
-  courseId,
-  setSelectedTab,
-  place,
-}) => {
+const BookDemoScreen = ({courseId, setSelectedTab, place}) => {
   const toast = useToast();
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
@@ -76,9 +75,12 @@ const BookDemoScreen = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [isCurrentStepDataFilled, setIsCurrentStepDataFilled] = useState(false);
   const [selectedDemoType, setSelectedDemoType] = useState('solo');
+  const [showAddChildView, setShowAddChildView] = useState(false);
   const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
     state => state.appTheme,
   );
+
+  const navigation = useNavigation();
   const {
     timezone,
     selectedSlot,
@@ -90,12 +92,17 @@ const BookDemoScreen = ({
     bookingFailReason,
     oneToOneBookingFailed,
   } = useSelector(bookDemoSelector);
-
   const {user} = useSelector(authSelector);
 
   const phone = user?.phone;
-  // console.log("ChildData is", childData)
   const dispatch = useDispatch();
+
+  // Set parent name from lead
+  useEffect(() => {
+    if (user?.fullName && user?.fullName?.length > 2) {
+      setFields(preVal => ({...preVal, parentName: user?.fullName}));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!ipData) {
@@ -103,58 +110,10 @@ const BookDemoScreen = ({
     }
   }, [ipData]);
 
-  // useEffect(() => {
-  //   if (fields.childName && fields.parentName) {
-  //     console.log('Changing 2');
-  //     setCurrentStep(2);
-  //   }
-  // }, []);
-
   useEffect(() => {
     setIsCurrentStepDataFilled(false);
   }, [currentStep]);
 
-  // useEffect(() => {
-  //   console.log('running useEffect');
-  //   if (currentStep === 1) {
-  //     if (fields.childName.length > 2 && fields.parentName.length > 2) {
-  //       setIsCurrentStepDataFilled(true);
-  //     } else {
-  //       setIsCurrentStepDataFilled(false);
-  //     }
-  //   } else if (currentStep === 2) {
-  //     if (selectedDemoType === 'solo') {
-  //       if (
-  //         selectedOneToOneDemoTime &&
-  //         selectedOneToOneDemoTime !== '' &&
-  //         selectedOneToOneDemoTime !== undefined &&
-  //         selectedOneToOneDemoTime !== 'undefined'
-  //       ) {
-  //         console.log('condition running', selectedOneToOneDemoTime);
-  //         setIsCurrentStepDataFilled(true);
-  //         return;
-  //       } else {
-  //         setIsCurrentStepDataFilled(false);
-  //       }
-  //     }
-
-  //     if (selectedDemoType === 'group' && selectedSlot) {
-  //       setIsCurrentStepDataFilled(true);
-  //     }
-  //   }
-  // }, [
-  //   fields,
-  //   selectedSlot,
-  //   selectedDemoType,
-  //   selectedOneToOneDemoTime,
-  //   currentStep,
-  //   dispatch,
-  // ]);
-
-  // console.log('Current Step is', currentStep);
-  /**
-   * Check if any field is not empty
-   */
   const isActive = useMemo(() => {
     if (!fields.parentName || !fields.childName || !childAge) {
       return false;
@@ -175,13 +134,6 @@ const BookDemoScreen = ({
     }
   };
 
-  const handleOnClose = () => setOpen(false);
-
-  const handleDemoSlots = async () => {
-    const formFields = {...fields, phone, childAge};
-    navigation.navigate(SCREEN_NAMES.BOOK_DEMO_SLOTS, {formFields});
-  };
-
   const handleChildAge = childAge => {
     setChildAge(childAge);
   };
@@ -197,13 +149,6 @@ const BookDemoScreen = ({
   ];
 
   const checkFirstStepData = () => {
-    console.log(
-      'childName: ' + fields.childName,
-      'parentname',
-      fields.parentName,
-      ' childAge',
-      childAge,
-    );
     if (!fields?.childName?.length || fields?.childName?.length < 3) {
       Showtoast({text: 'Enter Valid Child name', toast});
       return false;
@@ -240,95 +185,28 @@ const BookDemoScreen = ({
     }
   };
 
-  const handleNextBtnClick = () => {
-    if (currentStep === 1) {
-      if (!checkFirstStepData()) {
-        return;
-      }
-      setCurrentStep(currentStep + 1);
-      dispatch(
-        setChildData({
-          childName: fields.childName,
-          parentName: fields.parentName,
-          childAge: 7,
-        }),
-      );
-    } else if (currentStep === 2) {
-      if (!checkSecondStepData()) {
-        return;
-      }
-      if (selectedDemoType === 'solo') {
-        handleBookOneToOneDemo();
-        return;
-      }
-      // dispatch(changebookingCreatedSuccessfully(true));
-      handleBookNow();
-    } else {
-      console.log('Changing 4');
-      setCurrentStep(1);
-    }
-  };
-
-  useEffect(() => {
-    if (currentStep == 1 && childData) {
-      setFields({
-        parentName: childData.parentName,
-        childName: childData.childName,
-      });
-      setChildAge(childData.childAge);
-      console.log('Changing 1');
-      setCurrentStep(2);
-    }
-    if (!childData) {
-      setFields({
-        parentName: '',
-        childName: '',
-      });
-      setChildAge(null);
-    }
-    if (bookingCreatedSuccessfully) {
-      Showtoast({text: 'Booking Created Successfully', toast, type: 'success'});
-      dispatch(startGetAllBookings(user?.phone));
-      setCurrentStep(3);
-    }
-  }, [childData, bookingCreatedSuccessfully]);
-
-  handleBookNow = () => {
-    console.log('running handleBook');
+  const handleBookNow = () => {
+    console.log('field are in group', fields);
     const bodyData = {
       name: fields.parentName,
-      childAge: childAge || 7,
+      childAge: childAge,
       phone,
       childName: fields.childName,
       timeZone: timezone,
       demoDate: selectedSlot.demoDate,
       bookingType: 'direct',
       source: 'app',
-      course: 'Eng_Hw',
+      course: courseId,
       digits: 'na',
       slotId: selectedSlot.slotId,
       country: ipData.country_name.toUpperCase(),
       countryCode: ipData.calling_code,
     };
-    console.log('body data is', bodyData);
     dispatch(setNewBookingStart({data: bodyData}));
   };
 
   const handleBookOneToOneDemo = () => {
-    //   {
-    //     "demoDate": "2024-01-17T14:00:43.098Z",
-    //     "childAge": 5,
-    //     "childName": "abc",
-    //     "courseId": "Eng_Hw",
-    //     "parentName": "test",
-    //     "phone": 7983068672,
-    //     "countryCode": 91,
-    //     "timeZone": 5.5,
-    //     "leadId": 105099,
-    //     "country": "India",
-    //     "source": "app"
-    // }
-
+    console.log('fields are in solo', fields);
     let countryCode = ipData?.calling_code;
     if (countryCode?.charAt(0) == '+') {
       countryCode = countryCode.slice(1);
@@ -350,11 +228,61 @@ const BookDemoScreen = ({
       leadId: 105107,
     };
 
-    console.log('dispatching func');
     dispatch(setNewOneToOneBookingStart(body));
   };
 
-  // console.log('selectedOneToOneDemoTime in form is', selectedOneToOneDemoTime);
+  const handleNextBtnClick = () => {
+    if (currentStep === 1) {
+      if (!checkFirstStepData()) {
+        return;
+      }
+      setCurrentStep(currentStep + 1);
+      dispatch(
+        setChildData({
+          childName: fields.childName,
+          parentName: fields.parentName,
+          childAge,
+        }),
+      );
+
+      console.log('child data is', {
+        childName: fields.childName,
+        parentName: fields.parentName,
+        childAge,
+      });
+    } else if (currentStep === 2) {
+      if (!checkSecondStepData()) {
+        return;
+      }
+      console.log('fields in 2nd step: ', fields);
+      if (selectedDemoType === 'solo') {
+        handleBookOneToOneDemo();
+        return;
+      }
+      handleBookNow();
+    } else {
+      console.log('Changing 4');
+      setCurrentStep(1);
+    }
+  };
+
+  useEffect(() => {
+    // if (currentStep == 1 && childData) {
+    //   setFields({
+    //     parentName: childData.parentName,
+    //     childName: childData.childName,
+    //   });
+    //   setChildAge(childData.childAge);
+    //   console.log('Changing 1');
+    //   setCurrentStep(2);
+    // }
+    if (bookingCreatedSuccessfully) {
+      setCurrentStep(3);
+      setTimeout(() => {
+        navigation.navigate('MainWelcomeScreen');
+      }, 1000);
+    }
+  }, [bookingCreatedSuccessfully]);
 
   const stepPress = step => {
     console.log('step pressed', step);
@@ -505,6 +433,8 @@ const BookDemoScreen = ({
               fields={fields}
               handleChangeValue={handleChangeValue}
               handleChildAge={handleChildAge}
+              setFields={setFields}
+              setShowAddChildView={setShowAddChildView}
             />
           ) : currentStep === 2 ? (
             selectedDemoType === 'solo' ? (
@@ -571,6 +501,20 @@ const BookDemoScreen = ({
           </View>
         )}
       </View>
+
+      <ModalComponent
+        visible={showAddChildView}
+        onRequestClose={() => setShowAddChildView(false)}
+        animationType="fade"
+        duration={10}>
+        <View
+          className="bg-[#1312125c] relative z-50"
+          style={{height: height + 15, width}}>
+          <View className="flex-1 absolute bottom-0 pb-10 w-full bg-white p-3 rounded h-[450px]">
+            <AddChildModule />
+          </View>
+        </View>
+      </ModalComponent>
     </View>
   );
 };
@@ -582,10 +526,36 @@ const FirstStepDetails = ({
   phone,
   handleChangeValue,
   handleChildAge,
+  setFields,
+  setShowAddChildView,
 }) => {
-  const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
-    state => state.appTheme,
-  );
+  const {textColors, bgColor} = useSelector(state => state.appTheme);
+  const {children, currentChild} = useSelector(userSelector);
+
+  const [childList, setChildList] = useState([]);
+  const [defaultChild, setDefaultChild] = useState([]);
+
+  useEffect(() => {
+    if (children?.length > 0) {
+      let arr = [];
+      children.forEach(element => {
+        arr.push({label: element.name, value: element});
+      });
+      setChildList(arr);
+    } else {
+      setChildList([{label: 'No Child added. Add One', value: 'addChild'}]);
+    }
+  }, [children]);
+
+  useEffect(() => {
+    if (currentChild) {
+      const elem = [{label: currentChild.name, value: currentChild}];
+      const {name, age} = currentChild;
+      setFields(pre => ({...pre, childName: name}));
+      handleChildAge(age);
+      setDefaultChild(name);
+    }
+  }, [currentChild]);
 
   const ageArray = [
     {label: '5', value: 5},
@@ -600,111 +570,28 @@ const FirstStepDetails = ({
     {label: '14', value: 14},
   ];
 
+  const handleSelectChild = child => {
+    if (!child) {
+      return;
+    }
+    if (child === 'addChild') {
+      setShowAddChildView(true);
+      return;
+    }
+    const {name, age} = child;
+    // const parentName = user?.fullName || 'unknown';
+    console.log(name, age);
+
+    setFields(pre => ({...pre, childName: name}));
+    handleChildAge(age);
+  };
+
+  useEffect(() => {
+    console.log('default child is', defaultChild);
+  }, [defaultChild]);
+
   return (
     <>
-      {/* <View className="w-full p-2">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Your Phone number
-          </Text>
-        </View>
-        <Text
-          placeholder="Phone Number"
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textSecondary,
-          }}>
-          {`${country.callingCode} ${phone}`}
-        </Text>
-        {/* <TextInput placeholder="Phone Number" value={} className="border-b p-1 mt-1" style={{borderColor:textColors.textSecondary}}/> */}
-      {/* </View> */}
-
-      {/* <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Parent Name
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textPrimary,
-          }}
-          value={fields.parentName}
-          onChangeText={e => handleChangeValue({name: 'parentName', value: e})}
-        />
-      </View>
-
-      <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Child Name
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{
-            borderColor: textColors.textSecondary,
-            color: textColors.textPrimary,
-          }}
-          value={fields.childName}
-          onChangeText={e => handleChangeValue({name: 'childName', value: e})}
-        />
-      </View>
-
-      <View className="w-full p-2 mt-4">
-        <View className="flex-row items-center gap-1">
-          <MIcon
-            name="play"
-            size={20}
-            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
-          />
-          <Text
-            className="text-[18px]"
-            style={{
-              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
-            }}>
-            Select Child Age
-          </Text>
-        </View>
-        <TextInput
-          placeholder=""
-          className="border rounded p-2 mt-2 text-[18px]"
-          style={{borderColor: textColors.textSecondary}}
-        />
-      </View> */}
-
       <View className="relative w-[100%] border border-gray-400 mt-4 rounded-[10px] py-3 flex-row justify-between px-2 items-center">
         <Text
           className="absolute py-1 px-1 -top-4 left-5"
@@ -722,8 +609,16 @@ const FirstStepDetails = ({
       </View>
 
       <View className="my-1"></View>
+      {childList && (
+        <DropdownComponent
+          data={childList}
+          placeHolder="Select Child"
+          setSelectedValue={handleSelectChild}
+          defaultValue={defaultChild}
+        />
+      )}
 
-      <Input
+      {/* <Input
         placeHolder="Enter Your Child Name"
         setValue={e => {
           handleChangeValue({name: 'childName', value: e});
@@ -731,6 +626,7 @@ const FirstStepDetails = ({
         value={fields.childName}
       />
       <View className="my-1"></View>
+    */}
 
       <Input
         placeHolder="Enter Parent Name"
@@ -740,11 +636,11 @@ const FirstStepDetails = ({
         value={fields.parentName}
       />
 
-      <DropdownComponent
+      {/* <DropdownComponent
         data={ageArray}
         placeHolder="Select Child Age"
         setSelectedValue={handleChildAge}
-      />
+      /> */}
     </>
   );
 };
@@ -875,6 +771,115 @@ const styles = StyleSheet.create({
 });
 
 // <KeyboardAvoidingView>
+
+{
+  /* <View className="w-full p-2">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Your Phone number
+          </Text>
+        </View>
+        <Text
+          placeholder="Phone Number"
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{
+            borderColor: textColors.textSecondary,
+            color: textColors.textSecondary,
+          }}>
+          {`${country.callingCode} ${phone}`}
+        </Text>
+        {/* <TextInput placeholder="Phone Number" value={} className="border-b p-1 mt-1" style={{borderColor:textColors.textSecondary}}/> */
+}
+{
+  /* </View> */
+}
+
+{
+  /* <View className="w-full p-2 mt-4">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Parent Name
+          </Text>
+        </View>
+        <TextInput
+          placeholder=""
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{
+            borderColor: textColors.textSecondary,
+            color: textColors.textPrimary,
+          }}
+          value={fields.parentName}
+          onChangeText={e => handleChangeValue({name: 'parentName', value: e})}
+        />
+      </View>
+
+      <View className="w-full p-2 mt-4">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Child Name
+          </Text>
+        </View>
+        <TextInput
+          placeholder=""
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{
+            borderColor: textColors.textSecondary,
+            color: textColors.textPrimary,
+          }}
+          value={fields.childName}
+          onChangeText={e => handleChangeValue({name: 'childName', value: e})}
+        />
+      </View>
+
+      <View className="w-full p-2 mt-4">
+        <View className="flex-row items-center gap-1">
+          <MIcon
+            name="play"
+            size={20}
+            color={darkMode ? textColors.textYlMain : textColors.textPrimary}
+          />
+          <Text
+            className="text-[18px]"
+            style={{
+              color: darkMode ? textColors.textYlMain : textColors.textPrimary,
+            }}>
+            Select Child Age
+          </Text>
+        </View>
+        <TextInput
+          placeholder=""
+          className="border rounded p-2 mt-2 text-[18px]"
+          style={{borderColor: textColors.textSecondary}}
+        />
+      </View> */
+}
 
 {
   /* <ScrollView

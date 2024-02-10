@@ -20,7 +20,6 @@ import {
   setDemoData,
   setBookingTime,
   setIsAttended,
-  setShowJoinButton,
   setTeamUrl,
   joinFreeClass,
   setErrorMessage,
@@ -32,13 +31,13 @@ import {
   markNMISuccess,
   setLoading,
   joinDemo,
-  setBookingDetailsFailed,
   setClassOngoing,
   setDemoFlag,
   setJoinClassLoading,
   setJoinClassErrorMsg,
-  setMarkAttendance,
   startMarkAttendace,
+  setAppRemark,
+  setNMI,
 } from './join-demo.reducer';
 
 import {BASE_URL} from '@env';
@@ -47,10 +46,11 @@ import {startCallComposite} from '../../natiive-modules/team-module';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
-import {setEmail} from '../auth/reducer';
 import {localStorage} from '../../utils/storage/storage-provider';
 import moment from 'moment';
 import {setContentData} from '../content/reducer';
+import {redirectToCourse} from '../../utils/redirectToCourse';
+import {navigate} from '../../navigationRef';
 
 const TAG = 'JOIN_DEMO_SAGA_ERROR';
 
@@ -138,6 +138,7 @@ export function* fetchDemoDetailsFromPhone() {
  */
 function* fetchDemoDetailsFromBookingId({payload}) {
   try {
+    console.log('payload is for getting details', payload);
     const response = yield call(fetchBookingDetailsFromBookingId, payload);
     const data = yield response.json();
 
@@ -157,7 +158,7 @@ function* fetchDemoDetailsFromBookingId({payload}) {
 
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
   } catch (error) {
-    console.log(TAG, error);
+    console.log(TAG, '3', error);
     console.log('error');
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setLoading(false));
@@ -187,7 +188,7 @@ function* getPhoneFromStorage() {
  * @param {object} payload demoData
  * @description Set demo data to states
  */
-function* onSetDemoData({payload: {demoData}}) {
+function* onSetDemoData({payload: {demoData, bookingDetails}}) {
   try {
     // const {
     //   demoDate: {_seconds},
@@ -235,9 +236,7 @@ function* onSetDemoData({payload: {demoData}}) {
 
       const isClassOngoing =
         moment().isAfter(moment(demoTime)) &&
-        moment().isBefore(moment(demoTime).add(1, 'hours'));
-
-      // console.log('isClassOngoing'), isClassOngoing;
+        moment().isBefore(moment(demoTime).add(10, 'minutes'));
 
       if (isClassOngoing) {
         yield put(setClassOngoing(true));
@@ -260,6 +259,8 @@ function* onSetDemoData({payload: {demoData}}) {
       yield put(setDemoFlag(demoData.demoFlag));
     }
 
+    yield put(setAppRemark(bookingDetails.appRemark));
+    yield put(setNMI(bookingDetails.needMoreInfo));
     yield put(setBookingTime(demoTime));
 
     yield put(setLoading(false));
@@ -555,30 +556,15 @@ function* markAttendaceSaga({payload: {bookingId}}) {
  * @param bookingId booking id of free class
  * @description Mark need more info
  */
-function* handleNMI({payload: {bookingId}}) {
-  const text = 'Hello, I need more info about the full course';
+function* handleNMI({payload: {bookingId, courseId, courses}}) {
+  console.log(bookingId, courseId);
+
   try {
-    // const isNmi = yield AsyncStorage.getItem(LOCAL_KEYS.NMI);
-    // if (!isNmi) {
-
     const response = yield saveNeedMoreInfo({bookingId});
-
-    // console.log(yield response.json());
-
     if (response.status === 200) {
-      localStorage.set(LOCAL_KEYS.NMI, 'true');
       yield put(markNMISuccess());
-      // const url = getWhatsappRedirectUrl(text);
-      // yield Linking.openURL(url);
+      yield call(redirectToCourse, {navigate, courses, courseId});
     }
-    // } else {
-    //   yield new Promise(resolve => setTimeout(resolve, 1000));
-
-    //   yield put(markNMISuccess());
-
-    //   const url = getWhatsappRedirectUrl(text);
-    //   yield Linking.openURL(url);
-    // }
   } catch (error) {
     console.log('saveNMIError', error.message);
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {

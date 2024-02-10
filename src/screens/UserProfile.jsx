@@ -22,6 +22,11 @@ import RedeemPointsView from '../components/UserProfileComponents/RedeemPointsVi
 import MyTicketsView from './MyTicketsView';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {authSelector} from '../store/auth/selector';
+import {userSelector} from '../store/user/selector';
+import {logout} from '../store/auth/reducer';
+import {FONTS} from '../utils/constants/fonts';
+import {localStorage} from '../utils/storage/storage-provider';
+import {CommonActions} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
@@ -53,25 +58,89 @@ const UserProfile = ({navigation}) => {
   const [selectedBottomSheetComponent, setSelectedBottomSheetComponent] =
     useState('redeemPoints');
 
+  const {currentChild} = useSelector(userSelector);
+  const {user} = useSelector(authSelector);
   const {selectedUserOrder} = useSelector(welcomeScreenSelector);
   const {customer} = useSelector(authSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
   const dispatch = useDispatch();
-  const changeDarkMode = () => {
-    // console.log('changing dark mode to ', );
-    dispatch(setDarkMode(dark));
-    setdark(!dark);
-  };
-
   const openBottomSheet = component => {
     setBottomSheetOpen(true);
     setSelectedBottomSheetComponent(component);
   };
 
+  const changeDarkMode = payload => {
+    localStorage.set('darkModeEnabled', payload);
+    dispatch(setDarkMode(payload));
+  };
+
   return (
     <>
+      <View
+        className="justify-end w-full py-2 px-4 flex-row"
+        style={{backgroundColor: bgColor}}>
+        <View className="px-2 justify-center">
+          {darkMode ? (
+            <Pressable
+              onPress={() => changeDarkMode(false)}
+              className="flex-row items-center py-1 px-3 border rounded-full border-gray-300">
+              <Text
+                className="text-xs mr-1"
+                style={{
+                  fontFamily: FONTS.primaryFont,
+                  color: textColors.textSecondary,
+                }}>
+                Dark mode
+              </Text>
+              <MIcon
+                name="brightness-4"
+                color="white"
+                size={20}
+                onPress={() => changeDarkMode(true)}
+              />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => changeDarkMode(true)}
+              className="flex-row items-center py-1 px-3 border rounded-full border-gray-300">
+              <Text
+                className="text-xs mr-1"
+                style={{
+                  fontFamily: FONTS.primaryFont,
+                  color: textColors.textSecondary,
+                }}>
+                Light mode
+              </Text>
+              <MIcon
+                name="brightness-6"
+                color="orange"
+                size={20}
+                onPress={() => changeDarkMode(true)}
+              />
+            </Pressable>
+          )}
+        </View>
+
+        <Pressable
+          className="flex-row items-center px-3 py-1  border rounded-full"
+          style={{borderColor: textColors?.textYlMain}}
+          onPress={() => {
+            const resetAction = CommonActions.reset({
+              index: 0,
+              routes: [{name: 'Welcome'}],
+            });
+
+            navigation.dispatch(resetAction);
+            dispatch(logout());
+          }}>
+          <MIcon name="logout" size={20} color={textColors.textYlMain} />
+          <Text className="text-[14px]" style={{color: textColors?.textYlMain}}>
+            Signout
+          </Text>
+        </Pressable>
+      </View>
       {customer === 'yes' ? (
         <>
           <ScrollView
@@ -95,12 +164,13 @@ const UserProfile = ({navigation}) => {
                   <Text
                     className={`text-[12px] text-center font-semibold`}
                     style={{color: textColors.textYlMain}}>
-                    Rahul Sharma, Age: 9
+                    {currentChild?.name || user?.fullName}, Age:{' '}
+                    {currentChild?.age}
                   </Text>
                   <Text
                     className={`text-[12px] text-center`}
                     style={{color: textColors.textYlMain}}>
-                    Parent Name: Sohan Sharma
+                    Parent Name: {user?.fullName}
                   </Text>
                 </View>
               </View>
@@ -197,7 +267,7 @@ const UserProfile = ({navigation}) => {
                 {boughtCourses?.map((data, index) => {
                   return (
                     <CourseItemShow
-                      key={index}
+                      key={Math.random()}
                       data={data}
                       navigation={navigation}
                     />
@@ -237,7 +307,7 @@ const MyTransactionsView = () => {
   );
 };
 
-const CourseItemShow = ({data, navigation}) => {
+const CourseItemShow = ({data, navigation, key}) => {
   //   console.log('we have data', data);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
@@ -260,7 +330,8 @@ const CourseItemShow = ({data, navigation}) => {
       //   });
       // }}
       className="w-full"
-      style={{elevation: 1.2}}>
+      style={{elevation: 1.2}}
+      key={key}>
       <View
         className="w-full overflow-hidden mt-3 h-[180px] rounded-xl"
         style={{backgroundColor: bgSecondaryColor}}>
@@ -307,16 +378,67 @@ const CourseItemShow = ({data, navigation}) => {
 };
 
 const NotACustomerProfilePage = () => {
+  const dispatch = useDispatch();
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
+  const {user} = useSelector(authSelector);
+  const {currentChild} = useSelector(userSelector);
 
   return (
     <>
-      <View className="flex-1" style={{backgroundColor:bgColor}}>
-        <Text style={{color: textColors.textSecondary}}>
-          Not a customer profile
-        </Text>
+      <View className="flex-1 items-center" style={{backgroundColor: bgColor}}>
+        <View
+          className="w-[95%] px-2 py-5 mt-3 rounded-md flex-row justify-between"
+          style={{backgroundColor: bgSecondaryColor}}>
+          <View className="w-[35%] items-center justify-center">
+            <View className="h-[110px] w-[110px] rounded-full bg-white justify-center items-center overflow-hidden">
+              <Text
+                className="text-6xl font-semibold"
+                style={{color: textColors.textYlMain}}>
+                {currentChild?.name?.charAt(0)}
+              </Text>
+            </View>
+          </View>
+          <View className="w-[60%] items-start justify-center">
+            <View className="w-full flex-row">
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textSecondary}}>
+                Name :
+              </Text>
+              <Text
+                className="capitalize ml-[2px]"
+                style={{color: textColors.textYlMain}}>
+                {currentChild?.name || 'not set'}
+              </Text>
+            </View>
+            <View className="w-full flex-row mt-1">
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textSecondary}}>
+                Age :
+              </Text>
+              <Text
+                className="capitalize ml-[2px]"
+                style={{color: textColors.textYlMain}}>
+                {currentChild?.age || user?.childAge}
+              </Text>
+            </View>
+            <View className="w-full flex-row mt-1">
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textSecondary}}>
+                Parent Name :
+              </Text>
+              <Text
+                className="capitalize ml-[2px]"
+                style={{color: textColors.textYlMain}}>
+                {user?.fullName}
+              </Text>
+            </View>
+          </View>
+        </View>
       </View>
     </>
   );

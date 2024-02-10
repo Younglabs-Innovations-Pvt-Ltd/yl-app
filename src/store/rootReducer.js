@@ -11,6 +11,7 @@ import {paymentReducer} from './payment/reducer';
 import {uploadReducer} from './upload-handwriting/reducer';
 import {contentReducer} from './content/reducer';
 import {appThemeReducer} from './app-theme/appThemeReducer';
+import { userReducer } from './user/reducer';
 import {handleCourseReducer} from './handleCourse/reducer';
 import {handleHomeWorkReducer} from './homework-submit/reducer';
 import { handleRecordingRequestReducer } from './request-recording/reducer';
@@ -27,6 +28,7 @@ const reducer = combineReducers({
   upload: uploadReducer,
   content: contentReducer,
   appTheme: appThemeReducer,
+  user:userReducer,
   handleCourse: handleCourseReducer,
   submitHomeWork: handleHomeWorkReducer,
   requestRecording:handleRecordingRequestReducer

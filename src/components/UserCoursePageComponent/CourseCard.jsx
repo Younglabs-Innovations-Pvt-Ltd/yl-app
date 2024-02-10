@@ -4,7 +4,6 @@ import {Image, Text, View} from 'react-native-animatable';
 import ServiceRequestCard from './ServiceRequestCard';
 
 const CourseCard = ({course, navigation}) => {
-  console.log('CourseCard', course);
   return (
     <View
       key={course?.level}

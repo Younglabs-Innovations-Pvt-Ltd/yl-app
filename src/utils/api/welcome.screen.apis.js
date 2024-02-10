@@ -31,6 +31,6 @@ export const fetchAllOrdersFromLeadId = async payload => {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + payload.token,
     },
-    body: JSON.stringify({leadId: payload.leadId}),
+    body: JSON.stringify({leadId: payload?.leadId}),
   });
 };

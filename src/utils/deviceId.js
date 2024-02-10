@@ -12,6 +12,7 @@ export const saveDeviceId = async ({phone, deviceUID}) => {
     const token = await getCurrentDeviceId();
     // console.log('token', token);
 
+    console.log("device id payload",{deviceId: token, phone, deviceUID})
     const response = await storeDeviceId({deviceId: token, phone, deviceUID});
     const data = await response.json();
     // console.log('tokenData mobile', data);

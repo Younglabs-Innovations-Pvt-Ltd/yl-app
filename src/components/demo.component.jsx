@@ -10,11 +10,8 @@ import {
   Text,
 } from 'react-native';
 import DemoWaiting from './join-demo-class-screen/demo-waiting.component';
-// import Button from './button.component';
-import Spacer from './spacer.component';
 import TextWrapper from './text-wrapper.component';
 import PostDemoAction from './join-demo-class-screen/post-demo-actions.component';
-import Input from './input.component';
 import {COLORS} from '../utils/constants/colors';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -26,34 +23,24 @@ import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {i18nContext} from '../context/lang.context';
 import Modal from './modal.component';
 import BookDemoSlots from '../screens/book-demo-slots.screen';
-import TwoStepForm from './two-step-form.component';
 import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
 import {TextInput} from 'react-native-gesture-handler';
-import { welcomeScreenSelector } from '../store/welcome-screen/selector';
+import {userSelector} from '../store/user/selector';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
-const Demo = ({
-  isTimeover,
-  timeLeft,
-  showPostActions,
-  sheetOpen,
-  openResheduleSheet,
-  closeResheduleSheet,
-}) => {
+const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
   const [childName, setChildName] = useState('');
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [params, setParams] = useState(null);
   const [cn, setCn] = useState(false);
 
-  const {localLang} = i18nContext();
   const dispatch = useDispatch();
-  const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
-    useSelector(state => state.appTheme);
+  const {textColors} = useSelector(state => state.appTheme);
 
   const {
     demoData,
@@ -65,7 +52,7 @@ const Demo = ({
     joinClassErrorMsg,
   } = useSelector(joinDemoSelector);
 
-  const {isFirstTimeUser} = useSelector(welcomeScreenSelector)
+  const {isFirstTimeUser} = useSelector(userSelector);
 
   /**
    * @author Shobhit
@@ -83,6 +70,8 @@ const Demo = ({
       setCn(demoData.cN);
     }
   }, [demoData, bookingDetails]);
+
+  // console.log("is Time Over=" ,isTimeover)
 
   useEffect(() => {
     if (bookingDetails) {
@@ -121,6 +110,7 @@ const Demo = ({
   const onOpenForm = () => setVisible(true);
   const onCloseForm = () => setVisible(false);
 
+  // console.log("demodata is" , demoData)
   // Join Class
   const handleJoinClass = async () => {
     // console.log("first");
@@ -145,15 +135,23 @@ const Demo = ({
   // If there is no child name in booking details
   // then show input field for childname
   // otherwise show text
+
   const IS_CHILD_NAME = useMemo(() => {
     return !cn ? (
       <>
-        <TextInput
-          placeholder="Child Name"
-          value={childName}
-          onChangeText={onChangeChildName}
-          className="text-white border-b border-white p-1 text-base"
-        />
+        <View className="w-full flex-row items-end mb-3">
+          <Text className="text-white font-semibold text-base">
+            Your Child Name
+          </Text>
+          <View className="flex-1 px-3">
+            <TextInput
+              placeholder="Child Name"
+              value={childName}
+              onChangeText={onChangeChildName}
+              className="text-white border-b border-white p-1 text-base w-full"
+            />
+          </View>
+        </View>
         {message && (
           <TextWrapper fs={14} color={COLORS.pred}>
             {message}
@@ -172,96 +170,76 @@ const Demo = ({
     // </TextWrapper>
   }, [cn, childName, message]);
 
-  const NEW_BOOKING = useMemo(() => {
-    if (isFirstTimeUser) {
-      return (
-        <View style={{padding: 4}} className="flex-row justify-between">
-          <View>
-            <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
-              Improve your child's handwriting
-            </TextWrapper>
-            <TextWrapper fs={16} color={COLORS.white}>
-              Book your first free Handwriting Class.
-            </TextWrapper>
-          </View>
-          <View className="h-full items-center justify-center">
-            <Pressable
-              // onPress={()=>{openBottomSheet}}
-              onPress={() => sheetOpen()}
-              className="bg-white text-blue-500 py-2 px-3 rounded-md">
-              <Text
-                className="font-semibold"
-                style={{color: textColors.textYlMain}}>
-                Book Now
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      );
-    } else {
-      return null;
-    }
-  }, [demoData, onOpenForm]);
-
-  // post actions
-  const POST_ACTIONS = useMemo(() => {
-    if (!bookingTime) return null;
-
-    return moment().isAfter(moment(bookingTime).add(1, 'hours')) ? (
-      <PostDemoAction rescheduleClass={onOpen} />
-    ) : null;
-  }, [bookingTime, onOpen]);
-
-  const navigation = useNavigation();
-
-  const courseDetails = () => {
-    navigation.navigate(SCREEN_NAMES.COURSE_DETAILS);
-  };
+  // const NEW_BOOKING = useMemo(() => {
+  //   if (isFirstTimeUser) {
+  //     return (
+  //       <View style={{padding: 4}} className="flex-row justify-between">
+  //         <View>
+  //           <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
+  //             Improve your child's handwriting
+  //           </TextWrapper>
+  //           <TextWrapper fs={16} color={COLORS.white}>
+  //             Book your first free Handwriting Class.
+  //           </TextWrapper>
+  //         </View>
+  //         <View className="h-full items-center justify-center">
+  //           <Pressable
+  //             // onPress={()=>{openBottomSheet}}
+  //             onPress={() => sheetOpen()}
+  //             className="bg-white text-blue-500 py-2 px-3 rounded-md">
+  //             <Text
+  //               className="font-semibold"
+  //               style={{color: textColors.textYlMain}}>
+  //               Book Now
+  //             </Text>
+  //           </Pressable>
+  //         </View>
+  //       </View>
+  //     );
+  //   } else {
+  //     return null;
+  //   }
+  // }, [demoData, onOpenForm]);
 
   return (
     <ScrollView
       style={styles.contentWrapper}
       showsVerticalScrollIndicator={false}>
-      {NEW_BOOKING}
+      {/* {NEW_BOOKING} */}
       {/* Timer */}
-      {SHOW_TIMER && <DemoWaiting timeLeft={timeLeft} />}
+      {SHOW_TIMER && !isClassOngoing && <DemoWaiting timeLeft={timeLeft} />}
       {/* Show join button */}
       {isClassOngoing && (
-        <View style={{paddingHorizontal: 16, paddingTop: 12}}>
+        <View style={{paddingHorizontal: 16, paddingVertical: 6}}>
           {IS_CHILD_NAME}
-          <Pressable
-            style={styles.btnClass}
-            onPress={handleJoinClass}
-            disabled={joinClassLoading}>
-            <TextWrapper fs={18} color="#434a52">
-              Enter class
-            </TextWrapper>
-            {joinClassLoading && (
-              <ActivityIndicator
-                size={'small'}
-                color={COLORS.black}
-                style={{marginLeft: 4}}
-              />
-            )}
-          </Pressable>
-
           <View className="w-full p-1 px-3">
-            <Text className="text-white font-semibold text-base ml-3 ">
-              Your free handwriting class is going on
+            <Text
+              className="text-white font-semibold text-base ml-3"
+              style={{fontFamily: FONTS.primaryFont}}>
+              Your Demo class is going on
             </Text>
             <View className="w-full">
               <Pressable
-                className="p-2 w-full rounded-full bg-white mt-2"
+                className="p-2 w-full rounded-full bg-white mt-2 flex-row justify-center"
                 onPress={handleJoinClass}>
-                <Text className="text-base font-semibold text-gray-700 text-center">
-                  Enter Class
+                <Text
+                  className="text-base font-semibold text-gray-700 text-center flex-row"
+                  style={{fontFamily: FONTS.primaryFont}}>
+                  Enter Class{' '}
                 </Text>
+                {joinClassLoading && (
+                  <ActivityIndicator
+                    size={'small'}
+                    color={COLORS.black}
+                    style={{marginLeft: 4}}
+                  />
+                )}
               </Pressable>
             </View>
           </View>
         </View>
       )}
-      
+
       {
         // If user attended demo class
         // Demo has ended

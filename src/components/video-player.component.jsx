@@ -95,6 +95,7 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
           source={{uri: localUri}}
           style={styles.video}
           paused={paused}
+          muted={true}
           // posterResizeMode="cover"
           resizeMode="cover"
           onLoadStart={onLoadStart}
@@ -114,7 +115,7 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
   );
 };
 
-export default VideoMediaPlayer;
+export default React.memo(VideoMediaPlayer);
 
 const styles = StyleSheet.create({
   videoContainer: {

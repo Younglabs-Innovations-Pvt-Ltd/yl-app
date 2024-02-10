@@ -4,6 +4,7 @@ import {
   Pressable,
   ActivityIndicator,
   ImageBackground,
+  Dimensions,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {FONTS} from '../../utils/constants/fonts';
@@ -17,18 +18,22 @@ import {startFetchingIpData} from '../../store/book-demo/book-demo.reducer';
 import {getCoursesForWelcomeScreen} from '../../store/welcome-screen/reducer';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {authSelector} from '../../store/auth/selector';
+// Shimmer effects
+import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
+const {height, width} = Dimensions.get('window');
 const ShowCourses = ({navigation}) => {
   const coursesNameByCategory = {
     handwriting: 'English Handwriting Courses',
     learning: 'English Learning',
     mathematics: 'Mathematics Courses',
-    others: 'Other Acedemic Courses',
+    others: 'Other Academic Courses',
   };
 
   const dispatch = useDispatch();
   const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
-  const {courses, coursesLoading, coursesLoadingFailed} = useSelector(
+  const {courses, coursesLoadingFailed, coursesLoading} = useSelector(
     welcomeScreenSelector,
   );
   const {ipData} = useSelector(bookDemoSelector);
@@ -41,12 +46,14 @@ const ShowCourses = ({navigation}) => {
     }
   }, [ipData]);
 
-  // console.log("ip data is", ipData)
+  // console.log("ip data is", ipData?.country_name)
 
   useEffect(() => {
-    dispatch(
-      getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
-    );
+    if (ipData) {
+      dispatch(
+        getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
+      );
+    }
   }, [ipData, refreshCourses]);
 
   const reloadCourses = () => {
@@ -57,9 +64,7 @@ const ShowCourses = ({navigation}) => {
   return (
     <View className="w-full">
       {coursesLoading ? (
-        <View className="w-full items-center">
-          <ActivityIndicator />
-        </View>
+        <CoursesLoadingEffect />
       ) : coursesLoadingFailed ? (
         <View className="w-full items-center h-[80px] justify-center">
           <Text
@@ -78,7 +83,7 @@ const ShowCourses = ({navigation}) => {
         </View>
       ) : (
         Object.keys(courses)?.map(key => {
-          return (
+          return courses[key]?.length > 0 ? (
             <View className="py-1 w-[100%]" key={key}>
               <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
                 <Text
@@ -105,11 +110,86 @@ const ShowCourses = ({navigation}) => {
                 style={{paddingTop: 4}}
               />
             </View>
-          );
+          ) : null;
         })
       )}
+    </View>
+  );
+};
 
-      {/* <View className="py-1 w-[100%]">
+export default ShowCourses;
+
+const CourseItemRender = ({data, navigation}) => {
+  const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
+  return (
+    <>
+      <Pressable
+        onPress={() => {
+          navigation.navigate('CourseDetailScreen', {
+            courseData: data,
+          });
+        }}>
+        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[110px]">
+          <ImageBackground
+            source={{
+              uri:
+                data.coverPicture ||
+                'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEng_Tuitions_5-14%2FthimbnailUrl.jpeg?alt=media&token=be2b7b32-311d-4951-8e47-61ab5fbfc529',
+            }}
+            style={[{flex: 1, resizeMode: 'cover'}]}
+            className="w-[100%] rounded h-full justify-center items-center">
+            <LinearGradient
+              colors={['#00000014', '#000000db']}
+              className="w-full"
+              start={{x: 0.5, y: 0.5}}>
+              <View className="h-[20%] justify-center items-center"></View>
+              <View className="h-[80%] items-start justify-end p-1">
+                {data?.alternativeNameOnApp?.split(' ').map((item, index) => {
+                  return (
+                    <Text
+                      key={index}
+                      style={[{lineHeight: 20, fontFamily: FONTS.headingFont}]}
+                      className="flex-wrap text-white text-[18px] font-semibold">
+                      {item}
+                    </Text>
+                  );
+                })}
+              </View>
+            </LinearGradient>
+          </ImageBackground>
+        </View>
+      </Pressable>
+    </>
+  );
+};
+
+const CoursesLoadingEffect = () => {
+  return (
+    <View className="py-4">
+      <View className="">
+        <ShimmerPlaceholder
+          className="h-6 rounded w-[250px]"
+          shimmerWidthPercent={0.4}></ShimmerPlaceholder>
+      </View>
+      <View className="flex-row justify-start mt-3">
+        <FlatList
+          data={[1, 2, 3]}
+          keyExtractor={item => item}
+          renderItem={() => (
+            <ShimmerPlaceholder
+              shimmerWidthPercent={0.4}
+              className="h-[160px] w-[110px] mr-3 rounded"></ShimmerPlaceholder>
+          )}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+    </View>
+  );
+};
+
+{
+  /* <View className="py-1 w-[100%]">
         <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
           <Text
             className={`w-[80%] p-0`}
@@ -173,53 +253,5 @@ const ShowCourses = ({navigation}) => {
             style={{paddingTop: 4}}
           />
         )}
-      </View> */}
-    </View>
-  );
-};
-
-export default ShowCourses;
-
-const CourseItemRender = ({data, navigation}) => {
-  const {darkMode, bgColor, textColors} = useSelector(state => state.appTheme);
-  return (
-    <>
-      <Pressable
-        onPress={() => {
-          navigation.navigate('CourseDetailScreen', {
-            courseData: data,
-          });
-        }}>
-        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[110px]">
-          <ImageBackground
-            source={{
-              uri:
-                data.coverPicture ||
-                'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEng_Tuitions_5-14%2FthimbnailUrl.jpeg?alt=media&token=be2b7b32-311d-4951-8e47-61ab5fbfc529',
-            }}
-            style={[{flex: 1, resizeMode: 'cover'}]}
-            className="w-[100%] rounded h-full justify-center items-center">
-            <LinearGradient
-              colors={['#00000014', '#000000db']}
-              className="w-full"
-              start={{x: 0.5, y: 0.5}}>
-              <View className="h-[20%] justify-center items-center"></View>
-              <View className="h-[80%] items-start justify-end p-1">
-                {data?.alternativeNameOnApp?.split(' ').map((item, index) => {
-                  return (
-                    <Text
-                      key={index}
-                      style={[{lineHeight: 20, fontFamily: FONTS.headingFont}]}
-                      className="flex-wrap text-white text-[18px] font-semibold">
-                      {item}
-                    </Text>
-                  );
-                })}
-              </View>
-            </LinearGradient>
-          </ImageBackground>
-        </View>
-      </Pressable>
-    </>
-  );
-};
+      </View> */
+}

@@ -63,6 +63,7 @@
     "react-native-screens": "^3.22.0",
     "react-native-select-dropdown": "^3.4.0",
     "react-native-share": "^9.2.3",
+    "react-native-shimmer-placeholder": "^2.0.9",
     "react-native-snackbar": "^2.6.2",
     "react-native-splash-screen": "^3.3.0",
     "react-native-svg": "^14.1.0",

@@ -14,19 +14,13 @@ import Snackbar from 'react-native-snackbar';
 import {useToast} from 'react-native-toast-notifications';
 import {Showtoast} from '../../utils/toast';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { FONTS } from '../../utils/constants/fonts';
+import {FONTS} from '../../utils/constants/fonts';
 
-const OneToOneDemoBook = ({
-  navigation,
-  formData,
-  courseId,
-  selectedDemoType,
-}) => {
+const OneToOneDemoBook = ({}) => {
   const toast = useToast();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDemoDate, setSelectedDemoDate] = useState(null);
   const {textColors, bgColor} = useSelector(state => state.appTheme);
-  const {childAge, parentName: name, phone, childName} = formData;
   const dispatch = useDispatch();
 
   // console.log('user selected date', selectedDemoDate);
@@ -116,12 +110,16 @@ const OneToOneDemoBook = ({
       <View className="">
         <Text
           className="font-semibold text-center"
-          style={[FONTS.subHeading , {color: textColors.textPrimary }]}>
+          style={[FONTS.subHeading, {color: textColors.textPrimary}]}>
           Choose A Preferred Date
         </Text>
         <Text
           className="font-semibold text-center"
-          style={{color: textColors.textSecondary, fontSize: 13 , fontFamily:FONTS.primaryFont}}>
+          style={{
+            color: textColors.textSecondary,
+            fontSize: 13,
+            fontFamily: FONTS.primaryFont,
+          }}>
           (Date should be in between of today and among next 7 days )
         </Text>
         <View className="w-full mt-5">
@@ -148,7 +146,10 @@ const OneToOneDemoBook = ({
               {selectedOneToOneDemoTime ? (
                 <Text
                   className="w-full text-center text-[15px] font-semibold"
-                  style={{color: textColors.textSecondary , fontFamily:FONTS.primaryFont}}>
+                  style={{
+                    color: textColors.textSecondary,
+                    fontFamily: FONTS.primaryFont,
+                  }}>
                   {`You have selected: ${moment(
                     selectedOneToOneDemoTime,
                   ).format('DD-MM-YYYY hh:mm A')}`}
@@ -157,7 +158,10 @@ const OneToOneDemoBook = ({
                 <Pressable className="w-full items-center">
                   <Text
                     className="font-semibold text-[18px] w-full text-center"
-                    style={{color: textColors.textSecondary , fontFamily:FONTS.headingFont}}>
+                    style={{
+                      color: textColors.textSecondary,
+                      fontFamily: FONTS.headingFont,
+                    }}>
                     Click on Calendar to select date
                   </Text>
                 </Pressable>
@@ -165,9 +169,9 @@ const OneToOneDemoBook = ({
             </View>
 
             {oneToOneBookingFailed && (
-              <Text className="w-full text-center font-semibold text-red-500 mt-5 text-xl"
-              style={[FONTS.subHeading]}
-              >
+              <Text
+                className="w-full text-center font-semibold text-red-500 mt-5 text-xl"
+                style={[FONTS.subHeading]}>
                 Failed To create booking. Try Again
               </Text>
             )}

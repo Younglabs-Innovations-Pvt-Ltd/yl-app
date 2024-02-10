@@ -18,10 +18,13 @@ import {LOCAL_KEYS} from '../utils/storage/local-storage-keys';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
 import {FONTS} from '../utils/constants/fonts';
+import {useDispatch} from 'react-redux';
+import {fetchUserFormLoginDetails} from '../store/auth/reducer';
 
 const {width, height} = Dimensions.get('window');
 
 const EmailLogin = ({navigation}) => {
+  const dispatch = useDispatch();
   const toast = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -50,6 +53,7 @@ const EmailLogin = ({navigation}) => {
       );
       setLoginLoading(false);
       resetForm();
+      dispatch(fetchUserFormLoginDetails());
       navigation.navigate(SCREEN_NAMES.MAIN);
     } catch (error) {
       setLoginLoading(false);
@@ -158,18 +162,6 @@ const EmailLogin = ({navigation}) => {
           onPress={() => navigation.navigate(SCREEN_NAMES.WELCOME)}>
           <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">
             Not a user? Sign in with Whatsapp
-          </TextWrapper>
-        </Pressable>
-
-        <View className="my-3 border-t-[.7px] h-[1px] w-[80%] border-gray-400 relative">
-          <Text className="absolute -top-3 bg-white px-1 left-[48%]">or</Text>
-        </View>
-
-        <Pressable
-          style={{paddingVertical: 4}}
-          onPress={() => navigation.navigate(SCREEN_NAMES.SIGNUP)}>
-          <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">
-            Signin with Email and Phone number
           </TextWrapper>
         </Pressable>
       </View>

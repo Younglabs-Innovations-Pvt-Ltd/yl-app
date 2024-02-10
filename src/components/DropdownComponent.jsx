@@ -9,19 +9,25 @@ const DropdownComponent = ({
   data,
   placeHolder,
   setSelectedValue,
-  defaultSelectedItem,
+  defaultValue,
 }) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
     useSelector(state => state.appTheme);
-  const [value, setValue] = useState(defaultSelectedItem);
+  const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
+  // useEffect(() => {
+  //   console.log('value is', value);
+  // }, [value]);
 
-  // useEffect(()=>{
-  //   if(defaultSelectedItem){
-  //     setValue(defaultSelectedItem)
-  //   }
-  // },[defaultSelectedItem])
+  useEffect(() => {
+    if (defaultValue && data) {
+      console.log("default value is", defaultValue);
+      const filtered = data?.filter(item => item.label === defaultValue);
+      console.log('filtered', filtered);
+      setValue(filtered[0]);
+    }
+  }, [defaultValue, data]);
 
   const renderLabel = () => {
     if (value || isFocus) {
@@ -43,7 +49,7 @@ const DropdownComponent = ({
     <View style={styles.container} className="">
       {renderLabel()}
       <Dropdown
-        mode="auto"
+        mode="default"
         style={[
           styles.dropdown,
           isFocus && {
@@ -81,19 +87,11 @@ const DropdownComponent = ({
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          setValue(item.value);
           setSelectedValue(item.value);
+          setValue(item);
           setIsFocus(false);
         }}
         itemContainerStyle={{borderRadius: 8}}
-        // renderLeftIcon={() => (
-        //   <AntDesign
-        //     style={styles.icon}
-        //     color={isFocus ? 'blue' : 'black'}
-        //     name="Safety"
-        //     size={20}
-        //   />
-        // )}
       />
     </View>
   );

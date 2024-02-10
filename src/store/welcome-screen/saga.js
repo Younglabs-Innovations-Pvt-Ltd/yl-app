@@ -5,7 +5,6 @@ import {
   fetchBookingStatusSuccess,
   setErrorMessage,
   getCoursesForWelcomeScreen,
-  setLoading,
   getCoursesForWelcomeScreenFailed,
   getCoursesForWelcomeScreenSuccess,
   startGetAllBookings,
@@ -14,11 +13,11 @@ import {
   startFetchingUserOrders,
   userOrderFetchingSuccess,
   userOrdersLoadingFailed,
-  setSelectedUserOrder,
   setIsFirstTimeUser,
+  setCustomer,
 } from './reducer';
 
-import {createLead, fetchBookingDetailsFromPhone} from '../../utils/api/yl.api';
+import {createLead} from '../../utils/api/yl.api';
 import {
   fetchAllBookinsFromPhone,
   fetchAllOrdersFromLeadId,
@@ -26,21 +25,15 @@ import {
 } from '../../utils/api/welcome.screen.apis';
 import {isValidNumber} from '../../utils/isValidNumber';
 
-import {navigate, replace} from '../../navigationRef';
+import {replace} from '../../navigationRef';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
-import {
-  localStorage,
-  setCountryCallingCodeAsync,
-} from '../../utils/storage/storage-provider';
+import {localStorage} from '../../utils/storage/storage-provider';
 
-import {setCurrentNetworkState} from '../network/reducer';
-import {ERROR_MESSAGES} from '../../utils/constants/messages';
 import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import DeviceInfo from 'react-native-device-info';
-import {setBookingDetailSuccess} from '../join-demo/join-demo.reducer';
-import {fetchDemoDetailsFromPhone} from '../join-demo/join-demo.saga';
+import {fetchUserFormLoginDetails} from '../auth/reducer';
 
 /**
  * @author Shobhit
@@ -68,19 +61,6 @@ function* handleBookingStatus({payload: {phone}}) {
       return;
     }
 
-    // Get booking data
-    // const response = yield fetchBookingDetailsFromPhone(phone);
-    // const data = yield response.json();
-
-    localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
-    localStorage.set(
-      LOCAL_KEYS.LOGINDETAILS,
-      JSON.stringify({
-        loginType: 'whatsAppNumber',
-        phone,
-      }),
-    );
-
     const deviceId = yield getCurrentDeviceId();
     const deviceUID = yield DeviceInfo.getAndroidId();
     const countryCode = 91;
@@ -94,39 +74,40 @@ function* handleBookingStatus({payload: {phone}}) {
       deviceUID,
     });
     const leadData = yield leadRes.json();
-    console.log('leadData', leadData);
 
-    // yield call(fetchDemoDetailsFromPhone);
+    if (leadData.customer === 'yes') {
+      yield put(setCustomer('yes'));
+      return;
+    }
+
+    localStorage.set(LOCAL_KEYS.PHONE, parseInt(phone));
+    localStorage.set(
+      LOCAL_KEYS.LOGINDETAILS,
+      JSON.stringify({
+        loginType: 'whatsAppNumber',
+        phone,
+      }),
+    );
+
+    yield put(fetchUserFormLoginDetails());
     yield put(fetchBookingStatusSuccess(''));
     replace(SCREEN_NAMES.MAIN); // Redirect to main screen
-    // }
   } catch (error) {
     console.log('BOOKING_STATUS_WELCOME_SCREEN_ERROR_SAGA 4', error.message);
-    // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
-    //   yield put(setLoading(false));
-    //   yield put(
-    //     setCurrentNetworkState(fetchBookingStatusStart({phone, country})),
-    //   );
-    // } else {
-    //   yield put(fetchBookingStatusFailed('Something went wrong'));
-    // }
 
     yield put(fetchBookingStatusFailed('Something went wrong'));
   }
 }
 
-/**
- * Listener functions that call when dispatch a related action
- */
-
-// Set booking status
 function* startBookingStatus() {
   yield takeLatest(fetchBookingStatusStart.type, handleBookingStatus);
 }
 
 function* startFetchingCoursesForLandingPage({payload}) {
   try {
-    const country = payload.country;
+    const country = payload.country?.toLowerCase();
+    console.log('country: ', country);
+
     const res = yield fetchCoursesForWelcomeScreen(country);
     const data = yield res.json();
     // console.log("got data",data)
@@ -138,18 +119,16 @@ function* startFetchingCoursesForLandingPage({payload}) {
       };
       data?.forEach(obj => {
         const {category} = obj;
-
         if (category === 'handwriting') {
           formattedCourses['handwriting'].push(obj);
         } else {
           formattedCourses['others'].push(obj);
         }
       });
-      // console.log("Formatted Course is", formattedCourses)
       yield put(getCoursesForWelcomeScreenSuccess(formattedCourses));
     }
   } catch (error) {
-    console.log('fetch courses error', error.message);
+    console.log('fetch courses error', error.message, ' payload was', payload);
     yield put(getCoursesForWelcomeScreenFailed());
   }
 }
@@ -175,7 +154,7 @@ function* fetchAllBookings({payload}) {
       return;
     }
     const data = yield response.json();
-    console.log('data is', data, 'for payload', payload);
+    // console.log('data is', data, 'for payload', payload);
 
     if (data?.message == 'bookings not found') {
       yield put(getAllBookingsSuccess([]));
@@ -211,40 +190,20 @@ function* fetchAllBookingsWithPhone() {
 // fetching user's all orders
 function* fetchAllOrders({payload}) {
   try {
-    console.log('getting payload in');
     const response = yield fetchAllOrdersFromLeadId(payload);
-    const data = yield response.json();
-    console.log('got response', data, ' got status', response.status);
+    // console.log('got response', response, ' got status', response.status);
+    console.log('got response', response.status , payload);
     if (response.status !== 200) {
       yield put(userOrdersLoadingFailed('Something went Wrong'));
       return;
     }
 
-    console.log('got data', data);
-
-    // console.log('get courses', data, response.status);
+    const data = yield response.json();
 
     if (data?.orderData) {
-      console.log('in if condition');
-      const formattedOrders = {};
-      data?.orderData?.forEach(obj => {
-        const {childName} = obj;
-
-        if (!formattedOrders[childName]) {
-          formattedOrders[childName] = [];
-        }
-        formattedOrders[childName].push(obj);
-      });
-      const initialKey = Object.keys(formattedOrders)[0];
-      const initialValue = Object.values(formattedOrders)[0];
-      console.log(
-        'initial key: ' + initialKey,
-        ' initial value: ' + initialValue,
-      );
-      yield put(setSelectedUserOrder({[initialKey]: initialValue}));
-      yield put(userOrderFetchingSuccess(formattedOrders));
+      yield put(userOrderFetchingSuccess(data?.orderData));
     } else {
-      console.log('not data in order');
+      yield put(userOrderFetchingSuccess([]));
     }
   } catch (error) {
     console.log('fetch_all_order_err', error.message);

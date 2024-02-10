@@ -12,5 +12,6 @@ export const SCREEN_NAMES = {
   VERIFY_CODE: 'VerifyCode',
   USER_COURSES_PAGE: 'UserCoursePage',
   COURSE_LEVEL_PAGE: 'CourseLevelPage',
-  COURSE_CONDUCT_PAGE:"CourseConductScreen"
+  COURSE_CONDUCT_PAGE: 'CourseConductScreen',
+  PAYMENT_SUCCESS: 'paymentSuccess',
 };

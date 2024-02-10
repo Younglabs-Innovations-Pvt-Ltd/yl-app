@@ -11,9 +11,14 @@ import {getCourseVideo} from '../../utils/api/yl.api';
 
 function* courseDetail({payload}) {
   try {
-    const {courseId} = payload;
+    console.log(payload);
+
+    const {courseId, country} = payload;
     // console.log("Getting coursid 3", courseId);
-    const response = yield call(getCourseDetails, courseId);
+    const response = yield call(getCourseDetails, {
+      courseId,
+      country,
+    });
     const data = yield response.json();
     yield put(fetchCourseSuccess({...data, courseId}));
   } catch (error) {

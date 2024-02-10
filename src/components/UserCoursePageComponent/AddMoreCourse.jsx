@@ -3,15 +3,14 @@ import {Pressable, StyleSheet} from 'react-native';
 import BottomSheetComponent from '../BottomSheetComponent';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import PopularCourses from './PopularCourses';
+import {Text, View} from 'react-native-animatable';
 
 const AddMoreCourse = ({
-  addMoreCourseCardbgColor,
   darkMode,
   bgSecondaryColor,
-  courses,
-  navigation
+  openCoursesSheet,
+  textColors,
 }) => {
-  const [sheetOpen, setSheetOpen] = useState(false);
   const styles = StyleSheet.create({
     borderStyle: {
       borderColor: '#b6abab',
@@ -28,25 +27,23 @@ const AddMoreCourse = ({
   });
   return (
     <>
-      <Pressable
-        onPress={() => {
-          setSheetOpen(true);
-        }}
-        style={[
-          styles.borderStyle,
-          styles.innerBorder,
-          {backgroundColor: darkMode ? bgSecondaryColor : '#d8d5d5'},
-        ]}
-        className="w-[95vw] h-[150px] rounded-lg  mt-3 flex justify-center items-center">
-        <MIcon name="plus-circle" size={30} color="gray" />
-      </Pressable>
-      <BottomSheetComponent
-
-        isOpen={sheetOpen}
-        Children={<PopularCourses courses={courses} navigation={navigation}/>}
-        onClose={() => setSheetOpen(false)}
-        snapPoint={['50%', '75%']}
-      />
+      <View className="h-[90%] ">
+        <Pressable
+          onPress={openCoursesSheet}
+          style={[
+            styles.borderStyle,
+            styles.innerBorder,
+            {backgroundColor: 'b6b6bc4f'},
+          ]}
+          className="w-[95vw] h-full rounded-lg  mt-3 flex justify-center items-center">
+          <MIcon name="plus-circle" size={30} color="gray" />
+          <Text
+            className="text-gray-600 font-semibold text-base"
+            style={{color: textColors.textSecondary}}>
+            Add More Courses
+          </Text>
+        </Pressable>
+      </View>
     </>
   );
 };

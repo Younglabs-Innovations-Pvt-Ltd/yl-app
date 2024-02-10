@@ -1,27 +1,10 @@
-import {
-  View,
-  Text,
-  Dimensions,
-  ImageBackground,
-  Pressable,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Dimensions} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import tw from 'twrnc';
-import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {FlatList, ScrollView} from 'react-native-gesture-handler';
+import {RefreshControl, ScrollView} from 'react-native-gesture-handler';
 import Spacer from '../components/spacer.component';
-import MainSwiper from '../components/MainScreenComponents/MainSwiper';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
-import {COLORS} from '../utils/constants/colors';
-import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
-import {setDarkMode} from '../store/app-theme/appThemeReducer';
-import Animated, {
-  useSharedValue,
-  withSpring,
-  withDelay,
-} from 'react-native-reanimated';
 import HeaderComponent, {ChangeAddedChild} from '../components/HeaderComponent';
 import {
   setDemoData,
@@ -30,130 +13,38 @@ import {
   setToInitialState,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import DemoDetailsScreen from '../components/MainScreenComponents/DemoDetailsScreen';
 import Demo from '../components/demo.component';
-import TapeTimer from '../components/TapeTimer';
-import PostDemoAction from '../components/join-demo-class-screen/post-demo-actions.component';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
-import {
-  getCoursesForWelcomeScreen,
-  setSelectedChild,
-} from '../store/welcome-screen/reducer';
-import {Button} from 'react-native-share';
-import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
-import RecordingCourseBanner from '../components/MainScreenComponents/RecordingCourseBanner';
 import SwiperSlide from '../components/MainScreenComponents/SwiperSlide';
 import {authSelector} from '../store/auth/selector';
-import Testimonial from '../components/MainScreenComponents/Testimonial';
-import {FONTS} from '../utils/constants/fonts';
 import BookDemoScreen from './book-demo-form.screen';
 import ShowCourses from '../components/MainScreenComponents/ShowCourses';
 import ReviewsAndTestimonials from '../components/MainScreenComponents/ReviewsAndTestimonials';
-import {fetchUser, setIsCustomer} from '../store/auth/reducer';
+import {fetchUserFormLoginDetails} from '../store/auth/reducer';
 import {localStorage} from '../utils/storage/storage-provider';
-import {LOCAL_KEYS} from '../utils/storage/local-storage-keys';
-import {Showtoast} from '../utils/toast';
-import {useToast} from 'react-native-toast-notifications';
+import {
+  getCoursesForWelcomeScreen,
+  startFetchingUserOrders,
+} from '../store/welcome-screen/reducer';
+import auth from '@react-native-firebase/auth';
+import {setIsFirstTimeUser} from '../store/user/reducer';
+import {userSelector} from '../store/user/selector';
+import {setDarkMode} from '../store/app-theme/appThemeReducer';
+
+// Shimmer effects
+import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+import LinearGradient from 'react-native-linear-gradient';
+import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import {navigate} from '../navigationRef';
+const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
 
-const handwritingCourses = [
-  {
-    name: 'English Cursive',
-    courseId: 'Eng_Hw',
-    icon: 'alpha-e',
-    showBookDemoScreen: true,
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
-  },
-  {
-    name: 'English Print',
-    icon: 'pinterest',
-    courseId: 'English_PrintHW',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2FEnglish_PrintHW%2FthimbnailUrl.webp?alt=media&token=b81a6eb1-e4bf-4e0c-af96-4659c0106422',
-  },
-  {
-    name: 'Hindi Handwriting',
-    icon: 'abugida-devanagari',
-    courseId: 'Maths_Learning',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/course%20cover%20pictures%2Freading.webp?alt=media&token=34617f04-1c15-4bff-a75e-8a6668ad373a',
-  },
-  {
-    name: 'English Cursive2',
-    icon: 'abjad-arabic',
-    courseId: 'Science_Learning',
-    description:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit in id lig ut enim ad minim veniam',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/courses%2Ftuition_homework%2FthimbnailUrl.png?alt=media&token=19d07140-4a86-4671-88c2-c50003868795',
-  },
-];
-
-const sectionHeadingStyle = '';
-
-const swiperData = [
-  {
-    name: 'Banner 1',
-    coverImage:
-      'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
-    type: 'course',
-    screenRedirectButton: '',
-    age_max: 14,
-    age_min: 5,
-    alternativeNameOnApp: 'English Handwriting',
-    courseAvailable: true,
-    courseAvailableType: 'both',
-    coverPicture:
-      'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
-    demoAvailable: true,
-    demoAvailableType: 'both',
-    duration_minutes: 60,
-    id: 'Eng_Hw',
-    live_classes: 24,
-    subheading:
-      'Handwriting improvement tutoring and fine motor skills practice for children who face problems with handwriting.',
-    title: 'English Cursive Handwriting Course',
-  },
-];
-
-const testimonials = [
-  {
-    name: 'Jhon Doe',
-    posted_on: '12-04-2022',
-    comment:
-      'lorem ipsum d Pellentesque habitant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am',
-    coverPictureLink: null,
-  },
-  {
-    name: 'Harry hess',
-    posted_on: '16-03-2023',
-    comment:
-      'lorementesque habi tant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am lorem ipsum adhf hadfiuh ',
-    coverPictureLink: null,
-  },
-  {
-    name: 'Simon dull',
-    posted_on: '16-03-2023',
-    comment:
-      'lorementesque habi tant morbi tristique senectus et netus et malesu faucibus et faucibus et feugiat labor lorem. Lorem ipsum dolor sit am lorem ipsum adhf hadfiuh ',
-    coverPictureLink: null,
-  },
-];
-
 const MainWelcomeScreen = ({navigation}) => {
-  const toast = useToast();
-  const {customer} = useSelector(authSelector);
+  const {customer, user} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimeover, setIsTimeover] = useState(false);
@@ -162,67 +53,99 @@ const MainWelcomeScreen = ({navigation}) => {
   const [showBookFreeClassSheet, setShowBookFreeClassSheet] = useState(false);
   const [showRescheduleClassSheet, setShowRescheduleClassSheet] =
     useState(false);
-
-  const {darkMode, bgColor, textColors, colorYlMain, bgSecondaryColor} =
-    useSelector(state => state.appTheme);
-
-  const {user} = useSelector(authSelector);
-  // console.log("user phone nym", user?.phone)
-  const {selectedChild} = useSelector(welcomeScreenSelector);
-
   const dispatch = useDispatch();
+  const [swiperData, setSwiperData] = useState([]);
+
+  const {bgColor, textColors, colorYlMain} = useSelector(
+    state => state.appTheme,
+  );
+  const {currentChild} = useSelector(userSelector);
+  const {courses, coursesLoading} = useSelector(welcomeScreenSelector);
+
+  const [refresh, setRefresh] = useState(false);
+
   const {
     demoData,
     loading,
     demoPhoneNumber,
     bookingDetails,
-    demoBookingId,
     teamUrl,
     isAttended,
-    isAttendenceMarked,
     bookingTime,
+    isNmi,
+    appRemark,
   } = useSelector(joinDemoSelector);
+  const {ipData} = useSelector(bookDemoSelector);
 
+  // filter courses to show on the banner
+  useEffect(() => {
+    if (courses) {
+      console.log('has courses');
+      let arr = [];
+      const course = courses || {};
+      Object.keys(course).map(key => {
+        arr.push(...course[key]);
+      });
+      const filteredCourse = arr.filter(course => course.id === 'Eng_Hw');
+      setSwiperData(filteredCourse);
+    }
+  }, [courses]);
+
+  // setting apptheme
+  useEffect(() => {
+    const payload = localStorage.getBoolean('darkModeEnabled');
+    console.log('setting darkmode', payload);
+
+    dispatch(setDarkMode(payload));
+  }, []);
+
+  // Fetching user details here
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');
-    console.log("login details in top", loginDetails)
     if (!user && loginDetails) {
-    console.log('fetching user...');
-    loginDetails = JSON.parse(loginDetails);
-    console.log('got login details: ' + loginDetails.loginType);
-
-    if (!loginDetails) {
-      Showtoast({
-        text: 'Failed To Load Data, please logout and login again',
-        toast,
-        type: 'danger',
-      });
-    }
-
-    console.log('login details is', loginDetails);
-    if (loginDetails.loginType === 'whatsAppNumber') {
-      console.log('getting user by', loginDetails.phone);
-      dispatch(fetchUser({phone: loginDetails.phone}));
-    } else if (loginDetails.loginType === 'customerLogin') {
-      console.log('getting user by', loginDetails.email);
-      dispatch(fetchUser({email: loginDetails.email}));
-      dispatch(setIsCustomer(true));
-    }
+      dispatch(fetchUserFormLoginDetails());
     }
   }, [user]);
 
+  // fetching user orders here
   useEffect(() => {
-    // console.log("running for selectedChild", selectedChild.bookingId)
-    if (selectedChild?.bookingId) {
-      dispatch(setToInitialState());
-      dispatch(startFetchBookingDetailsFromId(selectedChild.bookingId));
+    const getOrders = async () => {
+      console.log('gettting orders');
+      const token = await auth().currentUser?.getIdToken();
+      let body = {
+        leadId: user?.leadId,
+        token,
+      };
+      dispatch(startFetchingUserOrders(body));
+    };
+    if (customer == 'yes') {
+      getOrders();
+    }
+  }, [customer, user]);
+
+  // Fetching booking Details of user
+  useEffect(() => {
+    // console.log('running for selectedChild', selectedChild.bookingId);
+    if (currentChild) {
+      console.log(
+        'getting booking for ',
+        currentChild?.name,
+        currentChild.bookingId,
+      );
+      if (currentChild?.bookingId) {
+        setIsFirstTimeUser(false);
+        dispatch(setToInitialState());
+        dispatch(startFetchBookingDetailsFromId(currentChild?.bookingId));
+      } else {
+        dispatch(setIsFirstTimeUser(true));
+      }
     } else if (user?.phone) {
+      console.log('getting by phone');
       dispatch(startFetchBookingDetailsFromPhone(user.phone));
     }
-  }, [user, selectedChild]);
+  }, [user, currentChild]);
 
   // Demo actions useEffects here
-
   const getTimeRemaining = bookingDate => {
     const countDownTime = new Date(bookingDate).getTime();
     const now = Date.now();
@@ -242,22 +165,24 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (demoData && user?.phone) {
-      dispatch(setDemoData({demoData, phone: user?.phone}));
+    console.log('demo data here is');
+    if (demoData && user?.phone && bookingDetails) {
+      console.log('dispatching function');
+      dispatch(setDemoData({demoData, phone: user?.phone, bookingDetails}));
     }
-  }, [demoData, user]);
+  }, [demoData, user, isTimeover, bookingDetails]);
 
   useEffect(() => {
     if (!bookingTime) return;
     const isDemoOver =
-      new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
-
-    if (isDemoOver && isAttended && teamUrl) {
+      new Date(bookingTime).getTime() + 1000 * 60 * 10 <= Date.now();
+    // console.log('demoData is', bookingDetails);
+    if (isDemoOver && isAttended && teamUrl && !isNmi && !appRemark) {
       setShowPostActions(true);
     } else {
       setShowPostActions(false);
     }
-  }, [bookingTime, isAttended, teamUrl]);
+  }, [bookingTime, isAttended, teamUrl, isNmi, appRemark]);
 
   useEffect(() => {
     let timer;
@@ -286,13 +211,25 @@ const MainWelcomeScreen = ({navigation}) => {
 
   // Change Added Child actions
   const onChangeChildSheetOpen = () => {
-    console.log('opening'), setShowChangeChildView(true);
+    setShowChangeChildView(true);
   };
   const onChangeChildSheetClose = () => {
     setShowChangeChildView(false);
   };
 
-  // ---------
+  // ---------Referesh
+  const pullMe = () => {
+    setRefresh(true);
+    console.log('dispating refresh');
+    dispatch(fetchUserFormLoginDetails());
+    dispatch(
+      getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
+    );
+    dispatch;
+    setTimeout(() => {
+      setRefresh(false);
+    }, 3000);
+  };
 
   return (
     <View style={[tw`items-center flex-1 `, {backgroundColor: bgColor}]}>
@@ -301,9 +238,17 @@ const MainWelcomeScreen = ({navigation}) => {
         setShowAddChildView={setShowAddChildView}
         open={onChangeChildSheetOpen}
       />
-
-      {/* {console.log("showPostactions is", showPostActions)} */}
-      {!loading && (
+      {loading ? (
+        <View>
+          <ShimmerPlaceholder
+            shimmerWidthPercent={0.4}
+            style={{
+              width: width,
+              height: 80,
+              borderRadius: 8,
+            }}></ShimmerPlaceholder>
+        </View>
+      ) : (
         <View className="w-full" style={{backgroundColor: colorYlMain}}>
           <Demo
             timeLeft={timeLeft}
@@ -322,69 +267,55 @@ const MainWelcomeScreen = ({navigation}) => {
           flex: 1,
           width: width,
         }}
-        contentContainerStyle={{alignItems: 'center'}}>
-        {/* <TapeTimer timeLeft={timeLeft} isTimeover={isTimeover} /> */}
-
-        <SwiperFlatList
-          autoplay
-          autoplayDelay={9}
-          autoplayLoopKeepAnimation={true}
-          autoplayLoop
-          index={0}
-          showPagination={swiperData.length > 1}
-          className="relative"
-          paginationStyle={[tw`absolute`, {top: height - height / 3 - 40}]}
-          paginationStyleItem={tw`h-[4px] bg-gray-500`}
-          paginationActiveColor={'#000'}
-          paginationStyleItemActive={{backgroundColor: textColors.textYlMain}}
-          paginationStyleItemInactive={{backgroundColor: 'gray'}}
-          data={swiperData}
-          style={[
-            {
-              width: width,
-              position: 'relative',
-              height: height - height / 3 - 40,
-            },
-          ]}
-          contentContainerStyle={{overflow: 'hidden'}}
-          renderItem={item => (
-            <SwiperSlide item={item.item} navigation={navigation} />
-          )}
-        />
+        contentContainerStyle={{alignItems: 'center'}}
+        // refreshControl={
+        //   <RefreshControl refreshing={refresh} onRefresh={() => pullMe()} />
+        // }
+      >
+        {coursesLoading ? (
+          <View className="rounded-md p-2 items-center">
+            <ShimmerPlaceholder
+              shimmerWidthPercent={0.4}
+              style={{
+                borderRadius: 8,
+                width: width - 30,
+                height: height - height / 3 - 30,
+              }}></ShimmerPlaceholder>
+          </View>
+        ) : (
+          <SwiperFlatList
+            autoplay
+            autoplayDelay={9}
+            autoplayLoopKeepAnimation={true}
+            autoplayLoop
+            index={0}
+            showPagination={swiperData.length > 1}
+            className="relative"
+            paginationStyle={[tw`absolute`, {top: height - height / 3 - 40}]}
+            paginationStyleItem={tw`h-[4px] bg-gray-500`}
+            paginationActiveColor={'#000'}
+            paginationStyleItemActive={{backgroundColor: textColors.textYlMain}}
+            paginationStyleItemInactive={{backgroundColor: 'gray'}}
+            data={swiperData}
+            style={[
+              {
+                width: width,
+                position: 'relative',
+                height: height - height / 3 - 40,
+              },
+            ]}
+            contentContainerStyle={{overflow: 'hidden'}}
+            renderItem={item => (
+              <SwiperSlide item={item.item} navigation={navigation} />
+            )}
+          />
+        )}
 
         <Spacer space={8} />
-
         <ShowCourses navigation={navigation} />
-
         {/* Reviews And Testimonials Here */}
         <Spacer space={12} />
         <ReviewsAndTestimonials />
-
-        {/* Testimonials */}
-        <Spacer space={12} />
-        <View className="w-full">
-          <View>
-            <Text
-              className={`${sectionHeadingStyle}`}
-              style={[FONTS.heading, {color: textColors.textPrimary}]}>
-              What Our Customer Speak
-            </Text>
-          </View>
-          <View className="w-[100%] mt-1">
-            <FlatList
-              data={testimonials}
-              keyExtractor={item => item.name}
-              renderItem={item => {
-                return <Testimonial data={item.item} />;
-              }}
-              showsHorizontalScrollIndicator={false}
-              ItemSeparatorComponent={()=>{
-                return<View className="p-1"></View>
-              }}
-              horizontal
-            />
-          </View>
-        </View>
 
         <Spacer space={16} />
       </ScrollView>
@@ -392,8 +323,8 @@ const MainWelcomeScreen = ({navigation}) => {
       <BottomSheetComponent
         isOpen={showAddChildView}
         onClose={() => setShowAddChildView(false)}
-        Children={AddChildModule}
-        snapPoint={customer == 'yes' ? ['25%', '50%'] : ['50%', '90%']}
+        Children={<AddChildModule onClose={() => setShowAddChildView(false)} />}
+        snapPoint={['25%', '50%']}
       />
 
       {/* Change Child Sheet */}
@@ -411,8 +342,6 @@ const MainWelcomeScreen = ({navigation}) => {
         onClose={() => setShowBookFreeClassSheet(false)}
         Children={
           <BookDemoScreen
-            navigation={''}
-            data={{country: {callingCode: 91}, phone: 7668983758}}
             courseId={'Eng_Hw'}
             demoAvailableType={'both'}
             place={'bookFreeClass'}
@@ -427,8 +356,6 @@ const MainWelcomeScreen = ({navigation}) => {
         onClose={() => setShowRescheduleClassSheet(false)}
         Children={
           <BookDemoScreen
-            navigation={''}
-            data={{country: {callingCode: 91}, phone: 7668983758}}
             courseId={'Eng_Hw'}
             setSelectedTab={''}
             demoAvailableType={'both'}
@@ -442,59 +369,3 @@ const MainWelcomeScreen = ({navigation}) => {
 };
 
 export default MainWelcomeScreen;
-
-// Extra code and recorded course code
-
-{
-  /* English Learning courses here */
-}
-{
-  /* <Spacer space={0} />
-
-        <View style={tw`gap-[0px]  w-full py-1`}>
-          <View style={tw`gap-1 pl-2 pr-3 flex-row items-center`}>
-            <Text
-              className={`w-[80%] ${courseListHeadingStyle}`}
-              style={{color: textColors?.textPrimary}}>
-              English Learning
-            </Text>
-
-            <Pressable
-              className="flex-row items-center"
-              onPress={() => {
-                navigation.navigate('AllCoursesScreen', {
-                  courses: englishLearningCourses,
-                });
-              }}>
-              <Text className="font-semibold" style={{color: COLORS.pblue}}>
-                See all
-              </Text>
-              <MIcon name="chevron-right" size={22} color={COLORS.pblue} />
-            </Pressable>
-          </View>
-
-          <FlatList
-            data={englishLearningCourses}
-            keyExtractor={item => item.name}
-            renderItem={item => {
-              return (
-                <CourseItemRender data={item.item} navigation={navigation} />
-              );
-            }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={tw`pt-1 `}
-            className="h-[auto]"
-          />
-        </View> */
-}
-
-{
-  /* <Spacer space={8} />
-        <View
-          style={[
-            tw`w-[100%] flex-row gap-2 items-center rounded-lg justify-center items-center`,
-          ]}>
-          <RecordingCourseBanner navigation={navigation} />
-        </View> */
-}

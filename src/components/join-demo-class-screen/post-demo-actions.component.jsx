@@ -17,23 +17,19 @@ import {
   markNMI,
   saveRating,
   checkForRating,
-  setNMI,
   setIsAttended,
-  startMarkAttendace,
   setNotInterestedPopup,
 } from '../../store/join-demo/join-demo.reducer';
 
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {joinDemoSelector} from '../../store/join-demo/join-demo.selector';
 import ModalComponent from '../modal.component';
 import NotInterested from '../not-interested.component';
-import {localStorage} from '../../utils/storage/storage-provider';
 import {FONTS} from '../../utils/constants/fonts';
 import RatingStars from '../rating-stars';
+import {welcomeScreenSelector} from '../../store/welcome-screen/selector';
 
-const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
+const {width: deviceWidth} = Dimensions.get('window');
 
 const PostDemoAction = ({rescheduleClass}) => {
   const [rating, setRating] = useState(0);
@@ -49,9 +45,12 @@ const PostDemoAction = ({rescheduleClass}) => {
     isAttended,
     nmiLoading,
     isNmi,
-    attendanceLoading,
+    notInterestedPopup,
   } = useSelector(joinDemoSelector);
-  console.log("demoData is", demoData)
+
+  const {courses} = useSelector(welcomeScreenSelector);
+
+  // console.log("demoData is", demoData)
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -61,41 +60,6 @@ const PostDemoAction = ({rescheduleClass}) => {
   useEffect(() => {
     dispatch(checkForRating());
   }, []);
-
-  // Check for Attended
-  // useEffect(() => {
-  //   const checkAttended = async () => {
-  //     try {
-  //       const checkAttended = localStorage.getString(LOCAL_KEYS.SAVE_ATTENDED);
-
-  //       if (checkAttended) {
-  //         dispatch(setIsAttended(true));
-  //       }
-  //     } catch (error) {
-  //       console.log('POST_ACTION_CHECK_ATTENDED_ERROR=', error);
-  //     }
-  //   };
-
-  //   checkAttended();
-  // }, []);
-
-  // Check NMI
-  // useEffect(() => {
-  //   const checkNMI = async () => {
-  //     try {
-  //       const nmi = localStorage.getString(LOCAL_KEYS.NMI);
-  //       console.log('nmiAsync', nmi);
-  //       if (nmi) {
-  //         console.log('hit NMI');
-  //         dispatch(setNMI(true));
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   checkNMI();
-  // }, []);
 
   const scrollSlider = scrollToX => {
     sliderRef.current &&
@@ -108,9 +72,7 @@ const PostDemoAction = ({rescheduleClass}) => {
   };
 
   useEffect(() => {
-    console.log("isAttended=",isAttended , "isRated=",isRated , "isNmi=",isNmi)
     if (isAttended && !isRated) {
-      console.log('slided');
       scrollSlider(deviceWidth);
     } else if (isRated && !isNmi) {
       scrollSlider(deviceWidth * 2);
@@ -128,11 +90,6 @@ const PostDemoAction = ({rescheduleClass}) => {
     if (demoData) {
       dispatch(saveRating({bookingId: demoData.bookingId, rating: rated}));
     }
-
-    // const isClassJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
-    // if (isClassJoined) {
-    //   localStorage.delete(LOCAL_KEYS.JOIN_CLASS);
-    // }
   };
 
   // On change rating state
@@ -143,12 +100,17 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   // Marked need more info
   const markNeedMoreInfo = async () => {
-    dispatch(markNMI({bookingId: demoData.bookingId}));
+    // mark nmi and go to corresponding course details
+    dispatch(
+      markNMI({
+        bookingId: demoData.bookingId,
+        courses,
+        courseId: bookingDetails.courseId,
+      }),
+    );
   };
 
   const saveAttended = async () => {
-    // dispatch(startMarkAttendace({bookingId: demoData.bookingId}));
-    // localStorage.set(LOCAL_KEYS.SAVE_ATTENDED, 'attended_yes');
     dispatch(setIsAttended(true));
     scrollSlider(deviceWidth);
   };
@@ -223,6 +185,9 @@ const PostDemoAction = ({rescheduleClass}) => {
     dispatch(setNotInterestedPopup(true));
   };
 
+  const onCloseNotInterested = () => {
+    dispatch(setNotInterestedPopup(false));
+  };
   // if (ratingLoading || attendedLoading || loading) return null;
 
   return (
@@ -318,7 +283,7 @@ const PostDemoAction = ({rescheduleClass}) => {
         </View>
         {/* )} */}
         {/* {isNmi && ( */}
-        <View style={styles.container}>
+        {/* <View style={styles.container}>
           <TextWrapper color={COLORS.white} fs={18}>
             Give your child a gift of beautiful handwriting today!
           </TextWrapper>
@@ -336,7 +301,11 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={courseDetails}>
-              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Course details</TextWrapper>
+              <TextWrapper
+                ff={FONTS.primaryFont}
+                styles={{color: COLORS.pblue}}>
+                Course details
+              </TextWrapper>
             </Pressable>
             <Pressable
               style={({pressed}) => [
@@ -344,10 +313,14 @@ const PostDemoAction = ({rescheduleClass}) => {
                 {flex: 1, opacity: pressed ? 0.8 : 1},
               ]}
               onPress={batchDetails}>
-              <TextWrapper ff={FONTS.primaryFont} styles={{color:COLORS.pblue}}>Batch/Fee details</TextWrapper>
+              <TextWrapper
+                ff={FONTS.primaryFont}
+                styles={{color: COLORS.pblue}}>
+                Batch/Fee details
+              </TextWrapper>
             </Pressable>
           </View>
-        </View>
+        </View> */}
         {/* )} */}
       </ScrollView>
       <View
@@ -362,7 +335,7 @@ const PostDemoAction = ({rescheduleClass}) => {
             paddingTop: 8,
             gap: 8,
           }}>
-          {Array.from({length: 4}, (_, i) => {
+          {Array.from({length: 3}, (_, i) => {
             return (
               <View
                 style={[
@@ -377,6 +350,18 @@ const PostDemoAction = ({rescheduleClass}) => {
           })}
         </View>
       </View>
+
+      <ModalComponent
+        visible={notInterestedPopup}
+        animationType="slide"
+        onRequestClose={onCloseNotInterested}>
+        {bookingDetails && (
+          <NotInterested
+            onClose={onCloseNotInterested}
+            bookingDetails={bookingDetails}
+          />
+        )}
+      </ModalComponent>
     </React.Fragment>
   );
 };
@@ -430,7 +415,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    borderRadius: 4,
+    borderRadius: 50,
   },
   dotIndicator: {
     width: 8,
