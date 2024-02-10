@@ -20,19 +20,15 @@ import {
   setJoinClassErrorMsg,
 } from '../store/join-demo/join-demo.reducer';
 import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
-import {i18nContext} from '../context/lang.context';
 import Modal from './modal.component';
 import BookDemoSlots from '../screens/book-demo-slots.screen';
-import {useNavigation} from '@react-navigation/native';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
 import {TextInput} from 'react-native-gesture-handler';
-import {userSelector} from '../store/user/selector';
 
 const {height: deviceHeight} = Dimensions.get('window');
 
-const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
+const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
   const [childName, setChildName] = useState('');
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -50,9 +46,9 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
     isClassOngoing,
     joinClassLoading,
     joinClassErrorMsg,
+    teamUrl,
+    isAttended,
   } = useSelector(joinDemoSelector);
-
-  const {isFirstTimeUser} = useSelector(userSelector);
 
   /**
    * @author Shobhit
@@ -104,13 +100,8 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
     setChildName(e);
   };
 
-  const onOpen = () => setOpen(true);
   const onClose = () => setOpen(false);
 
-  const onOpenForm = () => setVisible(true);
-  const onCloseForm = () => setVisible(false);
-
-  // console.log("demodata is" , demoData)
   // Join Class
   const handleJoinClass = async () => {
     // console.log("first");
@@ -126,11 +117,6 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
 
     return new Date(bookingTime).getTime() > Date.now();
   }, [bookingTime]);
-
-  // show join button to join class
-  // const SHOW_JOIN_BUTTON = useMemo(() => {
-  //   return isClassOngoing;
-  // }, [isClassOngoing]);
 
   // If there is no child name in booking details
   // then show input field for childname
@@ -161,45 +147,37 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
     ) : (
       ''
     );
-    // <TextWrapper
-    //   color={COLORS.white}
-    //   fs={20}
-    //   ff={FONTS.signika_semiBold}
-    //   styles={{marginBottom: 12}}>
-    //   Class is on going, Join now.
-    // </TextWrapper>
   }, [cn, childName, message]);
 
-  // const NEW_BOOKING = useMemo(() => {
-  //   if (isFirstTimeUser) {
-  //     return (
-  //       <View style={{padding: 4}} className="flex-row justify-between">
-  //         <View>
-  //           <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
-  //             Improve your child's handwriting
-  //           </TextWrapper>
-  //           <TextWrapper fs={16} color={COLORS.white}>
-  //             Book your first free Handwriting Class.
-  //           </TextWrapper>
-  //         </View>
-  //         <View className="h-full items-center justify-center">
-  //           <Pressable
-  //             // onPress={()=>{openBottomSheet}}
-  //             onPress={() => sheetOpen()}
-  //             className="bg-white text-blue-500 py-2 px-3 rounded-md">
-  //             <Text
-  //               className="font-semibold"
-  //               style={{color: textColors.textYlMain}}>
-  //               Book Now
-  //             </Text>
-  //           </Pressable>
-  //         </View>
-  //       </View>
-  //     );
-  //   } else {
-  //     return null;
-  //   }
-  // }, [demoData, onOpenForm]);
+  // If demo is over and user didn't join
+  const SHOW_RESCHEDULE = useMemo(() => {
+    if (!bookingTime) {
+      return null;
+    }
+
+    if (moment().isAfter(moment(bookingTime)) && !teamUrl) {
+      return (
+        <View style={{padding: 16}}>
+          <TextWrapper color={COLORS.white} ff={FONTS.primaryFont} fs={15}>
+            You missed your class. You can reschedule next class.
+          </TextWrapper>
+          <Pressable
+            style={({pressed}) => [
+              styles.paButton,
+              {
+                opacity: pressed ? 0.7 : 1,
+                marginTop: 6,
+              },
+            ]}
+            onPress={rescheduleClass}>
+            <TextWrapper color={'#434a52'} fs={16.5} ff={FONTS.primaryFont}>
+              Reschedule
+            </TextWrapper>
+          </Pressable>
+        </View>
+      );
+    }
+  }, [teamUrl, bookingTime, isAttended, rescheduleClass]);
 
   return (
     <ScrollView
@@ -240,6 +218,8 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
         </View>
       )}
 
+      {SHOW_RESCHEDULE}
+
       {
         // If user attended demo class
         // Demo has ended
@@ -251,7 +231,7 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
         )
       }
 
-      <Modal animationType="fade" visible={open} onRequestClose={onClose}>
+      {/* <Modal animationType="fade" visible={open} onRequestClose={onClose}>
         <View
           style={{
             flex: 1,
@@ -275,7 +255,7 @@ const Demo = ({timeLeft, showPostActions, sheetOpen, openResheduleSheet}) => {
             />
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </ScrollView>
   );
 };
@@ -299,5 +279,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     paddingVertical: 16,
     borderRadius: 6,
+  },
+  paButton: {
+    paddingHorizontal: 2,
+    paddingVertical: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 50,
   },
 });
