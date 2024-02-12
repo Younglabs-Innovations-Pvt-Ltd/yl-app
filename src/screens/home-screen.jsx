@@ -36,7 +36,6 @@ import TextWrapper from '../components/text-wrapper.component';
 
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 import Demo from '../components/demo.component';
-import Reviews from '../components/reviews.component';
 import VideoPlayer from '../components/video.component';
 
 // Icons

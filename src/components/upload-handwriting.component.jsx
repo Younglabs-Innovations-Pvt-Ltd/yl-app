@@ -8,7 +8,7 @@ import {
   View,
   Alert,
   Linking,
-  Text
+  Text,
 } from 'react-native';
 import Storage from '@react-native-firebase/storage';
 import RNFS from 'react-native-fs';
@@ -35,7 +35,9 @@ const UploadHandwriting = ({demoData}) => {
   const [visibleOptions, setVisibleOptions] = useState(false);
 
   const {selectedImage, modalVisible} = useSelector(uploadSelector);
-  const {darkMode, bgColor, textColors , colorYlMain} = useSelector(state => state.appTheme);
+  const {darkMode, bgColor, textColors, colorYlMain} = useSelector(
+    state => state.appTheme,
+  );
   const dispatch = useDispatch();
 
   const pickFile = async () => {
@@ -101,13 +103,6 @@ const UploadHandwriting = ({demoData}) => {
     }
   };
 
-  // useEffect(() => {
-  //   if (selectedImage) {
-  //     setVisible(true);
-  //     setVisibleOptions(false);
-  //   }
-  // }, [selectedImage]);
-
   const uploadHandwritingImage = async () => {
     try {
       setLoading(true);
@@ -133,15 +128,7 @@ const UploadHandwriting = ({demoData}) => {
           image: downloadUrl,
         });
         const data = await res.json();
-        console.log('data', data);
         setLoading(false);
-        // Alert.alert('Image uploaded successfully', '', [
-        //   {
-        //     text: 'OK',
-        //     onPress: onClose,
-        //   },
-        // ]);
-
         Snackbar.show({
           text: 'Image uploaded',
           textColor: COLORS.white,
@@ -170,8 +157,6 @@ const UploadHandwriting = ({demoData}) => {
     setVisibleOptions(true);
   };
 
-  
-
   return (
     <View style={{}}>
       <View style={{}} className="justify-center">
@@ -181,16 +166,16 @@ const UploadHandwriting = ({demoData}) => {
             styles.btnUpload,
             {opacity: pressed ? 0.9 : 1},
           ]}
-          className="flex-col items-center"
-          >
+          className="flex-col items-center">
           <Icon name="camera" size={24} color={COLORS.white} />
-          <TextWrapper color={COLORS.black} fs={13} className="text-center text-[12px] text-white">
+          <TextWrapper
+            color={COLORS.black}
+            fs={13}
+            className="text-center text-[12px] text-white">
             upload handwriting
           </TextWrapper>
         </Pressable>
-        
       </View>
-
 
       <ModalComponent
         visible={visibleOptions}
@@ -320,7 +305,6 @@ const UploadHandwriting = ({demoData}) => {
           </View>
         </View>
       </ModalComponent>
-      
     </View>
   );
 };
