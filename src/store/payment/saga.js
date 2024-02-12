@@ -276,14 +276,17 @@ function* makeSoloPaymentSaga({payload}) {
       const token = yield auth().currentUser.getIdToken();
       const url =
         'https://f55b-2401-4900-1c5c-3da3-1964-c1bc-473e-5467.ngrok-free.app';
-      const response = yield fetch(`${url}/shop/orderhandler/makepayment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token,
+      const response = yield fetch(
+        `${BASE_URL}/shop/orderhandler/makepayment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+          },
+          body: JSON.stringify(body),
         },
-        body: JSON.stringify(body),
-      });
+      );
 
       const data = yield response.json();
 
@@ -294,7 +297,7 @@ function* makeSoloPaymentSaga({payload}) {
 
       const {amount, id: order_id, currency} = data.order;
 
-      yield fetch(`${url}/shop/orderhandler/addToBag`, {
+      yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

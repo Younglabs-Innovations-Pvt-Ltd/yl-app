@@ -19,6 +19,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {FONTS} from '../utils/constants/fonts';
 import {useDispatch} from 'react-redux';
 import {fetchUserFormLoginDetails} from '../store/auth/reducer';
+import {CommonActions} from '@react-navigation/native';
 
 const EmailLogin = ({navigation}) => {
   const dispatch = useDispatch();
@@ -51,7 +52,12 @@ const EmailLogin = ({navigation}) => {
       setLoginLoading(false);
       resetForm();
       dispatch(fetchUserFormLoginDetails());
-      navigation.navigate(SCREEN_NAMES.MAIN);
+
+      const resetActions = CommonActions.reset({
+        index: 0,
+        routes: [{name: SCREEN_NAMES.MAIN}],
+      });
+      navigation.dispatch(resetActions);
     } catch (error) {
       setLoginLoading(false);
       Showtoast({text: 'Email or Password Incorrect', toast, type: 'danger'});

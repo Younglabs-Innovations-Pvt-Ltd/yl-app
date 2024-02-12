@@ -88,11 +88,7 @@ function* fetchUserSaga({payload}) {
 
     yield put(setUser(data?.data));
   } catch (error) {
-    console.log(
-      'FETCH_USER_ERROR',
-      'Something went wrong, try again later.',
-      error.message,
-    );
+    console.log('FETCH_USER_ERROR', payload, error.message);
   }
 }
 
