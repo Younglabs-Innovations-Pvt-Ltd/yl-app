@@ -81,7 +81,8 @@ const UserCoursesPage = ({navigation}) => {
 
   return (
     <View className="flex-1" style={{backgroundColor: bgColor}}>
-      {userOrdersLoading ? (
+      {
+      userOrdersLoading ? (
         <CourseLoadingSkeleton />
       ) : userOrderLoadingFailed ? (
         <View className="w-full items-center mt-6">
@@ -123,8 +124,8 @@ const UserCoursesPage = ({navigation}) => {
             </View>
           ) : (
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
-              <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4">
-                {userName} Doesn't Have Any Course
+              <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4 capitalize">
+                {currentChild?.name} Doesn't Have Any Course
               </Text>
             </View>
           )}
@@ -159,7 +160,8 @@ const UserCoursesPage = ({navigation}) => {
             snapPoint={['50%', '75%']}
           />
         </View>
-      )}
+      )
+      }
     </View>
   );
 };

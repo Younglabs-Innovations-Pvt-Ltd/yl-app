@@ -70,15 +70,15 @@ const OneToOneDemoBook = ({}) => {
 
   const dateCheckPassed = date => {
     const dateSelectd = moment(date);
-    const currentDate = moment();
+    const dateToStartBooking = moment().add(1 , "days");
 
-    if (dateSelectd.isBefore(currentDate)) {
+    if (dateSelectd.isBefore(dateToStartBooking)) {
       console.log('select date from today onwards');
-      Showtoast({text: 'Select date from today', toast});
+      Showtoast({text: 'Select date from Tomorrow onwards', toast});
       return false;
     }
 
-    const differenceInDays = dateSelectd.diff(currentDate, 'days');
+    const differenceInDays = dateSelectd.diff(dateToStartBooking, 'days');
     if (differenceInDays > 7) {
       Showtoast({text: 'Choose Demo date between 7 days span', toast});
       return false;

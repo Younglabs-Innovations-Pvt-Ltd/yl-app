@@ -57,7 +57,7 @@ const bookingSteps = [
   },
 ];
 
-const BookDemoScreen = ({courseId, setSelectedTab, place , courseData}) => {
+const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
   const toast = useToast();
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
@@ -65,11 +65,9 @@ const BookDemoScreen = ({courseId, setSelectedTab, place , courseData}) => {
   const [fields, setFields] = useState(INITIAL_sTATE);
   const [currentStep, setCurrentStep] = useState(1);
   const [isCurrentStepDataFilled, setIsCurrentStepDataFilled] = useState(false);
-  const [selectedDemoType, setSelectedDemoType] = useState('solo');
+  const [selectedDemoType, setSelectedDemoType] = useState('');
   const [showAddChildView, setShowAddChildView] = useState(false);
-  const {textColors, bgSecondaryColor, bgColor, darkMode} = useSelector(
-    state => state.appTheme,
-  );
+  const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
 
   const navigation = useNavigation();
   const {
@@ -85,6 +83,19 @@ const BookDemoScreen = ({courseId, setSelectedTab, place , courseData}) => {
 
   const phone = user?.phone;
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (courseData?.demoAvailable) {
+      if (
+        courseData?.demoTypeAvailable == 'solo' ||
+        courseData?.demoTypeAvailable == 'both'
+      ) {
+        setSelectedDemoType('solo');
+      } else {
+        setSelectedDemoType('group');
+      }
+    }
+  }, [courseData]);
 
   useEffect(() => {
     if (user?.fullName && user?.fullName?.length > 2) {
@@ -279,63 +290,74 @@ const BookDemoScreen = ({courseId, setSelectedTab, place , courseData}) => {
         <View
           className="p-2 my-2 w-full items-start rounded-md"
           style={{backgroundColor: bgSecondaryColor}}>
-          <View className="flex-row items-center">
-            <CheckBox
-              disabled={false}
-              value={selectedDemoType === 'group'}
-              tintColors={{
-                true: textColors.textYlMain,
-                false: textColors.textSecondary,
-              }}
-              onValueChange={() => setSelectedDemoType('group')}
-            />
-            <View className="flex-row flex-1 flex-wrap items-center">
-              <Text
-                className={`text-[12px]`}
-                style={[
-                  {color: textColors.textYlMain, fontFamily: FONTS.primaryFont},
-                ]}>
-                Group Demo:
-              </Text>
-              <Text
-                className="text-[12px]"
-                style={{
-                  color: textColors.textSecondary,
-                  fontFamily: FONTS.primaryFont,
-                }}>
-                Demo conducted with a group of 5-10 Students
-              </Text>
+          {(courseData?.demoTypeAvailable === 'group' ||
+            courseData?.demoTypeAvailable === 'both') && (
+            <View className="flex-row items-center">
+              <CheckBox
+                disabled={false}
+                value={selectedDemoType === 'group'}
+                tintColors={{
+                  true: textColors.textYlMain,
+                  false: textColors.textSecondary,
+                }}
+                onValueChange={() => setSelectedDemoType('group')}
+              />
+
+              <View className="flex-row flex-1 flex-wrap items-center">
+                <Text
+                  className={`text-[12px]`}
+                  style={[
+                    {
+                      color: textColors.textYlMain,
+                      fontFamily: FONTS.primaryFont,
+                    },
+                  ]}>
+                  Group Demo:
+                </Text>
+                <Text
+                  className="text-[12px]"
+                  style={{
+                    color: textColors.textSecondary,
+                    fontFamily: FONTS.primaryFont,
+                  }}>
+                  Demo conducted with a group of 5-10 Students
+                </Text>
+              </View>
             </View>
-          </View>
-          <View className="flex-row items-center">
-            <CheckBox
-              disabled={false}
-              value={selectedDemoType === 'solo'}
-              tintColors={{
-                true: textColors.textYlMain,
-                false: textColors.textSecondary,
-              }}
-              onValueChange={() => setSelectedDemoType('solo')}
-            />
-            <View className="flex-row flex-1 flex-wrap items-center ">
-              <Text
-                className={`text-[12px]`}
-                style={{
-                  color: textColors.textYlMain,
-                  fontFamily: FONTS.primaryFont,
-                }}>
-                One To One Demo:
-              </Text>
-              <Text
-                className="text-[12px] "
-                style={{
-                  color: textColors.textSecondary,
-                  fontFamily: FONTS.primaryFont,
-                }}>
-                Demo conducted 1-1 only
-              </Text>
+          )}
+
+          {(courseData?.demoTypeAvailable === 'solo' ||
+            courseData?.demoTypeAvailable === 'both') && (
+            <View className="flex-row items-center">
+              <CheckBox
+                disabled={false}
+                value={selectedDemoType === 'solo'}
+                tintColors={{
+                  true: textColors.textYlMain,
+                  false: textColors.textSecondary,
+                }}
+                onValueChange={() => setSelectedDemoType('solo')}
+              />
+              <View className="flex-row flex-1 flex-wrap items-center ">
+                <Text
+                  className={`text-[12px]`}
+                  style={{
+                    color: textColors.textYlMain,
+                    fontFamily: FONTS.primaryFont,
+                  }}>
+                  One To One Demo:
+                </Text>
+                <Text
+                  className="text-[12px] "
+                  style={{
+                    color: textColors.textSecondary,
+                    fontFamily: FONTS.primaryFont,
+                  }}>
+                  Demo conducted 1-1 only
+                </Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         <View className="w-full py-2 items-center">
@@ -644,4 +666,3 @@ const ThirdStpDetails = ({
     </>
   );
 };
-

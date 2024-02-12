@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Dimensions, View, Text, Pressable} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, View, Text, Pressable, Image} from 'react-native';
 import {COLORS} from '../../utils/constants/colors';
 import {useSelector} from 'react-redux';
 import UploadHandwriting from '../upload-handwriting.component';
@@ -7,25 +7,16 @@ import ModalComponent from '../modal.component';
 import Email from '../email.component';
 import Icon from '../icon.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'April',
-  'May',
-  'June',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+import Animated, {
+  useSharedValue,
+  withDelay,
+  withSpring,
+} from 'react-native-reanimated';
 
 const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 
 const DemoWaiting = ({timeLeft}) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [visibleEmail, setVisibleEmail] = useState(false);
   const {demoData} = useSelector(state => state.joinDemo);
 
@@ -38,44 +29,44 @@ const DemoWaiting = ({timeLeft}) => {
 
   if (!demoData) return;
 
+  const collapsibleClick = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
-    <View className="items-center">
-      <View className="flex-row items-end p-1">
-        <View className="flex-col w-[75%]">
-          <Text className="text-xs text-white">
-            Your First free dmeo class will start in
-          </Text>
-          <View className="flex-row mt-1">
-            <CountDownTimer timeLeft={timeLeft} />
-          </View>
+    <View className="relative">
+      {!isCollapsed && (
+        <View className="absolute top-0 right-0 bg-white z-50">
+          <MIcon
+            name={
+              isCollapsed
+                ? 'arrow-down-drop-circle-outline'
+                : 'arrow-up-drop-circle-outline'
+            }
+            color={'gray'}
+            size={15}
+            className=""
+            onPress={() => {
+              console.log('here'), collapsibleClick();
+            }}
+          />
         </View>
+      )}
 
-        <View className="w-[25%]">
-          <UploadHandwriting demoData={demoData} />
+      {isCollapsed && (
+        <View className="py-1 px-2 flex-row">
+          <ShortTape timeLeft={timeLeft} setIsCollapsed={setIsCollapsed} />
         </View>
-      </View>
+      )}
 
-      <View className="w-full p-1">
-        <Pressable
-          style={({pressed}) => [
-            {
-              width: '100%',
-              backgroundColor: 'white',
-              paddingVertical: 8,
-              borderRadius: 4,
-              justifyContent: 'center',
-              flexDirection: 'row',
-              alignItems: 'center',
-            },
-            {opacity: pressed ? 0.9 : 1},
-          ]}
-          onPress={onVisibleEmail}>
-          <MIcon name="gmail" size={24} color={COLORS.pblue} />
-          <Text style={{color: COLORS.pblue}} className="ml-2 text-base">
-            Get link on email
-          </Text>
-        </Pressable>
-      </View>
+      {!isCollapsed && (
+        <LongTape
+          timeLeft={timeLeft}
+          demoData={demoData}
+          onVisibleEmail={onVisibleEmail}
+        />
+      )}
+
       <ModalComponent visible={visibleEmail}>
         <View
           style={{
@@ -111,6 +102,76 @@ const DemoWaiting = ({timeLeft}) => {
 
 export default DemoWaiting;
 
+const LongTape = ({timeLeft, demoData, onVisibleEmail}) => {
+  const gmailIcon = require('../../assets/icons/gmailIcon.png');
+
+  const marginBottom = useSharedValue(-30);
+  const opacity = useSharedValue(0);
+
+  const animate = () => {
+    marginBottom.value = withDelay(400, withSpring(0));
+    opacity.value = withDelay(400, withSpring(1));
+  };
+  useEffect(() => {
+    animate();
+  }, []);
+  return (
+    <Animated.View
+      style={{
+        marginBottom: marginBottom,
+        opacity: opacity,
+      }}>
+      <View className="flex-row items-end justify-between py-1 px-2">
+        <View className="flex-col">
+          <Text className="text-xs text-white">
+            Your First free dmeo class will start in
+          </Text>
+          <View className="flex-row mt-1">
+            <CountDownTimer timeLeft={timeLeft} />
+          </View>
+        </View>
+
+        <View className="flex-row px-1 items-end justify-end mr-3">
+          <View className="">
+            <UploadHandwriting demoData={demoData} />
+          </View>
+          <View className="justify-end ml-3">
+            <Pressable
+              style={({pressed}) => [
+                {
+                  alignItems: 'center',
+                  justifyContent: 'end',
+                },
+                {opacity: pressed ? 0.9 : 1},
+              ]}
+              className="flex-col items-center justify-end"
+              onPress={onVisibleEmail}>
+              <Image
+                source={gmailIcon}
+                style={{
+                  width: 25,
+                  height: 20,
+                  resizeMode: 'cover',
+                }}
+              />
+              <Text
+                style={{color: COLORS.white}}
+                className="text-[12px] leading-[12px] mt-1">
+                Email
+              </Text>
+              <Text
+                style={{color: COLORS.white}}
+                className="text-[12px] leading-[12px]">
+                link
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Animated.View>
+  );
+};
+
 const CountDownTimer = ({timeLeft}) => {
   return Object.entries(timeLeft)
     .filter(entry => entry[0] !== 'remainingTime')
@@ -123,14 +184,76 @@ const CountDownTimer = ({timeLeft}) => {
         <View
           key={label}
           style={[]}
-          className="flex-col rounded-md bg-white mr-1 w-[60px] items-center justify-center">
-          <Text className="text-gray-700 font-semibold text-[18px] text-center">
+          className="flex-col rounded-md bg-white mr-1 px-2 py-1 items-center justify-center">
+          <Text className="text-gray-700 font-semibold text-[15px] text-center leading-[16px]">
             {zeroPrefix(value)}
           </Text>
-          <Text className="text-center text-[12px] text-gray-600">
+          <Text className="text-center text-[10px] text-gray-600 leading-[11px]">
             {updatedLabel}
           </Text>
         </View>
       );
     });
+};
+
+const CountDownTimer2 = ({timeLeft}) => {
+  return Object.entries(timeLeft)
+    .filter(entry => entry[0] !== 'remainingTime')
+    .map(time => {
+      const label = time[0];
+      const value = time[1];
+      const updatedLabel = label.slice(0, 1).toUpperCase() + label.slice(1);
+
+      return (
+        <View
+          className="flex-row rounded-md mr-1 items-end justify-center"
+          key={label}>
+          <Text className="text-white font-semibold text-[15px] text-center leading-[16px]">
+            {zeroPrefix(value)}
+          </Text>
+          {updatedLabel?.toLowerCase() !== 'seconds' && (
+            <Text className="text-white font-semibold text-[15px] text-center leading-[16px ml-[2px]">
+              :
+            </Text>
+          )}
+        </View>
+      );
+    });
+};
+
+const ShortTape = ({timeLeft, setIsCollapsed}) => {
+  const marginBottom = useSharedValue(-10);
+  const opacity = useSharedValue(0);
+
+  const animate = () => {
+    marginBottom.value = withDelay(100, withSpring(0));
+    opacity.value = withDelay(100, withSpring(1));
+  };
+  useEffect(() => {
+    animate();
+  }, []);
+
+  return (
+    <Animated.View
+      style={{
+        marginBottom: marginBottom,
+        flex: 1,
+        opacity: opacity,
+        flexDirection: 'row',
+      }}>
+      <Pressable
+        className="flex-row w-full items-center justify-between"
+        onPress={() => {
+          console.log('clickded'), setIsCollapsed(false);
+        }}>
+        <View className="flex-row">
+          <Text className="text-white font-semibold mr-2">
+            Class Starts in:
+          </Text>
+          <CountDownTimer2 timeLeft={timeLeft} />
+        </View>
+        <MIcon name="chevron-down" size={20} color="white" />
+      </Pressable>
+    </Animated.View>
+  );
 };

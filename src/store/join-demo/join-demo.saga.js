@@ -63,10 +63,10 @@ const TAG = 'JOIN_DEMO_SAGA_ERROR';
  * Also fetch booking details
  * Save phone number to local storage
  */
-export function* fetchDemoDetailsFromPhone() {
+export function* fetchDemoDetailsFromPhone({payload}) {
   try {
     const token = yield getCurrentDeviceId();
-    const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
+    const phone = payload?.phone;
 
     if (!phone) {
       yield put(setLoading(false));

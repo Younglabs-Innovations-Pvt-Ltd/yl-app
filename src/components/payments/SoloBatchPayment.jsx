@@ -42,7 +42,7 @@ const SoloBatchPayment = ({
   levelNames,
 }) => {
   const toast = useToast();
-  const {textColors, bgColor, bgSecondaryColor} = useSelector(
+  const {textColors, bgColor, bgSecondaryColor , darkMode} = useSelector(
     state => state.appTheme,
   );
   const [visible, setVisible] = useState(false);
@@ -108,21 +108,27 @@ const SoloBatchPayment = ({
   const hideDatePicker = () => setVisible(false);
 
   const setSelectedDate = date => {
+    const dateSelectd = moment(date);
+    const dateToStartBatch = moment().add(1, 'days');
+
+    if (dateSelectd.isBefore(dateToStartBatch)) {
+      console.log('select date from today onwards');
+      Showtoast({text: 'Select date from Tomorrow onwards', toast ,type:"danger"});
+      return;
+    }
+
+    const differenceInDays = dateSelectd.diff(dateToStartBatch, 'days');
+    if (differenceInDays > 15) {
+      Showtoast({text: 'Choose Demo date between 15 days span', toast , type:"danger"});
+      return;
+    }
+
     hideDatePicker();
     setDate(date);
     dispatch(setCurrentSelectedBatch({startDate: date, type: 'solo'}));
   };
 
-  const {price, strikeThroughPrice, currentAgeGroup} =
-    useSelector(courseSelector);
-
-  const makeAgeGroup = age => {
-    return ageGroups.find(group => {
-      const maxAge = group.split('-')[1];
-      const minAge = group.split('-')[0];
-      if (age >= parseInt(minAge) && age <= parseInt(maxAge)) return group;
-    });
-  };
+  const {currentAgeGroup} = useSelector(courseSelector);
 
   async function onGoogleButtonPress() {
     try {
@@ -180,11 +186,11 @@ const SoloBatchPayment = ({
     console.log('i am here', courseDetails?.course_type);
     if (courseDetails?.course_type == 'curriculum') {
       let classes = levelText.split(' ')[0];
-      classes = parseInt(classes);;
-      if  (isNaN(classes))  {
+      classes = parseInt(classes);
+      if (isNaN(classes)) {
         return;
-      }  else  {
-        setClassCount(classes);;
+      } else {
+        setClassCount(classes);
       }
     }
   };
@@ -216,7 +222,7 @@ const SoloBatchPayment = ({
 
           <View
             className="py-4 rounded mt-5"
-            style={{backgroundColor: bgSecondaryColor}}>
+            style={{backgroundColor:darkMode ? bgSecondaryColor : "#80808017" }}>
             <View className="">
               <Text
                 className="text-center w-full font-semibold text-xl"
@@ -282,8 +288,7 @@ const SoloBatchPayment = ({
                             price: obj?.offer,
                           });
                       }}
-                      key={Math.random()}
-                      >
+                      key={Math.random()}>
                       <View className="items-center justify-center flex-1">
                         <Text
                           className="font-semibold text-[16px] leading-[18px] text-center"

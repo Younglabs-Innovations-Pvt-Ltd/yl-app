@@ -95,12 +95,6 @@ const UserProfile = ({navigation}) => {
           className="flex-row items-center px-3 py-1  border rounded-full"
           style={{borderColor: textColors?.textYlMain}}
           onPress={() => {
-            const resetAction = CommonActions.reset({
-              index: 0,
-              routes: [{name: 'Welcome'}],
-            });
-
-            navigation.dispatch(resetAction);
             dispatch(logout());
           }}>
           <MIcon name="logout" size={20} color={textColors.textYlMain} />

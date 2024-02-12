@@ -126,23 +126,26 @@ const MainWelcomeScreen = ({navigation}) => {
 
   // Fetching booking Details of user
   useEffect(() => {
-    // console.log('running for selectedChild', selectedChild.bookingId);
-    if (currentChild) {
-      console.log(
-        'getting booking for ',
-        currentChild?.name,
-        currentChild.bookingId,
-      );
-      if (currentChild?.bookingId) {
-        setIsFirstTimeUser(false);
-        dispatch(setToInitialState());
-        dispatch(startFetchBookingDetailsFromId(currentChild?.bookingId));
-      } else {
-        dispatch(setIsFirstTimeUser(true));
+    if (customer !== 'yes') {
+      if (currentChild) {
+        console.log(
+          'getting booking for ',
+          currentChild?.name,
+          currentChild.bookingId,
+        );
+        if (currentChild?.bookingId) {
+          setIsFirstTimeUser(false);
+          dispatch(setToInitialState());
+          dispatch(startFetchBookingDetailsFromId(currentChild?.bookingId));
+        } else {
+          dispatch(setIsFirstTimeUser(true));
+        }
+      } else if (user?.phone) {
+        dispatch(startFetchBookingDetailsFromPhone({phone:user?.phone}));
       }
-    } else if (user?.phone) {
-      console.log('getting by phone');
-      dispatch(startFetchBookingDetailsFromPhone());
+    } else if (user?.phone && customer == 'yes') {
+      console.log('is customer yes and getting details from phone');
+      dispatch(startFetchBookingDetailsFromPhone({phone:user?.phone}));
     }
   }, [user, currentChild]);
 
@@ -194,10 +197,6 @@ const MainWelcomeScreen = ({navigation}) => {
           clearInterval(timer);
           return;
         }
-
-        // if (new Date(bookingTime).getTime() - 1000 <= new Date().getTime()) {
-        //   dispatch(startFetchBookingDetailsFromPhone(demoPhoneNumber));
-        // }
 
         // set time to show
         setTimeLeft(remaining);

@@ -142,6 +142,7 @@ function* fetchUserListener() {
 }
 
 function* logoutFunc() {
+  resetNavigation();
   localStorage.clearAll();
 
   const currentUser = auth().currentUser;
@@ -149,7 +150,6 @@ function* logoutFunc() {
     yield auth().signOut();
   }
 
-  resetNavigation();
   // navigate(SCREEN_NAMES.WELCOME);
 }
 

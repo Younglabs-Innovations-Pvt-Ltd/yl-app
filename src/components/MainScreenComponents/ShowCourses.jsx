@@ -127,7 +127,7 @@ const CourseItemRender = ({data, navigation}) => {
             courseData: data,
           });
         }}>
-        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[110px]">
+        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[115px]">
           <ImageBackground
             source={{
               uri:
@@ -137,9 +137,9 @@ const CourseItemRender = ({data, navigation}) => {
             style={[{flex: 1, resizeMode: 'cover'}]}
             className="w-[100%] rounded h-full justify-center items-center">
             <LinearGradient
-              colors={['#00000014', '#000000db']}
+              colors={['#00000014', '#000']}
               className="w-full"
-              start={{x: 0.5, y: 0.5}}>
+              start={{x: 0.5, y: 0.2}}>
               <View className="h-[20%] justify-center items-center"></View>
               <View className="h-[80%] items-start justify-end p-1">
                 {data?.alternativeNameOnApp?.split(' ').map((item, index) => {
@@ -147,7 +147,7 @@ const CourseItemRender = ({data, navigation}) => {
                     <Text
                       key={index}
                       style={[{lineHeight: 20, fontFamily: FONTS.headingFont}]}
-                      className="flex-wrap text-white text-[18px] font-semibold">
+                      className="flex-wrap text-white text-[17px] font-semibold">
                       {item}
                     </Text>
                   );
