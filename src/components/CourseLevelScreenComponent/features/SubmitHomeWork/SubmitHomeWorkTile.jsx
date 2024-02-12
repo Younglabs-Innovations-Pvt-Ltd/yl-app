@@ -4,6 +4,7 @@ import {Pressable, StyleSheet} from 'react-native';
 import {Text, View} from 'react-native-animatable';
 import BottomSheetComponent from '../../../BottomSheetComponent';
 import ViewUploadedHomeWork from './ViewUploadedHomeWork';
+import {useSelector} from 'react-redux';
 
 const SubmitHomeWorkTile = ({
   classData,
@@ -12,6 +13,7 @@ const SubmitHomeWorkTile = ({
   setViewUploadedHomwWork,
   setEditHomeWork,
 }) => {
+  const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
   const [startDate, setStartDate] = useState(null);
   useEffect(() => {
     const {_seconds, _nanoseconds} = classData?.classDate;
@@ -48,6 +50,7 @@ const SubmitHomeWorkTile = ({
     }
     return false;
   };
+
   const isChecked = getEvaluatedOrNot();
   const isUploaded = getUploadedOrNot();
   const isInFuture = ifClassInFuture();
@@ -69,13 +72,18 @@ const SubmitHomeWorkTile = ({
   return (
     <View
       key={classData?.classNumber}
-      style={[styles.borderStyle, styles.innerBorder]}
-      className="w-[100%] h-[120px] bg-[#b6b6bc4f] border-2 border-gray-300 rounded-md mt-3">
+      // style={[styles.borderStyle, styles.innerBorder]}
+      style={{backgroundColor: bgSecondaryColor}}
+      className={`w-[100%] h-[120px]  border-2 border-gray-300 rounded-md mt-3`}>
       <View className="w-[100%] h-[50%] flex flex-row justify-between items-start px-3 pt-2 ">
-        <Text className="text-black text-[20px] font-semibold">
+        <Text
+          style={{color: textColors?.textPrimary}}
+          className=" text-[20px] font-semibold">
           Class {classData?.classNumber}
         </Text>
-        <Text className="text-black text-[20px] font-semibold">
+        <Text
+          style={{color: textColors?.textPrimary}}
+          className=" text-[20px] font-semibold">
           Held on : {startDate}
         </Text>
       </View>

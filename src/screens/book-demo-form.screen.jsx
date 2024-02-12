@@ -244,15 +244,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
   };
 
   useEffect(() => {
-    // if (currentStep == 1 && childData) {
-    //   setFields({
-    //     parentName: childData.parentName,
-    //     childName: childData.childName,
-    //   });
-    //   setChildAge(childData.childAge);
-    //   console.log('Changing 1');
-    //   setCurrentStep(2);
-    // }
     if (bookingCreatedSuccessfully) {
       setCurrentStep(3);
       setTimeout(() => {
@@ -262,8 +253,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
   }, [bookingCreatedSuccessfully]);
 
   const stepPress = step => {
-    console.log('step pressed', step);
-
     if (currentStep == 2) {
       if (step?.step == 1) {
         setCurrentStep(1);
@@ -283,10 +272,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
     <View
       className="flex-1 items-center justify-center w-full h-full"
       style={{height: place ? height - 190 : height - 130}}>
-      <View
-        className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]"
-        // style={{backgroundColor: darkMode ? bgSecondaryColor : '#b0b6ef30'}}
-      >
+      <View className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]">
         <View
           className="p-2 my-2 w-full items-start rounded-md"
           style={{backgroundColor: bgSecondaryColor}}>

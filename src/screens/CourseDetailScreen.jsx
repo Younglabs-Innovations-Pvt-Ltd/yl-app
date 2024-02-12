@@ -1,24 +1,49 @@
-import {View, Text, Pressable, Image} from 'react-native';
+import {View, Text, Pressable, Image, ActivityIndicator} from 'react-native';
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 import CourseDetails from './course-details.screen';
 import BookDemoScreen from './book-demo-form.screen';
 import BatchFeeDetails from './batch-fees-details.screen';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {FlatList} from 'react-native-gesture-handler';
 import {FONTS} from '../utils/constants/fonts';
+import {courseSelector} from '../store/course/course.selector';
+import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
+import {COLORS} from '../utils/constants/colors';
+import {fetchCourseStart} from '../store/course/course.reducer';
 
 const BANNER_H = 190;
 const CourseDetailsScreen = ({navigation, route}) => {
-  // console.log("navigaion is", navigation)
   const {bgColor, colorYlMain} = useSelector(state => state.appTheme);
   const scrollViewRef = useRef();
   const {courseData} = route.params;
   const {subScreenToShow} = route.params;
-  // console.log("courseData", courseData);
   const [selectedTab, setSelectedTab] = useState('courseDetails');
   const [scrollPosition, setScrollPosition] = useState(0);
   const scrollA = useRef(new Animated.Value(0)).current;
+
+  const dispatch = useDispatch();
+
+  const {courseDetails} = useSelector(courseSelector);
+  const {ipData} = useSelector(bookDemoSelector);
+
+  useEffect(() => {
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData]);
+
+  useEffect(() => {
+    if (!courseDetails || courseDetails?.courseId !== courseData.id) {
+      dispatch(
+        fetchCourseStart({
+          courseId: courseData.id,
+          country: ipData?.country_name,
+        }),
+      );
+    }
+  }, [courseData, ipData, courseDetails]);
 
   useEffect(() => {
     if (subScreenToShow) {
@@ -50,6 +75,14 @@ const CourseDetailsScreen = ({navigation, route}) => {
       scrollToBottom();
     }
   }, [selectedTab]);
+
+  if (!courseDetails) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center0'}}>
+        <ActivityIndicator size="large" color={COLORS.black} />
+      </View>
+    );
+  }
 
   return (
     <View className="w-full flex-1" style={{backgroundColor: bgColor}}>

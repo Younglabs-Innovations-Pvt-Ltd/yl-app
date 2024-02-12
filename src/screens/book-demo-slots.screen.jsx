@@ -4,7 +4,6 @@ import {StyleSheet, Pressable, View, Linking, Alert, Text} from 'react-native';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
 import Spinner from '../components/spinner.component';
-// import Button from '../components/button.component';
 import Modal from '../components/modal.component';
 import {COLORS} from '../utils/constants/colors';
 
@@ -14,25 +13,20 @@ import {networkSelector} from '../store/network/selector';
 import {
   startFetchingBookingSlots,
   setTimezone,
-  setNewBookingStart,
   setIsBookingLimitExceeded,
   closePopup,
   startFetchingIpData,
   setSelectedSlot,
 } from '../store/book-demo/book-demo.reducer';
-import {startFetchBookingDetailsFromPhone} from '../store/join-demo/join-demo.reducer';
 import {logout} from '../store/auth/reducer';
 import {resetCurrentNetworkState} from '../store/network/reducer';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/icon.component';
-import Center from '../components/center.component';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
 import {localStorage} from '../utils/storage/storage-provider';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FONTS} from '../utils/constants/fonts';
 import {removeRegisterNotificationTimer} from '../natiive-modules/timer-notification';
-import {fetchDemoDetailsFromPhone} from '../store/join-demo/join-demo.saga';
 import {getWhatsappRedirectUrl} from '../utils/redirect-whatsapp';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
@@ -49,7 +43,6 @@ const BookDemoSlots = ({
   const [slotsTime, setSlotsTime] = useState(null);
   const {textColors} = useSelector(state => state.appTheme);
   const {childAge, phone} = formData;
-  console.log('child age in group demo slots: ' + childAge);
 
   const dispatch = useDispatch();
   const toast = useToast();
@@ -59,9 +52,7 @@ const BookDemoSlots = ({
     timezone,
     ipData,
     isBookingLimitExceeded,
-    popup,
     loading: {bookingSlotsLoading},
-    bookingCreatedSuccessfully,
     childData,
   } = useSelector(bookDemoSelector);
 
@@ -376,42 +367,6 @@ const BookDemoSlots = ({
 };
 
 export default BookDemoSlots;
-
-const Popup = ({onHandlePopup, popup, onClose}) => {
-  let STYLE = {paddingTop: 30};
-
-  if (!onClose) {
-    console.log('hit onClose');
-    STYLE.paddingTop = 0;
-    STYLE.justifyContent = 'center';
-  }
-
-  return (
-    <View style={[styles.modal, STYLE]} visible={popup}>
-      <View style={styles.popup}>
-        <Icon
-          name="checkmark"
-          size={54}
-          color={COLORS.pgreen}
-          style={{alignSelf: 'center'}}
-        />
-        <TextWrapper styles={{textAlign: 'center'}}>
-          Congratulations your free class booking successful
-        </TextWrapper>
-        <Spacer />
-        <View>
-          {/* <Button
-            bg={COLORS.orange}
-            textColor={COLORS.white}
-            rounded={4}
-            onPress={onHandlePopup}>
-            Continue
-          </Button> */}
-        </View>
-      </View>
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {

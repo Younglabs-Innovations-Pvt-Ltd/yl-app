@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {COLORS} from '../utils/constants/colors';
-import Icon from '../components/icon.component';
 import Spacer from '../components/spacer.component';
 import TextWrapper from '../components/text-wrapper.component';
 import {useDispatch, useSelector} from 'react-redux';
@@ -79,9 +78,6 @@ const CourseDetails = ({navigation, courseData}) => {
     }
   }, [courseVideos]);
 
-  const getCurricumumLevelName = level => {
-    // console.log(' curriculum=', level);
-  };
   useEffect(() => {
     let arr = [];
     ageGroups?.map(ageGroupItem => {
@@ -307,54 +303,7 @@ const CourseDetails = ({navigation, courseData}) => {
           </>
         )}
       </ScrollView>
-      <View
-        style={{
-          // position: 'absolute',
-          // bottom: 0,
-          // height: 90,
-          backgroundColor: '#eee',
-        }}>
-        {/* <Button
-          onPress={() => {
-            navigation.navigate(SCREEN_NAMES.BATCH_FEE_DETAILS);
-          }}
-          textSize={18}
-          textColor={COLORS.white}
-          bg={COLORS.pblue}
-          rounded={4}>
-          Batch/Fee Details
-        </Button> */}
-      </View>
     </View>
-  );
-};
-
-const CourseLevels = ({courseLevel, level, setCourseLevel}) => {
-  const {textColors} = useSelector(state => state.appTheme);
-
-  return (
-    <Pressable
-      style={[
-        {borderColor: textColors.textYlMain},
-        courseLevel === level ? {backgroundColor: textColors.textYlMain} : {},
-      ]}
-      className={`border py-[2px] px-3 items-center justify-center rounded-full`}
-      onPress={() => setCourseLevel(level)}>
-      <TextWrapper
-        fs={13}
-        ff={FONTS.signika_medium}
-        color={courseLevel === level ? COLORS.white : textColors.textYlMain}>
-        {level}
-      </TextWrapper>
-      <TextWrapper
-        fs={11}
-        ff={FONTS.signika_medium}
-        color={courseLevel === level ? COLORS.white : textColors.textYlMain}>
-        {level === 'Foundation' || level === 'Advanced'
-          ? '(12 classes)'
-          : '(24 classes)'}
-      </TextWrapper>
-    </Pressable>
   );
 };
 

@@ -36,6 +36,7 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
   const [loading, setLoading] = useState(false);
   const [showMyTickets, setShowMyTickets] = useState(false);
   const {user} = useSelector(authSelector);
+  const {bgSecondaryColor, textColors} = useSelector(state => state.appTheme);
   const toast = useToast();
   useEffect(() => {
     const classesNumberData = [];
@@ -136,7 +137,8 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
             />
           )}
           <TextInput
-            className="w-[100%]  text-black border border-solid border-[#adabab] text-[16px] rounded-xl px-2"
+          style={{color:textColors?.textPrimary}}
+            className="w-[100%]   border border-solid border-[#adabab] text-[16px] rounded-xl px-2"
             multiline
             numberOfLines={6}
             value={message}

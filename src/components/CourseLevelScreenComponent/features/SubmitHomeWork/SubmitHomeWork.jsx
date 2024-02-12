@@ -23,6 +23,7 @@ const SubmitHomeWork = ({
 }) => {
   const dispatch = useDispatch();
   const {user} = useSelector(authSelector);
+  const {textColors} = useSelector(state => state.appTheme);
   const [selecteImages, setSelectedImages] = useState([]);
   const [imgSrcUpload, setImgSrcUpload] = useState(null);
   const {
@@ -81,7 +82,9 @@ const SubmitHomeWork = ({
             color="gray"
           />
         </Pressable>
-        <Text className="text-black text-[20px] ml-3 font-semibold">
+        <Text
+          style={{color: textColors?.textPrimary}}
+          className="text-black text-[20px] ml-3 font-semibold">
           Submit homework for class {selectedClass?.classNumber}
         </Text>
       </View>

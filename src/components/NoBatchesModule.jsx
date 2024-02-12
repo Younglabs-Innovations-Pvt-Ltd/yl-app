@@ -17,7 +17,6 @@ const NoBatchesModule = ({courseData}) => {
       message = `Hi! i need to know the Prices of your ${courseData?.alternativeNameOnApp} Course.`;
       const link = getWhatsappRedirectUrl(message);
       await Linking.openURL(link);
-      console.log('link is', link);
     } catch (error) {
       Showtoast({
         text: "Couldn't Complete the Request, Please ensure you have Whatsapp app and try again",
@@ -63,13 +62,6 @@ const NoBatchesModule = ({courseData}) => {
             Chat with us
           </Text>
         </Pressable>
-
-        {/* <Pressable
-          className="rounded-full items-center mt-3 flex-row py-1 p-3"
-          style={{backgroundColor: textColors.textYlOrange}}>
-          <MIcon name="phone-outline" size={22} color="white" />
-          <Text className="text-white text-base ml-1" style={{fontFamily:FONTS.primaryFont}}>Request a call</Text>
-        </Pressable> */}
       </View>
     </View>
   );

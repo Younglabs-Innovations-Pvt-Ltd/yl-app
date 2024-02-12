@@ -217,18 +217,18 @@ const MainWelcomeScreen = ({navigation}) => {
   };
 
   // ---------Referesh
-  const pullMe = () => {
-    setRefresh(true);
-    console.log('dispating refresh');
-    dispatch(fetchUserFormLoginDetails());
-    dispatch(
-      getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
-    );
-    dispatch;
-    setTimeout(() => {
-      setRefresh(false);
-    }, 3000);
-  };
+  // const pullMe = () => {
+  //   setRefresh(true);
+  //   console.log('dispating refresh');
+  //   dispatch(fetchUserFormLoginDetails());
+  //   dispatch(
+  //     getCoursesForWelcomeScreen({country: ipData?.country_name || 'none'}),
+  //   );
+  //   dispatch;
+  //   setTimeout(() => {
+  //     setRefresh(false);
+  //   }, 3000);
+  // };
 
   const rescheduleClass = () => {
     if (bookingDetails) {

@@ -9,6 +9,7 @@ import {
   Alert,
   Linking,
   Text,
+  Text,
 } from 'react-native';
 import Storage from '@react-native-firebase/storage';
 import RNFS from 'react-native-fs';
@@ -103,13 +104,6 @@ const UploadHandwriting = ({demoData}) => {
     }
   };
 
-  // useEffect(() => {
-  //   if (selectedImage) {
-  //     setVisible(true);
-  //     setVisibleOptions(false);
-  //   }
-  // }, [selectedImage]);
-
   const uploadHandwritingImage = async () => {
     try {
       setLoading(true);
@@ -135,15 +129,7 @@ const UploadHandwriting = ({demoData}) => {
           image: downloadUrl,
         });
         const data = await res.json();
-        console.log('data', data);
         setLoading(false);
-        // Alert.alert('Image uploaded successfully', '', [
-        //   {
-        //     text: 'OK',
-        //     onPress: onClose,
-        //   },
-        // ]);
-
         Snackbar.show({
           text: 'Image uploaded',
           textColor: COLORS.white,
@@ -185,13 +171,9 @@ const UploadHandwriting = ({demoData}) => {
           <Icon name="camera" size={24} color={COLORS.white} />
           <TextWrapper
             color={COLORS.black}
-            className="text-center text-[12px] text-white leading-[12px]">
-            Submit
-          </TextWrapper>
-          <TextWrapper
-            color={COLORS.black}
-            className="text-center text-[12px] text-white  leading-[12px]">
-            handwriting
+            fs={13}
+            className="text-center text-[12px] text-white">
+            upload handwriting
           </TextWrapper>
         </Pressable>
       </View>

@@ -5,7 +5,6 @@ import {
   View,
   Pressable,
   Text,
-  Dimensions,
   ActivityIndicator,
 } from 'react-native';
 import TextWrapper from '../components/text-wrapper.component';
@@ -20,8 +19,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {FONTS} from '../utils/constants/fonts';
 import {useDispatch} from 'react-redux';
 import {fetchUserFormLoginDetails} from '../store/auth/reducer';
-
-const {width, height} = Dimensions.get('window');
+import {CommonActions} from '@react-navigation/native';
 
 const EmailLogin = ({navigation}) => {
   const dispatch = useDispatch();
@@ -54,7 +52,12 @@ const EmailLogin = ({navigation}) => {
       setLoginLoading(false);
       resetForm();
       dispatch(fetchUserFormLoginDetails());
-      navigation.navigate(SCREEN_NAMES.MAIN);
+
+      const resetActions = CommonActions.reset({
+        index: 0,
+        routes: [{name: SCREEN_NAMES.MAIN}],
+      });
+      navigation.dispatch(resetActions);
     } catch (error) {
       setLoginLoading(false);
       Showtoast({text: 'Email or Password Incorrect', toast, type: 'danger'});
@@ -112,32 +115,6 @@ const EmailLogin = ({navigation}) => {
             Enter Password
           </Text>
         </View>
-
-        {/* <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="Enter email"
-            style={styles.input}
-            selectionColor={COLORS.black}
-            value={email}
-            onChangeText={e => setEmail(e)}
-            inputMode="email"
-            placeholderTextColor={'gray'}
-            autoCapitalize="none"
-          />
-        </View> */}
-
-        {/* <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="Enter password"
-            style={[styles.input, {fontSize: 16}]}
-            selectionColor={COLORS.black}
-            value={password}
-            onChangeText={e => setPassword(e)}
-            inputMode="text"
-            secureTextEntry={true}
-            placeholderTextColor={'gray'}
-          />
-        </View> */}
         <Spacer />
         <Pressable
           style={{backgroundColor: COLORS.pblue}}

@@ -24,16 +24,14 @@ import CountryList from '../components/country-list.component';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   setCountry,
-  setModalVisible,
   fetchBookingStatusStart,
   setCustomer,
+  setErrorMessage,
 } from '../store/welcome-screen/reducer';
 
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
-import {networkSelector} from '../store/network/selector';
 
-import {phoneNumberLength} from '../utils/phoneNumbersLength';
 import {i18nContext} from '../context/lang.context';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {Showtoast} from '../utils/toast';
@@ -51,7 +49,7 @@ const GAP = 54;
 // Main Component
 const DemoClassScreen = ({navigation}) => {
   const toast = useToast();
-  const {textColors, colorYlMain} = useSelector(state => state.appTheme);
+  const {colorYlMain} = useSelector(state => state.appTheme);
 
   const {localLang, currentLang} = i18nContext();
 
@@ -60,11 +58,8 @@ const DemoClassScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  const {
-    networkState: {isConnected, alertAction},
-  } = useSelector(networkSelector);
   const {ipData} = useSelector(bookDemoSelector);
-  const {country, modalVisible, loading, message, customer} = useSelector(
+  const {country, loading, customer, message} = useSelector(
     welcomeScreenSelector,
   );
 
@@ -103,6 +98,13 @@ const DemoClassScreen = ({navigation}) => {
     }
   }, [ipData]);
 
+  useEffect(() => {
+    if (message) {
+      Showtoast({text: message, toast, type: 'danger'});
+      dispatch(setErrorMessage(''));
+    }
+  }, [message]);
+
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
     if (phoneRegex.test(e)) {
@@ -124,7 +126,8 @@ const DemoClassScreen = ({navigation}) => {
    */
   const handleBookingStatus = async () => {
     if (!phone) {
-      Showtoast({text: 'Please Enter Whatsapp Number', toast, type: 'danger'});
+      Showtoast({text: 'Please Enter WhatsApp Number', toast, type: 'danger'});
+      return;
     }
     dispatch(fetchBookingStatusStart({phone}));
   };
@@ -144,9 +147,6 @@ const DemoClassScreen = ({navigation}) => {
     );
     onModalClose();
   };
-
-  const onCloseBottomSheet = () => dispatch(setModalVisible(false));
-  const showCountryList = () => dispatch(setModalVisible(true));
 
   // Animation stuff
   const [slognText, setSlognText] = useState(localLang.tagline);
@@ -235,15 +235,6 @@ const DemoClassScreen = ({navigation}) => {
       );
     });
   }, [animatedValues]);
-
-  // Check for max length of a phone number according country
-  // const maxPhoneLength = useMemo(() => {
-  //   if (!country?.countryCode) {
-  //     return 15;
-  //   }
-
-  //   return phoneNumberLength[country.countryCode.cca2];
-  // }, [country]);
 
   const isTablet = deviceWidth > 540;
   let CONTAINER_STYLE = {};
