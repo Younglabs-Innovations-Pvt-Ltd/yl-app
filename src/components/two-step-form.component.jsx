@@ -1,3 +1,7 @@
+////////////////////////
+// Current not in use
+///////////////////////
+
 import React, {useRef, useState} from 'react';
 import {StyleSheet, View, ScrollView, Dimensions} from 'react-native';
 import BookingForm from './booking-form.component';

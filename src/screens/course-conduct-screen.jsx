@@ -9,34 +9,18 @@ import Play from '../assets/newVideoPlayerIcons/play-button.png';
 import Fullsize from '../assets/newVideoPlayerIcons/full-screen.png';
 import Minisize from '../assets/newVideoPlayerIcons/minimise.png';
 import Setting from '../assets/newVideoPlayerIcons/settings.png';
-import arrow from '../assets/images/right-arrow.png';
 import Slider from '@react-native-community/slider';
 import Orientation from 'react-native-orientation-locker';
 import debounce from 'lodash/debounce';
-import {Dropdown} from 'react-native-element-dropdown';
-import {FONTS} from '../utils/constants/fonts';
 import {authSelector} from '../store/auth/selector';
-import {useDispatch, useSelector} from 'react-redux';
-import {startFetchServiceRequestClasses} from '../store/handleCourse/reducer';
+import {useSelector} from 'react-redux';
 import DropdownComponent from '../components/DropdownComponent';
 
 const CourseConductScreen = ({route, navigation}) => {
-  const {videoUrl, serviceRequestId} = route.params;
-  console.log('check video url', videoUrl);
+  const {videoUrl} = route.params;
   const [settings, setSettings] = useState(false);
   const [speed, setSpeed] = useState(1.0);
   const [fullScreen, setFullScreen] = useState(false);
-  const {user} = useSelector(authSelector);
-
-  // useEffect(() => {
-  //   console.log('check object', {
-  //     leadId,
-  //     serviceRequestId,
-  //   });
-  //   // handleCourseClick({serviceRequestId});
-  // }, []);
-
-  // const playBackSpeed = [1.0, 1.25, 1.5, 1.75, 2.0];
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', e => {
@@ -69,10 +53,11 @@ const CourseConductScreen = ({route, navigation}) => {
     {label: 'Medium', value: 'Medium'},
     {label: 'High', value: 'High'},
   ];
-  // const videoQuality = ['low', 'Medium', 'High'];
+
   useEffect(() => {
     console.log('check fullscreen', fullScreen);
   }, [fullScreen]);
+
   return (
     <View style={{flex: 1, width: '100%', height: '100%'}} className="bg-white">
       <NewVideoPlayer

@@ -18,6 +18,8 @@ import {handleClassesHomeWork} from '../store/homework-submit/selector';
 import {handleRequestRecording} from '../store/request-recording/selector';
 import {SetRecordingRequest} from '../store/request-recording/reducer';
 import AskPreClassRating from '../components/CourseLevelScreenComponent/AskPreClassRating';
+import {useToast} from 'react-native-toast-notifications';
+import {Showtoast} from '../utils/toast';
 
 const CourseLevelScreen = ({navigation, route}) => {
   const {serviceRequestId} = route.params;
@@ -29,6 +31,7 @@ const CourseLevelScreen = ({navigation, route}) => {
   const [displayFeature, setDisplayFeature] = useState('submit_homework');
   const [previousClassData, setPreviousClassData] = useState(null);
   const dispatch = useDispatch();
+  const toast = useToast();
   const {user} = useSelector(authSelector);
   const {serviceReqClassesLoading, serviceReqClassesData} =
     useSelector(handleCourseSelector);
@@ -69,6 +72,11 @@ const CourseLevelScreen = ({navigation, route}) => {
   const scrollA = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     if (displayFeature === 'download_worksheets') {
+      Showtoast({
+        text: 'Download started',
+        toast,
+        type: 'success',
+      });
       downloadWorksheet();
     }
     if (displayFeature === 'course_certificate') {

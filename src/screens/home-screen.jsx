@@ -1,3 +1,7 @@
+/////////////////
+// Currently not in use
+/////////////////
+
 import React, {useEffect, useState, useRef} from 'react';
 import {
   StyleSheet,
@@ -32,7 +36,6 @@ import TextWrapper from '../components/text-wrapper.component';
 
 import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 import Demo from '../components/demo.component';
-import Reviews from '../components/reviews.component';
 import VideoPlayer from '../components/video.component';
 
 // Icons
@@ -40,7 +43,6 @@ import TipsIcon from '../assets/icons/tipsandtricks.png';
 import WorksheetIcon from '../assets/icons/document.png';
 import ReviewIcon from '../assets/icons/reviews.png';
 import ImprovementIcon from '../assets/icons/improvement.png';
-import {fetchUser} from '../store/auth/reducer';
 import {FONTS} from '../utils/constants/fonts';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../utils/constants/local-keys';
@@ -54,7 +56,6 @@ import Icon from '../components/icon.component';
 import {authSelector} from '../store/auth/selector';
 import {setPaymentMessage} from '../store/payment/reducer';
 import RatingPopup from '../components/popups/rating';
-import {fetchContentDataStart} from '../store/content/reducer';
 import {contentSelector} from '../store/content/selector';
 import BottomSheet from '@gorhom/bottom-sheet';
 import moment from 'moment';

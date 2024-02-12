@@ -17,7 +17,6 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
   const [videoLoading, setVideoLoading] = useState(false);
   const [paused, setPaused] = useState(false);
   const [localUri, setLocalUri] = useState('');
-  const [loadedVideo, setLoadedVideo] = useState(false);
   const videoRef = useRef(null);
 
   const navigation = useNavigation();
@@ -65,11 +64,9 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
           },
         }).fetch('GET', uri);
         setLocalUri(res.path());
-        setLoadedVideo(true);
       } else {
         setLocalUri(result.filePath);
       }
-      setLoadedVideo(true);
     } catch (error) {
       console.log(error);
     }

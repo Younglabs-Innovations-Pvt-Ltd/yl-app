@@ -1,28 +1,14 @@
 import React, {useState} from 'react';
-import {
-  StyleSheet,
-  Dimensions,
-  View,
-  TextInput,
-  Pressable,
-  Text,
-} from 'react-native';
+import {StyleSheet, View, TextInput, Pressable, Text} from 'react-native';
 import {COLORS} from '../utils/constants/colors';
 import Spacer from '../components/spacer.component';
 import TextWrapper from '../components/text-wrapper.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {useDispatch} from 'react-redux';
 import {fetchBookingStatusStart} from '../store/welcome-screen/reducer';
-import Input from '../components/CustomInputComponent';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import {FONTS} from '../utils/constants/fonts';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
-
-const {width: deviceWidth} = Dimensions.get('window');
-
-const BASE_URL =
-  'https://e125-2401-4900-415c-5347-d578-d1bd-ad36-7a16.ngrok-free.app';
 
 const Signup = ({navigation}) => {
   const toast = useToast();
@@ -94,20 +80,6 @@ const Signup = ({navigation}) => {
             Enter Your Email
           </Text>
         </View>
-
-        {/* <Spacer space={6.5} />
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="Enter email"
-            style={styles.input}
-            selectionColor={COLORS.black}
-            value={email}
-            onChangeText={e => setEmail(e)}
-            inputMode="email"
-            placeholderTextColor={'gray'}
-            autoCapitalize="none"
-          />
-        </View> */}
 
         <Spacer />
         <View className="w-full justify-around flex-row">

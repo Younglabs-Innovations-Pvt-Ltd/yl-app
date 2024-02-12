@@ -3,10 +3,7 @@ import auth from '@react-native-firebase/auth';
 import {
   phoneAuthStart,
   phoneAuthFailed,
-  setVerificationLoading,
   setConfirm,
-  verifyCode,
-  setFailedVerification,
   fetchUser,
   setUser,
   setIsCustomer,
@@ -20,12 +17,9 @@ import {setChildren, setCurrentChild} from '../user/reducer';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LOCAL_KEYS} from '../../utils/storage/local-storage-keys';
 import {isValidNumber} from '../../utils/isValidNumber';
-import {createLead, getCustomers} from '../../utils/api/yl.api';
+import {getCustomers} from '../../utils/api/yl.api';
 import {localStorage} from '../../utils/storage/storage-provider';
-import DeviceInfo from 'react-native-device-info';
-import {getCurrentDeviceId} from '../../utils/deviceId';
-import {navigate, resetNavigation} from '../../navigationRef';
-import {SCREEN_NAMES} from '../../utils/constants/screen-names';
+import {resetNavigation} from '../../navigationRef';
 import {setIsFirstTimeUser} from '../welcome-screen/reducer';
 import {BASE_URL} from '@env';
 
@@ -60,33 +54,7 @@ function* phoneAuthentication({payload: {phone}}) {
   }
 }
 
-function* verifyCodeVerification({payload: {confirm, verificationCode}}) {
-  try {
-    yield confirm.confirm(verificationCode);
-
-    const phone = localStorage.getNumber(LOCAL_KEYS.PHONE);
-    const countryCode = 91;
-    const courseType = 'Eng_Hw';
-    const deviceUID = yield DeviceInfo.getAndroidId();
-    const deviceId = yield getCurrentDeviceId();
-
-    // yield createLead({phone, countryCode, courseType, deviceUID, deviceId});
-    yield put(setVerificationLoading(false));
-  } catch (error) {
-    console.log(error);
-    yield put(setVerificationLoading(false));
-    if (error.code === 'auth/invalid-verification-code') {
-      yield put(setFailedVerification('Invalid verification code.'));
-    } else {
-      yield put(
-        setFailedVerification('Something went wrong, try again later.'),
-      );
-    }
-  }
-}
-
 function* fetchUserSaga({payload}) {
-  console.log('in fetchUserSaga', payload);
   try {
     if (!payload) {
       return;
@@ -120,21 +88,13 @@ function* fetchUserSaga({payload}) {
 
     yield put(setUser(data?.data));
   } catch (error) {
-    console.log(
-      'FETCH_USER_ERROR',
-      'Something went wrong, try again later.',
-      error.message,
-    );
+    console.log('FETCH_USER_ERROR', payload, error.message);
   }
 }
 
 // listeners
 function* startAuthentication() {
   yield takeLatest(phoneAuthStart.type, phoneAuthentication);
-}
-
-function* startCodeVerification() {
-  yield takeLatest(verifyCode.type, verifyCodeVerification);
 }
 
 function* fetchUserListener() {
@@ -222,7 +182,6 @@ function* fetchUserFormLoginDetailsListner() {
 export function* authSaga() {
   yield all([
     call(startAuthentication),
-    call(startCodeVerification),
     call(fetchUserListener),
     call(logoutUser),
     call(fetchUserFormLoginDetailsListner),

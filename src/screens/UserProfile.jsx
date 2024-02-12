@@ -1,18 +1,10 @@
+import React from 'react';
 import {View, Text, Pressable, Dimensions, ImageBackground} from 'react-native';
-import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {setDarkMode} from '../store/app-theme/appThemeReducer';
 import {ScrollView} from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  withDelay,
-  withSpring,
-} from 'react-native-reanimated';
-import LinearGradient from 'react-native-linear-gradient';
-import BottomSheetComponent from '../components/BottomSheetComponent';
 import RedeemPointsView from '../components/UserProfileComponents/RedeemPointsView';
-import MyTicketsView from './MyTicketsView';
 import {authSelector} from '../store/auth/selector';
 import {userSelector} from '../store/user/selector';
 import {logout} from '../store/auth/reducer';
@@ -23,10 +15,6 @@ import {CommonActions} from '@react-navigation/native';
 const {width, height} = Dimensions.get('window');
 
 const UserProfile = ({navigation}) => {
-  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
-  const [selectedBottomSheetComponent, setSelectedBottomSheetComponent] =
-    useState('redeemPoints');
-
   const {currentChild} = useSelector(userSelector);
   const {user} = useSelector(authSelector);
   const {customer} = useSelector(authSelector);
@@ -34,10 +22,6 @@ const UserProfile = ({navigation}) => {
     state => state.appTheme,
   );
   const dispatch = useDispatch();
-  const openBottomSheet = component => {
-    setBottomSheetOpen(true);
-    setSelectedBottomSheetComponent(component);
-  };
 
   const changeDarkMode = payload => {
     localStorage.set('darkModeEnabled', payload);
@@ -203,8 +187,7 @@ const UserProfile = ({navigation}) => {
 };
 
 const NotACustomerProfilePage = () => {
-  const dispatch = useDispatch();
-  const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
+  const {bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
   const {user} = useSelector(authSelector);
@@ -270,83 +253,3 @@ const NotACustomerProfilePage = () => {
 };
 
 export default UserProfile;
-
-{
-  /* <Pressable onPress={() => openBottomSheet('redeemPoints')}>
-                  <View
-                    className="border-b justify-end"
-                    style={{borderColor: textColors.textSecondary}}>
-                    <View className="flex-row items-center py-2">
-                      <MIcon
-                        name="hand-coin-outline"
-                        color={textColors.textYlOrange}
-                        size={38}
-                      />
-                      <View className="ml-1">
-                        <Text
-                          className="font-semibold"
-                          style={{color: textColors.textYlOrange}}>
-                          Refferal Points
-                        </Text>
-                        <Text
-                          className=""
-                          style={{color: textColors.textSecondary}}>
-                          {user?.credits || 0}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </Pressable>
-
-                <Pressable onPress={() => openBottomSheet('transactionsView')}>
-                  <View
-                    className="justify-start border-b"
-                    style={{borderColor: textColors.textSecondary}}>
-                    <View className="flex-row items-center py-2">
-                      <MIcon
-                        name="swap-horizontal"
-                        color={textColors.textYlGreen}
-                        size={40}
-                      />
-                      <View className="ml-1">
-                        <Text
-                          className="font-semibold"
-                          style={{color: textColors.textYlGreen}}>
-                          My Transactions
-                        </Text>
-                        <Text
-                          className=""
-                          style={{color: textColors.textSecondary}}>
-                          5460
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </Pressable>
-
-                <Pressable onPress={() => openBottomSheet('ticketsView')}>
-                  <View
-                    className="justify-start"
-                    style={{borderColor: textColors.textSecondary}}>
-                    <View className="flex-row items-center py-2">
-                      <MIcon
-                        name="ticket-confirmation-outline"
-                        color={textColors.textYlRed}
-                        size={40}
-                      />
-                      <View className="ml-1 flex-wrap">
-                        <Text
-                          className="font-semibold"
-                          style={{color: textColors.textYlRed}}>
-                          My Tickets
-                        </Text>
-                        <Text
-                          className="flex-wrap"
-                          style={{color: textColors.textSecondary}}>
-                          Total: 4 , Closed: 3
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </Pressable> */
-}

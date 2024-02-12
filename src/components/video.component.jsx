@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -16,7 +16,7 @@ import {FONTS} from '../utils/constants/fonts';
 import RNFS from 'react-native-fs';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 
-const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
+const {height: deviceHeight} = Dimensions.get('window');
 
 const isFileExists = async uri => {
   const videoName = uri.split('&token=')[1];
@@ -35,7 +35,6 @@ const VideoPlayer = ({
   const [visible, setVisible] = useState(false);
   const [muted, setMuted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [loadedVideo, setLoadedVideo] = useState(false);
   const currentVideo = useRef();
 
   const onOpen = async () => {
@@ -69,17 +68,11 @@ const VideoPlayer = ({
     setVisible(false);
   };
 
-  // useEffect(() => {
-  //   if (uri) {
-  //     checkForLocal();
-  //   }
-  // }, [uri]);
-
   const checkForLocal = async uri => {
     try {
       const result = await isFileExists(uri);
       if (!result.isExists) {
-        const res = await ReactNativeBlobUtil.config({
+        await ReactNativeBlobUtil.config({
           fileCache: true,
           addAndroidDownloads: {
             useDownloadManager: true,
@@ -94,7 +87,6 @@ const VideoPlayer = ({
           },
         }).fetch('GET', uri);
       }
-      setLoadedVideo(true);
     } catch (error) {
       console.log(error);
     }
@@ -114,23 +106,6 @@ const VideoPlayer = ({
         style={[styles.container, {width: width, aspectRatio}]}
         onPress={onOpen}
         disabled={!poster}>
-        {/* {!loadedVideo ? (
-          <View
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              backgroundColor: '#eee',
-            }}></View>
-        ) : (
-          <Image
-            source={{uri: poster}}
-            resizeMode="cover"
-            style={{width: '100%', height: '100%'}}
-          />
-        )} */}
         <Image
           source={{uri: poster}}
           resizeMode="cover"

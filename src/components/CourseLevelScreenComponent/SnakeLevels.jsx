@@ -335,7 +335,7 @@ const SnakeLevels = ({
                       )}
 
                     {!todaysClass &&
-                      !currentOngoingClass &&
+                      // !currentOngoingClass &&
                       upcomingClass &&
                       upcomingClass.classNumber === level?.classNumber && (
                         <View className="absolute -top-11 flex justify-center items-center animate-bounce">
@@ -390,9 +390,9 @@ const SnakeLevels = ({
                         </Pressable>
                       )}
                     {upcomingClass &&
+                      todaysClass?.classNumber !== level?.classNumber &&
+                      currentOngoingClass?.classNumber !== level?.classNumber &&
                       upcomingClass.classNumber !== level?.classNumber &&
-                      !currentOngoingClass &&
-                      !todaysClass &&
                       allTagValues.includes(`${level?.classId} true`) && (
                         <Pressable
                           disabled={false}
