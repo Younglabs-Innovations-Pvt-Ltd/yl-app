@@ -20,7 +20,7 @@ import {authSelector} from '../store/auth/selector';
 import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const UserCoursesPage = ({navigation}) => {
   const dispatch = useDispatch();
   const {courses, userOrdersLoading, userOrderLoadingFailed, userOrders} =
@@ -67,14 +67,12 @@ const UserCoursesPage = ({navigation}) => {
       leadId: user?.leadId,
       token,
     };
-    console.log('dispatcing');
 
     dispatch(startFetchingUserOrders(body));
   };
 
   const getUserOrders = () => {
     if (customer == 'yes') {
-      console.log('getting Orders');
       getOrders();
     }
   };

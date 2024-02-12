@@ -342,10 +342,6 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                     />
                   )}
                 </Pressable>
-
-                {/* {console.log('prices are', prices)}
-                {console.log('prices are', prices)} */}
-                {/* {console.log("filtered batches are", filteredBatches)} */}
                 {filteredBatches.length > 0 && (
                   <View style={{paddingTop: 8}}>
                     <Collapsible collapsed={steps.step2} duration={450}>

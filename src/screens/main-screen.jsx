@@ -1,17 +1,8 @@
-import React, {useEffect} from 'react';
-import {StatusBar} from 'react-native';
+import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import Tabbar from '../components/tabbar-component';
 import DrawerScreen from './drawer-screen';
-
-import {COLORS} from '../utils/constants/colors';
-
-import {useDispatch} from 'react-redux';
-import {setDemoBookingId} from '../store/join-demo/join-demo.reducer';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-import {LOCAL_KEYS} from '../utils/constants/local-keys';
-import {localStorage} from '../utils/storage/storage-provider';
 
 import {i18nContext} from '../context/lang.context';
 import UserProfile from './UserProfile';
@@ -27,47 +18,12 @@ function ShareScreen() {
   return <></>;
 }
 
-function CourseScreen() {
-  return <></>;
-}
-
 const MainScreen = ({route}) => {
   const data = route.params;
-  const dispatch = useDispatch();
   const {localLang} = i18nContext();
 
-  // useEffect(() => {
-  //   StatusBar.setHidden(false);
-  //   StatusBar.setBackgroundColor(COLORS.pgreen);
-  //   StatusBar.setBarStyle('light-content');
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!data) return;
-
-  //   checkForPhone();
-  // }, []);
-
-  /**
-   * @author Shobhit
-   * @since 20/09/2023
-   * @description
-   * Check is phone number exists in local storage
-   * If it does not exist only then set booking id by dispatching an action
-   */
-  // const checkForPhone = () => {
-  //   try {
-  //     const isPhoneExists = localStorage.getNumber(LOCAL_KEYS.PHONE);
-  //     if (!isPhoneExists) {
-  //       dispatch(setDemoBookingId(data.bookingId));
-  //     }
-  //   } catch (error) {
-  //     console.log('CHECK_FOR_PHONE_MAIN_SCREEN', error);
-  //   }
-  // };
-
   return (
-    <Tab.Navigator tabBar={props => <Tabbar {...props}  />}>
+    <Tab.Navigator tabBar={props => <Tabbar {...props} />}>
       <Tab.Screen
         name="Drawer"
         component={DrawerScreen}
@@ -100,7 +56,7 @@ const MainScreen = ({route}) => {
       />
       <Tab.Screen
         name={'Account'}
-        options={{tabBarLabel: "Account" , headerShown: false}}
+        options={{tabBarLabel: 'Account', headerShown: false}}
         component={UserProfile}
       />
     </Tab.Navigator>

@@ -31,7 +31,6 @@ import {ToastProvider} from 'react-native-toast-notifications';
 
 // Screens
 import WelcomeScreen from './src/screens/welcome-screen';
-import OnBoardingScreen from './src/screens/on-boarding-screen';
 import BookDemoFormScreen from './src/screens/book-demo-form.screen';
 import BookDemoSlotsScreen from './src/screens/book-demo-slots.screen';
 import MainScreen from './src/screens/main-screen';
@@ -50,15 +49,12 @@ import auth from '@react-native-firebase/auth';
 import Icon from './src/components/icon.component';
 import MainWelcomeScreen from './src/screens/MainWelcomeScreen';
 import CourseDetailsScreen from './src/screens/CourseDetailScreen';
-import ViewAllCourses from './src/screens/ViewAllCourses';
 import UserProfile from './src/screens/UserProfile';
-import ScrollingAnimation from './src/screens/ScrollingAnimation';
 import CustomToast from './src/components/CustomToast';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
 import {initialize} from 'react-native-clarity';
 import Signup from './src/screens/signup-screen';
-import VerifyCode from './src/screens/verify-code.screen';
 import EmailLogin from './src/screens/email-login-screen';
 import PaymentSuccess from './src/screens/payment-success';
 import CourseConductScreen from './src/screens/course-conduct-screen';
@@ -105,22 +101,14 @@ function App() {
     storeDeviceId();
   }, []);
 
-  // check for authentication
-
-  console.log('is user authenticated', isUserAuthenticated);
-
   useEffect(() => {
     requestPermissions();
-    console.log('here');
     let storedUser = localStorage.getString(LOCAL_KEYS.LOGINDETAILS);
-    console.log('got stored user');
     if (!storedUser) {
-      console.log("did't get credentials");
       setLoading(false);
       return;
     }
     let loginDetails = JSON.parse(storedUser);
-    console.log('loginDetails is', loginDetails);
     if (loginDetails.loginType === 'whatsAppNumber' && loginDetails.phone) {
       setIsUserAuthenticated(true);
       setInitialRouteName(SCREEN_NAMES.MAIN);
@@ -132,10 +120,11 @@ function App() {
       if (email && password) {
         const authCustomer = async () => {
           try {
-            console.log('adding');
-            await auth().signInWithEmailAndPassword(email, password.trim());
-            setIsUserAuthenticated(true);
-            setInitialRouteName(SCREEN_NAMES.MAIN);
+            const token = await auth().currentUser.getIdToken();
+            if (token) {
+              setIsUserAuthenticated(true);
+              setInitialRouteName(SCREEN_NAMES.MAIN);
+            }
             setLoading(false);
           } catch (error) {
             setLoading(false);
@@ -246,8 +235,6 @@ function App() {
                   headerStyle: {
                     elevation: 0,
                     shadowOpacity: 0,
-                    // borderBottomWidth: 1,
-                    // borderBottomColor: '#eaeaea',
                     backgroundColor: '#fff',
                   },
                   headerTintColor: '#636165',
@@ -272,11 +259,6 @@ function App() {
 
                 <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={Signup} />
                 <Stack.Screen
-                  name={SCREEN_NAMES.VERIFY_CODE}
-                  component={VerifyCode}
-                  options={{headerTitle: 'Verify OTP'}}
-                />
-                <Stack.Screen
                   name={SCREEN_NAMES.EMAIL_LOGIN}
                   component={EmailLogin}
                   options={{headerTitle: 'Log in'}}
@@ -294,28 +276,10 @@ function App() {
                   options={{headerShown: false}}
                 />
 
-                {/* <Stack.Screen
-                  name={'UserProfileScreen'}
-                  component={UserProfile}
-                  options={{headerShown: false}}
-                /> */}
-
                 <Stack.Screen
                   name="CourseDetailScreen"
                   component={CourseDetailsScreen}
                   options={{headerShown: false}}
-                />
-                <Stack.Screen
-                  name="AllCoursesScreen"
-                  component={ViewAllCourses}
-                  options={({route}) => ({
-                    title: route.params.heading || 'All Courses',
-                  })}
-                />
-
-                <Stack.Screen
-                  name={SCREEN_NAMES.ON_BOARDING}
-                  component={OnBoardingScreen}
                 />
                 <Stack.Screen
                   name={SCREEN_NAMES.BOOK_DEMO_FORM}
