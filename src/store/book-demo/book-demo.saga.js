@@ -8,7 +8,6 @@ import {
   setNewBookingFailed,
   setNewBookingSuccess,
   setIsBookingLimitExceeded,
-  stopLoading,
   changebookingCreatedSuccessfully,
   setNewOneToOneBookingStart,
   setOneToOneBookingSuccess,
@@ -16,13 +15,7 @@ import {
 } from './book-demo.reducer';
 
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
-
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makeNewBooking, addNewSoloBooking} from '../../utils/api/yl.api';
-// import {LOCAL_KEYS} from '../../utils/constants/local-keys';
-// import {ERROR_MESSAGES} from '../../utils/constants/messages';
-// import {setCurrentNetworkState} from '../network/reducer';
-// import {localStorage} from '../../utils/storage/storage-provider';
 import {fetchUserFormLoginDetails} from '../auth/reducer';
 import Snackbar from 'react-native-snackbar';
 
@@ -64,7 +57,7 @@ function* fetchBookingSlots({payload}) {
       body: JSON.stringify(payload),
     });
 
-    console.log("response is", response.status)
+    console.log('response is', response.status);
     const slotsData = yield response.json();
     console.log('data is', slotsData);
     yield put(fetchBookingSlotsSuccess(slotsData));
@@ -92,11 +85,6 @@ function* handleNewBooking({payload: {data, ipData}}) {
     console.log(bookingDetails);
 
     if (response.status === 200) {
-      // yield AsyncStorage.setItem(LOCAL_KEYS.PHONE, data.phone.toString());
-      // yield AsyncStorage.setItem(LOCAL_KEYS.CALLING_CODE, ipData.calling_code);
-      // localStorage.set(LOCAL_KEYS.PHONE, data.phone.toString());
-      // localStorage.set(LOCAL_KEYS.CALLING_CODE, ipData.calling_code);
-
       yield put(setNewBookingSuccess());
       yield put(changebookingCreatedSuccessfully(true));
       Snackbar.show({

@@ -45,8 +45,7 @@ function* payOnTazapay({body, ipData}) {
     const {bagId} = yield addToBagRes.json();
 
     const createCheckoutSessionBody = {
-      // country: ipData?.country_code2, //ipData.country_code2 change with country
-      country: 'QA',
+      country: ipData?.country_code2, //ipData.country_code2 change with country
       bagId,
     };
 
@@ -172,7 +171,7 @@ function* makePaymentSaga({payload}) {
       body: JSON.stringify(body),
     });
 
-    if (response.status === 403) {
+    if (data.order.status === 'failed') {
       yield put(makePaymentFailed('Something went wrong'));
       return;
     }
@@ -185,7 +184,7 @@ function* makePaymentSaga({payload}) {
 
     const {amount, id: order_id, currency} = data.order;
 
-    const orderResp = yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
+    yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -196,27 +195,24 @@ function* makePaymentSaga({payload}) {
       }),
     });
 
-    const orderRes = yield orderResp.json();
-    // console.log('orderRes=', orderRes);
-
-    let config = {
-      display: {
-        blocks: {
-          banks: {
-            name: 'Pay via UPI',
-            instruments: [
-              {
-                method: 'upi',
-              },
-            ],
-          },
-        },
-        sequence: ['block.banks'],
-        preferences: {
-          show_default_blocks: false,
-        },
-      },
-    };
+    // let config = {
+    //   display: {
+    //     blocks: {
+    //       banks: {
+    //         name: 'Pay via UPI',
+    //         instruments: [
+    //           {
+    //             method: 'upi',
+    //           },
+    //         ],
+    //       },
+    //     },
+    //     sequence: ['block.banks'],
+    //     preferences: {
+    //       show_default_blocks: false,
+    //     },
+    //   },
+    // };
 
     const options = {
       key: 'rzp_test_0cYlLVRMEaCUDx',
@@ -298,7 +294,7 @@ function* makeSoloPaymentSaga({payload}) {
 
       const {amount, id: order_id, currency} = data.order;
 
-      const orderResp = yield fetch(`${url}/shop/orderhandler/addToBag`, {
+      yield fetch(`${url}/shop/orderhandler/addToBag`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -309,29 +305,24 @@ function* makeSoloPaymentSaga({payload}) {
         }),
       });
 
-      const orderRes = yield orderResp.json();
-      console.log('i am here 2');
-
-      // console.log('orderRes=', orderRes);
-
-      let config = {
-        display: {
-          blocks: {
-            banks: {
-              name: 'Pay via UPI',
-              instruments: [
-                {
-                  method: 'upi',
-                },
-              ],
-            },
-          },
-          sequence: ['block.banks'],
-          preferences: {
-            show_default_blocks: false,
-          },
-        },
-      };
+      // let config = {
+      //   display: {
+      //     blocks: {
+      //       banks: {
+      //         name: 'Pay via UPI',
+      //         instruments: [
+      //           {
+      //             method: 'upi',
+      //           },
+      //         ],
+      //       },
+      //     },
+      //     sequence: ['block.banks'],
+      //     preferences: {
+      //       show_default_blocks: false,
+      //     },
+      //   },
+      // };
 
       console.log('i am her 3');
 
