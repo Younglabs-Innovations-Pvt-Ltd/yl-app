@@ -45,16 +45,11 @@ import {fetchUserFormLoginDetails} from '../auth/reducer';
  * If booking then redirect to home screen
  * If not redirect to create new booking screen
  */
-function* handleBookingStatus({payload: {phone}}) {
-  if (!phone) {
-    yield put(setErrorMessage('Enter phone number'));
-    return;
-  }
-
+function* handleBookingStatus({payload: {phone, ipData}}) {
   try {
     // Check for length of a phone number according to country
     // Return true or false
-    const isValidPhone = isValidNumber(phone, 'IN');
+    const isValidPhone = isValidNumber(phone, ipData.country_code2);
 
     if (!isValidPhone) {
       yield put(setErrorMessage('Please enter a valid number'));
@@ -66,14 +61,20 @@ function* handleBookingStatus({payload: {phone}}) {
     const countryCode = 91;
     const courseId = 'Eng_Hw';
 
-    const leadRes = yield createLead({
+    const leadBody = {
       phone,
       countryCode,
       courseId,
       deviceId,
       deviceUID,
-    });
+      country: ipData.country_name.toUpperCase() || '',
+      city: ipData.city || '',
+      timezone: ipData.time_zone.offset_with_dst,
+    };
+    const leadRes = yield createLead(leadBody);
     const leadData = yield leadRes.json();
+
+    console.log('leadData', leadData);
 
     if (leadData.customer === 'yes') {
       yield put(setCustomer('yes'));

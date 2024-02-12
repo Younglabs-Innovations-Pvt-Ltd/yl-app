@@ -24,14 +24,13 @@ import CountryList from '../components/country-list.component';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   setCountry,
-  setModalVisible,
   fetchBookingStatusStart,
   setCustomer,
+  setErrorMessage,
 } from '../store/welcome-screen/reducer';
 
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
-import {networkSelector} from '../store/network/selector';
 
 import {i18nContext} from '../context/lang.context';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
@@ -60,7 +59,9 @@ const DemoClassScreen = ({navigation}) => {
   const dispatch = useDispatch();
 
   const {ipData} = useSelector(bookDemoSelector);
-  const {country, loading, customer} = useSelector(welcomeScreenSelector);
+  const {country, loading, customer, message} = useSelector(
+    welcomeScreenSelector,
+  );
 
   // Setting background color and style of Statusbar
   useEffect(() => {
@@ -97,6 +98,13 @@ const DemoClassScreen = ({navigation}) => {
     }
   }, [ipData]);
 
+  useEffect(() => {
+    if (message) {
+      Showtoast({text: message, toast, type: 'danger'});
+      dispatch(setErrorMessage(''));
+    }
+  }, [message]);
+
   const handlePhone = e => {
     const phoneRegex = /^[0-9]*$/; // Check for only number enters in input
     if (phoneRegex.test(e)) {
@@ -118,7 +126,8 @@ const DemoClassScreen = ({navigation}) => {
    */
   const handleBookingStatus = async () => {
     if (!phone) {
-      Showtoast({text: 'Please Enter Whatsapp Number', toast, type: 'danger'});
+      Showtoast({text: 'Please Enter WhatsApp Number', toast, type: 'danger'});
+      return;
     }
     dispatch(fetchBookingStatusStart({phone}));
   };
