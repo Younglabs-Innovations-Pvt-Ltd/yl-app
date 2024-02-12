@@ -16,7 +16,10 @@ import {select} from 'redux-saga/effects';
 import {fetchUserFormLoginDetails, logout} from '../store/auth/reducer';
 import {localStorage} from '../utils/storage/storage-provider';
 import {userSelector} from '../store/user/selector';
-import {setCurrentChild} from '../store/user/reducer';
+import {setCurrentChild, startEditChild} from '../store/user/reducer';
+import Input from './CustomInputComponent';
+import DropdownComponent from './DropdownComponent';
+import {COLORS} from '../utils/constants/colors';
 
 const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   const handleShowDrawer = () => navigation.openDrawer();
@@ -161,11 +164,14 @@ export default HeaderComponent;
 
 export const ChangeAddedChild = ({close}) => {
   const {user, customer} = useSelector(authSelector);
+  const [childToEdit, setChildToEdit] = useState(null);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
   const dispatch = useDispatch();
   const {currentChild, children} = useSelector(userSelector);
+
+  // console.log("current chid is", currentChild)
 
   useEffect(() => {
     let loginDetails = localStorage.getString('loginDetails');
@@ -177,6 +183,11 @@ export const ChangeAddedChild = ({close}) => {
   const handleChangeCurrentChild = child => {
     dispatch(setCurrentChild(child));
     close();
+  };
+
+  const handleEditChild = child => {
+    setChildToEdit(child);
+    console.log('child is', child);
   };
 
   return (
@@ -191,7 +202,7 @@ export const ChangeAddedChild = ({close}) => {
       <View className="w-[90%] mt-3">
         {children?.map((child, key) => {
           return (
-            <Pressable
+            <View
               className="w-full border py-2 px-2 my-2 rounded-md relative"
               style={{
                 borderColor:
@@ -199,75 +210,178 @@ export const ChangeAddedChild = ({close}) => {
                     ? textColors?.textYlMain
                     : textColors.textSecondary,
               }}
-              onPress={() => handleChangeCurrentChild(child)}
               key={key}>
-              <View className="w-full flex-row items-center">
-                <View
-                  className="h-[40px] w-[40px] items-center justify-center"
-                  style={[
-                    {
-                      borderRadius: 50,
-                      backgroundColor: textColors.textYlMain,
-                    },
-                  ]}>
-                  <MIcon name="account" size={25} color="white" />
-                </View>
-
-                <View className="ml-3">
-                  <Text
-                    className="text-base capitalize leading-[18px]"
-                    style={{
-                      color: textColors.textYlMain,
-                      fontFamily: FONTS.headingFont,
-                    }}>
-                    {child.name}
-                  </Text>
-                  <Text
-                    className="text-[14px] leading-[18px]"
-                    style={{
-                      color: textColors.textSecondary,
-                      fontFamily: FONTS.headingFont,
-                    }}>
-                    Age: {child?.age || ''}
-                  </Text>
-                </View>
-
-                {currentChild?.name == child.name && (
+              <Pressable
+                className="w-full"
+                onPress={() => handleChangeCurrentChild(child)}>
+                <View className="w-full flex-row items-center">
                   <View
-                    className="absolute -top-3 -right-3"
-                    style={{backgroundColor: bgColor}}>
-                    <MIcon
-                      name="check-circle-outline"
-                      size={25}
-                      color={textColors.textYlMain}
+                    className="h-[40px] w-[40px] items-center justify-center"
+                    style={[
+                      {
+                        borderRadius: 50,
+                        backgroundColor: textColors.textYlMain,
+                      },
+                    ]}>
+                    <MIcon name="account" size={25} color="white" />
+                  </View>
+
+                  <View className="ml-3">
+                    <Text
+                      className="text-base capitalize leading-[18px]"
+                      style={{
+                        color: textColors.textYlMain,
+                        fontFamily: FONTS.headingFont,
+                      }}>
+                      {child.name}
+                    </Text>
+                    <Text
+                      className="text-[14px] leading-[18px]"
+                      style={{
+                        color: textColors.textSecondary,
+                        fontFamily: FONTS.headingFont,
+                      }}>
+                      Age: {child?.age || ''}
+                    </Text>
+                  </View>
+                </View>
+
+                {child?.courses?.length > 0 && (
+                  <View className="w-full p-2 flex flex-row items-center">
+                    {/* <Text className="text-gray-500 font-semibold text-[14px]">Courses Bought: </Text> */}
+                    <FlatList
+                      data={child?.courses}
+                      keyExtractor={course => course}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      renderItem={({item}) => {
+                        return (
+                          <View className="py-[2px] px-2 border border-gray-200 rounded-full items-center justify-center">
+                            <Text
+                              className="text-[12px]"
+                              style={{color: textColors.textSecondary}}>
+                              {item}
+                            </Text>
+                          </View>
+                        );
+                      }}
+                      ItemSeparatorComponent={() => (
+                        <View className="ml-2"></View>
+                      )}
                     />
                   </View>
                 )}
-              </View>
-              {child?.courses?.length > 0 && (
-                <View className="w-full p-2 flex flex-row items-center">
-                  {/* <Text className="text-gray-500 font-semibold text-[14px]">Courses Bought: </Text> */}
-                  <FlatList
-                    data={child?.courses}
-                    keyExtractor={course => course}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({item}) => {
-                      return (
-                        <View className="py-[2px] px-2 border border-gray-200 rounded-full items-center justify-center">
-                          <Text className="text-[12px]" style={{color:textColors.textSecondary}}>{item}</Text>
-                        </View>
-                      );
-                    }}
-                    ItemSeparatorComponent={() => (
-                      <View className="ml-2"></View>
-                    )}
+              </Pressable>
+              {currentChild?.name == child.name && (
+                <View
+                  className="absolute -top-2 -right-2"
+                  style={{backgroundColor: bgColor}}>
+                  <MIcon
+                    name="check-circle-outline"
+                    size={25}
+                    color={textColors.textYlMain}
                   />
                 </View>
               )}
-            </Pressable>
+
+              <View className="absolute bottom-1 right-1 z-50">
+                <MIcon
+                  name={
+                    childToEdit?.name === child.name
+                      ? 'close'
+                      : 'pencil-outline'
+                  }
+                  size={22}
+                  color={textColors?.textYlMain}
+                  onPress={() => {
+                    childToEdit?.name === child.name
+                      ? setChildToEdit(null)
+                      : handleEditChild(child);
+                  }}
+                />
+              </View>
+
+              {childToEdit?.name === child.name && (
+                <View className="w-full">
+                  <EditChildView
+                    child={child}
+                    close={close}
+                    setChildToEdit={setChildToEdit}
+                  />
+                </View>
+              )}
+            </View>
           );
         })}
+      </View>
+    </View>
+  );
+};
+
+const EditChildView = ({child, close, setChildToEdit}) => {
+  const dispatch = useDispatch();
+  const {user} = useSelector(authSelector);
+  const [childName, setChildName] = useState('');
+  const [childAge, setChildAge] = useState(null);
+  const {editChildLoading} = useSelector(userSelector);
+
+  useEffect(() => {
+    setChildName(child?.name);
+    setChildAge(child?.age);
+  }, [child]);
+
+  const arr = [
+    {label: '5', value: 5},
+    {label: '6', value: 6},
+    {label: '7', value: 7},
+    {label: '8', value: 8},
+    {label: '9', value: 9},
+    {label: '10', value: 10},
+    {label: '11', value: 11},
+    {label: '12', value: 12},
+    {label: '13', value: 13},
+    {label: '14', value: 14},
+  ];
+
+  const onSaveChild = () => {
+    let body = {
+      toAdd: childName,
+      toRemove: child?.name,
+      childAge,
+      leadId: user?.leadId,
+      close,
+    };
+    console.log('body is', body);
+    dispatch(startEditChild(body));
+    setChildToEdit(null);
+  };
+
+  return (
+    <View className="w-full items-center mt-4">
+      <View className="w-[80%]">
+        <Input
+          placeHolder="Enter Child Name"
+          setValue={setChildName}
+          value={childName}
+        />
+
+        <DropdownComponent
+          data={arr}
+          placeHolder="Select Child"
+          setSelectedValue={setChildAge}
+          defaultValue={childAge?.toString()}
+        />
+
+        <Pressable
+          className="w-full py-2 rounded-full justify-center flex-row"
+          style={{backgroundColor: COLORS.pblue}}
+          onPress={onSaveChild}
+          disabled={editChildLoading}>
+          <Text className="text-white text-base font-semibold">Save</Text>
+          {editChildLoading && (
+            <ActivityIndicator size={'small'} color={'white'} className="ml-2"/>
+          )}
+        </Pressable>
       </View>
     </View>
   );

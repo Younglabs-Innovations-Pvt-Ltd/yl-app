@@ -333,7 +333,7 @@ export default UploadHandwriting;
 const styles = StyleSheet.create({
   btnUpload: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 2,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

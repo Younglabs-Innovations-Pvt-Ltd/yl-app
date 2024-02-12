@@ -2,9 +2,11 @@ import {all, call, put, takeLatest} from 'redux-saga/effects';
 import auth from '@react-native-firebase/auth';
 import {
   childAdded,
+  setChildAddSuccess,
   setChildren,
   setCurrentChild,
   startAddingChild,
+  startEditChild,
   startFetchBookingDetailsByName,
 } from './reducer';
 import {BASE_URL} from '@env';
@@ -49,22 +51,38 @@ export function* userSaga() {
     }
   }
 
-  function* fetchBookingByName({payload}) {
-    // console.log('fetching by name', payload);
-    // const response = yield put(fetchBookingDetails(payload));
-    // const data = yield response.json();
-    // const detailsResponse = yield call(fetchBookingDetils, {
-    //   bookingId: payload,
-    // });
-    // const bookingDetails = yield detailsResponse.json();
-    // // set id to local storage
-    // // const bookingIdFromAsync = yield AsyncStorage.getItem(
-    // //   LOCAL_KEYS.BOOKING_ID,
-    // // );
-    // // if (!bookingIdFromAsync) {
-    // //   yield AsyncStorage.setItem(LOCAL_KEYS.BOOKING_ID, payload);
-    // // }
-    // yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
+  function* fetchBookingByName({payload}) {}
+
+  function* editChildFunction({payload}) {
+    try {
+      const close = payload?.close;
+      delete payload.close;
+
+      console.log('sending payload to child', payload);
+      const response = yield fetch(`${BASE_URL}/admin/app/updateChildName`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = yield response.json();
+
+      if (data?.data?.children) {
+        yield put(setChildren(data?.data?.children));
+      }
+      Snackbar.show({
+        text: 'Child Edited Successfully',
+        textColor: 'white',
+        duration: Snackbar.LENGTH_LONG,
+      });
+      close && close();
+    } catch (error) {
+      console.log("edit child error", error);
+      
+      setChildAddSuccess(false);
+    }
   }
 
   function* startAddingChildListner() {
@@ -73,7 +91,8 @@ export function* userSaga() {
 
   function* childrendAddEffect({payload}) {
     if (payload && payload.length > 0) {
-      setCurrentChild(payload[0]);
+      console.log('in if condition');
+      yield put(setCurrentChild(payload[0]));
     }
   }
 
@@ -85,9 +104,14 @@ export function* userSaga() {
     yield takeLatest(startFetchBookingDetailsByName.type, fetchBookingByName);
   }
 
+  function* editChildListner() {
+    yield takeLatest(startEditChild.type, editChildFunction);
+  }
+
   yield all([
     call(startAddingChildListner),
     call(setChildrenListner),
     call(startFetchBookingDetailsByNameListner),
+    call(editChildListner),
   ]);
 }

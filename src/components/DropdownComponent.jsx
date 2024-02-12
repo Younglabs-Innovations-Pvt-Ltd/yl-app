@@ -22,9 +22,7 @@ const DropdownComponent = ({
 
   useEffect(() => {
     if (defaultValue && data) {
-      console.log("default value is", defaultValue);
       const filtered = data?.filter(item => item.label === defaultValue);
-      console.log('filtered', filtered);
       setValue(filtered[0]);
     }
   }, [defaultValue, data]);

@@ -35,24 +35,6 @@ const DemoWaiting = ({timeLeft}) => {
 
   return (
     <View className="relative">
-      {!isCollapsed && (
-        <View className="absolute top-0 right-0 bg-white z-50">
-          <MIcon
-            name={
-              isCollapsed
-                ? 'arrow-down-drop-circle-outline'
-                : 'arrow-up-drop-circle-outline'
-            }
-            color={'gray'}
-            size={15}
-            className=""
-            onPress={() => {
-              console.log('here'), collapsibleClick();
-            }}
-          />
-        </View>
-      )}
-
       {isCollapsed && (
         <View className="py-1 px-2 flex-row">
           <ShortTape timeLeft={timeLeft} setIsCollapsed={setIsCollapsed} />
@@ -64,6 +46,7 @@ const DemoWaiting = ({timeLeft}) => {
           timeLeft={timeLeft}
           demoData={demoData}
           onVisibleEmail={onVisibleEmail}
+          setIsCollapsed={setIsCollapsed}
         />
       )}
 
@@ -102,7 +85,7 @@ const DemoWaiting = ({timeLeft}) => {
 
 export default DemoWaiting;
 
-const LongTape = ({timeLeft, demoData, onVisibleEmail}) => {
+const LongTape = ({timeLeft, demoData, onVisibleEmail, setIsCollapsed}) => {
   const gmailIcon = require('../../assets/icons/gmailIcon.png');
 
   const marginBottom = useSharedValue(-30);
@@ -121,7 +104,7 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail}) => {
         marginBottom: marginBottom,
         opacity: opacity,
       }}>
-      <View className="flex-row items-end justify-between py-1 px-2">
+      <View className="flex-row items-end justify-between py-1 px-1">
         <View className="flex-col">
           <Text className="text-xs text-white">
             Your First free dmeo class will start in
@@ -131,11 +114,11 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail}) => {
           </View>
         </View>
 
-        <View className="flex-row px-1 items-end justify-end mr-3">
+        <View className="flex-row px-1 items-center justify-end">
           <View className="">
             <UploadHandwriting demoData={demoData} />
           </View>
-          <View className="justify-end ml-3">
+          <View className="justify-end ml-2">
             <Pressable
               style={({pressed}) => [
                 {
@@ -149,22 +132,33 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail}) => {
               <Image
                 source={gmailIcon}
                 style={{
-                  width: 25,
-                  height: 20,
+                  width: 22,
+                  height: 18,
                   resizeMode: 'cover',
                 }}
               />
-              <Text
-                style={{color: COLORS.white}}
-                className="text-[12px] leading-[12px] mt-1">
-                Email
-              </Text>
-              <Text
-                style={{color: COLORS.white}}
-                className="text-[12px] leading-[12px]">
-                link
-              </Text>
+              <View className="items-center mt-1">
+                <Text
+                  style={{color: COLORS.white}}
+                  className="text-[12px] leading-[12px]">
+                  Email
+                </Text>
+                <Text
+                  style={{color: COLORS.white}}
+                  className="text-[12px] leading-[12px]">
+                  link
+                </Text>
+              </View>
             </Pressable>
+          </View>
+
+          <View className="items-center justify-start h-full ml-2">
+            <MIcon
+              name="arrow-up"
+              size={35}
+              color="white"
+              onPress={() => setIsCollapsed(true)}
+            />
           </View>
         </View>
       </View>
@@ -252,7 +246,7 @@ const ShortTape = ({timeLeft, setIsCollapsed}) => {
           </Text>
           <CountDownTimer2 timeLeft={timeLeft} />
         </View>
-        <MIcon name="chevron-down" size={20} color="white" />
+        <MIcon name="arrow-down" size={20} color="white" />
       </Pressable>
     </Animated.View>
   );
