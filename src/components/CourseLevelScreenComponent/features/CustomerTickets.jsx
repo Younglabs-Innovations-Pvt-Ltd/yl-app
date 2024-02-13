@@ -81,9 +81,10 @@ const CustomerTickets = ({setShowMyTickets}) => {
       ) : (
         <ScrollView className="w-[100%]">
           {myTickets &&
-            myTickets?.map(ticket => {
+            myTickets?.map((ticket, index) => {
               return (
                 <TicketTile
+                  key={index}
                   category={ticket?.category}
                   ticketStatus={ticket?.ticketStatus}
                   createdAt={ticket?.createdAt}

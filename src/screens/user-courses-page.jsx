@@ -79,8 +79,7 @@ const UserCoursesPage = ({navigation}) => {
 
   return (
     <View className="flex-1" style={{backgroundColor: bgColor}}>
-      {
-      userOrdersLoading ? (
+      {userOrdersLoading ? (
         <CourseLoadingSkeleton />
       ) : userOrderLoadingFailed ? (
         <View className="w-full items-center mt-6">
@@ -115,8 +114,15 @@ const UserCoursesPage = ({navigation}) => {
           {userCourseData?.length > 0 ? (
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
               <ScrollView className="" showsVerticalScrollIndicator={false}>
-                {userCourseData?.map(course => {
-                  return <CourseCard course={course} navigation={navigation} />;
+                {userCourseData?.map((course,index) => {
+                  console.log(course);
+                  return (
+                    <CourseCard
+                      key={index}
+                      course={course}
+                      navigation={navigation}
+                    />
+                  );
                 })}
               </ScrollView>
             </View>
@@ -158,8 +164,7 @@ const UserCoursesPage = ({navigation}) => {
             snapPoint={['50%', '75%']}
           />
         </View>
-      )
-      }
+      )}
     </View>
   );
 };

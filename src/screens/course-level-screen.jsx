@@ -38,7 +38,7 @@ const CourseLevelScreen = ({navigation, route}) => {
   const {homeworksubmittedsuccessfully} = useSelector(handleClassesHomeWork);
   const {requestRecordingSuccessfully} = useSelector(handleRequestRecording);
   const handleCourseClick = ({serviceRequestId}) => {
-    const leadId = user.leadId;
+    const leadId = user?.leadId;
     dispatch(startFetchServiceRequestClasses({leadId, serviceRequestId}));
   };
 
