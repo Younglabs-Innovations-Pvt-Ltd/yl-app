@@ -266,6 +266,10 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
     dispatch(setChildData(null));
   };
 
+  const onRequestClose = () => {
+    setShowAddChildView(false);
+  };
+
   const {width, height} = Dimensions.get('window');
 
   return (
@@ -471,14 +475,14 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
 
       <ModalComponent
         visible={showAddChildView}
-        onRequestClose={() => setShowAddChildView(false)}
+        onRequestClose={onRequestClose}
         animationType="fade"
         duration={10}>
         <View
           className="bg-[#1312125c] relative z-50"
           style={{height: height + 15, width}}>
           <View className="flex-1 absolute bottom-0 pb-10 w-full bg-white p-3 rounded h-[450px]">
-            <AddChildModule />
+            <AddChildModule onClose={onRequestClose} />
           </View>
         </View>
       </ModalComponent>
