@@ -90,6 +90,7 @@ const EmailLogin = ({navigation}) => {
             value={email}
             inputMode="email"
             className="w-full border rounded-md border-gray-400"
+            autoCapitalize="none"
           />
           <Text
             style={{fontFamily: FONTS.primaryFont}}

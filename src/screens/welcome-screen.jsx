@@ -129,7 +129,7 @@ const DemoClassScreen = ({navigation}) => {
       Showtoast({text: 'Please Enter WhatsApp Number', toast, type: 'danger'});
       return;
     }
-    dispatch(fetchBookingStatusStart({phone}));
+    dispatch(fetchBookingStatusStart({phone, ipData}));
   };
 
   // Select different countries

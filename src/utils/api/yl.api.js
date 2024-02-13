@@ -281,19 +281,13 @@ export const getCourseVideo = async ({courseId}) => {
 };
 
 // Create lead
-export const createLead = async ({
-  phone,
-  countryCode,
-  courseId,
-  deviceUID,
-  deviceId,
-}) => {
+export const createLead = async body => {
   return fetch(`${BASE_URL}${CREATE_LEAD}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({deviceId, phone, deviceUID, countryCode, courseId}),
+    body: JSON.stringify(body),
   });
 };
 

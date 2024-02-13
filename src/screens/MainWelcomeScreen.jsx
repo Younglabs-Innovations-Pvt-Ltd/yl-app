@@ -141,11 +141,12 @@ const MainWelcomeScreen = ({navigation}) => {
           dispatch(setIsFirstTimeUser(true));
         }
       } else if (user?.phone) {
-        dispatch(startFetchBookingDetailsFromPhone({phone:user?.phone}));
+        dispatch(startFetchBookingDetailsFromPhone({phone: user?.phone}));
       }
     } else if (user?.phone && customer == 'yes') {
       console.log('is customer yes and getting details from phone');
-      dispatch(startFetchBookingDetailsFromPhone({phone:user?.phone}));
+      console.log('user.phone', user.phone);
+      dispatch(startFetchBookingDetailsFromPhone({phone: user?.phone}));
     }
   }, [user, currentChild]);
 
@@ -180,6 +181,8 @@ const MainWelcomeScreen = ({navigation}) => {
     if (!bookingTime) return;
     const isDemoOver =
       new Date(bookingTime).getTime() + 1000 * 60 * 10 <= Date.now();
+    console.log('teamUrl', teamUrl);
+
     if (isDemoOver && isAttended && teamUrl && !isNmi && !appRemark) {
       setShowPostActions(true);
     } else {

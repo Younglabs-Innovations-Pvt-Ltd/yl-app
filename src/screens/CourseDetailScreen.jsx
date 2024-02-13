@@ -67,7 +67,8 @@ const CourseDetailsScreen = ({navigation, route}) => {
 
   const scrollToBottom = () => {
     // console.log('scrolling to bottom');
-    scrollViewRef.current.scrollToEnd({animated: true});
+    scrollViewRef.current &&
+      scrollViewRef.current.scrollToEnd({animated: true});
   };
 
   useEffect(() => {

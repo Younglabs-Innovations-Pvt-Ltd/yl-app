@@ -71,6 +71,9 @@ function* handleBookingStatus({payload: {phone, ipData}}) {
       city: ipData.city || '',
       timezone: ipData.time_zone.offset_with_dst,
     };
+
+    console.log('leadBody', leadBody);
+
     const leadRes = yield createLead(leadBody);
     const leadData = yield leadRes.json();
 

@@ -105,7 +105,7 @@ export function* fetchDemoDetailsFromPhone({payload}) {
     yield put(setBookingDetailSuccess({demoData: data, bookingDetails}));
     yield put(setContentData({improvements, reviews, tips, content}));
   } catch (error) {
-    console.log('fetchDemoDetailsFromPhoneError', error);
+    console.log('fetchDemoDetailsFromPhoneError', payload, error);
     // yield put(setBookingDetailsFailed("Something went wrong, try again"))
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setLoading(false));

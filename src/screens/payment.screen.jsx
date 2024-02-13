@@ -544,7 +544,7 @@ const Payment = ({navigation, route}) => {
               Order For
             </Text>
 
-            {dropdownData && dropdownData.length > 1 ? (
+            {dropdownData && dropdownData.length > 0 ? (
               <View className="flex-row justify-start w-full mt-3">
                 <View className="w-[40%]">
                   <Text
@@ -1068,7 +1068,7 @@ const Payment = ({navigation, route}) => {
 };
 
 const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
-  const {textColors , bgColor} = useSelector(state => state.appTheme);
+  const {textColors, bgColor} = useSelector(state => state.appTheme);
   return (
     <View className="w-full items-center">
       <Text
@@ -1096,8 +1096,7 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
                 {selectChild?.name === child?.name && (
                   <View
                     className="absolute -top-2 -right-2"
-                    style={{backgroundColor:bgColor}}
-                    >
+                    style={{backgroundColor: bgColor}}>
                     <MIcon
                       name="check-circle-outline"
                       size={25}
@@ -1109,12 +1108,18 @@ const ChangeChildModule = ({data, setChild, selectChild, closeSheet}) => {
                 <View className="ml-3">
                   <Text
                     className="text-xl font-semibold"
-                    style={{fontFamily: FONTS.primaryFont , color:textColors.textYlMain}}>
+                    style={{
+                      fontFamily: FONTS.primaryFont,
+                      color: textColors.textYlMain,
+                    }}>
                     {child.name}
                   </Text>
                   <Text
                     className="mt-1"
-                    style={{fontFamily: FONTS.primaryFont ,color:textColors.textSecondary}}>
+                    style={{
+                      fontFamily: FONTS.primaryFont,
+                      color: textColors.textSecondary,
+                    }}>
                     Age: {child.age}
                   </Text>
                 </View>
