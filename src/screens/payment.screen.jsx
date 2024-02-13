@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useMemo} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -30,7 +30,7 @@ import ModalComponent from '../components/modal.component';
 import Icon from '../components/icon.component';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {resetCourseDetails} from '../store/course/course.reducer';
-import {getOfferCode} from '../utils/api/yl.api';
+import {addParentNameToLead, getOfferCode} from '../utils/api/yl.api';
 import {FONTS} from '../utils/constants/fonts';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import auth from '@react-native-firebase/auth';
@@ -43,6 +43,8 @@ import {useToast} from 'react-native-toast-notifications';
 import {userSelector} from '../store/user/selector';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 import Snackbar from 'react-native-snackbar';
+import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
+import {setUser} from '../store/auth/reducer';
 
 GoogleSignin.configure({
   webClientId:
@@ -84,6 +86,11 @@ const Payment = ({navigation, route}) => {
   const [classCount, setClassCount] = useState(null);
   const [defCouponApplyLoading, setDefCouponApplyLoading] = useState(false);
   const [couponApplyLoading, setCouponApllyLoading] = useState(false);
+  const [visibleNameSheet, setVisibleNameSheet] = useState(false);
+  const [parentName, setParentName] = useState('');
+  const [parentNameLoading, setParentNameLoading] = useState(false);
+  const [fullName, setFullName] = useState('');
+
   const {textColors, bgColor, darkMode, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -104,6 +111,8 @@ const Payment = ({navigation, route}) => {
     courseDetails,
   } = useSelector(courseSelector);
 
+  const toast = useToast();
+
   useEffect(() => {
     let classesSolds;
     if (classesSold && classesSold > 0) {
@@ -121,6 +130,7 @@ const Payment = ({navigation, route}) => {
       setLeadDataFormVisible(false);
     }
     setTotalCredits(user?.credits || 0);
+    setFullName(user?.fullName || '');
 
     const fetchOfferCodes = async () => {
       console.log('fetching offers');
@@ -179,6 +189,38 @@ const Payment = ({navigation, route}) => {
     }
   }, [payment]);
 
+  const saveParentName = async () => {
+    try {
+      if (!parentName) {
+        Showtoast({text: 'Enter your name', toast, type: 'danger'});
+        return;
+      }
+
+      setParentNameLoading(true);
+      const response = await addParentNameToLead({
+        leadId: user.leadId,
+        fullName: parentName,
+      });
+
+      if (response.status === 200) {
+        setFullName(parentName);
+        setParentNameLoading(false);
+        setVisibleNameSheet(false);
+        Showtoast({text: 'Name added', toast});
+        const updatedUser = {...user, fullName: parentName};
+        dispatch(setUser(updatedUser));
+        setParentName('');
+      } else {
+        Showtoast({text: 'Something went wrong', toast, type: 'danger'});
+        setParentNameLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      Showtoast({text: 'Something went wrong', toast, type: 'danger'});
+      setParentNameLoading(false);
+    }
+  };
+
   const handleCheckout = async () => {
     if (!email) {
       setEmailErr('Enter your email address.');
@@ -229,7 +271,11 @@ const Payment = ({navigation, route}) => {
   };
 
   const handleSoloBatchCheckOut = () => {
-    console.log('user is');
+    if (!fullName) {
+      Showtoast({text: 'Add your name', toast, type: 'danger'});
+      return;
+    }
+
     if (!email) {
       setEmailErr('Enter your email address.');
       return;
@@ -255,7 +301,7 @@ const Payment = ({navigation, route}) => {
       promisedStartDate: startDateTime,
       promisedBatchFrequency: null,
       phone: user?.phone,
-      fullName: user?.fullName || 'unknown', // TODO: this should be from user
+      fullName: user?.fullName, // TODO: this should be from user
       batchId: null,
       childName: selectedChildForOrder.name,
       email: email,
@@ -460,14 +506,6 @@ const Payment = ({navigation, route}) => {
     }
   }
 
-  // const getToken = async()=>{
-  //   let token = await auth().currentUser.getIdToken()
-  //   console.log("token is",token)
-  // }
-
-  // getToken()
-  // referral and coupon handlers
-
   const redeemCredits = async () => {
     try {
       if (user.credits == 0) {
@@ -513,6 +551,24 @@ const Payment = ({navigation, route}) => {
     }
   }, [children]);
 
+  const FULL_NAME = useMemo(() => {
+    return fullName ? (
+      <TextWrapper
+        fs={18}
+        fw="700"
+        styles={{textTransform: 'capitalize'}}
+        color={textColors.textPrimary}>
+        {fullName}
+      </TextWrapper>
+    ) : (
+      <Pressable
+        className="w-[140px] py-[6px] px-2 bg-blue-500 rounded items-center justify-center"
+        onPress={() => setVisibleNameSheet(true)}>
+        <Text className="text-white font-semibold">Add your name</Text>
+      </Pressable>
+    );
+  }, [fullName, setVisibleNameSheet]);
+
   return (
     <View style={{flex: 1, backgroundColor: bgColor}}>
       <ScrollView
@@ -524,13 +580,14 @@ const Payment = ({navigation, route}) => {
             styles.card,
             {backgroundColor: darkMode ? bgSecondaryColor : '#fff'},
           ]}>
-          <TextWrapper
+          {/* <TextWrapper
             fs={18}
             fw="700"
             styles={{textTransform: 'capitalize'}}
             color={textColors.textPrimary}>
             {user?.fullName}
-          </TextWrapper>
+          </TextWrapper> */}
+          {FULL_NAME}
 
           <Spacer space={2} />
           <TextWrapper color={textColors.textSecondary}>
@@ -934,6 +991,48 @@ const Payment = ({navigation, route}) => {
         snapPoint={['40%', '75%']}
       />
 
+      {/* Add parent name */}
+      <BottomSheetComponent
+        isOpen={visibleNameSheet}
+        onClose={() => setVisibleNameSheet(false)}
+        style={{
+          borderWidth: 1.25,
+          borderColor: '#eaeaea',
+          borderTopLeftRadius: 6,
+          borderTopRightRadius: 6,
+        }}
+        // keyboardBehavior="fillParent"
+        Children={
+          <View style={{width: '85%', paddingTop: 8}}>
+            <BottomSheetTextInput
+              placeholder="Enter your name"
+              style={[styles.emailInput, {color: textColors.textPrimary}]}
+              textContentType="name"
+              autoCorrect={false}
+              autoCapitalize="none"
+              keyboardType="default"
+              value={parentName}
+              onChangeText={e => setParentName(e)}
+              selectionColor={textColors.textYlMain}
+              placeholderTextColor={textColors.textSecondary}
+            />
+            <Pressable
+              className="py-4 px-2 mt-3 bg-blue-500 rounded items-center justify-center flex-row"
+              onPress={saveParentName}>
+              <Text className="text-white font-semibold">Submit</Text>
+              {parentNameLoading && (
+                <ActivityIndicator
+                  size={'small'}
+                  color={COLORS.white}
+                  style={{marginLeft: 4}}
+                />
+              )}
+            </Pressable>
+          </View>
+        }
+        snapPoint={['30%']}
+      />
+
       <BottomSheetComponent
         isOpen={openAddChildSheet}
         onClose={() => setOpenAddChildSheet(false)}
@@ -961,7 +1060,7 @@ const Payment = ({navigation, route}) => {
         </View>
       </ModalComponent>
 
-      <ModalComponent visible={visibleCongratulations} animationType="fade">
+      {/* <ModalComponent visible={visibleCongratulations} animationType="fade">
         <View
           style={{
             flex: 1,
@@ -976,9 +1075,9 @@ const Payment = ({navigation, route}) => {
             Congratulations
           </TextWrapper>
         </View>
-      </ModalComponent>
+      </ModalComponent> */}
 
-      <ModalComponent
+      {/* <ModalComponent
         visible={visible}
         onRequestClose={onClose}
         animationType="fade">
@@ -1012,7 +1111,7 @@ const Payment = ({navigation, route}) => {
           </View>
           <Pressable style={styles.modalOverlay}></Pressable>
         </View>
-      </ModalComponent>
+      </ModalComponent> */}
       <ModalComponent visible={authVisible}>
         <View
           style={{

@@ -303,3 +303,14 @@ export const addNewSoloBooking = async data => {
     body: JSON.stringify(data),
   });
 };
+
+// Add parent name
+export const addParentNameToLead = async ({leadId, fullName}) => {
+  return await fetch(`${BASE_URL}/admin/app/addParentName`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({leadId, fullName}),
+  });
+};
