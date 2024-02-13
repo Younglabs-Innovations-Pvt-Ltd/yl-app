@@ -57,7 +57,6 @@ const Payment = ({navigation, route}) => {
   const {paymentBatchType} = route.params;
   const {paymentMethod} = route.params;
   const {classesSold} = route.params;
-  const [email, setEmail] = useState('');
   const [emailErr, setEmailErr] = useState('');
   const [dateTime, setDateTime] = useState('');
   const [visible, setVisible] = useState(false);
@@ -69,6 +68,7 @@ const Payment = ({navigation, route}) => {
   const [authVisible, setAuthVisible] = useState(false);
   // reducers values
   const {user} = useSelector(authSelector);
+  const [email, setEmail] = useState(user?.email || '');
   // referral and coupon handle
   const [totalCredits, setTotalCredits] = useState(0);
   const [totalCreditsUsed, setTotalCreditsUsed] = useState(0);
@@ -803,7 +803,6 @@ const Payment = ({navigation, route}) => {
                   {color: textColors.textPrimary},
                 ]}
                 autoCorrect={false}
-                autoCapitalize="characters"
                 keyboardType="default"
                 value={couponCode}
                 onChangeText={e => setCouponCode(e)}

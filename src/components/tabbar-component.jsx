@@ -10,8 +10,6 @@ import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {useSelector} from 'react-redux';
 import {FONTS} from '../utils/constants/fonts';
 
-
-
 const shareApp = async () => {
   const message =
     'I really liked Younglabs handwriting improvement App. You can try it as well.';
@@ -32,27 +30,27 @@ function Tabbar({state, descriptors, navigation}) {
   const {bgColor, bgSecondaryColor, textColors, darkMode, colorYlMain} =
     useSelector(state => state.appTheme);
 
-    const Icons = (name, focused) => {
-      switch (name) {
-        case 'Drawer':
-          return (
-            <Image
-              source={require('../assets/images/spinner.png')}
-              style={{width: 28, height: 28, objectFit: 'contain'}}
-            />
-          );
-        case 'Account':
-          return (
-            <MIcon
-              name="account"
-              size={26}
-              color={focused ? COLORS.pblue : textColors.textPrimary}
-            />
-          );
-        default:
-          return;
-      }
-    };
+  const Icons = (name, focused) => {
+    switch (name) {
+      case 'Drawer':
+        return (
+          <Image
+            source={require('../assets/images/spinner.png')}
+            style={{width: 28, height: 28, objectFit: 'contain'}}
+          />
+        );
+      case 'Account':
+        return (
+          <MIcon
+            name="account"
+            size={26}
+            color={focused ? COLORS.pblue : textColors.textPrimary}
+          />
+        );
+      default:
+        return;
+    }
+  };
 
   const ScreenIcon = ({name, focused}) => {
     const icon = Icons(name, focused);
@@ -99,6 +97,11 @@ function Tabbar({state, descriptors, navigation}) {
                 testID={options.tabBarTestID}
                 onPress={() => onPress(route.name)}
                 style={{flex: 1, alignItems: 'center'}}>
+                {isFocused && (
+                  <View
+                    className="w-[70%] top-0 right-0 p-[2px] rounded-full"
+                    style={{backgroundColor: colorYlMain}}></View>
+                )}
                 <Icon
                   name="book-outline"
                   size={26}

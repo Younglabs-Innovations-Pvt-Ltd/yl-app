@@ -17,6 +17,8 @@ import {BASE_URL, RP_KEY} from '@env';
 import {localStorage} from '../../utils/storage/storage-provider';
 import auth from '@react-native-firebase/auth';
 import {Linking} from 'react-native';
+import {replace} from '../../navigationRef';
+import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
 function* payOnTazapay({body, ipData}) {
   try {
@@ -223,13 +225,13 @@ function* makePaymentSaga({payload}) {
       description: 'Younglabs Innovations',
     };
 
-    console.log('options is', options);
-
     const rzRes = yield RazorpayCheckout.open(options);
     console.log('rzRes=', rzRes);
-    if (rzRes) {
-      yield put(makePaymentSuccess(MESSAGES.PAYMENT_SUCCESS));
-      yield put(setEmail(body.email));
+
+    if (rzRes.status_code === 200) {
+      replace(SCREEN_NAMES.PAYMENT_SUCCESS);
+    } else {
+      yield put(makePaymentFailed('Payment failed, Something went wrong.'));
     }
   } catch (error) {
     console.log(error);
@@ -338,11 +340,14 @@ function* makeSoloPaymentSaga({payload}) {
         description: 'Younglabs Innovations',
       };
 
-      console.log('options=', options);
-
       const rzRes = yield RazorpayCheckout.open(options);
       console.log('rzRes=', rzRes);
       yield put(setLoading(false));
+      if (rzRes.status_code === 200) {
+        replace(SCREEN_NAMES.PAYMENT_SUCCESS);
+      } else {
+        yield put(makePaymentFailed('Payment failed, Something went wrong.'));
+      }
     }
   } catch (error) {
     console.log('getting err', error);

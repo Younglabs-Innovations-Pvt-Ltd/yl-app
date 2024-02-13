@@ -38,7 +38,7 @@ const MainScreen = ({route}) => {
         component={CourseScreenNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Course',
+          tabBarLabel: 'My Courses',
         }}
       />
       <Tab.Screen
