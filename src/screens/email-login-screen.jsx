@@ -109,6 +109,7 @@ const EmailLogin = ({navigation}) => {
             value={password}
             inputMode="text"
             className="w-full border rounded-md border-gray-400"
+            secureTextEntry={true}
           />
           <Text
             style={{fontFamily: FONTS.primaryFont}}
