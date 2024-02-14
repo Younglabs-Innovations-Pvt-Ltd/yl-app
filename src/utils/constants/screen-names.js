@@ -14,4 +14,6 @@ export const SCREEN_NAMES = {
   COURSE_LEVEL_PAGE: 'CourseLevelPage',
   COURSE_CONDUCT_PAGE: 'CourseConductScreen',
   PAYMENT_SUCCESS: 'paymentSuccess',
+  REFERRAL: 'referral',
+  MYTICKETS: 'myTicket',
 };

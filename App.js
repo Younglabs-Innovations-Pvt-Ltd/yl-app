@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Linking, Alert, ActivityIndicator, View} from 'react-native';
+import {Linking, Alert, ActivityIndicator, View, StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -47,9 +47,7 @@ import {NetworkProvider} from './src/context/network.state';
 import auth from '@react-native-firebase/auth';
 
 import Icon from './src/components/icon.component';
-import MainWelcomeScreen from './src/screens/MainWelcomeScreen';
 import CourseDetailsScreen from './src/screens/CourseDetailScreen';
-import UserProfile from './src/screens/UserProfile';
 import CustomToast from './src/components/CustomToast';
 import DeviceInfo from 'react-native-device-info';
 import {saveDeviceId} from './src/utils/deviceId';
@@ -58,6 +56,8 @@ import Signup from './src/screens/signup-screen';
 import EmailLogin from './src/screens/email-login-screen';
 import PaymentSuccess from './src/screens/payment-success';
 import CourseConductScreen from './src/screens/course-conduct-screen';
+import Referral from './src/screens/referral-scree';
+import MyTickets from './src/screens/mytickets-screen';
 
 initialize('kdg30i0fnc');
 
@@ -76,6 +76,11 @@ function App() {
   );
 
   const notificationRef = useRef({});
+
+  useEffect(() => {
+    StatusBar.setBackgroundColor(COLORS.pblue);
+    StatusBar.setBarStyle('light-content');
+  }, []);
 
   // Splash Screen
   useEffect(() => {
@@ -205,13 +210,12 @@ function App() {
       </View>
     );
 
-  console.log('initialRouteName=', initialRouteName);
-  const CustomBackButton = ({navigation}) => {
+  const CustomBackButton = ({navigation, color}) => {
     return (
       <Icon
         name="arrow-back-outline"
         size={24}
-        color={COLORS.black}
+        color={color}
         Conti
         style={{marginLeft: 4}}
         onPress={() => navigation.goBack()}
@@ -243,9 +247,9 @@ function App() {
                     fontFamily: FONTS.gelasio_semibold,
                     fontWeight: '700',
                   },
-                  headerLeft: () => (
-                    <CustomBackButton navigation={navigation} />
-                  ),
+                  // headerLeft: () => (
+                  //   <CustomBackButton navigation={navigation} color={COLORS.black}/>
+                  // ),
                   cardStyle: {backgroundColor: '#fff'},
                   cardStyleInterpolator:
                     CardStyleInterpolators.forHorizontalIOS,
@@ -315,12 +319,31 @@ function App() {
                     headerTitle: 'Checkout',
                   }}
                 />
-
                 <Stack.Screen
                   name={SCREEN_NAMES.PAYMENT_SUCCESS}
                   component={PaymentSuccess}
                   options={{
                     headerTitle: 'Success',
+                  }}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.REFERRAL}
+                  component={Referral}
+                  options={{
+                    headerTitle: 'Refer & Earn',
+                    headerStyle: {backgroundColor: COLORS.pblue},
+                    headerTitleStyle: {color: COLORS.white},
+                    headerTintColor: COLORS.white,
+                  }}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.MYTICKETS}
+                  component={MyTickets}
+                  options={{
+                    headerTitle: 'My Tickets',
+                    headerStyle: {backgroundColor: COLORS.pblue},
+                    headerTitleStyle: {color: COLORS.white},
+                    headerTintColor: COLORS.white,
                   }}
                 />
               </Stack.Navigator>
