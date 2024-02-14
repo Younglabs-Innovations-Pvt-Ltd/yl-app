@@ -281,19 +281,13 @@ export const getCourseVideo = async ({courseId}) => {
 };
 
 // Create lead
-export const createLead = async ({
-  phone,
-  countryCode,
-  courseId,
-  deviceUID,
-  deviceId,
-}) => {
+export const createLead = async body => {
   return fetch(`${BASE_URL}${CREATE_LEAD}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({deviceId, phone, deviceUID, countryCode, courseId}),
+    body: JSON.stringify(body),
   });
 };
 
@@ -307,5 +301,16 @@ export const addNewSoloBooking = async data => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
+  });
+};
+
+// Add parent name
+export const addParentNameToLead = async ({leadId, fullName}) => {
+  return await fetch(`${BASE_URL}/admin/app/addParentName`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({leadId, fullName}),
   });
 };

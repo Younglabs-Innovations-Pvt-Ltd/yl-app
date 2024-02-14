@@ -8,6 +8,7 @@ import {
   View,
   Alert,
   Linking,
+  Text,
 } from 'react-native';
 import Storage from '@react-native-firebase/storage';
 import RNFS from 'react-native-fs';

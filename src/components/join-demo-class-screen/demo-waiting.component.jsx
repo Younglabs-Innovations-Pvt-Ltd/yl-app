@@ -114,11 +114,11 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail, setIsCollapsed}) => {
           </View>
         </View>
 
-        <View className="flex-row px-1 items-center justify-end">
-          <View className="">
+        <View className="flex-row px-1 items-end justify-end mr-3">
+          {/* <View className="">
             <UploadHandwriting demoData={demoData} />
-          </View>
-          <View className="justify-end ml-2">
+          </View> */}
+          <View className="justify-end ml-3">
             <Pressable
               style={({pressed}) => [
                 {

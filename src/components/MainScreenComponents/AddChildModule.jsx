@@ -22,7 +22,6 @@ export const AddChildModule = ({onClose}) => {
   const {customer, user} = useSelector(authSelector);
   const {childAddLoading} = useSelector(userSelector);
 
-
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -71,7 +70,7 @@ export const AddChildModule = ({onClose}) => {
         <Text
           className="font-semibold text-center"
           style={[FONTS.heading, {color: textColors.textSecondary}]}>
-          Add Another child
+          Add child
         </Text>
 
         <View className="w-[95%] mt-4">

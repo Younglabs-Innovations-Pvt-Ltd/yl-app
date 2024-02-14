@@ -42,7 +42,7 @@ const SoloBatchPayment = ({
   levelNames,
 }) => {
   const toast = useToast();
-  const {textColors, bgColor, bgSecondaryColor , darkMode} = useSelector(
+  const {textColors, bgColor, bgSecondaryColor, darkMode} = useSelector(
     state => state.appTheme,
   );
   const [visible, setVisible] = useState(false);
@@ -51,9 +51,6 @@ const SoloBatchPayment = ({
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [classCount, setClassCount] = useState(0);
   const {courseDetails} = useSelector(courseSelector);
-
-  console.log('total classes are', classCount);
-  console.log('total classes are', classCount);
 
   useEffect(() => {
     if (prices?.solo) {
@@ -113,20 +110,32 @@ const SoloBatchPayment = ({
 
     if (dateSelectd.isBefore(dateToStartBatch)) {
       console.log('select date from today onwards');
-      Showtoast({text: 'Select date from Tomorrow onwards', toast ,type:"danger"});
+      Showtoast({
+        text: 'Select date from Tomorrow onwards',
+        toast,
+        type: 'danger',
+      });
+      hideDatePicker();
       return;
     }
 
     const differenceInDays = dateSelectd.diff(dateToStartBatch, 'days');
     if (differenceInDays > 15) {
-      Showtoast({text: 'Choose Demo date between 15 days span', toast , type:"danger"});
+      Showtoast({
+        text: 'Choose Demo date between 15 days span',
+        toast,
+        type: 'danger',
+      });
+      hideDatePicker();
       return;
     }
 
-    hideDatePicker();
     setDate(date);
     dispatch(setCurrentSelectedBatch({startDate: date, type: 'solo'}));
+    hideDatePicker();
   };
+
+  console.log('visible', visible);
 
   const {currentAgeGroup} = useSelector(courseSelector);
 
@@ -222,7 +231,9 @@ const SoloBatchPayment = ({
 
           <View
             className="py-4 rounded mt-5"
-            style={{backgroundColor:darkMode ? bgSecondaryColor : "#80808017" }}>
+            style={{
+              backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+            }}>
             <View className="">
               <Text
                 className="text-center w-full font-semibold text-xl"

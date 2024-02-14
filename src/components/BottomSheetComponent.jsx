@@ -3,14 +3,16 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
 import {useSelector} from 'react-redux';
 import {ScrollView} from 'react-native-gesture-handler';
-import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Animated, {
-  Extrapolate,
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
+import Animated, {interpolate, useAnimatedStyle} from 'react-native-reanimated';
 
-const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
+const BottomSheetComponent = ({
+  Children,
+  isOpen,
+  onClose,
+  snapPoint,
+  style,
+  ...otherProps
+}) => {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
   const {bgColor, textColors, colorYlMain, darkMode, bgSecondaryColor} =
     useSelector(state => state.appTheme);
@@ -19,11 +21,7 @@ const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
   const CustomBackdrop = ({animatedIndex, style}) => {
     // animated variables
     const containerAnimatedStyle = useAnimatedStyle(() => ({
-      opacity: interpolate(
-        animatedIndex.value,
-        [0, 1],
-        [0, 1]
-      ),
+      opacity: interpolate(animatedIndex.value, [0, 1], [0, 1]),
     }));
 
     // styles
@@ -41,9 +39,9 @@ const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
     return <Animated.View style={containerStyle} />;
   };
 
-  const CustomBackDrop = ()=>{
-    return(<View className="bg-[#000000a7]"></View>)
-  }
+  const CustomBackDrop = () => {
+    return <View className="bg-[#000000a7]"></View>;
+  };
 
   useEffect(() => {
     setBottomSheetOpen(isOpen);
@@ -82,25 +80,11 @@ const BottomSheetComponent = ({Children, isOpen, onClose, snapPoint}) => {
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
-      style={{}}
       backgroundStyle={{backgroundColor: bgColor}}
       handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}
       stackBehavior="replace"
-      // backdropComponent={CustomBackdrop}
-      >
-      {/* <View className="w-full px-3 items-end">
-        <View
-          className={`${
-            darkMode ? 'bg-gray-500' : 'bg-gray-100'
-          }  rounded-full p-1`}>
-          <MIcon
-            name="close"
-            color={textColors.textSecondary}
-            size={30}
-            onPress={closeBottomSheet}
-          />
-        </View>
-      </View> */}
+      style={style}
+      {...otherProps}>
       <ScrollView
         className="flex-1 px-2 z-50"
         contentContainerStyle={{alignItems: 'center'}}>
