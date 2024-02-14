@@ -175,7 +175,7 @@ const CoursesLoadingEffect = () => {
           keyExtractor={item => item}
           renderItem={() => (
             <ShimmerPlaceholder
-              shimmerWidthPercent={0.4}
+              // shimmerWidthPercent={0.4}
               className="h-[160px] w-[110px] mr-3 rounded"></ShimmerPlaceholder>
           )}
           horizontal

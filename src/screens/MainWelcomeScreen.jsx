@@ -256,7 +256,7 @@ const MainWelcomeScreen = ({navigation}) => {
       {loading ? (
         <View>
           <ShimmerPlaceholder
-            shimmerWidthPercent={0.4}
+            // shimmerWidthPercent={}
             style={{
               width: width,
               height: 80,
@@ -290,7 +290,7 @@ const MainWelcomeScreen = ({navigation}) => {
         {coursesLoading ? (
           <View className="rounded-md p-2 items-center">
             <ShimmerPlaceholder
-              shimmerWidthPercent={0.4}
+              // shimmerWidthPercent={0.4}
               style={{
                 borderRadius: 8,
                 width: width - 30,

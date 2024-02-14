@@ -72,7 +72,8 @@ const CourseDetailsScreen = ({navigation, route}) => {
   };
 
   useEffect(() => {
-    if (selectedTab === 'bookFreeClass') {
+    console.log('selected tab is', selectedTab);
+    if (selectedTab !== 'courseDetails') {
       scrollToBottom();
     }
   }, [selectedTab]);
@@ -107,6 +108,7 @@ const CourseDetailsScreen = ({navigation, route}) => {
             className="absolute -bottom-4  py-4 rounded-full w-[100%]"
             style={{backgroundColor: bgColor}}></View>
         </View>
+
         <View className="flex-1 relative rounded-t-2xl pt-2 px-2 mb">
           <View className="flex-1">
             {selectedTab === 'courseDetails' ? (
@@ -180,11 +182,11 @@ export const FeatureTray = ({
   const FeatureItem = ({feature}) => {
     return (
       <Pressable
-        className="w-[115px] ml-2 items-center"
+        className="w-[105px] ml-2 items-center justify-center h-[140px]"
         onPress={() => setSelectedTab(feature.value)}
         key={feature?.value}>
         <View
-          className={`py-1 rounded overflow-hidden px-1 items-center w-full bg-white justify-between`}
+          className={`py-1 rounded overflow-hidden px-1 items-center w-full h-[98%] justify-between`}
           style={{
             backgroundColor: selectedTab === feature?.value ? 'white' : 'white',
           }}>
@@ -210,20 +212,20 @@ export const FeatureTray = ({
         </View>
 
         {selectedTab === feature?.value && (
-          <View className="w-[100px] py-[1px] rounded-full bg-white mt-1"></View>
+          <View className="w-[100px] py-[1px] h-[2%] rounded-full bg-white mt-1"></View>
         )}
       </Pressable>
     );
   };
+
   return (
     <Animated.View
       style={[styles.banner(scrollA)]}
-      className="flex justify-center items-center w-full h-full">
+      className="flex items-center w-full h-full">
       <FlatList
         data={features}
         keyExtractor={item => item.value}
         renderItem={item => {
-          // console.log('feature: ')
           return <FeatureItem feature={item.item} />;
         }}
         className=""

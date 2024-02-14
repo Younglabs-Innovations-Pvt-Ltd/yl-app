@@ -26,9 +26,13 @@ const Input = ({setValue, placeHolder, value, isDisabled}) => {
         <Text
           style={[
             styles.label,
+            {borderRadius:8 , paddingHorizontal:4 , paddingVertical:2},
             {color: isFocus ? colorYlMain : textColors.textSecondary},
             {backgroundColor: bgColor, fontFamily: FONTS.primaryFont},
-          ]}>
+          ]}
+          
+          >
+
           {placeHolder}
         </Text>
       );

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Image,
+  Linking,
 } from 'react-native';
 import TextWrapper from '../components/text-wrapper.component';
 import Spacer from '../components/spacer.component';
@@ -30,6 +31,10 @@ import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import NoBatchesModule from '../components/NoBatchesModule';
 import SoloBatchPayment from '../components/payments/SoloBatchPayment';
 import {Text} from 'react-native-animatable';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {getWhatsappRedirectUrl} from '../utils/redirect-whatsapp';
+import {Showtoast} from '../utils/toast';
+import {useToast} from 'react-native-toast-notifications';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -238,7 +243,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
             />
           </View>
         ) : (
-          <ShowPriceFalseView />
+          <ShowPriceFalseView courseData={courseData} />
         )
       ) : showPriceType === 'group' || showPriceType === 'both' ? (
         <View style={{flex: 1}}>
@@ -458,7 +463,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
           )}
         </View>
       ) : (
-        <ShowPriceFalseView />
+        <ShowPriceFalseView courseData={courseData} />
       )}
     </>
   );
@@ -511,9 +516,25 @@ const AgeSelector = ({
   );
 };
 
-const ShowPriceFalseView = () => {
+const ShowPriceFalseView = ({courseData}) => {
+  const toast = useToast();
   const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
+  console.log('course Data is', courseData);
 
+  const reqBatchPrices = async () => {
+    try {
+      console.log('hit');
+      message = `Hi! i need to know the Prices of your ${courseData?.alternativeNameOnApp} Course.`;
+      const link = getWhatsappRedirectUrl(message);
+      await Linking.openURL(link);
+    } catch (error) {
+      Showtoast({
+        text: "Couldn't Complete the Request, Please ensure you have Whatsapp app and try again",
+        toast,
+        type: 'danger',
+      });
+    }
+  };
   return (
     <View className="flex-1 mt-3 p-2">
       <View className="items-center">
@@ -524,15 +545,18 @@ const ShowPriceFalseView = () => {
         </Text>
         <View className="w-full flex-row justify-center gap-3 mt-4">
           <Pressable
-            className="py-2 w-[45%] rounded-full items-center"
-            style={{backgroundColor: textColors?.textYlGreen}}>
-            <Text className="text-white">Contact Us</Text>
+            className="py-2 w-[90%] rounded-full items-center flex-row justify-center"
+            style={{backgroundColor: textColors?.textYlGreen}}
+            onPress={reqBatchPrices}>
+            <MIcon name="whatsapp" size={25} color="white" />
+            <Text className="text-white ml-1">Contact Us</Text>
           </Pressable>
-          <Pressable
-            className="py-2 w-[45%] rounded-full items-center"
+          {/* <Pressable
+            className="py-2 w-[45%] rounded-full items-center flex-row justify-center"
             style={{backgroundColor: textColors?.textYlOrange}}>
+            <MIcon name="phone" size={25} color="white" />
             <Text className="text-white">Call Us</Text>
-          </Pressable>
+          </Pressable> */}
         </View>
       </View>
     </View>

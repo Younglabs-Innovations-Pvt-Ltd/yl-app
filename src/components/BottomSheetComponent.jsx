@@ -18,31 +18,6 @@ const BottomSheetComponent = ({
     useSelector(state => state.appTheme);
   const bottomSheetRef = useRef(null);
 
-  const CustomBackdrop = ({animatedIndex, style}) => {
-    // animated variables
-    const containerAnimatedStyle = useAnimatedStyle(() => ({
-      opacity: interpolate(animatedIndex.value, [0, 1], [0, 1]),
-    }));
-
-    // styles
-    const containerStyle = useMemo(
-      () => [
-        style,
-        {
-          backgroundColor: '#000000a7',
-        },
-        containerAnimatedStyle,
-      ],
-      [style, containerAnimatedStyle],
-    );
-
-    return <Animated.View style={containerStyle} />;
-  };
-
-  const CustomBackDrop = () => {
-    return <View className="bg-[#000000a7]"></View>;
-  };
-
   useEffect(() => {
     setBottomSheetOpen(isOpen);
   }, [isOpen]);
@@ -80,8 +55,8 @@ const BottomSheetComponent = ({
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
-      backgroundStyle={{backgroundColor: bgColor}}
-      handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}
+      backgroundStyle={{backgroundColor: darkMode ? "#00001a" : "#f0f0f5"}}
+       handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}
       stackBehavior="replace"
       style={style}
       {...otherProps}>
