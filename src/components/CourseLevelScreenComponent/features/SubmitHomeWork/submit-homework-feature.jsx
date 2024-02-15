@@ -10,7 +10,7 @@ const SubmitHomeworkFeature = ({setSheetOpen, serviceRequestId}) => {
   const [allClassesHomeWork, setAllClassesHomeWork] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [viewUploadedHomwWork, setViewUploadedHomwWork] = useState(false);
-  const [editHomeWork,setEditHomeWork] = useState(false)
+  const [editHomeWork, setEditHomeWork] = useState(false);
 
   const {
     serviceReqClassesLoading,
@@ -34,9 +34,10 @@ const SubmitHomeworkFeature = ({setSheetOpen, serviceRequestId}) => {
       </View>
       {!selectedClass ? (
         <ScrollView>
-          {allClassesHomeWork?.map(classData => {
+          {allClassesHomeWork?.map((classData, index) => {
             return (
               <SubmitHomeWorkTile
+                key={index}
                 classData={classData}
                 setSelectedClass={setSelectedClass}
                 selectedClass={selectedClass}
@@ -57,7 +58,7 @@ const SubmitHomeworkFeature = ({setSheetOpen, serviceRequestId}) => {
         />
       ) : (
         <SubmitHomeWork
-        serviceReqClassesLoading={serviceReqClassesLoading}
+          serviceReqClassesLoading={serviceReqClassesLoading}
           setSheetOpen={setSheetOpen}
           setSelectedClass={setSelectedClass}
           selectedClass={selectedClass}

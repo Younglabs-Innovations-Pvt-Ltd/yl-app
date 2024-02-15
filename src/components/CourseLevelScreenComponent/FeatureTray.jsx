@@ -96,11 +96,11 @@ const FeatureTray = ({
         className="w-[96vw] h-[100%] mx-auto mt-6"
         data={features}
         horizontal
-        keyExtractor={item => item}
+        keyExtractor={item => item.index.toString()}
         renderItem={item => {
           return (
             <Pressable
-              key={item?.item?.feature}
+              key={item?.item?.index}
               onPress={() => {
                 setDisplayFeature(item.item?.feature);
                 setSheetOpen(true);

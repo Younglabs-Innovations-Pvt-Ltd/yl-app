@@ -30,8 +30,14 @@ const CourseCard = ({course, navigation}) => {
           Student : {course?.childName}
         </Text>
       </View>
-      {course?.serviceRequests?.map(data => {
-        return <ServiceRequestCard course={data} navigation={navigation} />;
+      {course?.serviceRequests?.map((data, index) => {
+        return (
+          <ServiceRequestCard
+            key={index}
+            course={data}
+            navigation={navigation}
+          />
+        );
       })}
     </View>
   );

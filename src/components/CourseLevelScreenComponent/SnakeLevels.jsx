@@ -234,9 +234,7 @@ const SnakeLevels = ({
             allClasses?.map((level, index) => {
               count = count >= marginleftcustom.length - 1 ? 0 : count + 1;
               return (
-                <View
-                  key={level?.classId}
-                  className="w-[100%] my-3 bg-transparent">
+                <View key={index} className="w-[100%] my-3 bg-transparent">
                   <View
                     style={[
                       {marginLeft: marginleftcustom[count]},
@@ -264,7 +262,13 @@ const SnakeLevels = ({
                       const textVariable = [...allTagValues, showTagValue];
 
                       const allNewTags = textVariable.map(tagValue => {
-                        if (tagValue.includes(level?.classId)) {
+                        if (
+                          tagValue.includes(level?.classId) &&
+                          currentOngoingClass?.classNumber !==
+                            level?.classNumber &&
+                          todaysClass?.classNumber !== level?.classNumber &&
+                          upcomingClass.classNumber !== level?.classNumber
+                        ) {
                           return tagValue.replace('false', 'true');
                         } else {
                           return tagValue.replace('true', 'false');
@@ -277,20 +281,21 @@ const SnakeLevels = ({
                       styles.myView,
                     ]}
                     className={`p-4
-                ${
-                  level?.classStatus === 'Upcoming'
-                    ? 'bg-[#AEAEAE]'
-                    : level?.classStatus === 'Missed'
-                    ? 'bg-[#F74300]'
-                    : level?.classStatus === 'Ongoing' ||
-                      currentOngoingClass?.classNumber === level?.classNumber
-                    ? 'bg-[#55D400]'
-                    : level?.classStatus === 'Attended'
-                    ? 'bg-blue-500'
-                    : level?.classStatus === 'Rescheduled'
-                    ? 'bg-[#76C8F2]'
-                    : null
-                }
+                    ${
+                      level?.classStatus === 'Upcoming' && level === 'Attended'
+                        ? 'bg-[#AEAEAE]'
+                        : level?.classStatus === 'Rescheduled'
+                        ? 'bg-[#76C8F2]'
+                        : level?.classStatus === 'Missed'
+                        ? 'bg-[#F74300]'
+                        : level?.classStatus === 'Ongoing' ||
+                          currentOngoingClass?.classNumber ===
+                            level?.classNumber
+                        ? 'bg-[#55D400]'
+                        : level?.classStatus === 'Attended'
+                        ? 'bg-blue-500'
+                        : 'bg-[#8b8888]'
+                    }
 
                   h-[80px] w-[80px] mt-6 rounded-full flex justify-center items-center relative`}>
                     <MIcon
@@ -325,9 +330,9 @@ const SnakeLevels = ({
                               </Text>
                             </View>
                           ) : (
-                            <View className="h-[60px] w-[90px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
+                            <View className="h-[60px] w-[140px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                               <Text className="font-semibold text-[20px]">
-                                TBD
+                                To be decided
                               </Text>
                             </View>
                           )}
@@ -340,7 +345,7 @@ const SnakeLevels = ({
                       upcomingClass.classNumber === level?.classNumber && (
                         <View className="absolute -top-11 flex justify-center items-center animate-bounce">
                           <View className="h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute top-6 border-2 border-gray-300 border-solid "></View>
-                          <View className="h-[60px] w-[130px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
+                          <View className="h-[60px] w-[150px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                             {upcomingClass?.visibility ? (
                               <View>
                                 <Text className="font-semibold text-[16px]">
@@ -354,7 +359,7 @@ const SnakeLevels = ({
                               </View>
                             ) : (
                               <Text className="font-semibold text-[20px]">
-                                TBD
+                                To be decided
                               </Text>
                             )}
                           </View>
@@ -389,52 +394,48 @@ const SnakeLevels = ({
                           </View>
                         </Pressable>
                       )}
-                    {upcomingClass &&
-                      todaysClass?.classNumber !== level?.classNumber &&
-                      currentOngoingClass?.classNumber !== level?.classNumber &&
-                      upcomingClass.classNumber !== level?.classNumber &&
-                      allTagValues.includes(`${level?.classId} true`) && (
-                        <Pressable
-                          disabled={false}
-                          className="absolute -top-9 flex justify-center items-center">
-                          <View
-                            className={`h-[40px] w-[40px] rotate-[45deg] ${
-                              level?.classStatus === 'Upcoming'
-                                ? 'bg-[#AEAEAE]'
-                                : level?.classStatus === 'Missed'
-                                ? 'bg-[#F74300]'
-                                : level?.classStatus === 'Ongoing' ||
-                                  currentOngoingClass?.classNumber ===
-                                    level?.classNumber
-                                ? 'bg-[#55D400]'
-                                : level?.classStatus === 'Attended'
-                                ? 'bg-blue-500'
-                                : level?.classStatus === 'Rescheduled'
-                                ? 'bg-[#76C8F2]'
-                                : null
-                            } rounded-[5px] absolute top-3 border-2 border-gray-300 border-solid `}></View>
-                          <View
-                            className={`h-[50px] w-[100px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  ${
-                              level?.classStatus === 'Upcoming'
-                                ? 'bg-[#AEAEAE]'
-                                : level?.classStatus === 'Missed'
-                                ? 'bg-[#F74300]'
-                                : level?.classStatus === 'Ongoing' ||
-                                  currentOngoingClass?.classNumber ===
-                                    level?.classNumber
-                                ? 'bg-[#55D400]'
-                                : level?.classStatus === 'Attended'
-                                ? 'bg-blue-500'
-                                : level?.classStatus === 'Rescheduled'
-                                ? 'bg-[#76C8F2]'
-                                : null
-                            } `}>
-                            <Text className="font-semibold text-[16px] text-white">
-                              {level?.classStatus}
-                            </Text>
-                          </View>
-                        </Pressable>
-                      )}
+                    {allTagValues.includes(`${level?.classId} true`) && (
+                      <Pressable
+                        disabled={false}
+                        className="absolute -top-9 flex justify-center items-center">
+                        <View
+                          className={`h-[40px] w-[40px] rotate-[45deg] ${
+                            level?.classStatus === 'Upcoming'
+                              ? 'bg-[#AEAEAE]'
+                              : level?.classStatus === 'Missed'
+                              ? 'bg-[#F74300]'
+                              : level?.classStatus === 'Ongoing' ||
+                                currentOngoingClass?.classNumber ===
+                                  level?.classNumber
+                              ? 'bg-[#55D400]'
+                              : level?.classStatus === 'Attended'
+                              ? 'bg-blue-500'
+                              : level?.classStatus === 'Rescheduled'
+                              ? 'bg-[#76C8F2]'
+                              : null
+                          } rounded-[5px] absolute top-3 border-2 border-gray-300 border-solid `}></View>
+                        <View
+                          className={`h-[50px] w-[100px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  ${
+                            level?.classStatus === 'Upcoming'
+                              ? 'bg-[#AEAEAE]'
+                              : level?.classStatus === 'Missed'
+                              ? 'bg-[#F74300]'
+                              : level?.classStatus === 'Ongoing' ||
+                                currentOngoingClass?.classNumber ===
+                                  level?.classNumber
+                              ? 'bg-[#55D400]'
+                              : level?.classStatus === 'Attended'
+                              ? 'bg-blue-500'
+                              : level?.classStatus === 'Rescheduled'
+                              ? 'bg-[#76C8F2]'
+                              : null
+                          } `}>
+                          <Text className="font-semibold text-[16px] text-white">
+                            {level?.classStatus}
+                          </Text>
+                        </View>
+                      </Pressable>
+                    )}
                   </TouchableOpacity>
                 </View>
               );

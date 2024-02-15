@@ -46,7 +46,7 @@ export const downloadCertificate = async ({
         showAppsToView: true,
       };
 
-      await Share.open(options);
+      // await Share.open(options);
 
       // Additional code for handling the downloaded file, e.g., open it, etc.
     } else {

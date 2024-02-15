@@ -14,7 +14,7 @@ const ServiceRequestCard = ({course, navigation}) => {
   }, [course]);
 
   useEffect(() => {
-    // console.log('check service request', course);
+   
     if (
       course?.promisedStartDate?._seconds &&
       course?.promisedStartDate?._nanoseconds
