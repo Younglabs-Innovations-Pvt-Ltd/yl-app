@@ -222,9 +222,44 @@ const Payment = ({navigation, route}) => {
   };
 
   const handleCheckout = async () => {
+    if (!fullName) {
+      // Showtoast({text: 'Add your name', toast, type: 'danger'});
+      Snackbar.show({
+        text: 'Please add your name',
+        textColor: COLORS.white,
+        duration: Snackbar.LENGTH_LONG,
+        action: {
+          text: 'Add',
+          textColor: COLORS.white,
+          onPress: () => setVisibleNameSheet(true),
+        },
+      });
+      return;
+    }
+
     if (!email) {
       setEmailErr('Enter your email address.');
       return;
+    }
+
+    if (!selectedChildForOrder?.name || !selectedChildForOrder?.age) {
+      console.log('i am here s', children);
+      if (!children || children?.length == 0) {
+        Snackbar.show({
+          text: 'Please Add Child first',
+          textColor: COLORS.white,
+          duration: Snackbar.LENGTH_LONG,
+          action: {
+            text: 'Add',
+            textColor: COLORS.white,
+            onPress: () => setOpenAddChildSheet(true),
+          },
+        });
+        return;
+      } else {
+        Showtoast({text: 'Please Select child.', toast, type: 'danger'});
+        return;
+      }
     }
 
     const currentUser = auth().currentUser;
@@ -272,13 +307,43 @@ const Payment = ({navigation, route}) => {
 
   const handleSoloBatchCheckOut = () => {
     if (!fullName) {
-      Showtoast({text: 'Add your name', toast, type: 'danger'});
+      // Showtoast({text: 'Add your name', toast, type: 'danger'});
+      Snackbar.show({
+        text: 'Please add your name',
+        textColor: COLORS.white,
+        duration: Snackbar.LENGTH_LONG,
+        action: {
+          text: 'Add',
+          textColor: COLORS.white,
+          onPress: () => setVisibleNameSheet(true),
+        },
+      });
       return;
     }
 
     if (!email) {
       setEmailErr('Enter your email address.');
       return;
+    }
+
+    if (!selectedChildForOrder?.name || !selectedChildForOrder?.age) {
+      console.log('i am here s', children);
+      if (!children || children?.length == 0) {
+        Snackbar.show({
+          text: 'Please Add Child first',
+          textColor: COLORS.white,
+          duration: Snackbar.LENGTH_LONG,
+          action: {
+            text: 'Add',
+            textColor: COLORS.white,
+            onPress: () => setOpenAddChildSheet(true),
+          },
+        });
+        return;
+      } else {
+        Showtoast({text: 'Please Select child.', toast, type: 'danger'});
+        return;
+      }
     }
 
     const currentUser = auth().currentUser;

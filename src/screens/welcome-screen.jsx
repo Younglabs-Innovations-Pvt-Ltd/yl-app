@@ -64,10 +64,10 @@ const DemoClassScreen = ({navigation}) => {
   );
 
   // Setting background color and style of Statusbar
-  useEffect(() => {
-    StatusBar.setBackgroundColor(COLORS.pblue);
-    StatusBar.setBarStyle('light-content');
-  }, []);
+  // useEffect(() => {
+  //   StatusBar.setBackgroundColor(COLORS.pblue);
+  //   StatusBar.setBarStyle('light-content');
+  // }, []);
 
   // show message to customer to login with right credentials (email and password)
   useEffect(() => {

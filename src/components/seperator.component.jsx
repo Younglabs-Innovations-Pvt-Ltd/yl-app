@@ -1,12 +1,12 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
-const Seperator = ({text}) => {
+const Seperator = ({text, color}) => {
   return (
     <View style={styles.wrapper}>
-      <View style={styles.seperatorLine} />
-      <Text style={styles.seperatorText}>{text}</Text>
-      <View style={styles.seperatorLine} />
+      <View style={[styles.seperatorLine, {backgroundColor: color}]} />
+      <Text style={[styles.seperatorText, {color}]}>{text}</Text>
+      <View style={[styles.seperatorLine, {backgroundColor: color}]} />
     </View>
   );
 };
@@ -24,13 +24,11 @@ const styles = StyleSheet.create({
   },
   seperatorLine: {
     flex: 1,
-    height: 1,
-    backgroundColor: '#000',
+    height: StyleSheet.hairlineWidth,
   },
   seperatorText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#000',
     textTransform: 'uppercase',
   },
 });

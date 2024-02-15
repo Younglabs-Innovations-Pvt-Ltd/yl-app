@@ -18,6 +18,7 @@ import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import {authSelector} from '../store/auth/selector';
 import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
+import { navigate } from '../navigationRef';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width} = Dimensions.get('window');
@@ -110,6 +111,7 @@ const UserCoursesPage = ({navigation}) => {
             darkMode={darkMode}
             bgSecondaryColor={bgSecondaryColor}
             changeChildsheetOpen={() => setChangeChildSheeet(true)}
+            navigation={navigation}
           />
           {userCourseData?.length > 0 ? (
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
@@ -129,7 +131,7 @@ const UserCoursesPage = ({navigation}) => {
           ) : (
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
               <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4 capitalize">
-                {currentChild?.name} Doesn't Have Any Course
+                {currentChild?.name || "You"} Don't Have Any Course
               </Text>
             </View>
           )}

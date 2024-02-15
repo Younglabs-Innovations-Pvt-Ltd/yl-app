@@ -8,12 +8,16 @@ import {authSelector} from '../../store/auth/selector';
 import {FONTS} from '../../utils/constants/fonts';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {userSelector} from '../../store/user/selector';
+import Snackbar from 'react-native-snackbar';
+import { COLORS } from '../../utils/constants/colors';
+import { navigate } from '../../navigationRef';
 
-const AppBar = ({bgSecondaryColor, darkMode, textColors, userName , changeChildsheetOpen}) => {
+
+const AppBar = ({bgSecondaryColor, darkMode, textColors, userName , changeChildsheetOpen , navigation}) => {
   const [isSwitchOn, setIsSwitchOn] = useState(false);
   const {userFetchLoading, userFetchFailed} = useSelector(authSelector);
   const dispatch = useDispatch();
-  const {currentChild} = useSelector(userSelector);
+  const {currentChild , children} = useSelector(userSelector);
   const onToggleSwitch = () => {
     setIsSwitchOn(!isSwitchOn);
     dispatch(setDarkMode(!isSwitchOn));
@@ -30,11 +34,29 @@ const AppBar = ({bgSecondaryColor, darkMode, textColors, userName , changeChilds
     },
   });
 
+
+  const childSheetOpenClick = ()=>{
+    if(!children || children?.length === 0){
+      Snackbar.show({
+        text: 'Please Add Child',
+        textColor: COLORS.white,
+        duration: Snackbar.LENGTH_LONG,
+        action: {
+          text: 'Add One',
+          textColor: COLORS.white,
+          onPress: () => navigation.navigate("MainWelcomeScreen"),
+        },
+      });
+      return;
+    }
+    changeChildsheetOpen()
+  }
+
   return (
     <View
       style={styles.myView}
       className="flex w-[100%]  h-[60px] px-3 flex-row justify-between items-center">
-      <TouchableOpacity onPress={changeChildsheetOpen}>
+      <TouchableOpacity onPress={childSheetOpenClick}>
         {userFetchLoading ? (
           <ActivityIndicator />
         ) : userFetchFailed ? (
@@ -79,14 +101,6 @@ const AppBar = ({bgSecondaryColor, darkMode, textColors, userName , changeChilds
                 ]}
                 className={`font-semibold`}>
                 Welcome, {currentChild?.name || 'To Younglabs'}
-              </Text>
-
-              <Text
-                style={{
-                  color: darkMode ? textColors.textSecondary : '#448BD6',
-                }}
-                className={`text-[10px] font-semibold `}>
-                {} points
               </Text>
             </View>
           </View>

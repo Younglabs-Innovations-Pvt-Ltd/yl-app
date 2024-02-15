@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 
 const ShowSnackbar = ({text}) => {
   const {textColors} = useSelector(state => state.appTheme);
-  Snackbar.show({
+  return Snackbar.show({
     text,
     textColor: textColors.textSecondary,
     duration: Snackbar.LENGTH_LONG,

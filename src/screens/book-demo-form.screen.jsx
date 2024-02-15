@@ -278,75 +278,91 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
       style={{height: place ? height - 190 : height - 130}}>
       <View className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]">
         <View
-          className="p-2 my-2 w-full items-start rounded-md"
-          style={{backgroundColor: bgSecondaryColor}}>
+          className=" my-2 w-full justify-between items-center flex-row rounded-md border border-gray-200"
+          // style={{backgroundColor: bgSecondaryColor}}
+        >
           {(courseData?.demoTypeAvailable === 'group' ||
             courseData?.demoTypeAvailable === 'both') && (
-            <View className="flex-row items-center">
-              <CheckBox
-                disabled={false}
-                value={selectedDemoType === 'group'}
-                tintColors={{
-                  true: textColors.textYlMain,
-                  false: textColors.textSecondary,
-                }}
-                onValueChange={() => setSelectedDemoType('group')}
+            <Pressable
+              className={`flex-col items-center justify-center rounded py-1 px-1 ${
+                courseData?.demoTypeAvailable == 'both'
+                  ? 'w-[50%]'
+                  : 'w-full'
+              } 
+              `}
+              style={
+                selectedDemoType == 'group'
+                  ? {backgroundColor: bgSecondaryColor}
+                  : {}
+              }
+              onPress={() => setSelectedDemoType('group')}>
+              <MIcon
+                name="account-group"
+                size={35}
+                color={textColors.textYlMain}
               />
-
-              <View className="flex-row flex-1 flex-wrap items-center">
-                <Text
-                  className={`text-[12px]`}
-                  style={[
-                    {
-                      color: textColors.textYlMain,
-                      fontFamily: FONTS.primaryFont,
-                    },
-                  ]}>
-                  Group Demo:
-                </Text>
-                <Text
-                  className="text-[12px]"
-                  style={{
-                    color: textColors.textSecondary,
+              <Text
+                className={`text-[18px]`}
+                style={[
+                  {
+                    color: textColors.textYlMain,
                     fontFamily: FONTS.primaryFont,
-                  }}>
-                  Demo conducted with a group of 5-10 Students
-                </Text>
-              </View>
-            </View>
+                  },
+                ]}>
+                Group Demo
+              </Text>
+              <Text
+                className="text-[13px] text-center"
+                style={{
+                  color: textColors.textSecondary,
+                  fontFamily: FONTS.primaryFont,
+                }}>
+                Demo conducted with a group of 5-10 Students
+              </Text>
+            </Pressable>
           )}
 
           {(courseData?.demoTypeAvailable === 'solo' ||
             courseData?.demoTypeAvailable === 'both') && (
-            <View className="flex-row items-center">
-              <CheckBox
-                disabled={false}
-                value={selectedDemoType === 'solo'}
-                tintColors={{
-                  true: textColors.textYlMain,
-                  false: textColors.textSecondary,
-                }}
-                onValueChange={() => setSelectedDemoType('solo')}
+            <Pressable
+              className={`flex-col items-center justify-center py-1 px-1 rounded  ${
+                courseData?.demoTypeAvailable == 'both'
+                  ? 'w-[50%]'
+                  : 'w-full'
+              } 
+              `}
+              onPress={() => setSelectedDemoType('solo')}
+              style={
+                selectedDemoType == 'solo'
+                  ? {backgroundColor: bgSecondaryColor}
+                  : {}
+              }
+              // style={courseData?.demoTypeAvailable == solo ? {} :}
+            >
+              <MIcon
+                name="account-supervisor"
+                size={35}
+                color={textColors.textYlMain}
               />
-              <View className="flex-row flex-1 flex-wrap items-center ">
-                <Text
-                  className={`text-[12px]`}
-                  style={{
+              <Text
+                className={`text-[18px]`}
+                style={[
+                  {
                     color: textColors.textYlMain,
                     fontFamily: FONTS.primaryFont,
-                  }}>
-                  One To One Demo:
-                </Text>
-                <Text
-                  className="text-[12px] "
-                  style={{
-                    color: textColors.textSecondary,
-                    fontFamily: FONTS.primaryFont,
-                  }}>
-                  Demo conducted 1-1 only
-                </Text>
-              </View>
-            </View>
+                  },
+                ]}>
+                Solo Demo
+              </Text>
+              <Text
+                className="text-[13px] text-center"
+                style={{
+                  color: textColors.textSecondary,
+                  fontFamily: FONTS.primaryFont,
+                }}>
+                Demo conducted One to One between teacher and student
+              </Text>
+            </Pressable>
           )}
         </View>
 

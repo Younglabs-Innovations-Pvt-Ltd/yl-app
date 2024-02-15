@@ -1,5 +1,5 @@
 import {View, Text, Pressable, ActivityIndicator} from 'react-native';
-import React, {Children, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {setDarkMode} from '../store/app-theme/appThemeReducer';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -20,6 +20,7 @@ import {setCurrentChild, startEditChild} from '../store/user/reducer';
 import Input from './CustomInputComponent';
 import DropdownComponent from './DropdownComponent';
 import {COLORS} from '../utils/constants/colors';
+import Snackbar from 'react-native-snackbar';
 
 const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   const handleShowDrawer = () => navigation.openDrawer();
@@ -39,7 +40,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
     allBookingsLoadingFailed,
   } = useSelector(welcomeScreenSelector);
   const {user, customer, userFetchLoading} = useSelector(authSelector);
-  const {currentChild} = useSelector(userSelector);
+  const {currentChild, children} = useSelector(userSelector);
 
   useEffect(() => {
     console.log('current child is', currentChild);
@@ -70,6 +71,23 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
     }
   }, [userOrders, currentChild, customer]);
 
+  const handleChangeSheetClick = () => {
+    if (children?.length > 0) {
+      open();
+    } else {
+      Snackbar.show({
+        text: 'Please Add Child',
+        textColor: COLORS.white,
+        duration: Snackbar.LENGTH_LONG,
+        action: {
+          text: 'Add One',
+          textColor: COLORS.white,
+          onPress: () => setShowAddChildView(true),
+        },
+      });
+    }
+  };
+
   return (
     <>
       <View
@@ -77,7 +95,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
           }`}>
         <View className="flex-row items-center w-[75%]">
           <View className="relative w-full items-start overflow-hidden pl-3">
-            <TouchableOpacity onPress={open}>
+            <TouchableOpacity onPress={handleChangeSheetClick}>
               {userFetchLoading ? (
                 <ActivityIndicator />
               ) : ordersOrBookingsLoadingFailed ? (
@@ -379,7 +397,11 @@ const EditChildView = ({child, close, setChildToEdit}) => {
           disabled={editChildLoading}>
           <Text className="text-white text-base font-semibold">Save</Text>
           {editChildLoading && (
-            <ActivityIndicator size={'small'} color={'white'} className="ml-2"/>
+            <ActivityIndicator
+              size={'small'}
+              color={'white'}
+              className="ml-2"
+            />
           )}
         </Pressable>
       </View>

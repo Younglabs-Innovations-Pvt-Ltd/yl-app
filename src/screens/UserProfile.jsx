@@ -1,31 +1,77 @@
 import React from 'react';
-import {View, Text, Pressable, Dimensions, ImageBackground} from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Dimensions,
+  ImageBackground,
+  StyleSheet,
+  Image,
+  Linking,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {setDarkMode} from '../store/app-theme/appThemeReducer';
 import {ScrollView} from 'react-native-gesture-handler';
-import RedeemPointsView from '../components/UserProfileComponents/RedeemPointsView';
 import {authSelector} from '../store/auth/selector';
 import {userSelector} from '../store/user/selector';
 import {logout} from '../store/auth/reducer';
 import {FONTS} from '../utils/constants/fonts';
 import {localStorage} from '../utils/storage/storage-provider';
-import {CommonActions} from '@react-navigation/native';
+import TextWrapper from '../components/text-wrapper.component';
+import {navigate} from '../navigationRef';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
+import GiftBoxIcon from '../assets/icons/giftbox.png';
+import {COLORS} from '../utils/constants/colors';
+import Spacer from '../components/spacer.component';
+import Icon from '../components/icon.component';
+import {welcomeScreenSelector} from '../store/welcome-screen/selector';
+import {redirectToCourse} from '../utils/redirectToCourse';
 
 const {width, height} = Dimensions.get('window');
 
+const WEBSITE_URL = 'https://www.younglabs.in/';
+
 const UserProfile = ({navigation}) => {
   const {currentChild} = useSelector(userSelector);
-  const {user} = useSelector(authSelector);
-  const {customer} = useSelector(authSelector);
+  const {user, customer} = useSelector(authSelector);
+  const {courses} = useSelector(welcomeScreenSelector);
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
   const dispatch = useDispatch();
 
   const changeDarkMode = payload => {
-    localStorage.set('darkModeEnabled', payload);
     dispatch(setDarkMode(payload));
+  };
+
+  const goToReferral = () => {
+    navigate(SCREEN_NAMES.REFERRAL, {referralCode: user?.referralCode});
+  };
+
+  const goToMyCoures = () => {
+    navigation.navigate('Course');
+  };
+
+  const redirectToWebsite = async () => {
+    try {
+      await Linking.openURL(WEBSITE_URL);
+    } catch (error) {
+      console.log('OPEN_ABOUT_US_URL_ERROR', error);
+    }
+  };
+
+  const redirectToBookFreeClass = () => {
+    redirectToCourse({
+      navigate: navigation.navigate,
+      courseId: 'Eng_Hw',
+      courses,
+      subScreen: 'bookFreeClass',
+    });
+  };
+
+  const goToMyTickets = () => {
+    navigate(SCREEN_NAMES.MYTICKETS);
   };
 
   return (
@@ -94,7 +140,7 @@ const UserProfile = ({navigation}) => {
             className="flex-1 px-2"
             style={{backgroundColor: bgColor}}>
             <View
-              className="w-full p-1 rounded-md mt-4 flex-row"
+              className="w-full p-1 rounded-md mt-2 flex-row"
               style={{backgroundColor: bgSecondaryColor, height: height / 5}}>
               <View className="w-[35%] h-full items-center justify-center flex-col">
                 <View
@@ -157,7 +203,7 @@ const UserProfile = ({navigation}) => {
               </View>
             </View>
 
-            <View className="w-full items-center mt-4">
+            {/* <View className="w-full items-center mt-4">
               <View
                 className="w-[100%] p-2 rounded"
                 style={{backgroundColor: bgSecondaryColor}}>
@@ -174,15 +220,147 @@ const UserProfile = ({navigation}) => {
                   </Text>
                 </View>
               </View>
-            </View>
+            </View> */}
 
-            <RedeemPointsView />
+            {/* <RedeemPointsView /> */}
+
+            <View style={{marginTop: 16}}>
+              <View
+                style={{
+                  paddingVertical: 18,
+                  paddingHorizontal: 14,
+                  borderRadius: 8,
+                  backgroundColor: bgSecondaryColor,
+                }}>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                  <View style={{flex: 1}}>
+                    <TextWrapper
+                      fs={20}
+                      color={textColors.textPrimary}
+                      ff={FONTS.headingFont}>
+                      Refer and earn credits
+                    </TextWrapper>
+                    <TextWrapper
+                      fs={15}
+                      color={textColors.textSecondary}
+                      styles={{lineHeight: 22}}
+                      ff={FONTS.primaryFont}>
+                      Invite your friends to join Younglabs courses and earn
+                      credits
+                    </TextWrapper>
+                  </View>
+                  <View
+                    style={{paddingHorizontal: 4, justifyContent: 'center'}}>
+                    <Image source={GiftBoxIcon} style={styles.giftBoxIcon} />
+                  </View>
+                </View>
+                <Spacer space={4} />
+                <Pressable
+                  style={({pressed}) => [
+                    styles.btnRefer,
+                    {opacity: pressed ? 0.8 : 1},
+                  ]}
+                  onPress={goToReferral}>
+                  <TextWrapper color={COLORS.white} ff={FONTS.primaryFont}>
+                    Refer
+                  </TextWrapper>
+                </Pressable>
+              </View>
+            </View>
+            <Spacer space={6} />
+            <Pressable
+              style={({pressed}) => [
+                styles.btnActions,
+                {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
+              ]}
+              onPress={goToMyCoures}>
+              <Icon
+                name="book-outline"
+                size={26}
+                color={textColors.textSecondary}
+              />
+              <TextWrapper
+                color={textColors.textSecondary}
+                ff={FONTS.primaryFont}>
+                My courses
+              </TextWrapper>
+            </Pressable>
+            <Pressable
+              style={({pressed}) => [
+                styles.btnActions,
+                {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
+              ]}>
+              <MIcon
+                name="headset"
+                size={24}
+                color={textColors.textSecondary}
+              />
+              <TextWrapper
+                color={textColors.textSecondary}
+                ff={FONTS.primaryFont}>
+                Customer support
+              </TextWrapper>
+            </Pressable>
+            <Pressable
+              style={({pressed}) => [
+                styles.btnActions,
+                {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
+              ]}
+              onPress={goToMyTickets}>
+              <Icon
+                name="ticket-outline"
+                size={26}
+                color={textColors.textSecondary}
+              />
+              <TextWrapper
+                color={textColors.textSecondary}
+                ff={FONTS.primaryFont}>
+                My Tickets
+              </TextWrapper>
+            </Pressable>
+            <CommonActions
+              textColors={textColors}
+              redirectToWebsite={redirectToWebsite}
+              redirectToBookFreeClass={redirectToBookFreeClass}
+            />
           </ScrollView>
         </>
       ) : (
         <NotACustomerProfilePage />
       )}
     </>
+  );
+};
+
+const CommonActions = ({
+  textColors,
+  redirectToWebsite,
+  redirectToBookFreeClass,
+}) => {
+  return (
+    <React.Fragment>
+      <Pressable
+        style={({pressed}) => [
+          styles.btnActions,
+          {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
+        ]}
+        onPress={redirectToWebsite}>
+        <MIcon name="web" size={24} color={textColors.textSecondary} />
+        <TextWrapper color={textColors.textSecondary} ff={FONTS.primaryFont}>
+          Visit website
+        </TextWrapper>
+      </Pressable>
+      <Pressable
+        style={({pressed}) => [
+          styles.btnActions,
+          {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
+        ]}
+        onPress={redirectToBookFreeClass}>
+        <TextWrapper color={textColors.textSecondary} ff={FONTS.primaryFont}>
+          Book free Handwriting class
+        </TextWrapper>
+      </Pressable>
+    </React.Fragment>
   );
 };
 
@@ -253,3 +431,27 @@ const NotACustomerProfilePage = () => {
 };
 
 export default UserProfile;
+
+const styles = StyleSheet.create({
+  giftBoxIcon: {
+    width: 58,
+    height: 58,
+  },
+  btnRefer: {
+    width: 120,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 100,
+    backgroundColor: COLORS.pblue,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btnActions: {
+    paddingLeft: 6,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderRadius: 6,
+  },
+});
