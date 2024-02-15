@@ -115,7 +115,7 @@ const ViewUploadedHomeWork = ({
                     uri: `${item}`,
                   }}
                 />
-                {editHomeWork && (
+                {/* {editHomeWork && (
                   <Pressable
                     onPress={() => {
                       const newImages = homeWorkUrls.filter(value => {
@@ -132,7 +132,7 @@ const ViewUploadedHomeWork = ({
                       Delete
                     </Text>
                   </Pressable>
-                )}
+                )} */}
               </View>
             );
           }}
