@@ -16,6 +16,8 @@ import {Showtoast} from '../../../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
 import auth from '@react-native-firebase/auth';
 import CustomerTickets from './CustomerTickets';
+import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
+import {COLORS} from '../../../utils/constants/colors';
 
 const CustomerSupportFeature = ({
   serviceReqClassesData,
@@ -157,8 +159,8 @@ const CustomerSupportFeature = ({
               setSelectedValue={setSelectClassNumber}
             />
           )}
-          <TextInput
-            style={{color: textColors?.textPrimary}}
+          <BottomSheetTextInput
+            style={[styles.input, {color: textColors?.textPrimary}]}
             className="w-[100%]   border border-solid border-[#adabab] text-[16px] rounded-xl px-2"
             multiline
             numberOfLines={6}
@@ -183,3 +185,15 @@ const CustomerSupportFeature = ({
 };
 
 export default CustomerSupportFeature;
+
+const styles = StyleSheet.create({
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#adabab',
+    fontSize: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    color: COLORS.black,
+  },
+});
