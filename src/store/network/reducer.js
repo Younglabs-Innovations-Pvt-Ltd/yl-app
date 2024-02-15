@@ -16,6 +16,9 @@ const reducer = {
     state.networkState.isConnected = true;
     state.networkState.alertAction = null;
   },
+  setIsConnected(state, action) {
+    state.networkState.isConnected = action.payload;
+  },
 };
 
 const networkSlice = createSlice({
@@ -24,7 +27,10 @@ const networkSlice = createSlice({
   reducers: reducer,
 });
 
-export const {setCurrentNetworkState, resetCurrentNetworkState} =
-  networkSlice.actions;
+export const {
+  setCurrentNetworkState,
+  resetCurrentNetworkState,
+  setIsConnected,
+} = networkSlice.actions;
 
 export const networkReducer = networkSlice.reducer;

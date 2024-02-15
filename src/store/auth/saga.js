@@ -59,7 +59,7 @@ function* fetchUserSaga({payload}) {
     if (!payload) {
       return;
     }
-    console.log('getting response');
+    console.log('getting response', payload);
     const res = yield getCustomers(payload);
     console.log('res status', res.status);
     const data = yield res.json();

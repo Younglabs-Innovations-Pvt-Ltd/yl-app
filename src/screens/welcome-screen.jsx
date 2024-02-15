@@ -6,9 +6,8 @@ import {
   Dimensions,
   Animated,
   TextInput,
-  StatusBar,
   ImageBackground,
-  Text,
+  Alert,
 } from 'react-native';
 
 import {FONTS} from '../utils/constants/fonts';
@@ -39,12 +38,9 @@ import {useToast} from 'react-native-toast-notifications';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import Icon from '../components/icon.component';
+import {networkSelector} from '../store/network/selector';
 
 const {width: deviceWidth} = Dimensions.get('window');
-const IMAGE_WIDTH = deviceWidth * 0.7;
-const IMAGE_HEIGHT = deviceWidth * 0.7;
-
-const GAP = 54;
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
@@ -63,11 +59,9 @@ const DemoClassScreen = ({navigation}) => {
     welcomeScreenSelector,
   );
 
-  // Setting background color and style of Statusbar
-  // useEffect(() => {
-  //   StatusBar.setBackgroundColor(COLORS.pblue);
-  //   StatusBar.setBarStyle('light-content');
-  // }, []);
+  const {
+    networkState: {isConnected},
+  } = useSelector(networkSelector);
 
   // show message to customer to login with right credentials (email and password)
   useEffect(() => {
@@ -81,6 +75,13 @@ const DemoClassScreen = ({navigation}) => {
       dispatch(setCustomer(''));
     }
   }, [customer]);
+
+  // Retry fetch ipData if network is available
+  useEffect(() => {
+    if (isConnected && !ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [isConnected, ipData]);
 
   // fetch ipData
   useEffect(() => {
@@ -129,6 +130,20 @@ const DemoClassScreen = ({navigation}) => {
       Showtoast({text: 'Please Enter WhatsApp Number', toast, type: 'danger'});
       return;
     }
+
+    if (!isConnected) {
+      Alert.alert(
+        'Network error',
+        'You are not connected with internet. Please check your connection.',
+        [{text: 'OK'}],
+      );
+      return;
+    }
+
+    if (!ipData) {
+      dispatch(startFetchingIpData());
+    }
+
     dispatch(fetchBookingStatusStart({phone, ipData}));
   };
 

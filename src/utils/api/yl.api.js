@@ -231,7 +231,9 @@ export const getOfferCode = async ({phone}) => {
 
 // Check for customer
 export const getCustomers = async body => {
-  return await fetch(`${BASE_URL}/admin/customers/checkCustomer`, {
+  const url =
+    'https://bdb7-2401-4900-1f38-2fba-9122-a2de-6aec-44f3.ngrok-free.app';
+  return await fetch(`${url}/admin/customers/checkCustomer`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

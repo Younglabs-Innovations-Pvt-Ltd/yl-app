@@ -1,33 +1,19 @@
-import React, {useContext, useState} from 'react';
-import NetInfo from '@react-native-community/netinfo';
+import React, {useEffect} from 'react';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {useDispatch} from 'react-redux';
+import {setIsConnected} from '../store/network/reducer';
 
 const NetworkContext = React.createContext();
 
-export const useNetworkContext = () => useContext(NetworkContext);
-
-const TAG = 'NETWORK STATE CONTEXT';
-
 export const NetworkProvider = ({children}) => {
-  const [isConnected, setIsConnected] = useState(true);
+  const dispatch = useDispatch();
+  const {isConnected} = useNetInfo();
 
-  const setCurrentNetworkState = state => setIsConnected(state);
-
-  const checkNetworkState = async () => {
-    try {
-      const state = await NetInfo.fetch();
-      setIsConnected(state.isConnected);
-    } catch (error) {
-      console.log(TAG, error);
-    }
-  };
-
-  const value = {
-    isConnected,
-    setCurrentNetworkState,
-    checkNetworkState,
-  };
+  useEffect(() => {
+    dispatch(setIsConnected(isConnected));
+  }, [isConnected]);
 
   return (
-    <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
+    <NetworkContext.Provider value={{}}>{children}</NetworkContext.Provider>
   );
 };

@@ -226,10 +226,10 @@ function App() {
   return (
     // Provider for language
     <I18NProvider>
-      {/* Provider for checking internet state */}
-      <NetworkProvider>
-        {/* Provider for redux store */}
-        <Provider store={store}>
+      {/* Provider for redux store */}
+      <Provider store={store}>
+        {/* Provider for checking internet state */}
+        <NetworkProvider>
           <ToastProvider
             renderToast={toastOptions => <CustomToast toast={toastOptions} />}>
             <NavigationContainer ref={navigationRef}>
@@ -265,7 +265,12 @@ function App() {
                 <Stack.Screen
                   name={SCREEN_NAMES.EMAIL_LOGIN}
                   component={EmailLogin}
-                  options={{headerTitle: 'Log in'}}
+                  options={{
+                    headerTitle: 'Log in',
+                    headerStyle: {backgroundColor: COLORS.pblue},
+                    headerTitleStyle: {color: COLORS.white},
+                    headerTintColor: COLORS.white,
+                  }}
                 />
 
                 <Stack.Screen
@@ -349,8 +354,8 @@ function App() {
               </Stack.Navigator>
             </NavigationContainer>
           </ToastProvider>
-        </Provider>
-      </NetworkProvider>
+        </NetworkProvider>
+      </Provider>
     </I18NProvider>
   );
 }

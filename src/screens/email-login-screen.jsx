@@ -72,7 +72,7 @@ const EmailLogin = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View
-        className="mt-4 mb-1 w-full items-center"
+        className="pt-3 pb-4 mb-1 w-full items-center"
         style={{backgroundColor: COLORS.pblue}}>
         <Text
           className="text-center w-[95%] py-1"

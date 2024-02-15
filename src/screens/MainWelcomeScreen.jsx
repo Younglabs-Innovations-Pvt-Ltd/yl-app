@@ -24,10 +24,7 @@ import ShowCourses from '../components/MainScreenComponents/ShowCourses';
 import ReviewsAndTestimonials from '../components/MainScreenComponents/ReviewsAndTestimonials';
 import {fetchUserFormLoginDetails} from '../store/auth/reducer';
 import {localStorage} from '../utils/storage/storage-provider';
-import {
-  getCoursesForWelcomeScreen,
-  startFetchingUserOrders,
-} from '../store/welcome-screen/reducer';
+import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
 import auth from '@react-native-firebase/auth';
 import {setIsFirstTimeUser} from '../store/user/reducer';
 import {userSelector} from '../store/user/selector';
@@ -37,8 +34,6 @@ import {setDarkMode} from '../store/app-theme/appThemeReducer';
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
-import {navigate} from '../navigationRef';
 import {redirectToCourse} from '../utils/redirectToCourse';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
@@ -81,7 +76,6 @@ const MainWelcomeScreen = ({navigation}) => {
   // filter courses to show on the banner
   useEffect(() => {
     if (courses) {
-      console.log('has courses');
       let arr = [];
       const course = courses || {};
       Object.keys(course).map(key => {
