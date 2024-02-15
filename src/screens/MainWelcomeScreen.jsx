@@ -1,4 +1,4 @@
-import {View, Dimensions} from 'react-native';
+import {View, Dimensions, ActivityIndicator} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import tw from 'twrnc';
 import {RefreshControl, ScrollView} from 'react-native-gesture-handler';
@@ -35,12 +35,15 @@ import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import {bookDemoSelector} from '../store/book-demo/book-demo.selector';
 import {redirectToCourse} from '../utils/redirectToCourse';
+import ModalComponent from '../components/modal.component';
+import {COLORS} from '../utils/constants/colors';
+import TextWrapper from '../components/text-wrapper.component';
+import {FONTS} from '../utils/constants/fonts';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
 
 const MainWelcomeScreen = ({navigation}) => {
-  const {customer, user} = useSelector(authSelector);
   const [showPostActions, setShowPostActions] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimeover, setIsTimeover] = useState(false);
@@ -52,6 +55,7 @@ const MainWelcomeScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const [swiperData, setSwiperData] = useState([]);
 
+  const {customer, user, userFetchLoading} = useSelector(authSelector);
   const {bgColor, textColors, colorYlMain} = useSelector(
     state => state.appTheme,
   );
@@ -281,6 +285,24 @@ const MainWelcomeScreen = ({navigation}) => {
         //   <RefreshControl refreshing={refresh} onRefresh={() => pullMe()} />
         // }
       >
+        {userFetchLoading && (
+          <ModalComponent visible={!userFetchLoading}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: 'rgba(0,0,0,0.3)',
+              }}>
+              <View style={{justifyContent: 'center'}}>
+                <ActivityIndicator size={'large'} color={COLORS.white} />
+                <TextWrapper ff={FONTS.secondaryFont} color={COLORS.white}>
+                  Loading...
+                </TextWrapper>
+              </View>
+            </View>
+          </ModalComponent>
+        )}
         {coursesLoading ? (
           <View className="rounded-md p-2 items-center">
             <ShimmerPlaceholder

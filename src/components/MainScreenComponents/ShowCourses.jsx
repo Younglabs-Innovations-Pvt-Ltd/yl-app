@@ -20,6 +20,7 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {authSelector} from '../../store/auth/selector';
 // Shimmer effects
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+import {fetchUserFormLoginDetails} from '../../store/auth/reducer';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {height, width} = Dimensions.get('window');
@@ -56,6 +57,7 @@ const ShowCourses = ({navigation}) => {
 
   const reloadCourses = () => {
     setRefreshCourses({});
+    !user && dispatch(fetchUserFormLoginDetails());
   };
 
   //   console.log("courses are", courses)
