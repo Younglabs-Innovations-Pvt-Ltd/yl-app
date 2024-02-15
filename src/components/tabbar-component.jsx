@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, View, Pressable, Image} from 'react-native';
 import TextWrapper from './text-wrapper.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -6,7 +6,6 @@ import {COLORS} from '../utils/constants/colors';
 import CustomerSupportActions from './customer-support-actions';
 import Icon from './icon.component';
 import Share from 'react-native-share';
-import {SCREEN_NAMES} from '../utils/constants/screen-names';
 import {useSelector} from 'react-redux';
 import {FONTS} from '../utils/constants/fonts';
 
@@ -27,8 +26,14 @@ const shareApp = async () => {
 function Tabbar({state, descriptors, navigation}) {
   const [currentTab, setCurrentTab] = useState('drawer');
   const [actions, setActions] = useState(false);
-  const {bgColor, bgSecondaryColor, textColors, darkMode, colorYlMain} =
-    useSelector(state => state.appTheme);
+  const {textColors, darkMode, colorYlMain} = useSelector(
+    state => state.appTheme,
+  );
+
+  useEffect(() => {
+    const currentRoute = state.routes[state.index];
+    setCurrentTab(currentRoute.name.toLowerCase());
+  }, [state]);
 
   const Icons = (name, focused) => {
     switch (name) {
@@ -43,6 +48,14 @@ function Tabbar({state, descriptors, navigation}) {
         return (
           <MIcon
             name="account"
+            size={26}
+            color={focused ? COLORS.pblue : textColors.textPrimary}
+          />
+        );
+      case 'Course':
+        return (
+          <Icon
+            name="book-outline"
             size={26}
             color={focused ? COLORS.pblue : textColors.textPrimary}
           />
@@ -62,7 +75,12 @@ function Tabbar({state, descriptors, navigation}) {
     setActions(true);
   };
 
-  const goOnCourse = () => {};
+  const closeActions = () => {
+    setActions(false);
+    const lastRoute = state.history.reverse()[0];
+    const route = state.routes.find(r => r.key === lastRoute.key);
+    navigation.navigate(route.name);
+  };
 
   return (
     <>
@@ -87,37 +105,6 @@ function Tabbar({state, descriptors, navigation}) {
             navigation.navigate(name);
           };
 
-          if (route.name === 'Course') {
-            return (
-              <Pressable
-                key={route.key}
-                accessibilityRole="button"
-                accessibilityState={isFocused ? {selected: true} : {}}
-                accessibilityLabel={options.tabBarAccessibilityLabel}
-                testID={options.tabBarTestID}
-                onPress={() => onPress(route.name)}
-                style={{flex: 1, alignItems: 'center'}}>
-                {isFocused && (
-                  <View
-                    className="w-[70%] top-0 right-0 p-[2px] rounded-full"
-                    style={{backgroundColor: colorYlMain}}></View>
-                )}
-                <Icon
-                  name="book-outline"
-                  size={26}
-                  color={isFocused ? COLORS.pblue : textColors.textPrimary}
-                />
-                <TextWrapper
-                  // fw="600"
-                  fs={14}
-                  ff={FONTS.headingFont}
-                  color={isFocused ? COLORS.pblue : textColors.textPrimary}>
-                  {label}
-                </TextWrapper>
-              </Pressable>
-            );
-          }
-
           if (route.name === 'Contact') {
             return (
               <Pressable
@@ -128,6 +115,11 @@ function Tabbar({state, descriptors, navigation}) {
                 testID={options.tabBarTestID}
                 onPress={handleActions}
                 style={{flex: 1, alignItems: 'center'}}>
+                {isFocused && (
+                  <View
+                    className="w-[70%] top-0 right-0 p-[2px] rounded-full"
+                    style={{backgroundColor: colorYlMain}}></View>
+                )}
                 <MIcon
                   name="headset"
                   size={24}
@@ -198,10 +190,7 @@ function Tabbar({state, descriptors, navigation}) {
           );
         })}
       </View>
-      <CustomerSupportActions
-        visible={actions}
-        onClose={() => setActions(false)}
-      />
+      <CustomerSupportActions visible={actions} onClose={closeActions} />
     </>
   );
 }
