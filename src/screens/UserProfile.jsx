@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,8 @@ import Spacer from '../components/spacer.component';
 import Icon from '../components/icon.component';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {redirectToCourse} from '../utils/redirectToCourse';
+import BottomSheetComponent from '../components/BottomSheetComponent';
+import CustomerSupportFeature from '../components/CourseLevelScreenComponent/features/customer-support-feature';
 
 const {width, height} = Dimensions.get('window');
 
@@ -39,6 +41,7 @@ const UserProfile = ({navigation}) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
+  const [sheetOpen, setSheetOpen] = useState(false);
   const dispatch = useDispatch();
 
   const changeDarkMode = payload => {
@@ -286,6 +289,7 @@ const UserProfile = ({navigation}) => {
               </TextWrapper>
             </Pressable>
             <Pressable
+              onPress={() => setSheetOpen(true)}
               style={({pressed}) => [
                 styles.btnActions,
                 {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
@@ -328,6 +332,17 @@ const UserProfile = ({navigation}) => {
       ) : (
         <NotACustomerProfilePage />
       )}
+      <BottomSheetComponent
+        isOpen={sheetOpen}
+        Children={
+          <CustomerSupportFeature
+            setSheetOpen={setSheetOpen}
+            source="userProfile"
+          />
+        }
+        onClose={() => setSheetOpen(false)}
+        snapPoint={['40%', '55%']}
+      />
     </>
   );
 };
