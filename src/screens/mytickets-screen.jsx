@@ -4,10 +4,14 @@ import {BASE_URL} from '@env';
 import auth from '@react-native-firebase/auth';
 import {useSelector} from 'react-redux';
 import {authSelector} from '../store/auth/selector';
+import CustomerTickets from '../components/CourseLevelScreenComponent/features/CustomerTickets';
 
 const MyTickets = () => {
   const [myTickets, ssetMyTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
+    state => state.appTheme,
+  );
 
   const {user} = useSelector(authSelector);
 
@@ -42,7 +46,11 @@ const MyTickets = () => {
     fetchCustomerTickets();
   }, []);
 
-  return <View style={styles.container}></View>;
+  return (
+    <View style={{backgroundColor: bgColor}} className="px-1">
+      <CustomerTickets source="userProfile" />
+    </View>
+  );
 };
 
 export default MyTickets;

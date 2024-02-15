@@ -17,7 +17,11 @@ import {useToast} from 'react-native-toast-notifications';
 import auth from '@react-native-firebase/auth';
 import CustomerTickets from './CustomerTickets';
 
-const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
+const CustomerSupportFeature = ({
+  serviceReqClassesData,
+  setSheetOpen,
+  source,
+}) => {
   const [issueType, setIssueType] = useState([
     {label: 'Batch Issues', value: 'Batch Issues'},
     {label: 'Homework Submission', value: 'Homework Submission'},
@@ -39,14 +43,16 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
   const {bgSecondaryColor, textColors} = useSelector(state => state.appTheme);
   const toast = useToast();
   useEffect(() => {
-    const classesNumberData = [];
-    serviceReqClassesData?.classes?.map(classData => {
-      classesNumberData.push({
-        label: classData?.classNumber.toString(),
-        value: classData?.classNumber,
+    if (source !== 'userProfile') {
+      const classesNumberData = [];
+      serviceReqClassesData?.classes?.map(classData => {
+        classesNumberData.push({
+          label: classData?.classNumber.toString(),
+          value: classData?.classNumber,
+        });
       });
-    });
-    setAllClassNumber(classesNumberData);
+      setAllClassNumber(classesNumberData);
+    }
   }, [serviceReqClassesData]);
 
   const onFormSubmit = async data => {
@@ -54,13 +60,16 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
     console.log(selectClassNumber, selectedIssueType, message);
     if (selectedIssueType == null || selectedIssueType == '') {
       Showtoast({text: 'Please select issue type', toast, type: 'danger'});
-    } else if (selectClassNumber == null || selectClassNumber == '') {
+    } else if (
+      source !== 'userProfile' &&
+      (selectClassNumber == null || selectClassNumber == '')
+    ) {
       Showtoast({text: 'Please select class', toast, type: 'danger'});
     } else if (message == null || message == '') {
       Showtoast({text: 'Please enter message', toast, type: 'danger'});
     } else {
       setLoading(true);
-      const body = {
+      const body1 = {
         leadId: user?.leadId,
         category: selectedIssueType,
         details: message,
@@ -78,7 +87,17 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
           batchId: serviceReqClassesData?.classes[selectClassNumber]?.batchId,
         },
       };
-      // console.log(body, 'body');
+      const body2 = {
+        leadId: user?.leadId,
+        category: selectedIssueType,
+        details: message,
+        customerName: user.fullName,
+        creatorEmail: user.email,
+        source: 'app',
+      };
+
+      const body = source === 'userProfile' ? body2 : body1;
+      console.log(body, 'body');
       const API_URL = `${BASE_URL}/admin/tickets/createticketcustomer`;
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -94,9 +113,9 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
           toast,
           type: 'success',
         });
-        setSelectedIssueType(null);
+        source != 'userProfile' && setSelectedIssueType(null);
         setMessage(null);
-        setSelectClassNumber(null);
+        source != 'userProfile' && setSelectClassNumber(null);
         setSheetOpen(null);
       } else {
         Showtoast({
@@ -112,24 +131,26 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
   return (
     <View className="w-[100%] h-[100%] flex flex-col justify-center items-center">
       {showMyTickets ? (
-        <CustomerTickets setShowMyTickets={setShowMyTickets}/>
+        <CustomerTickets setShowMyTickets={setShowMyTickets} />
       ) : (
         <View className="w-[100%] h-[100%] flex flex-col justify-center items-center">
-          <View className="w-full flex flex-row justify-end items-center">
-            <Pressable
-              onPress={() => {
-                setShowMyTickets(true);
-              }}
-              className="bg-green-600 px-3 py-2 rounded-lg">
-              <Text className="text-white font-semibold">My Tickets</Text>
-            </Pressable>
-          </View>
+          {source !== 'userProfile' && (
+            <View className="w-full flex flex-row justify-end items-center">
+              <Pressable
+                onPress={() => {
+                  setShowMyTickets(true);
+                }}
+                className="bg-green-600 px-3 py-2 rounded-lg">
+                <Text className="text-white font-semibold">My Tickets</Text>
+              </Pressable>
+            </View>
+          )}
           <DropdownComponent
             data={issueType}
             placeHolder="Issue type"
             setSelectedValue={setSelectedIssueType}
           />
-          {allClassNumber && (
+          {source !== 'userProfile' && allClassNumber && (
             <DropdownComponent
               data={allClassNumber}
               placeHolder="Select class"
@@ -137,7 +158,7 @@ const CustomerSupportFeature = ({serviceReqClassesData, setSheetOpen}) => {
             />
           )}
           <TextInput
-          style={{color:textColors?.textPrimary}}
+            style={{color: textColors?.textPrimary}}
             className="w-[100%]   border border-solid border-[#adabab] text-[16px] rounded-xl px-2"
             multiline
             numberOfLines={6}
