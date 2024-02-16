@@ -18,6 +18,7 @@ import {authSelector} from '../../store/auth/selector';
 import {useSelector} from 'react-redux';
 import auth from '@react-native-firebase/auth';
 import {BASE_URL} from '@env';
+import {userSelector} from '../../store/user/selector';
 
 const SnakeLevels = ({
   navigation,
@@ -33,7 +34,9 @@ const SnakeLevels = ({
   const [todaysClass, setTodaysClass] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [allTagValues, setAllTagsValues] = useState([]);
+
   const user = useSelector(authSelector);
+  const {currentChild} = useSelector(userSelector);
 
   const convertTimeStamp = time => {
     const {_seconds, _nanoseconds} = time;
@@ -117,19 +120,14 @@ const SnakeLevels = ({
         if (currentOngoingClass?.conductOnWebsiteTemasSDK) {
           const response = await getAcsToken();
           const {token} = await response.json();
-          console.log(
-            'Conducting on teams SDK',
-            user?.childName,
-            user?.user?.leadId,
-          );
           startCallComposite(
-            user?.childName ? user?.childName : 'Children',
-            currentOngoingClass.teamUrl,
+            currentChild?.name || user.user?.fullName || 'Child',
+            currentOngoingClass.joinUrl,
             token,
           );
         } else {
           console.log('on web');
-          Linking.openURL(currentOngoingClass?.teamsUrl).catch(err =>
+          Linking.openURL(currentOngoingClass?.joinUrl).catch(err =>
             console.error('An error occurred: ', err),
           );
         }
@@ -267,7 +265,7 @@ const SnakeLevels = ({
                           currentOngoingClass?.classNumber !==
                             level?.classNumber &&
                           todaysClass?.classNumber !== level?.classNumber &&
-                          upcomingClass.classNumber !== level?.classNumber
+                          upcomingClass?.classNumber !== level?.classNumber
                         ) {
                           return tagValue.replace('false', 'true');
                         } else {
@@ -383,7 +381,6 @@ const SnakeLevels = ({
                             ) {
                               conductOnTeamsSDK();
                             }
-                            console.log('join now');
                           }}
                           className="absolute -top-9 flex justify-center items-center">
                           <View className="h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute top-3 border-2 border-gray-300 border-solid "></View>

@@ -108,6 +108,9 @@ const MainWelcomeScreen = ({navigation}) => {
 
   // fetching user orders here
   useEffect(() => {
+    if (!user) {
+      return;
+    }
     const getOrders = async () => {
       console.log('gettting orders');
       const token = await auth().currentUser?.getIdToken();
