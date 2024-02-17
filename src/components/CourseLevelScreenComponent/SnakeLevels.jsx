@@ -253,7 +253,7 @@ const SnakeLevels = ({
                         ? 'bg-[#6d6ded]'
                         : 'bg-[#8b8888]'
                     }   rounded-full`}></View>
-                  <TouchableOpacity
+                  <Pressable
                     // disabled={true}
                     onPress={() => {
                       const showTagValue = `${level?.classId} true`;
@@ -308,8 +308,16 @@ const SnakeLevels = ({
                     {!currentOngoingClass &&
                       todaysClass &&
                       todaysClass.classNumber === level?.classNumber && (
-                        <View className="absolute -top-11 flex justify-center items-center animate-bounce">
-                          <View className="h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute top-6 border-2 border-gray-300 border-solid "></View>
+                        <View
+                          className={`absolute ${
+                            todaysClass.classNumber == 1
+                              ? '-right-[165px]'
+                              : '-top-11'
+                          } flex justify-center items-center animate-bounce`}>
+                          <View
+                            className={`h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[2px] absolute ${
+                              todaysClass.classNumber == 1 ? '-left-0' : 'top-6'
+                            } border-2 border-gray-300 border-solid`}></View>
                           {todaysClass?.visibility ? (
                             <View className="h-[60px] w-[160px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                               <Text className="font-semibold text-[16px]">
@@ -328,7 +336,7 @@ const SnakeLevels = ({
                               </Text>
                             </View>
                           ) : (
-                            <View className="h-[60px] w-[140px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
+                            <View className="h-[60px] w-[160px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                               <Text className="font-semibold text-[20px]">
                                 To be decided
                               </Text>
@@ -341,8 +349,18 @@ const SnakeLevels = ({
                       // !currentOngoingClass &&
                       upcomingClass &&
                       upcomingClass.classNumber === level?.classNumber && (
-                        <View className="absolute -top-11 flex justify-center items-center animate-bounce">
-                          <View className="h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute top-6 border-2 border-gray-300 border-solid "></View>
+                        <View
+                          className={`absolute ${
+                            upcomingClass.classNumber == 1
+                              ? '-right-[165px]'
+                              : '-top-11'
+                          } flex justify-center items-center animate-bounce`}>
+                          <View
+                            className={`h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute ${
+                              upcomingClass.classNumber == 1
+                                ? '-left-0'
+                                : 'top-6'
+                            } border-2 border-gray-300 border-solid `}></View>
                           <View className="h-[60px] w-[150px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                             {upcomingClass?.visibility ? (
                               <View>
@@ -433,7 +451,7 @@ const SnakeLevels = ({
                         </View>
                       </Pressable>
                     )}
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               );
             })}
