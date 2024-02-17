@@ -124,7 +124,7 @@ const EmailLogin = ({navigation}) => {
           onPress={loginWithEmail}
           className={`rounded-full py-3 w-full items-center mt-4 flex-row justify-center`}>
           <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
-            {loginLoading ? 'Logging in' : 'Log in'}
+            Log in
           </TextWrapper>
           {loginLoading && (
             <ActivityIndicator

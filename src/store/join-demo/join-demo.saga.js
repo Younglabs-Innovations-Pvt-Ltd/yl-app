@@ -68,6 +68,8 @@ export function* fetchDemoDetailsFromPhone({payload}) {
     const token = yield getCurrentDeviceId();
     const phone = payload?.phone;
 
+    console.log('payload.phone', phone);
+
     if (!phone) {
       yield put(setLoading(false));
       console.log('phone does not exist');
@@ -183,7 +185,7 @@ function* onSetDemoData({payload: {demoData, bookingDetails}}) {
         moment().isAfter(moment(demoTime)) &&
         moment().isBefore(moment(demoTime).add(10, 'minutes'));
 
-      if (isClassOngoing) {
+      if (isClassOngoing && demoData.teamUrl) {
         yield put(setClassOngoing(true));
       } else {
         yield put(setClassOngoing(false));

@@ -55,8 +55,8 @@ const BottomSheetComponent = ({
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
-      backgroundStyle={{backgroundColor: darkMode ? "#00001a" : "#f0f0f5"}}
-       handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}
+      backgroundStyle={{backgroundColor: bgColor}}
+      handleIndicatorStyle={{backgroundColor: textColors.textPrimary}}
       stackBehavior="replace"
       style={style}
       {...otherProps}>

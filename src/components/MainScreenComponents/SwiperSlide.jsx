@@ -34,7 +34,7 @@ const SwiperSlide = ({item, navigation}) => {
   return (
     <View
       style={[tw`h-full flex justify-center  items-center`, {width: width}]}>
-      <View style={[tw`rounded-md h-[100%] w-[100%]`, , {overflow: 'hidden'}]}>
+      <View style={[tw`rounded-md h-[100%] w-[100%]`, {overflow: 'hidden'}]}>
         <ImageBackground
           source={{
             uri: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',

@@ -8,6 +8,9 @@ import Icon from './icon.component';
 import Share from 'react-native-share';
 import {useSelector} from 'react-redux';
 import {FONTS} from '../utils/constants/fonts';
+import {authSelector} from '../store/auth/selector';
+import BottomSheetComponent from './BottomSheetComponent';
+import CustomerSupportFeature from './CourseLevelScreenComponent/features/customer-support-feature';
 
 const shareApp = async () => {
   const message =
@@ -26,14 +29,12 @@ const shareApp = async () => {
 function Tabbar({state, descriptors, navigation}) {
   const [currentTab, setCurrentTab] = useState('drawer');
   const [actions, setActions] = useState(false);
+  const [visible, setVisible] = useState(false);
   const {textColors, darkMode, colorYlMain} = useSelector(
     state => state.appTheme,
   );
 
-  useEffect(() => {
-    const currentRoute = state.routes[state.index];
-    setCurrentTab(currentRoute.name.toLowerCase());
-  }, [state]);
+  const {customer} = useSelector(authSelector);
 
   const Icons = (name, focused) => {
     switch (name) {
@@ -65,6 +66,11 @@ function Tabbar({state, descriptors, navigation}) {
     }
   };
 
+  useEffect(() => {
+    const currentRoute = state.routes[state.index];
+    setCurrentTab(currentRoute.name.toLowerCase());
+  }, [state]);
+
   const ScreenIcon = ({name, focused}) => {
     const icon = Icons(name, focused);
     return icon;
@@ -72,14 +78,28 @@ function Tabbar({state, descriptors, navigation}) {
 
   const handleActions = () => {
     setCurrentTab('contact');
-    setActions(true);
+
+    if (customer === 'no') {
+      setActions(true);
+    } else {
+      setVisible(true);
+    }
+  };
+
+  const redirectToLastTab = () => {
+    const lastRoute = state.history.reverse()[0];
+    const route = state.routes.find(r => r.key === lastRoute.key);
+    navigation.navigate(route.name);
   };
 
   const closeActions = () => {
     setActions(false);
-    const lastRoute = state.history.reverse()[0];
-    const route = state.routes.find(r => r.key === lastRoute.key);
-    navigation.navigate(route.name);
+    redirectToLastTab();
+  };
+
+  const onCloseBottomSheet = () => {
+    redirectToLastTab();
+    setVisible(false);
   };
 
   return (
@@ -191,6 +211,17 @@ function Tabbar({state, descriptors, navigation}) {
         })}
       </View>
       <CustomerSupportActions visible={actions} onClose={closeActions} />
+      <BottomSheetComponent
+        isOpen={visible}
+        Children={
+          <CustomerSupportFeature
+            setSheetOpen={setVisible}
+            source="userProfile"
+          />
+        }
+        onClose={onCloseBottomSheet}
+        snapPoint={['40%', '55%']}
+      />
     </>
   );
 }

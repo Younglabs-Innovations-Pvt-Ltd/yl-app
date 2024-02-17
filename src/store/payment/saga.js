@@ -71,7 +71,6 @@ function* payOnTazapay({body, ipData}) {
     const {token} = yield checkOutSessionRes.json();
     console.log('token is', token);
     const redirectUrl = `https://younglabsdev1.vercel.app/yl_app/tazapay?token=${token}`;
-    console.log('redirectUrl', redirectUrl);
 
     yield put(setLoading(false));
     yield Linking.openURL(redirectUrl);

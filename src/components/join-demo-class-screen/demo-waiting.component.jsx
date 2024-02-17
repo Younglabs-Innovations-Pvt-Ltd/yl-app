@@ -104,21 +104,19 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail, setIsCollapsed}) => {
         marginBottom: marginBottom,
         opacity: opacity,
       }}>
-      <View className="flex-row items-end justify-between py-1 px-1">
+      <View className="flex-row items-center justify-between py-1 px-1">
         <View className="flex-col">
-          <Text className="text-xs text-white">
-            Your First free dmeo class will start in
-          </Text>
+          <Text className="text-xs text-white">Your free class starts in</Text>
           <View className="flex-row mt-1">
             <CountDownTimer timeLeft={timeLeft} />
           </View>
         </View>
 
-        <View className="flex-row px-1 items-end justify-end mr-3">
+        <View className="flex-row px-1 items-center justify-center">
           {/* <View className="">
             <UploadHandwriting demoData={demoData} />
           </View> */}
-          <View className="justify-end ml-3">
+          <View className="justify-center">
             <Pressable
               style={({pressed}) => [
                 {
@@ -132,12 +130,12 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail, setIsCollapsed}) => {
               <Image
                 source={gmailIcon}
                 style={{
-                  width: 22,
-                  height: 18,
+                  width: 24,
+                  height: 24,
                   resizeMode: 'cover',
                 }}
               />
-              <View className="items-center mt-1">
+              {/* <View className="items-center mt-1">
                 <Text
                   style={{color: COLORS.white}}
                   className="text-[12px] leading-[12px]">
@@ -148,14 +146,14 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail, setIsCollapsed}) => {
                   className="text-[12px] leading-[12px]">
                   link
                 </Text>
-              </View>
+              </View> */}
             </Pressable>
           </View>
 
           <View className="items-center justify-start h-full ml-2">
             <MIcon
-              name="arrow-up"
-              size={35}
+              name="chevron-up"
+              size={28}
               color="white"
               onPress={() => setIsCollapsed(true)}
             />
@@ -238,7 +236,7 @@ const ShortTape = ({timeLeft, setIsCollapsed}) => {
       <Pressable
         className="flex-row w-full items-center justify-between"
         onPress={() => {
-          console.log('clickded'), setIsCollapsed(false);
+          setIsCollapsed(false);
         }}>
         <View className="flex-row">
           <Text className="text-white font-semibold mr-2">
@@ -246,7 +244,7 @@ const ShortTape = ({timeLeft, setIsCollapsed}) => {
           </Text>
           <CountDownTimer2 timeLeft={timeLeft} />
         </View>
-        <MIcon name="arrow-down" size={20} color="white" />
+        <Icon name="chevron-down" size={24} color="white" />
       </Pressable>
     </Animated.View>
   );

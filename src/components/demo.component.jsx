@@ -138,20 +138,28 @@ const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
 
     if (moment().isAfter(moment(bookingTime)) && !teamUrl) {
       return (
-        <View style={{padding: 16}}>
-          <TextWrapper color={COLORS.white} ff={FONTS.primaryFont} fs={15}>
-            You missed your class. You can reschedule next class.
+        <View
+          style={{
+            flexDirection: 'row',
+            padding: 4,
+            // justifyContent: 'space-between',
+          }}>
+          <TextWrapper
+            color={COLORS.white}
+            ff={FONTS.primaryFont}
+            fs={15}
+            styles={{flex: 1}}>
+            You missed your free class
           </TextWrapper>
           <Pressable
             style={({pressed}) => [
               styles.paButton,
               {
                 opacity: pressed ? 0.7 : 1,
-                marginTop: 6,
               },
             ]}
             onPress={rescheduleClass}>
-            <TextWrapper color={'#434a52'} fs={16.5} ff={FONTS.primaryFont}>
+            <TextWrapper color={'#434a52'} fs={12} ff={FONTS.primaryFont}>
               Reschedule
             </TextWrapper>
           </Pressable>
@@ -207,7 +215,7 @@ const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
         // Show post action after demo class
         showPostActions && (
           <View className="w-full">
-            <PostDemoAction rescheduleClass={openResheduleSheet} />
+            <PostDemoAction rescheduleClass={rescheduleClass} />
           </View>
         )
       }
@@ -236,11 +244,11 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   paButton: {
-    paddingHorizontal: 2,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    borderRadius: 50,
+    borderRadius: 100,
   },
 });

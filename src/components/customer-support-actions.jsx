@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Pressable,
@@ -40,13 +40,33 @@ import Input from './input.component';
 import {i18nContext} from '../context/lang.context';
 
 import {getWhatsappRedirectUrl} from '../utils/redirect-whatsapp';
+import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 
 const {width: deviceWidth} = Dimensions.get('window');
+
+const courseNames = courses => {
+  let courseValues = Object.values(courses);
+
+  let all = [];
+  for (let i = 0; i < courseValues.length; i++) {
+    all.push(...courseValues[i]);
+  }
+
+  all = all
+    .filter(course => course.alternativeNameOnApp)
+    .map(course => ({id: course.id, name: course.alternativeNameOnApp}));
+
+  return all;
+};
 
 const CustomerSupportActions = ({visible, onClose}) => {
   if (!visible) return null;
 
+  const [names, setNames] = useState([]);
+
   const {localLang} = i18nContext();
+
+  const {courses} = useSelector(welcomeScreenSelector);
 
   const dispatch = useDispatch();
 
@@ -63,6 +83,14 @@ const CustomerSupportActions = ({visible, onClose}) => {
   const {bookingDetails} = useSelector(joinDemoSelector);
 
   const handleShowFormVisible = () => dispatch(setFormVisible(true));
+
+  useEffect(() => {
+    if (!courses) {
+      return;
+    }
+
+    setNames(courseNames(courses));
+  }, [courses]);
 
   const openWhatsapp = async () => {
     const text = 'I would like to know more about your courses';
@@ -177,21 +205,14 @@ const CustomerSupportActions = ({visible, onClose}) => {
                   defaultValue={courseId || 'Choose course'}
                   onSelect={onSelectCourseId}>
                   <SelectContent>
-                    <SelectItem
-                      currentValue={courseId}
-                      value="English handwriting">
-                      English handwriting
-                    </SelectItem>
-                    <SelectItem
-                      currentValue={courseId}
-                      value="English speaking">
-                      English speaking
-                    </SelectItem>
-                    <SelectItem
-                      currentValue={courseId}
-                      value="Hindi handwriting">
-                      Hindi handwriting
-                    </SelectItem>
+                    {names.map(item => (
+                      <SelectItem
+                        key={item.id}
+                        currentValue={courseId}
+                        value={item.name}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Spacer space={4} />
@@ -256,7 +277,7 @@ const CustomerSupportActions = ({visible, onClose}) => {
       </Modal>
       <SuccessPopup
         open={success}
-        msg="We will call you soon"
+        msg="We will connect you soon"
         onContinue={handleOnContinue}
       />
       <Modal visible={loading}>

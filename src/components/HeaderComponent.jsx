@@ -1,5 +1,5 @@
-import {View, Text, Pressable, ActivityIndicator} from 'react-native';
 import React, {useEffect, useState} from 'react';
+import {View, Text, Pressable, ActivityIndicator, Image} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {setDarkMode} from '../store/app-theme/appThemeReducer';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,7 +22,7 @@ import DropdownComponent from './DropdownComponent';
 import {COLORS} from '../utils/constants/colors';
 import Snackbar from 'react-native-snackbar';
 
-const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
+const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
   const handleShowDrawer = () => navigation.openDrawer();
   const [customerName, setCustomerName] = useState('To Younglabs');
   const [ordersOrBookingsLoading, setOrdersOrBookingsLoading] = useState(false);
@@ -43,7 +43,6 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   const {currentChild, children} = useSelector(userSelector);
 
   useEffect(() => {
-    console.log('current child is', currentChild);
     if (currentChild) {
       setCustomerName(currentChild?.name);
     }
@@ -57,7 +56,6 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
     } else {
       setOrdersOrBookingsLoading(allBookingsLoding);
       setOrdersOrBookingsLoadingFailed(allBookingsLoadingFailed);
-      console.log('here 2', allBookingsLoadingFailed);
     }
   }, [customer, allBookingsLoding, userOrdersLoading]);
 
@@ -91,35 +89,47 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
   return (
     <>
       <View
-        style={tw`flex flex-row justify-between items-center w-[100%] px-2 py-1 bg-[${bgSecondaryColor}]
+        style={tw`flex flex-row justify-between items-center w-[100%] px-2 py-1 bg-[${COLORS.pblue}]
           }`}>
-        <View className="flex-row items-center w-[75%]">
-          <View className="relative w-full items-start overflow-hidden pl-3">
-            <TouchableOpacity onPress={handleChangeSheetClick}>
-              {userFetchLoading ? (
-                <ActivityIndicator />
-              ) : ordersOrBookingsLoadingFailed ? (
-                <View>
-                  <Text
-                    className="text-[12px]"
+        <View className="flex-row items-center flex-1">
+          <View className="relative w-full items-start overflow-hidden">
+            {/* <TouchableOpacity onPress={handleChangeSheetClick}> */}
+            {userFetchLoading ? (
+              <ActivityIndicator />
+            ) : ordersOrBookingsLoadingFailed ? (
+              <View>
+                <Text
+                  className="text-[12px]"
+                  style={{
+                    color: textColors.textSecondary,
+                    fontFamily: FONTS.primaryFont,
+                  }}>
+                  Error in Fetcing Data
+                </Text>
+                <Text
+                  className="text-[10px]"
+                  style={{
+                    color: textColors.textYlMain,
+                    fontFamily: FONTS.primaryFont,
+                  }}>
+                  Try Again
+                </Text>
+              </View>
+            ) : (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                {ipData && (
+                  <Image
+                    source={{uri: ipData.country_flag}}
                     style={{
-                      color: textColors.textSecondary,
-                      fontFamily: FONTS.primaryFont,
-                    }}>
-                    Error in Fetcing Data
-                  </Text>
-                  <Text
-                    className="text-[10px]"
-                    style={{
-                      color: textColors.textYlMain,
-                      fontFamily: FONTS.primaryFont,
-                    }}>
-                    Try Again
-                  </Text>
-                </View>
-              ) : (
+                      width: 20,
+                      height: 20,
+                      borderRadius: 20,
+                      marginRight: 4,
+                    }}
+                  />
+                )}
                 <View style={tw` pr-2 flex-row gap-2 justify-end items-center`}>
-                  <View
+                  {/* <View
                     style={[
                       {
                         borderRadius: 50,
@@ -128,48 +138,69 @@ const HeaderComponent = ({navigation, setShowAddChildView, open}) => {
                       },
                     ]}>
                     <MIcon name="account" size={25} color="white" />
-                  </View>
+                  </View> */}
 
                   <View style={tw`gap-0`}>
                     <Text
                       style={[
                         {
-                          color: darkMode
-                            ? textColors.textSecondary
-                            : '#448BD6',
+                          color: COLORS.white,
                           fontFamily: FONTS.headingFont,
                         },
                       ]}
                       className={`font-semibold`}>
-                      Welcome, {customerName || 'To Younglabs'}
+                      Welcome{' '}
+                      {customerName && customerName.length > 12
+                        ? customerName.slice(0, 12) + '...'
+                        : customerName || 'to Younglabs'}
                     </Text>
 
-                    <Text
-                      style={{
-                        color: darkMode ? textColors.textSecondary : '#448BD6',
-                      }}
-                      className={`text-[10px] font-semibold `}>
-                      {user?.credits} points
-                    </Text>
+                    {user?.credits > 0 && (
+                      <Text
+                        style={{
+                          color: darkMode
+                            ? textColors.textSecondary
+                            : '#448BD6',
+                        }}
+                        className={`text-[10px] font-semibold `}>
+                        {user?.credits} credits
+                      </Text>
+                    )}
                   </View>
                 </View>
-              )}
-            </TouchableOpacity>
+              </View>
+            )}
+            {/* </TouchableOpacity> */}
           </View>
         </View>
 
-        <View className="w-[25%]">
+        <View className="flex-row gap-1">
+          <Pressable
+            className={` flex-row items-center justify-center rounded-full py-1 px-2`}
+            onPress={handleChangeSheetClick}
+            style={{backgroundColor: COLORS.white}}>
+            <MIcon name="account-switch" size={20} color={COLORS.black} />
+            <Text
+              className="text-xs"
+              style={{
+                fontFamily: FONTS.primaryFont,
+                color: COLORS.black,
+              }}>
+              Select child
+            </Text>
+          </Pressable>
           <Pressable
             className={` flex-row items-center justify-center rounded-full py-1 px-2`}
             onPress={() => setShowAddChildView(true)}
-            style={{backgroundColor: textColors.textYlGreen}}>
-            <MIcon name="plus" size={20} color={'white'} />
+            style={{backgroundColor: COLORS.white}}>
+            <MIcon name="plus" size={20} color={COLORS.black} />
             <Text
-              className="text-xs text-white"
+              className="text-xs"
               style={{
                 fontFamily: FONTS.primaryFont,
+                color: COLORS.black,
               }}>
-              Add Child
+              Add child
             </Text>
           </Pressable>
         </View>
@@ -213,9 +244,7 @@ export const ChangeAddedChild = ({close}) => {
       <Text
         className="font-semibold"
         style={[FONTS.heading, {color: textColors.textYlMain}]}>
-        {customer === 'yes'
-          ? 'Select Child To switch'
-          : 'Select Child To See Booking'}
+        {customer === 'yes' ? 'Select child' : 'Select child'}
       </Text>
       <View className="w-[90%] mt-3">
         {children?.map((child, key) => {

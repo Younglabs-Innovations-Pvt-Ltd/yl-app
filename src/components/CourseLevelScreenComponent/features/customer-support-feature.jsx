@@ -5,6 +5,7 @@ import {
   TextInput,
   Pressable,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {BASE_URL} from '@env';
@@ -18,6 +19,7 @@ import auth from '@react-native-firebase/auth';
 import CustomerTickets from './CustomerTickets';
 import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
 import {COLORS} from '../../../utils/constants/colors';
+import Icon from '../../icon.component';
 
 const CustomerSupportFeature = ({
   serviceReqClassesData,
@@ -130,6 +132,22 @@ const CustomerSupportFeature = ({
     }
   };
 
+  const redirectToWhatsApp = async () => {
+    try {
+      let url = '';
+      const phoneNumber = '+919289029696';
+      if (Platform.OS === 'android') {
+        url = `whatsapp://send?phone=${phoneNumber}`;
+      } else if (Platform.OS === 'ios') {
+        url = `whatsapp://wa.me/${phoneNumber}`;
+      }
+
+      await Linking.openURL(url);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
   return (
     <View className="w-[100%] h-[100%] flex flex-col justify-center items-center">
       {showMyTickets ? (
@@ -146,6 +164,21 @@ const CustomerSupportFeature = ({
                 <Text className="text-white font-semibold">My Tickets</Text>
               </Pressable>
             </View>
+          )}
+          {source === 'userProfile' && (
+            <Pressable
+              onPress={redirectToWhatsApp}
+              style={({pressed}) => [
+                styles.btnWhatsApp,
+                {backgroundColor: pressed ? '#eee' : 'transparent'},
+              ]}>
+              <Icon name="logo-whatsapp" size={28} color={COLORS.pgreen} />
+              <Text
+                className="font-semibold"
+                style={{color: textColors.textPrimary}}>
+                Chat with us
+              </Text>
+            </Pressable>
           )}
           <DropdownComponent
             data={issueType}
@@ -195,5 +228,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 4,
     color: COLORS.black,
+  },
+  btnWhatsApp: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 100,
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignSelf: 'flex-end',
   },
 });

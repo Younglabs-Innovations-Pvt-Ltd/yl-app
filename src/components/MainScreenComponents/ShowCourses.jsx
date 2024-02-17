@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  Pressable,
-  ActivityIndicator,
-  ImageBackground,
-  Dimensions,
-} from 'react-native';
+import {View, Text, Pressable, ImageBackground, Dimensions} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {FONTS} from '../../utils/constants/fonts';
 import {COLORS} from '../../utils/constants/colors';
@@ -26,7 +19,7 @@ const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 const {height, width} = Dimensions.get('window');
 const ShowCourses = ({navigation}) => {
   const coursesNameByCategory = {
-    handwriting: 'English Handwriting Courses',
+    handwriting: 'Handwriting Improvement Courses',
     learning: 'English Learning',
     mathematics: 'Mathematics Courses',
     others: 'Other Academic Courses',
@@ -129,7 +122,7 @@ const CourseItemRender = ({data, navigation}) => {
             courseData: data,
           });
         }}>
-        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100  w-[115px]">
+        <View className="overflow-hidden items-center h-[160px] mx-[3px] shadow rounded-md bg-gray-100 w-[115px]">
           <ImageBackground
             source={{
               uri:
@@ -148,7 +141,12 @@ const CourseItemRender = ({data, navigation}) => {
                   return (
                     <Text
                       key={index}
-                      style={[{lineHeight: 20, fontFamily: FONTS.headingFont}]}
+                      style={[
+                        {
+                          lineHeight: 20,
+                        },
+                        FONTS.subHeading,
+                      ]}
                       className="flex-wrap text-white text-[17px] font-semibold">
                       {item}
                     </Text>
@@ -187,71 +185,3 @@ const CoursesLoadingEffect = () => {
     </View>
   );
 };
-
-{
-  /* <View className="py-1 w-[100%]">
-        <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
-          <Text
-            className={`w-[80%] p-0`}
-            style={[FONTS.heading, {color: textColors?.textPrimary}]}>
-            Handwriting Improvement
-          </Text>
-
-          <Pressable
-            className="flex-row"
-            onPress={() => {
-              navigation.navigate('AllCoursesScreen', {
-                //   courses: handwritingCourses,
-                heading: 'Handwriting Improvement',
-              });
-            }}>
-            <Text className="font-semibold" style={{color: COLORS.pblue}}>
-              See all
-            </Text>
-            <MIcon name="chevron-right" size={22} color={COLORS.pblue} />
-          </Pressable>
-        </View>
-
-        {coursesLoading ? (
-          <View className="w-full items-center h-[80px] justify-center mt-1">
-            <ActivityIndicator
-              color={textColors.textYlMain}
-              className="h-10 w-10"
-            />
-          </View>
-        ) : coursesLoadingFailed ? (
-          <View className="w-full items-center h-[80px] justify-center">
-            <Text
-              className="font-semibold"
-              style={[FONTS.primary, {color: textColors.textSecondary}]}>
-              Unable To Load Courses For You
-            </Text>
-
-            <Pressable onPress={() => reloadCourses()}>
-              <Text
-                className="text-base mt-1"
-                style={{color: textColors.textYlMain}}>
-                Try Again
-              </Text>
-            </Pressable>
-          </View>
-        ) : (
-          <FlatList
-            data={courses}
-            keyExtractor={item => item.name}
-            renderItem={item => {
-              return (
-                <CourseItemRender
-                  data={item.item}
-                  navigation={navigation}
-                  phone={user?.phone}
-                />
-              );
-            }}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            style={{paddingTop: 4}}
-          />
-        )}
-      </View> */
-}

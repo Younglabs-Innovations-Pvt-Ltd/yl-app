@@ -39,6 +39,8 @@ import ModalComponent from '../components/modal.component';
 import {COLORS} from '../utils/constants/colors';
 import TextWrapper from '../components/text-wrapper.component';
 import {FONTS} from '../utils/constants/fonts';
+import {networkSelector} from '../store/network/selector';
+import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
@@ -75,7 +77,18 @@ const MainWelcomeScreen = ({navigation}) => {
     isNmi,
     appRemark,
   } = useSelector(joinDemoSelector);
+
   const {ipData} = useSelector(bookDemoSelector);
+  const {
+    networkState: {isConnected},
+  } = useSelector(networkSelector);
+
+  // fetch IpData
+  useEffect(() => {
+    if (isConnected && !ipData) {
+      dispatch(startFetchingIpData());
+    }
+  }, [ipData, isConnected]);
 
   // filter courses to show on the banner
   useEffect(() => {
@@ -253,6 +266,7 @@ const MainWelcomeScreen = ({navigation}) => {
         navigation={navigation}
         setShowAddChildView={setShowAddChildView}
         open={onChangeChildSheetOpen}
+        ipData={ipData}
       />
       {loading ? (
         <View>

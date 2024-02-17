@@ -17,7 +17,6 @@ import {authSelector} from '../store/auth/selector';
 import {userSelector} from '../store/user/selector';
 import {logout} from '../store/auth/reducer';
 import {FONTS} from '../utils/constants/fonts';
-import {localStorage} from '../utils/storage/storage-provider';
 import TextWrapper from '../components/text-wrapper.component';
 import {navigate} from '../navigationRef';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
@@ -27,8 +26,7 @@ import Spacer from '../components/spacer.component';
 import Icon from '../components/icon.component';
 import {welcomeScreenSelector} from '../store/welcome-screen/selector';
 import {redirectToCourse} from '../utils/redirectToCourse';
-import BottomSheetComponent from '../components/BottomSheetComponent';
-import CustomerSupportFeature from '../components/CourseLevelScreenComponent/features/customer-support-feature';
+import SocialMediaIconsTray from '../components/social-media-icon-tray';
 
 const {width, height} = Dimensions.get('window');
 
@@ -41,7 +39,6 @@ const UserProfile = ({navigation}) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
-  const [sheetOpen, setSheetOpen] = useState(false);
   const dispatch = useDispatch();
 
   const changeDarkMode = payload => {
@@ -179,7 +176,7 @@ const UserProfile = ({navigation}) => {
                     <Text
                       className="text-base font-semibold"
                       style={{color: textColors.textYlMain}}>
-                      Student Name:
+                      Child Name:
                     </Text>
                     <Text
                       className="className text-base flex-wrap ml-1 capitalize"
@@ -194,7 +191,7 @@ const UserProfile = ({navigation}) => {
                     <Text
                       className="text-base font-semibold"
                       style={{color: textColors.textYlMain}}>
-                      Student Age:
+                      Child Age:
                     </Text>
                     <Text
                       className="className text-base flex-wrap ml-1 capitalize"
@@ -205,27 +202,6 @@ const UserProfile = ({navigation}) => {
                 </View>
               </View>
             </View>
-
-            {/* <View className="w-full items-center mt-4">
-              <View
-                className="w-[100%] p-2 rounded"
-                style={{backgroundColor: bgSecondaryColor}}>
-                <View className="flex-row items-center">
-                  <Text
-                    className="text-[15px] font-semibold"
-                    style={{color: textColors.textYlOrange}}>
-                    Earned Credits:
-                  </Text>
-                  <Text
-                    className="text-16px ml-2"
-                    style={{color: textColors.textYlOrange}}>
-                    {user?.credits}
-                  </Text>
-                </View>
-              </View>
-            </View> */}
-
-            {/* <RedeemPointsView /> */}
 
             <View style={{marginTop: 16}}>
               <View
@@ -289,23 +265,6 @@ const UserProfile = ({navigation}) => {
               </TextWrapper>
             </Pressable>
             <Pressable
-              onPress={() => setSheetOpen(true)}
-              style={({pressed}) => [
-                styles.btnActions,
-                {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
-              ]}>
-              <MIcon
-                name="headset"
-                size={24}
-                color={textColors.textSecondary}
-              />
-              <TextWrapper
-                color={textColors.textSecondary}
-                ff={FONTS.primaryFont}>
-                Customer support
-              </TextWrapper>
-            </Pressable>
-            <Pressable
               style={({pressed}) => [
                 styles.btnActions,
                 {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
@@ -330,19 +289,11 @@ const UserProfile = ({navigation}) => {
           </ScrollView>
         </>
       ) : (
-        <NotACustomerProfilePage />
+        <NotACustomerProfilePage
+          redirectToWebsite={redirectToWebsite}
+          redirectToBookFreeClass={redirectToBookFreeClass}
+        />
       )}
-      <BottomSheetComponent
-        isOpen={sheetOpen}
-        Children={
-          <CustomerSupportFeature
-            setSheetOpen={setSheetOpen}
-            source="userProfile"
-          />
-        }
-        onClose={() => setSheetOpen(false)}
-        snapPoint={['40%', '55%']}
-      />
     </>
   );
 };
@@ -371,15 +322,20 @@ const CommonActions = ({
           {backgroundColor: pressed ? '#f5f5f5' : 'transparent'},
         ]}
         onPress={redirectToBookFreeClass}>
+        <MIcon name="pencil" size={24} color={textColors.textSecondary} />
         <TextWrapper color={textColors.textSecondary} ff={FONTS.primaryFont}>
-          Book free Handwriting class
+          Book free handwriting class
         </TextWrapper>
       </Pressable>
+      <SocialMediaIconsTray />
     </React.Fragment>
   );
 };
 
-const NotACustomerProfilePage = () => {
+const NotACustomerProfilePage = ({
+  redirectToWebsite,
+  redirectToBookFreeClass,
+}) => {
   const {bgColor, textColors, bgSecondaryColor} = useSelector(
     state => state.appTheme,
   );
@@ -388,9 +344,9 @@ const NotACustomerProfilePage = () => {
 
   return (
     <>
-      <View className="flex-1 items-center" style={{backgroundColor: bgColor}}>
+      <View className="flex-1 px-2" style={{backgroundColor: bgColor}}>
         <View
-          className="w-[95%] px-2 py-5 mt-3 rounded-md flex-row justify-between"
+          className="px-2 py-5 rounded-md flex-row justify-between"
           style={{backgroundColor: bgSecondaryColor}}>
           <View className="w-[35%] items-center justify-center">
             <View className="h-[110px] w-[110px] rounded-full bg-white justify-center items-center overflow-hidden">
@@ -440,6 +396,12 @@ const NotACustomerProfilePage = () => {
             </View>
           </View>
         </View>
+        <Spacer />
+        <CommonActions
+          textColors={textColors}
+          redirectToWebsite={redirectToWebsite}
+          redirectToBookFreeClass={redirectToBookFreeClass}
+        />
       </View>
     </>
   );

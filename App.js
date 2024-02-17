@@ -148,7 +148,9 @@ function App() {
   const handlePaymentDeepLink = ({url}) => {
     const route = url.replace(/.*?:\/\//g, '');
 
-    const paymentLink = 'redirect.com.younglabs.android';
+    console.log('route', route);
+
+    const paymentLink = 'redirect.com.younglabs.android.payment.success';
     if (route === paymentLink) {
       navigate(SCREEN_NAMES.PAYMENT_SUCCESS);
     }

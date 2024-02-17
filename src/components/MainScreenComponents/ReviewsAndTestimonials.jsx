@@ -21,8 +21,6 @@ const ReviewsAndTestimonials = () => {
     dispatch(fetchContentDataStart());
   }, []);
 
-  // console.log("Content Data is" , contentData)
-
   return (
     <View className="w-full">
       {/* Video slider */}
@@ -39,9 +37,9 @@ const ReviewsAndTestimonials = () => {
           style={[
             {
               color: textColors.textPrimary,
-              fontFamily: FONTS.primaryFont,
+              fontFamily: FONTS.dancing_script,
               lineHeight: 18,
-              fontSize: 16,
+              fontSize: 18,
             },
           ]}>
           {contentData?.content?.reviews?.subheading}
@@ -90,9 +88,9 @@ const ReviewsAndTestimonials = () => {
           style={[
             {
               color: textColors.textPrimary,
-              fontFamily: FONTS.primaryFont,
+              fontFamily: FONTS.dancing_script,
               lineHeight: 18,
-              fontSize: 16,
+              fontSize: 18,
             },
           ]}>
           {contentData?.content?.tips?.subheading}
@@ -116,12 +114,35 @@ const ReviewsAndTestimonials = () => {
         />
       </View>
 
+      {contentData?.content?.rating && (
+        <View style={{marginTop: 16}}>
+          <Text
+            style={[
+              FONTS.heading,
+              {
+                color: textColors.textPrimary,
+              },
+            ]}>
+            {contentData?.content?.rating?.heading}
+          </Text>
+          <Text
+            style={[
+              {
+                color: textColors.textPrimary,
+                fontFamily: FONTS.dancing_script,
+                lineHeight: 18,
+                fontSize: 18,
+              },
+            ]}>
+            {contentData?.content?.rating?.subheading}
+          </Text>
+        </View>
+      )}
+
       {/* Testimonials */}
       <View className="w-full mt-5">
         <View>
-          <Text
-            className={``}
-            style={[FONTS.heading, {color: textColors.textPrimary}]}>
+          <Text style={[FONTS.heading, {color: textColors.textPrimary}]}>
             What Our Customer Speak
           </Text>
         </View>
