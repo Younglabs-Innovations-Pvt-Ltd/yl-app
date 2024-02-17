@@ -14,13 +14,13 @@ const Drawer = createDrawerNavigator();
 
 const DrawerScreen = ({route}) => {
   const data = route.params;
-  console.log('drawerData', data);
   return (
     <Drawer.Navigator
       screenOptions={{
         drawerPosition: 'right',
         headerShown: false,
         drawerType: 'front',
+        swipeEnabled: false,
       }}
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen

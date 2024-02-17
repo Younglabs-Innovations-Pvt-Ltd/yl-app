@@ -196,7 +196,7 @@ const Referral = ({route}) => {
                 ff={FONTS.primaryFont}
                 color={textColors.textSecondary}
                 fs={16.5}>
-                You will get credits of 20% of course price.
+                You will get credits of 20% of course price
               </TextWrapper>
             </View>
           </View>

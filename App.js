@@ -96,7 +96,6 @@ function App() {
     const storeDeviceId = async () => {
       try {
         const uid = await DeviceInfo.getAndroidId();
-        console.log('uid', uid);
         await saveDeviceId({phone: '', deviceUID: uid});
       } catch (error) {
         console.log('storeDeviceIdError', error.message);
