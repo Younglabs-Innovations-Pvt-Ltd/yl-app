@@ -27,6 +27,9 @@ const ViewUploadedHomeWork = ({
   //   useEffect(() => {
   //     console.log('check all urls', selectedClass?.homeworkUrls);
   //   }, [selectedClass]);
+  const {bgSecondaryColor, textColors, darkMode} = useSelector(
+    state => state.appTheme,
+  );
   const width = Dimensions.get('window').width;
   const {user} = useSelector(authSelector);
   const [homeWorkUrls, setHomeWorkUrls] = useState(selectedClass?.homeworkUrls);
@@ -78,19 +81,21 @@ const ViewUploadedHomeWork = ({
 
   return (
     <View className="w-[100%] h-[55vh] rounded-md overflow-hidden">
-      <Pressable
-        onPress={() => {
-          setViewUploadedHomwWork(null);
-          setSelectedClass(null);
-          setEditHomeWork(null);
-        }}>
-        <MIcon
-          name="arrow-left-bold-circle"
-          className="mt-2"
-          size={35}
-          color="gray"
-        />
-      </Pressable>
+      <View className="w-[50%] flex flex-row justify-between items-center">
+        <Pressable
+          onPress={() => {
+            setViewUploadedHomwWork(null);
+            setSelectedClass(null);
+            setEditHomeWork(null);
+          }}>
+          <MIcon
+            name="arrow-left-bold-circle"
+            className="mt-2"
+            size={35}
+            color="gray"
+          />
+        </Pressable>
+      </View>
       <View className="rounded-lg w-[100%] h-full overflow-hidden">
         <Carousel
           loop
@@ -99,7 +104,7 @@ const ViewUploadedHomeWork = ({
           height="100%"
           data={homeWorkUrls}
           scrollAnimationDuration={1000}
-          renderItem={({item}) => {
+          renderItem={({item, index}) => {
             return (
               <View
                 style={{
@@ -133,6 +138,13 @@ const ViewUploadedHomeWork = ({
                     </Text>
                   </Pressable>
                 )} */}
+                <View className="absolute top-2 right-9 px-3 py-2 h-fit w-fit rounded-2xl bg-[#76C8F2]">
+                  <Text
+                    // style={{color: textColors?.textPrimary}}
+                    className="text-[16px] font-semibold text-white">
+                    {`${index + 1}/${homeWorkUrls?.length}`}
+                  </Text>
+                </View>
               </View>
             );
           }}

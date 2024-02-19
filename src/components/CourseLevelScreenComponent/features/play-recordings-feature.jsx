@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import RecordingPlay from '../../../assets/images/recordingPlay.png';
+import RecordingPlay from '../../../assets/newVideoPlayerIcons/play-button(1).png';
 import {Image} from 'react-native-animatable';
 import {SCREEN_NAMES} from '../../../utils/constants/screen-names';
 import {handleCourseSelector} from '../../../store/handleCourse/selector';
@@ -121,7 +121,8 @@ export const RecordingsTile = ({
                 }),
               );
             }}
-            className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1 bg-[#55D400]  rounded-md">
+            style={{backgroundColor: textColors.textYlGreen}}
+            className="w-fit h-[70%] flex flex-row justify-center items-center px-2 py-1   rounded-md">
             <Text className="font-semibold text-white">Request Recording</Text>
             {(ClasseRecordingRequestLoading || serviceReqClassesLoading) &&
               clicked && (
@@ -148,7 +149,9 @@ export const RecordingsTile = ({
           </Pressable>
         ) : (
           <View>
-            <Text>Recording Expired</Text>
+            <Text style={{color: textColors?.textSecondary}}>
+              Recording Expired
+            </Text>
           </View>
         )
       ) : (

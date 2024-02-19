@@ -64,19 +64,35 @@ const CustomerTickets = ({setShowMyTickets, source}) => {
     <View className="w-[100%] h-[100%] relative flex flex-col justify-center items-center">
       <View className="w-full flex flex-row justify-start items-center">
         {source !== 'userProfile' && (
-          <View className="w-[64%] flex flex-row justify-between items-center">
-            <Pressable className="" onPress={() => setShowMyTickets(false)}>
+          <View
+            className={`w-[64%] flex flex-row justify-between items-center ${
+              loading ? 'mt-10' : 'mt-1'
+            } `}>
+            <Pressable className={``} onPress={() => setShowMyTickets(false)}>
               <MIcon
                 name="arrow-left-bold-circle"
-                className="mt-2"
                 size={35}
                 color={textColors?.textPrimary}
               />
             </Pressable>
             <Text
               style={{color: textColors?.textPrimary}}
-              className="font-semibold text-[20px]">
+              className={`font-semibold text-[20px] `}>
               My Tickets
+            </Text>
+          </View>
+        )}
+        {source === 'userProfile' && (
+          <View className="w-full flex flex-row justify-center items-center">
+            <Text
+              style={{
+                fontFamily: FONTS.headingFont,
+                color: textColors?.textPrimary,
+              }}
+              className={`font-semibold text-[20px] ${
+                loading ? 'mt-16' : 'mt-3'
+              }`}>
+              Log your issue here
             </Text>
           </View>
         )}

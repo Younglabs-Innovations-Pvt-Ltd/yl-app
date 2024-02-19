@@ -117,11 +117,13 @@ const UserCoursesPage = ({navigation}) => {
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
               <ScrollView className="" showsVerticalScrollIndicator={false}>
                 {userCourseData?.map((course,index) => {
-                  console.log(course);
+                  console.log("fiojwogiejrogiejrg",course);
                   return (
                     <CourseCard
                       key={index}
                       course={course}
+                      alternativeNameOnApp={course?.alternativeNameOnApp}
+                      thumbnailUrl={course?.thumbnail_url}
                       navigation={navigation}
                     />
                   );

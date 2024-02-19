@@ -96,7 +96,8 @@ const SubmitHomeWorkTile = ({
                 setViewUploadedHomwWork(true);
                 setEditHomeWork(false);
               }}
-              className="w-[100%] flex flex-row justify-center items-center rounded-md py-2 bg-blue-400">
+              style={{backgroundColor: textColors?.textYlMain}}
+              className="w-[100%] flex flex-row justify-center items-center rounded-md py-2 ">
               <Text className="text-white text-[20px] font-semibold">
                 View Checked
               </Text>
@@ -110,7 +111,8 @@ const SubmitHomeWorkTile = ({
                     setViewUploadedHomwWork(true);
                     setEditHomeWork(true);
                   }}
-                  className="w-[50%] mr-1 flex flex-row justify-center items-center rounded-md py-2 bg-blue-400">
+                  style={{backgroundColor: textColors?.textYlMain}}
+                  className="w-[50%] mr-1 flex flex-row justify-center items-center rounded-md py-2">
                   <Text className="text-white text-[20px] font-semibold">
                     View Uploaded
                   </Text>
@@ -118,9 +120,10 @@ const SubmitHomeWorkTile = ({
               )}
               <Pressable
                 onPress={() => setSelectedClass(classData)}
+                style={{backgroundColor: textColors?.textYlMain}}
                 className={`${
                   !isUploaded ? 'w-[100%]' : 'w-[50%]'
-                } flex flex-row justify-center items-center rounded-md py-2 bg-blue-400`}>
+                } flex flex-row justify-center items-center rounded-md py-2`}>
                 <Text className="text-white text-[20px] font-semibold">
                   Upload
                 </Text>

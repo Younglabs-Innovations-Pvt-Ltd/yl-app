@@ -1,9 +1,10 @@
-import {View, Text} from 'react-native';
+import {View, Text, Pressable} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
 import {useSelector} from 'react-redux';
 import {ScrollView} from 'react-native-gesture-handler';
 import Animated, {interpolate, useAnimatedStyle} from 'react-native-reanimated';
+import Icon from './icon.component';
 
 const BottomSheetComponent = ({
   Children,
@@ -50,6 +51,7 @@ const BottomSheetComponent = ({
 
   return (
     <BottomSheet
+      // className="relative"
       ref={bottomSheetRef}
       index={-1}
       snapPoints={snapPoints}
@@ -60,6 +62,20 @@ const BottomSheetComponent = ({
       stackBehavior="replace"
       style={style}
       {...otherProps}>
+      <View className="w-[100%]  flex flex-row justify-end items-center">
+        <Pressable
+          onPress={() => {
+            setBottomSheetOpen(false);
+          }}
+          style={{backgroundColor: darkMode ? '#20202a' : bgColor}}
+          className="h-9 w-9 flex mr-2 flex-row justify-center items-center rounded-full ">
+          <Icon
+            name="close-outline"
+            size={25}
+            color={textColors.textSecondary}
+          />
+        </Pressable>
+      </View>
       <ScrollView
         className="flex-1 px-2 z-50"
         contentContainerStyle={{alignItems: 'center'}}>
