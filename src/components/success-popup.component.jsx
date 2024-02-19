@@ -1,9 +1,9 @@
 import React from 'react';
-import {StyleSheet, View, Modal} from 'react-native';
+import {StyleSheet, View, Modal, Pressable} from 'react-native';
 import Icon from './icon.component';
 import TextWrapper from './text-wrapper.component';
 import Spacer from './spacer.component';
-import Button from './button.component';
+// import Button from './button.component';
 import {COLORS} from '../utils/constants/colors';
 
 const SuccessPopup = ({open, msg, onContinue}) => {
@@ -20,13 +20,13 @@ const SuccessPopup = ({open, msg, onContinue}) => {
           <TextWrapper styles={{textAlign: 'center'}}>{msg}</TextWrapper>
           <Spacer />
           <View>
-            <Button
+            <Pressable
               bg={COLORS.pblue}
               textColor={COLORS.white}
               rounded={4}
               onPress={onContinue}>
               Continue
-            </Button>
+            </Pressable>
           </View>
         </View>
       </View>

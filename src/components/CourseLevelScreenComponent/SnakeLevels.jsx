@@ -19,6 +19,7 @@ import {useSelector} from 'react-redux';
 import auth from '@react-native-firebase/auth';
 import {BASE_URL} from '@env';
 import Icon from '../icon.component';
+import { userSelector } from '../../store/user/selector';
 
 const SnakeLevels = ({
   navigation,
