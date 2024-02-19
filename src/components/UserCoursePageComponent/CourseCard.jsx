@@ -9,6 +9,7 @@ const CourseCard = ({
   navigation,
   alternativeNameOnApp,
   thumbnailUrl,
+  userName,
 }) => {
   const {
     bgColor,
@@ -41,6 +42,7 @@ const CourseCard = ({
           <ServiceRequestCard
             key={index}
             course={data}
+            userName={userName}
             alternativeNameOnApp={alternativeNameOnApp}
             thumbnailUrl={thumbnailUrl}
             navigation={navigation}

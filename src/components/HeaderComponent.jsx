@@ -150,8 +150,8 @@ const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
                       ]}
                       className={`font-semibold`}>
                       Welcome{' '}
-                      {customerName && customerName.length > 12
-                        ? customerName.slice(0, 12) + '...'
+                      {customerName && customerName?.length > 8
+                        ? customerName.slice(0, 8) + '...'
                         : customerName || 'to Younglabs'}
                     </Text>
 
@@ -176,7 +176,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
 
         <View className="flex-row gap-1">
           <Pressable
-            className={` flex-row items-center justify-center rounded-full py-1 px-2`}
+            className={` flex-row items-center justify-center rounded-full py-1 px-[6px]`}
             onPress={handleChangeSheetClick}
             style={{backgroundColor: COLORS.white}}>
             <MIcon name="account-switch" size={20} color={COLORS.black} />
@@ -190,7 +190,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
             </Text>
           </Pressable>
           <Pressable
-            className={` flex-row items-center justify-center rounded-full py-1 px-2`}
+            className={`flex-row items-center justify-center rounded-full py-1 px-[6px]`}
             onPress={() => setShowAddChildView(true)}
             style={{backgroundColor: COLORS.white}}>
             <MIcon name="plus" size={20} color={COLORS.black} />
