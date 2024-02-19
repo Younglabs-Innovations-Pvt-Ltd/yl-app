@@ -4,7 +4,12 @@ import {Image, Text, View} from 'react-native-animatable';
 import ServiceRequestCard from './ServiceRequestCard';
 import {useSelector} from 'react-redux';
 
-const CourseCard = ({course, navigation}) => {
+const CourseCard = ({
+  course,
+  navigation,
+  alternativeNameOnApp,
+  thumbnailUrl,
+}) => {
   const {
     bgColor,
     bgSecondaryColor,
@@ -13,6 +18,7 @@ const CourseCard = ({course, navigation}) => {
     darkMode,
     addMoreCourseCardbgColor,
   } = useSelector(state => state.appTheme);
+  console.log('thumbnailUrl', thumbnailUrl);
   return (
     <View
       key={course?.level}
@@ -22,19 +28,21 @@ const CourseCard = ({course, navigation}) => {
         <Text
           style={{color: textColors?.textPrimary}}
           className="text-[16px] font-semibold">
-          {course?.courseId}
+          {alternativeNameOnApp}
         </Text>
-        <Text
+        {/* <Text
           style={{color: textColors?.textPrimary}}
           className="text-[16px] font-semibold">
           Student : {course?.childName}
-        </Text>
+        </Text> */}
       </View>
       {course?.serviceRequests?.map((data, index) => {
         return (
           <ServiceRequestCard
             key={index}
             course={data}
+            alternativeNameOnApp={alternativeNameOnApp}
+            thumbnailUrl={thumbnailUrl}
             navigation={navigation}
           />
         );

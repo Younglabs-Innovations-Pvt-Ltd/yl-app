@@ -145,7 +145,8 @@ const SubmitHomeWork = ({
             handleSubmitHomeWorkClick();
           }}
           disabled={ClassesHomeWorkSubmitLoading}
-          className="flex flex-row justify-center items-center w-[90%] py-2 rounded-md mx-auto bg-blue-300">
+          style={{backgroundColor: textColors?.textYlMain}}
+          className="flex flex-row justify-center items-center w-[90%] py-2 rounded-md mx-auto ">
           <MIcon
             name="image-multiple"
             className="mt-2"
@@ -162,7 +163,8 @@ const SubmitHomeWork = ({
       ) : (
         <Pressable
           onPress={pickFile}
-          className="flex flex-row justify-center items-center w-[90%] py-2 rounded-md mx-auto bg-blue-300">
+          style={{backgroundColor: textColors?.textYlMain}}
+          className="flex flex-row justify-center items-center w-[90%] py-2 rounded-md mx-auto ">
           <MIcon
             name="image-multiple"
             className="mt-2"

@@ -135,12 +135,13 @@ const CustomerSupportFeature = ({
       ) : (
         <View className="w-[100%] h-[100%] flex flex-col justify-center items-center">
           {source !== 'userProfile' && (
-            <View className="w-full flex flex-row justify-end items-center">
+            <View className="w-full flex flex-row justify-start items-center">
               <Pressable
                 onPress={() => {
                   setShowMyTickets(true);
                 }}
-                className="bg-green-600 px-3 py-2 rounded-lg">
+                style={{backgroundColor: textColors?.textYlMain}}
+                className="px-3 py-2 rounded-lg">
                 <Text className="text-white font-semibold">My Tickets</Text>
               </Pressable>
             </View>
@@ -159,7 +160,7 @@ const CustomerSupportFeature = ({
           )}
           <TextInput
             style={{color: textColors?.textPrimary}}
-            className="w-[100%]   border border-solid border-[#adabab] text-[16px] rounded-xl px-2"
+            className="w-[100%] border border-solid border-[#adabab] text-[16px] rounded-xl px-2 mt-3"
             multiline
             numberOfLines={6}
             value={message}
@@ -170,7 +171,8 @@ const CustomerSupportFeature = ({
           />
           <Pressable
             onPress={onFormSubmit}
-            className="bg-orange-500 px-5 mt-3 py-3 rounded-lg flex flex-row justify-center items-center">
+            style={{backgroundColor: textColors?.textYlMain}}
+            className=" px-5 mt-3 py-3 rounded-lg flex flex-row justify-center items-center">
             <Text className="text-white font-semibold text-[16px]">Submit</Text>
             {loading && (
               <ActivityIndicator color={'white'} style={{width: 40}} />

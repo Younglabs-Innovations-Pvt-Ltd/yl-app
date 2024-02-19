@@ -148,14 +148,14 @@ const CourseLevelScreen = ({navigation, route}) => {
             />
           }
           onClose={() => setSheetOpen(false)}
-          snapPoint={['65%', '72%']}
+          snapPoint={['50%', '70%']}
         />
       ) : displayFeature === 'request_recording' ? (
         <BottomSheetComponent
           isOpen={sheetOpen}
           Children={<PlayRecordingFeature navigation={navigation} />}
           onClose={() => setSheetOpen(false)}
-          snapPoint={['65%', '72%']}
+          snapPoint={['50%', '70%']}
         />
       ) : // displayFeature === 'download_worksheets' ? (
       // downloadWorksheet()
@@ -183,7 +183,7 @@ const CourseLevelScreen = ({navigation, route}) => {
             />
           }
           onClose={() => setSheetOpen(false)}
-          snapPoint={['65%', '72%']}
+          snapPoint={['50%', '70%']}
         />
       ) : (
         displayFeature === 'customer_support' && (
@@ -196,7 +196,7 @@ const CourseLevelScreen = ({navigation, route}) => {
               />
             }
             onClose={() => setSheetOpen(false)}
-            snapPoint={['65%', '72%']}
+            snapPoint={['50%', '70%']}
           />
         )
       )}

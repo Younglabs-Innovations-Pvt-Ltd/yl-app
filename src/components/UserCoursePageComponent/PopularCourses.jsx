@@ -33,7 +33,6 @@ const PopularCourses = ({courses, navigation}) => {
         {allCoursesKey &&
           allCourses &&
           allCoursesKey.map(key => {
-            console.log('isodnfoweif', key);
             return allCourses[key]?.map((item, index) => {
               return (
                 <Pressable

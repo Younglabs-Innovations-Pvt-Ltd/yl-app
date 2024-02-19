@@ -7,14 +7,18 @@ import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
 import {Image} from 'react-native-animatable';
 
-const ServiceRequestCard = ({course, navigation}) => {
+const ServiceRequestCard = ({
+  course,
+  navigation,
+  alternativeNameOnApp,
+  thumbnailUrl,
+}) => {
   const [startDate, setStartDate] = useState(null);
   useEffect(() => {
-    console.log(course?.serviceRequestId);
+    console.log('course?.serviceRequestId', course);
   }, [course]);
 
   useEffect(() => {
-   
     if (
       course?.promisedStartDate?._seconds &&
       course?.promisedStartDate?._nanoseconds
@@ -30,10 +34,7 @@ const ServiceRequestCard = ({course, navigation}) => {
 
   return (
     <View className="overflow-hidden rounded-xl relative mt-[6px] border border-solid border-gray-200">
-      <ImageBackground
-        source={{
-          uri: 'https://firebasestorage.googleapis.com/v0/b/younglabs-8c353.appspot.com/o/handwriting.jpg?alt=media&token=b593eaeb-6bfa-41e3-9725-d7e3499f351f',
-        }}>
+      <ImageBackground source={{uri: `${thumbnailUrl}`}}>
         <LinearGradient
           start={{x: 0.5, y: -0.3}}
           colors={['#e9dcdc78', '#161414a2']}>
@@ -48,43 +49,63 @@ const ServiceRequestCard = ({course, navigation}) => {
             <View className="flex flex-row justify-between items-center w-[100%]">
               <View className="w-[70%] py-2 h-[160px] flex flex-col justify-end items-start mr-2">
                 <View className="flex flex-col justify-center items-start">
-                  <Text className="text-[25px] text-white font-semibold">
+                  <Text className="text-[22px] text-white font-semibold">
                     {course.level == 1 ? 'Foundation' : 'Advanced'}
                   </Text>
-                  <Text className="text-[25px] text-white font-semibold">
-                    {course?.courseId}
+                  <Text className="text-[22px] text-white font-semibold">
+                    {alternativeNameOnApp}
                   </Text>
 
                   {startDate && (
-                    <Text className="text-[25px] text-white font-semibold">
+                    <Text className="text-[22px] text-white font-semibold">
                       {startDate}
                     </Text>
                   )}
-                  <Text className="text-[25px] text-white font-semibold">
+                  {/* <Text className="text-[25px] text-white font-semibold">
                     Sessions : {course?.classCount}
-                  </Text>
+                  </Text> */}
                 </View>
               </View>
 
               {course?.level && course?.level == 1 ? (
                 <View className="flex flex-col justify-center items-center min-h-[100%] w-[30%] pr-3">
-                  <View
-                    className={`border-2 border-[#e9dcdc78] h-fit w-fit px-3  mb-2  py-2 flex flex-row items-center justify-center rounded-md text-white ${
-                      course?.level == 1 ? 'bg-cyan-600' : 'bg-red-500'
-                    }`}>
-                    <Text className="font-semibold text-[16px]">Level 1</Text>
-                  </View>
-                  <Image source={Level1} style={{height: 90, width: 90}} />
+                  {course?.batchType !== 'unhandled' &&
+                    course?.batchType !== 'custom' && (
+                      <View
+                        className={`border-2 border-[#e9dcdc78] h-fit w-fit px-3  mb-2  py-2 flex flex-row items-center justify-center rounded-md text-white ${
+                          course?.level == 1 ? 'bg-cyan-600' : 'bg-red-500'
+                        }`}>
+                        <Text className="font-semibold text-[16px]">
+                          Level 1
+                        </Text>
+                      </View>
+                    )}
+                  {course?.batchType !== 'unhandled' &&
+                  course?.batchType !== 'custom' ? (
+                    <Image source={Level1} style={{height: 90, width: 90}} />
+                  ) : (
+                    <Image source={Level1} style={{height: 110, width: 110}} />
+                  )}
                 </View>
               ) : (
                 <View className="flex flex-col justify-center items-center min-h-[100%] w-[30%] pr-3">
-                  <View
-                    className={`border-2 border-[#e9dcdc78] h-fit w-fit px-3 py-2 mb-2 flex flex-row items-center justify-center rounded-md text-white ${
-                      course?.level == 1 ? 'bg-cyan-600' : 'bg-red-500'
-                    }`}>
-                    <Text className="font-semibold text-[16px]">Level 2</Text>
-                  </View>
-                  <Image source={Level2} style={{height: 90, width: 90}} />
+                  {course?.batchType !== 'unhandled' &&
+                    course?.batchType !== 'custom' && (
+                      <View
+                        className={`border-2 border-[#e9dcdc78] h-fit w-fit px-3 py-2 mb-2 flex flex-row items-center justify-center rounded-md text-white ${
+                          course?.level == 1 ? 'bg-cyan-600' : 'bg-red-500'
+                        }`}>
+                        <Text className="font-semibold text-[16px]">
+                          Level 2
+                        </Text>
+                      </View>
+                    )}
+                  {course?.batchType !== 'unhandled' &&
+                  course?.batchType !== 'custom' ? (
+                    <Image source={Level2} style={{height: 90, width: 90}} />
+                  ) : (
+                    <Image source={Level2} style={{height: 110, width: 110}} />
+                  )}
                 </View>
               )}
             </View>

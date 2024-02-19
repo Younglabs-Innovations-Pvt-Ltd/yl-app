@@ -112,7 +112,7 @@ const AppBar = ({bgSecondaryColor, darkMode, textColors, userName , changeChilds
           color: textColors?.textPrimary,
         }}
         className="font-semibold text-[20px] text-black">
-        My Course
+        My Courses
       </Text>
     </View>
   );

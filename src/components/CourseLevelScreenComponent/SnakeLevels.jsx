@@ -18,6 +18,7 @@ import {authSelector} from '../../store/auth/selector';
 import {useSelector} from 'react-redux';
 import auth from '@react-native-firebase/auth';
 import {BASE_URL} from '@env';
+import Icon from '../icon.component';
 
 const SnakeLevels = ({
   navigation,
@@ -34,6 +35,7 @@ const SnakeLevels = ({
   const [timeLeft, setTimeLeft] = useState(null);
   const [allTagValues, setAllTagsValues] = useState([]);
   const user = useSelector(authSelector);
+  const {bgSecondaryColor, textColors} = useSelector(state => state.appTheme);
 
   const convertTimeStamp = time => {
     const {_seconds, _nanoseconds} = time;
@@ -149,10 +151,10 @@ const SnakeLevels = ({
       const isCurrentClassOngoing =
         currentClassTime >= -60 && currentClassTime < 5;
       if (isCurrentClassOngoing) {
-        if (allClasses[i].classNumber < allClasses.length) {
+        if (allClasses[i]?.classNumber < allClasses.length) {
           setUpcomingClass(allClasses[i + 1]);
         }
-        if (allClasses[i].classNumber !== 1) {
+        if (allClasses[i]?.classNumber !== 1) {
           setPreviousClass(allClasses[i - 1]);
         }
         setCurrentOngoingClass(allClasses[i]);
@@ -162,21 +164,21 @@ const SnakeLevels = ({
         !todaysClassTimeBefore
       ) {
         setTodaysClass(allClasses[i]);
-        if (allClasses[i].classNumber < allClasses.length) {
+        if (allClasses[i]?.classNumber < allClasses.length) {
           setUpcomingClass(allClasses[i + 1]);
         }
-        if (allClasses[i].classNumber !== 1) {
+        if (allClasses[i]?.classNumber !== 1) {
           setPreviousClass(allClasses[i - 1]);
         }
         break;
       } else if (moment(classDate).isAfter(moment())) {
-        if (allClasses[i].classNumber !== 1) {
+        if (allClasses[i]?.classNumber !== 1) {
           setPreviousClass(allClasses[i - 1]);
         }
         setUpcomingClass(allClasses[i]);
         break;
       } else {
-        if (allClasses[i].classNumber === allClasses.length) {
+        if (allClasses[i]?.classNumber === allClasses.length) {
           setPreviousClass(allClasses[i]);
         }
       }
@@ -230,6 +232,51 @@ const SnakeLevels = ({
           // resizeMode="cover"
           style={styles.backgroundImage}
           source={darkMode ? RoadMapBGDark : RoadMapBG}>
+          {currentOngoingClass?.conductOnWebsiteTemasSDK ||
+            (todaysClass?.conductOnWebsiteTemasSDK && (
+              <View className="w-full bg-white flex flex-col justify-center items-start px-2 py-2 gap-y-1">
+                <View className="flex flex-row justify-start items-start w-full gap-x-2">
+                  <Icon
+                    name="checkmark-done-outline"
+                    size={20}
+                    color={textColors.textYlGreen}
+                  />
+                  <Text
+                    className="font-semibold text-[13px]"
+                    style={{color: textColors?.textYlMain}}>
+                    This Batch will be conducted on Microsoft Teams App
+                  </Text>
+                </View>
+                <View className="flex flex-row justify-start items-start w-full gap-x-2">
+                  <Icon
+                    name="checkmark-done-outline"
+                    size={20}
+                    color={textColors.textYlGreen}
+                  />
+                  <View className="flex flex-row justify-start items-center ">
+                    <Text
+                      className="font-semibold text-[13px]"
+                      style={{color: textColors?.textYlMain}}>
+                      Click here to download
+                    </Text>
+                    <Pressable
+                      onPress={() => {
+                        Linking.openURL(
+                          'https://play.google.com/store/apps/details?id=com.microsoft.teams',
+                        ).catch(err =>
+                          console.error('An error occurred: ', err),
+                        );
+                      }}
+                      className="px-2 py-1 rounded-md ml-2"
+                      style={{backgroundColor: textColors?.textYlMain}}>
+                      <Text className="text-[13px] font-semibold text-white">
+                        Microsoft Teams
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+            ))}
           {allClasses &&
             allClasses?.map((level, index) => {
               count = count >= marginleftcustom.length - 1 ? 0 : count + 1;
@@ -267,7 +314,7 @@ const SnakeLevels = ({
                           currentOngoingClass?.classNumber !==
                             level?.classNumber &&
                           todaysClass?.classNumber !== level?.classNumber &&
-                          upcomingClass.classNumber !== level?.classNumber
+                          upcomingClass?.classNumber !== level?.classNumber
                         ) {
                           return tagValue.replace('false', 'true');
                         } else {
@@ -300,7 +347,7 @@ const SnakeLevels = ({
                   h-[80px] w-[80px] mt-6 rounded-full flex justify-center items-center relative`}>
                     <MIcon
                       name={
-                        level.classStatus === 'Attended'
+                        level?.classStatus === 'Attended'
                           ? 'lock-open-variant'
                           : 'lock'
                       }
@@ -309,16 +356,18 @@ const SnakeLevels = ({
                     />
                     {!currentOngoingClass &&
                       todaysClass &&
-                      todaysClass.classNumber === level?.classNumber && (
+                      todaysClass?.classNumber === level?.classNumber && (
                         <View
                           className={`absolute ${
-                            todaysClass.classNumber == 1
+                            todaysClass?.classNumber == 1
                               ? '-right-[165px]'
                               : '-top-11'
                           } flex justify-center items-center animate-bounce`}>
                           <View
                             className={`h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[2px] absolute ${
-                              todaysClass.classNumber == 1 ? '-left-0' : 'top-6'
+                              todaysClass?.classNumber == 1
+                                ? '-left-0'
+                                : 'top-6'
                             } border-2 border-gray-300 border-solid`}></View>
                           {todaysClass?.visibility ? (
                             <View className="h-[60px] w-[160px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
@@ -328,19 +377,20 @@ const SnakeLevels = ({
                               <Text className="font-semibold text-[16px]">
                                 {timeLeft
                                   ? timeLeft?.days +
-                                    ':' +
+                                    'd:' +
                                     timeLeft?.hours +
-                                    ':' +
+                                    'h:' +
                                     timeLeft?.minutes +
-                                    ':' +
-                                    timeLeft?.seconds
+                                    'm:' +
+                                    timeLeft?.seconds +
+                                    's'
                                   : '0:0:0:0'}
                               </Text>
                             </View>
                           ) : (
                             <View className="h-[60px] w-[160px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                               <Text className="font-semibold text-[20px]">
-                                To be decided
+                                Upcoming
                               </Text>
                             </View>
                           )}
@@ -350,16 +400,16 @@ const SnakeLevels = ({
                     {!todaysClass &&
                       // !currentOngoingClass &&
                       upcomingClass &&
-                      upcomingClass.classNumber === level?.classNumber && (
+                      upcomingClass?.classNumber === level?.classNumber && (
                         <View
                           className={`absolute ${
-                            upcomingClass.classNumber == 1
+                            upcomingClass?.classNumber == 1
                               ? '-right-[165px]'
                               : '-top-11'
                           } flex justify-center items-center animate-bounce`}>
                           <View
                             className={`h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute ${
-                              upcomingClass.classNumber == 1
+                              upcomingClass?.classNumber == 1
                                 ? '-left-0'
                                 : 'top-6'
                             } border-2 border-gray-300 border-solid `}></View>
@@ -377,14 +427,14 @@ const SnakeLevels = ({
                               </View>
                             ) : (
                               <Text className="font-semibold text-[20px]">
-                                To be decided
+                                Upcoming
                               </Text>
                             )}
                           </View>
                         </View>
                       )}
                     {currentOngoingClass &&
-                      currentOngoingClass.classNumber ===
+                      currentOngoingClass?.classNumber ===
                         level?.classNumber && (
                         <Pressable
                           disabled={
@@ -397,7 +447,7 @@ const SnakeLevels = ({
                             if (
                               currentOngoingClass &&
                               level?.classNumber ===
-                                currentOngoingClass.classNumber
+                                currentOngoingClass?.classNumber
                             ) {
                               conductOnTeamsSDK();
                             }
