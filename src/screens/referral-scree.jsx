@@ -78,8 +78,8 @@ const Referral = ({route}) => {
                 color={textColors.textSecondary}
                 styles={{lineHeight: 22}}
                 ff={FONTS.primaryFont}>
-                Invite your friends to join Younglabs courses. They will get
-                instant 20% off. You will get credits of 20% of course price.
+                Invite your friends to join Younglabs courses. They get instant
+                15% off. You get credits of 15% of worth.
               </TextWrapper>
             </View>
             <View
@@ -181,7 +181,7 @@ const Referral = ({route}) => {
                 //   fontFamily: FONTS.primaryFont,
                 // }}
               >
-                They will use your referral code and get 20% off
+                They use your referral code and get 15% off
               </TextWrapper>
             </View>
             <Spacer />
@@ -196,7 +196,7 @@ const Referral = ({route}) => {
                 ff={FONTS.primaryFont}
                 color={textColors.textSecondary}
                 fs={16.5}>
-                You will get credits of 20% of course price
+                You get credits of 15% of worth
               </TextWrapper>
             </View>
           </View>
@@ -238,7 +238,7 @@ const Referral = ({route}) => {
                 ff={FONTS.primaryFont}
                 color={textColors.textSecondary}
                 fs={16.5}>
-                Go to checkout
+                Go to payment
               </TextWrapper>
             </View>
             <Spacer />
@@ -253,7 +253,7 @@ const Referral = ({route}) => {
                 ff={FONTS.primaryFont}
                 color={textColors.textSecondary}
                 fs={16.5}>
-                Click on Redeem Now
+                Click on Redeem Now button
               </TextWrapper>
             </View>
             <Spacer />
@@ -268,7 +268,7 @@ const Referral = ({route}) => {
                 ff={FONTS.primaryFont}
                 color={textColors.textSecondary}
                 fs={16.5}>
-                Credits will be apply
+                Credits will be applied
               </TextWrapper>
             </View>
           </View>
