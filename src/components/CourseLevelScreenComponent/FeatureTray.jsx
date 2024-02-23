@@ -42,37 +42,37 @@ const FeatureTray = ({
   };
   const featuresNew = [
     {
-      featureName: 'Submit HomeWork',
+      featureName: 'Submit/HomeWork',
       icon: SubmitHomework,
       feature: 'submit_homework',
       index: 1,
     },
     {
-      featureName: 'Play Recording',
+      featureName: 'Play/Recording',
       icon: PlayRecording,
       feature: 'request_recording',
       index: 2,
     },
     {
-      featureName: 'Download Worksheets',
+      featureName: 'Download/Worksheets',
       icon: DownloadWorksheets,
       feature: 'download_worksheets',
       index: 3,
     },
     {
-      featureName: 'Download Certificate',
+      featureName: 'Download/Certificate',
       icon: DownloadCertificate,
       feature: 'course_certificate',
       index: 4,
     },
     {
-      featureName: 'Class Wise HomeWork',
+      featureName: 'Class Wise/HomeWork',
       icon: ClassViewHomeWork,
       feature: 'view_class_wise_homework',
       index: 5,
     },
     {
-      featureName: 'Customer Support',
+      featureName: 'Customer/Support',
       icon: CUstomerSupport,
       feature: 'customer_support',
       index: 6,
@@ -106,21 +106,31 @@ const FeatureTray = ({
                 setSheetOpen(true);
               }}
               style={{backgroundColor: darkMode ? bgSecondaryColor : 'white'}}
-              className=" mt-2 mr-6 h-[150px] w-[120px] relative rounded-md">
+              className=" mt-2 mr-6 h-[150px] relative rounded-md">
               <View>
                 <Image
                   className="rounded-t-md"
                   style={[styles?.icon, {width: 120, height: 100}]}
                   source={item?.item?.icon}
                 />
-                <Text
-                  style={{
-                    fontFamily: FONTS.signika_medium,
-                    color: darkMode ? 'white' : 'black',
-                  }}
-                  className="px-4 text-[16px] w-[100%] text-center">
-                  {item.item?.featureName}
-                </Text>
+                <View className="flex flex-col justify-center items-center">
+                  <Text
+                    style={{
+                      fontFamily: FONTS.signika_medium,
+                      color: darkMode ? 'white' : 'black',
+                    }}
+                    className="px-4 text-[16px] w-[100%] text-center">
+                    {item.item?.featureName.split('/')[0]}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: FONTS.signika_medium,
+                      color: darkMode ? 'white' : 'black',
+                    }}
+                    className="px-4 text-[16px] w-[100%] text-center">
+                    {item.item?.featureName.split('/')[1]}
+                  </Text>
+                </View>
               </View>
             </Pressable>
           );

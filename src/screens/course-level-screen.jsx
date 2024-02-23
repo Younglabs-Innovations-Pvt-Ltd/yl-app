@@ -77,7 +77,7 @@ const CourseLevelScreen = ({navigation, route}) => {
         toast,
         type: 'success',
       });
-      downloadWorksheet();
+      const response = downloadWorksheet({serviceReqClassesData});
     }
     if (displayFeature === 'course_certificate') {
       const leadId = user.leadId;

@@ -18,7 +18,7 @@ import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import {authSelector} from '../store/auth/selector';
 import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
-import { navigate } from '../navigationRef';
+import {navigate} from '../navigationRef';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width} = Dimensions.get('window');
@@ -47,6 +47,7 @@ const UserCoursesPage = ({navigation}) => {
       setUserName(currentChild.name);
     }
   }, [currentChild, userOrders]);
+
   const {
     bgColor,
     bgSecondaryColor,
@@ -116,14 +117,21 @@ const UserCoursesPage = ({navigation}) => {
           {userCourseData?.length > 0 ? (
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
               <ScrollView className="" showsVerticalScrollIndicator={false}>
-                {userCourseData?.map((course,index) => {
-                  console.log("fiojwogiejrogiejrg",course);
+                {userCourseData?.map((course, index) => {
+                  console.log('check courseCard', course?.serviceRequests);
                   return (
                     <CourseCard
                       key={index}
+                      userName={userName}
                       course={course}
-                      alternativeNameOnApp={course?.alternativeNameOnApp}
-                      thumbnailUrl={course?.thumbnail_url}
+                      alternativeNameOnApp={
+                        course?.alternativeNameOnApp
+                          ? course?.alternativeNameOnApp
+                          : ''
+                      }
+                      thumbnailUrl={
+                        course?.thumbnail_url ? course?.thumbnail_url : ''
+                      }
                       navigation={navigation}
                     />
                   );
@@ -133,7 +141,7 @@ const UserCoursesPage = ({navigation}) => {
           ) : (
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
               <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4 capitalize">
-                {currentChild?.name || "You"} Don't Have Any Course
+                {currentChild?.name || 'You'} Don't Have Any Course
               </Text>
             </View>
           )}
