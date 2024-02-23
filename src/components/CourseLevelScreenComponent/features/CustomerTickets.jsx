@@ -160,13 +160,17 @@ export const TicketTile = ({
         comments[i] &&
           Object.values(comments[i])[0].map(
             ({comment, createdAt, createdBy, createdFor}) => {
-              const commentNewObj = {
-                comment,
-                createdAt,
-                createdBy,
-                createdFor,
-              };
-              createdFor === 'customer' && commentsList.push(commentNewObj);
+              if (comment?.includes('http')) {
+                return;
+              } else {
+                const commentNewObj = {
+                  comment,
+                  createdAt,
+                  createdBy,
+                  createdFor,
+                };
+                createdFor === 'customer' && commentsList.push(commentNewObj);
+              }
             },
           );
       }
