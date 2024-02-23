@@ -267,7 +267,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         ) : (
           <ShowPriceFalseView courseData={courseData} />
         )
-      ) : showPriceType !== 'solo'  && showPriceType !== 'none' ? (
+      ) : showPriceType !== 'solo' && showPriceType !== 'none' ? (
         <View style={{flex: 1}}>
           {loading ? (
             <View style={{flex: 1, justifyContent: 'center'}}>
@@ -559,9 +559,18 @@ const ShowPriceFalseView = ({courseData}) => {
   };
   return (
     <View className="flex-1 mt-3 p-2">
-      <View className="items-center">
+      <View className="items-center mt-6">
+        <Image
+          source={require('../assets/images/customerService.png')}
+          style={{
+            width: 120,
+            height: 120,
+            borderRadius: 20,
+            marginRight: 4,
+          }}
+        />
         <Text
-          className="text-2xl font-semibold capitalize text-center"
+          className="text-2xl font-semibold text-center"
           style={{color: textColors.textSecondary}}>
           Contact us for prices of this batch.
         </Text>

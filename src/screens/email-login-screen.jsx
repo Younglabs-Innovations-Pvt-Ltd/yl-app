@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -20,6 +20,7 @@ import {FONTS} from '../utils/constants/fonts';
 import {useDispatch} from 'react-redux';
 import {fetchUserFormLoginDetails} from '../store/auth/reducer';
 import {CommonActions} from '@react-navigation/native';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const EmailLogin = ({navigation}) => {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ const EmailLogin = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginWithEmail = async () => {
     try {
@@ -102,21 +104,33 @@ const EmailLogin = ({navigation}) => {
         <Spacer space={12} />
 
         <View style={styles.inputWrapper} className="relative">
-          <TextInput
-            style={[styles.input, {fontFamily: FONTS.primaryFont}]}
-            selectionColor={COLORS.black}
-            onChangeText={e => setPassword(e)}
-            value={password}
-            inputMode="text"
-            className="w-full border rounded-md border-gray-400"
-            secureTextEntry={true}
-            autoCapitalize="none"
-          />
-          <Text
-            style={{fontFamily: FONTS.primaryFont}}
-            className="absolute text-[16px] bg-white -top-3 left-4 px-1 text-gray-500">
-            Enter Password
-          </Text>
+          <View style={[styles.input]} className="relative w-full">
+            <TextInput
+              style={[{fontFamily: FONTS.primaryFont, fontSize: 16.5}]}
+              selectionColor={COLORS.black}
+              onChangeText={e => setPassword(e)}
+              value={password}
+              inputMode="text"
+              className="w-full rounded-md border-gray-400 border py-3 pl-2 pr-[50px] text-black"
+              secureTextEntry={showPassword}
+              autoCapitalize="none"
+            />
+            <View className="absolute top-5  right-3 z-50">
+              <MIcon
+                name={!showPassword ? 'eye-off' : 'eye'}
+                size={32}
+                color={'gray'}
+                onPress={() => {
+                  setShowPassword(!showPassword);
+                }}
+              />
+            </View>
+            <Text
+              style={{fontFamily: FONTS.primaryFont}}
+              className="absolute text-[16px] bg-white -top-0 left-4 px-1 text-gray-500">
+              Enter Password
+            </Text>
+          </View>
         </View>
         <Spacer />
         <Pressable
@@ -164,8 +178,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingVertical: 12,
-    paddingLeft: 8,
-    fontSize: 16.5,
     letterSpacing: 1.15,
     color: COLORS.black,
     // borderWidth: 1,

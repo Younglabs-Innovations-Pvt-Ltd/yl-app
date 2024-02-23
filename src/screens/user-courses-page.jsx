@@ -140,8 +140,8 @@ const UserCoursesPage = ({navigation}) => {
             </View>
           ) : (
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
-              <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4 capitalize">
-                {currentChild?.name || 'You'} Don't Have Any Course
+              <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4">
+                {currentChild?.name || 'You'} don't have any course
               </Text>
             </View>
           )}

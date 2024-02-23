@@ -139,69 +139,73 @@ const UserProfile = ({navigation}) => {
           <ScrollView
             className="flex-1 px-2"
             style={{backgroundColor: bgColor}}>
-            <View
-              className="w-full p-1 rounded-md mt-2 flex-row"
-              style={{backgroundColor: bgSecondaryColor, height: height / 5}}>
-              <View className="w-[35%] h-full items-center justify-center flex-col">
-                <View
-                  className="h-[72%] w-[85%] bg-gray-400 overflow-hidden"
-                  style={{borderRadius: 100}}>
-                  <ImageBackground
-                    source={{
-                      uri: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
-                    }}
-                    className="w-[100%] rounded h-full justify-center items-center"
-                    style={[{flex: 1, resizeMode: 'cover'}]}></ImageBackground>
+            {currentChild && (
+              <View
+                className="w-full p-1 rounded-md mt-2 flex-row"
+                style={{backgroundColor: bgSecondaryColor, height: height / 5}}>
+                <View className="w-[35%] h-full items-center justify-center flex-col">
+                  <View
+                    className="h-[72%] w-[85%] bg-gray-400 overflow-hidden"
+                    style={{borderRadius: 100}}>
+                    <ImageBackground
+                      source={{
+                        uri: 'https://img.freepik.com/free-photo/playful-boy-holding-stack-books_23-2148414547.jpg?w=740&t=st=1703674788~exp=1703675388~hmac=24445b95541fba0512cfcb562557440de28ed52ef02e516f9a050a1d2871cc21',
+                      }}
+                      className="w-[100%] rounded h-full justify-center items-center"
+                      style={[
+                        {flex: 1, resizeMode: 'cover'},
+                      ]}></ImageBackground>
+                  </View>
+                </View>
+
+                <View className="w-[65%] h-full p-2 px-2 items-start justify-center">
+                  <View className="w-full">
+                    <View className="w-full flex-row">
+                      <Text
+                        className="text-base font-semibold"
+                        style={{color: textColors.textYlMain}}>
+                        Parent Name:
+                      </Text>
+                      <Text
+                        className="className text-base flex-wrap ml-1 capitalize"
+                        style={{color: textColors.textSecondary}}>
+                        {user?.fullName || 'Unknown'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="w-full">
+                    <View className="w-full flex-row">
+                      <Text
+                        className="text-base font-semibold"
+                        style={{color: textColors.textYlMain}}>
+                        Child Name:
+                      </Text>
+                      <Text
+                        className="className text-base flex-wrap ml-1 capitalize"
+                        style={{color: textColors.textSecondary}}>
+                        {currentChild?.name}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="w-full">
+                    <View className="w-full flex-row">
+                      <Text
+                        className="text-base font-semibold"
+                        style={{color: textColors.textYlMain}}>
+                        Child Age:
+                      </Text>
+                      <Text
+                        className="className text-base flex-wrap ml-1 capitalize"
+                        style={{color: textColors.textSecondary}}>
+                        {currentChild?.age}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </View>
-
-              <View className="w-[65%] h-full p-2 px-2 items-start justify-center">
-                <View className="w-full">
-                  <View className="w-full flex-row">
-                    <Text
-                      className="text-base font-semibold"
-                      style={{color: textColors.textYlMain}}>
-                      Parent Name:
-                    </Text>
-                    <Text
-                      className="className text-base flex-wrap ml-1 capitalize"
-                      style={{color: textColors.textSecondary}}>
-                      {user?.fullName || 'Unknown'}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="w-full">
-                  <View className="w-full flex-row">
-                    <Text
-                      className="text-base font-semibold"
-                      style={{color: textColors.textYlMain}}>
-                      Child Name:
-                    </Text>
-                    <Text
-                      className="className text-base flex-wrap ml-1 capitalize"
-                      style={{color: textColors.textSecondary}}>
-                      {currentChild?.name}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="w-full">
-                  <View className="w-full flex-row">
-                    <Text
-                      className="text-base font-semibold"
-                      style={{color: textColors.textYlMain}}>
-                      Child Age:
-                    </Text>
-                    <Text
-                      className="className text-base flex-wrap ml-1 capitalize"
-                      style={{color: textColors.textSecondary}}>
-                      {currentChild?.age}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
+            )}
 
             <View style={{marginTop: 16}}>
               <View
@@ -246,6 +250,7 @@ const UserProfile = ({navigation}) => {
                 </Pressable>
               </View>
             </View>
+
             <Spacer space={6} />
             <Pressable
               style={({pressed}) => [
@@ -345,57 +350,59 @@ const NotACustomerProfilePage = ({
   return (
     <>
       <View className="flex-1 px-2" style={{backgroundColor: bgColor}}>
-        <View
-          className="px-2 py-5 rounded-md flex-row justify-between"
-          style={{backgroundColor: bgSecondaryColor}}>
-          <View className="w-[35%] items-center justify-center">
-            <View className="h-[110px] w-[110px] rounded-full bg-white justify-center items-center overflow-hidden">
-              <Text
-                className="text-6xl font-semibold"
-                style={{color: textColors.textYlMain}}>
-                {currentChild?.name?.charAt(0)}
-              </Text>
+        {currentChild && (
+          <View
+            className="px-2 py-5 rounded-md flex-row justify-between"
+            style={{backgroundColor: bgSecondaryColor}}>
+            <View className="w-[35%] items-center justify-center">
+              <View className="h-[110px] w-[110px] rounded-full bg-white justify-center items-center overflow-hidden">
+                <Text
+                  className="text-6xl font-semibold"
+                  style={{color: textColors.textYlMain}}>
+                  {currentChild?.name?.charAt(0)}
+                </Text>
+              </View>
+            </View>
+            <View className="w-[60%] items-start justify-center">
+              <View className="w-full flex-row">
+                <Text
+                  className="font-semibold"
+                  style={{color: textColors.textSecondary}}>
+                  Name :
+                </Text>
+                <Text
+                  className="capitalize ml-[2px]"
+                  style={{color: textColors.textYlMain}}>
+                  {currentChild?.name || 'not set'}
+                </Text>
+              </View>
+              <View className="w-full flex-row mt-1">
+                <Text
+                  className="font-semibold"
+                  style={{color: textColors.textSecondary}}>
+                  Age :
+                </Text>
+                <Text
+                  className="capitalize ml-[2px]"
+                  style={{color: textColors.textYlMain}}>
+                  {currentChild?.age || user?.childAge}
+                </Text>
+              </View>
+              <View className="w-full flex-row mt-1">
+                <Text
+                  className="font-semibold"
+                  style={{color: textColors.textSecondary}}>
+                  Parent Name :
+                </Text>
+                <Text
+                  className="capitalize ml-[2px]"
+                  style={{color: textColors.textYlMain}}>
+                  {user?.fullName}
+                </Text>
+              </View>
             </View>
           </View>
-          <View className="w-[60%] items-start justify-center">
-            <View className="w-full flex-row">
-              <Text
-                className="font-semibold"
-                style={{color: textColors.textSecondary}}>
-                Name :
-              </Text>
-              <Text
-                className="capitalize ml-[2px]"
-                style={{color: textColors.textYlMain}}>
-                {currentChild?.name || 'not set'}
-              </Text>
-            </View>
-            <View className="w-full flex-row mt-1">
-              <Text
-                className="font-semibold"
-                style={{color: textColors.textSecondary}}>
-                Age :
-              </Text>
-              <Text
-                className="capitalize ml-[2px]"
-                style={{color: textColors.textYlMain}}>
-                {currentChild?.age || user?.childAge}
-              </Text>
-            </View>
-            <View className="w-full flex-row mt-1">
-              <Text
-                className="font-semibold"
-                style={{color: textColors.textSecondary}}>
-                Parent Name :
-              </Text>
-              <Text
-                className="capitalize ml-[2px]"
-                style={{color: textColors.textYlMain}}>
-                {user?.fullName}
-              </Text>
-            </View>
-          </View>
-        </View>
+        )}
         <Spacer />
         <CommonActions
           textColors={textColors}
