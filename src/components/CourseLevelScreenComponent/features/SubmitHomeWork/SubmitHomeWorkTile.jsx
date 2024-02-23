@@ -74,20 +74,18 @@ const SubmitHomeWorkTile = ({
       key={classData?.classNumber}
       // style={[styles.borderStyle, styles.innerBorder]}
       style={{backgroundColor: bgSecondaryColor}}
-      className={`w-[100%] h-[120px]  border-2 border-gray-300 rounded-md mt-3`}>
-      <View className="w-[100%] h-[50%] flex flex-row justify-between items-start px-3 pt-2 ">
+      className={`w-[100%] flex flex-col justify-center items-start gap-y-2 border-2 border-gray-300 rounded-md mt-3`}>
+      <View className="w-[100%] flex flex-col justify-between items-start px-3 pt-2 ">
         <Text
           style={{color: textColors?.textPrimary}}
-          className=" text-[20px] font-semibold">
-          Class {classData?.classNumber}
+          className=" text-[20px] font-[400]">
+          Class #{classData?.classNumber}
         </Text>
-        <Text
-          style={{color: textColors?.textPrimary}}
-          className=" text-[20px] font-semibold">
-          Held on : {startDate}
+        <Text style={{color: textColors?.textPrimary}} className=" text-[16px]">
+          Date Held : {startDate}
         </Text>
       </View>
-      <View className="w-[100%] h-[50%] flex flex-row justify-between items-end px-3 pb-2 ">
+      <View className="w-[100%]  flex flex-row justify-between items-end px-3 pb-2 ">
         {!isInFuture ? (
           isChecked ? (
             <Pressable
