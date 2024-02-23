@@ -22,6 +22,7 @@ import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
 import {FONTS} from '../utils/constants/fonts';
 import moment from 'moment';
 import {TextInput} from 'react-native-gesture-handler';
+import CourseDetails from '../screens/course-details.screen';
 
 const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
   const [childName, setChildName] = useState('');
@@ -47,6 +48,7 @@ const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
    * @since 07/08/2023
    * @description Update child name if child name not exist or contains your child text
    */
+
 
   useEffect(() => {
     if (demoData && bookingDetails) {
@@ -136,7 +138,7 @@ const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
       return null;
     }
 
-    if (moment().isAfter(moment(bookingTime)) && !teamUrl) {
+    if (moment().isAfter(moment(bookingTime).add(50, 'minutes')) && !teamUrl) {
       return (
         <View
           style={{
@@ -168,6 +170,8 @@ const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
     }
   }, [teamUrl, bookingTime, isAttended, rescheduleClass]);
 
+  const courseName = bookingDetails?.courseName || ""
+
   return (
     <ScrollView
       style={styles.contentWrapper}
@@ -177,17 +181,17 @@ const Demo = ({timeLeft, showPostActions, rescheduleClass}) => {
       {SHOW_TIMER && !isClassOngoing && <DemoWaiting timeLeft={timeLeft} />}
       {/* Show join button */}
       {isClassOngoing && (
-        <View style={{paddingHorizontal: 16, paddingVertical: 6}}>
+        <View style={{paddingHorizontal: 2, paddingVertical: 6}}>
           {IS_CHILD_NAME}
           <View className="w-full p-1 px-3">
             <Text
               className="text-white font-semibold text-base ml-3"
               style={{fontFamily: FONTS.primaryFont}}>
-              Your Demo class is going on
+              Your first free {courseName} class is live
             </Text>
             <View className="w-full">
               <Pressable
-                className="p-2 w-full rounded-full bg-white mt-2 flex-row justify-center"
+                className="py-1 w-full rounded-full bg-white mt-2 flex-row justify-center"
                 onPress={handleJoinClass}>
                 <Text
                   className="text-base font-semibold text-gray-700 text-center flex-row"
@@ -228,7 +232,6 @@ export default Demo;
 const styles = StyleSheet.create({
   contentWrapper: {
     maxWidth: 428,
-    // alignSelf: 'center',
   },
   rightNavButtons: {
     flexDirection: 'row',

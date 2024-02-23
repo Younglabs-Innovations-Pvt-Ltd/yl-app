@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {COLORS} from '../../utils/constants/colors';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {useDispatch, useSelector} from 'react-redux';
@@ -51,6 +57,7 @@ const SoloBatchPayment = ({
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [classCount, setClassCount] = useState(0);
   const {courseDetails} = useSelector(courseSelector);
+  const [paynowLoading, setPaynowLoading] = useState(false);
 
   useEffect(() => {
     if (prices?.solo) {
@@ -135,8 +142,6 @@ const SoloBatchPayment = ({
     hideDatePicker();
   };
 
-  console.log('visible', visible);
-
   const {currentAgeGroup} = useSelector(courseSelector);
 
   async function onGoogleButtonPress() {
@@ -159,14 +164,16 @@ const SoloBatchPayment = ({
   const payNow = () => {
     // const ageGroup = makeAgeGroup(selectedChild.childAge);
     // const startDateTime = moment(date).format('YYYY-MM-DD HH:mm');
-
+    setPaynowLoading(true);
     if (!currentAgeGroup || currentAgeGroup === '') {
       Showtoast({text: 'Please Select Age Group', toast, type: 'danger'});
+      setPaynowLoading(false);
       return;
     }
 
     if (!selectedLevelToBuy) {
       Showtoast({text: 'Please Select a batch', toast, type: 'danger'});
+      setPaynowLoading(false);
       return;
     }
 
@@ -176,6 +183,7 @@ const SoloBatchPayment = ({
         toast,
         type: 'danger',
       });
+      setPaynowLoading(false);
       return;
     }
 
@@ -184,7 +192,14 @@ const SoloBatchPayment = ({
       paymentMethod: courseData?.paymentMethod,
       classesSold: classCount || null,
     });
+    setPaynowLoading(false);
   };
+
+  useEffect(()=>{
+    if(paynowLoading){
+      console.log("become true")
+    }
+  },[paynowLoading])
 
   const handleBatchSelect = (level, price, strikeThroughPrice) => {
     let levelText = getLevelName(level);
@@ -371,9 +386,9 @@ const SoloBatchPayment = ({
             </View>
           </View>
 
-          <View className="mt-5 items-center">
+          <View className="my-5 items-center">
             <Pressable
-              className="w-[95%] rounded py-2 items-center"
+              className="w-[95%] rounded py-2 items-center flex-row justify-center"
               style={{backgroundColor: textColors.textYlMain}}
               onPress={payNow}>
               <Text
@@ -381,6 +396,8 @@ const SoloBatchPayment = ({
                 style={{fontFamily: FONTS.primaryFont}}>
                 Buy Now
               </Text>
+
+              {paynowLoading && <ActivityIndicator size={20} className="ml-3" color={'white'} />}
             </Pressable>
           </View>
         </View>

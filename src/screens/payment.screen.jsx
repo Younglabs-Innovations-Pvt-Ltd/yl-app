@@ -348,8 +348,6 @@ const Payment = ({navigation, route}) => {
 
     const currentUser = auth().currentUser;
 
-    // console.log('currentuser is', courseDetails);
-
     if (!currentUser) {
       setAuthVisible(true);
       return;
@@ -361,7 +359,7 @@ const Payment = ({navigation, route}) => {
       courseType: 'solo',
       leadId: user?.leadId,
       ageGroup: currentAgeGroup,
-      courseId: courseDetails.courseId,
+      courseId: courseDetails?.courseId,
       FCY: `${ipData?.currency?.code} ${price}`,
       promisedStartDate: startDateTime,
       promisedBatchFrequency: null,
@@ -379,6 +377,8 @@ const Payment = ({navigation, route}) => {
       price: price,
       level: currentLevel,
       classesSold: classesSold || null,
+      course_type: courseDetails?.course_type,
+      levelText:levelText,
     };
 
     if (selectedCoupon) {

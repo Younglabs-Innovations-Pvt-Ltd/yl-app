@@ -95,6 +95,7 @@ function* makePaymentSaga({payload}) {
       credits,
       paymentMethod,
     } = payload;
+    console.log("Level text is", levelText)
 
     let selectBatch = {...currentSelectedBatch};
 
@@ -110,9 +111,7 @@ function* makePaymentSaga({payload}) {
     }
 
     const startDate = new Date(selectBatch.startDate._seconds * 1000);
-
     const startDateTime = moment(startDate).format('YYYY-MM-DD HH:mm');
-
     const countryCode = parseInt(ipData?.calling_code?.split('+')[1]);
     // const country = ipData?.country_name;
     const timezone = ipData?.time_zone?.offset;
@@ -155,6 +154,7 @@ function* makePaymentSaga({payload}) {
     const offeringBody = generateOffering(selectBatch);
     body.offeringData = offeringBody;
 
+    console.log("payment method is", paymentMethod)
     if (paymentMethod === 'tazapay') {
       body.FCY = `QAR ${selectBatch?.price}`;
       yield payOnTazapay({body, ipData});
@@ -162,7 +162,7 @@ function* makePaymentSaga({payload}) {
     }
 
     const token = yield auth().currentUser.getIdToken();
-    console.log('body=', body);
+    // console.log('body=', body);
     const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
       method: 'POST',
       headers: {
@@ -172,7 +172,7 @@ function* makePaymentSaga({payload}) {
       body: JSON.stringify(body),
     });
 
-    if (data.order.status === 'failed') {
+    if (data?.order?.status === 'failed') {
       yield put(makePaymentFailed('Something went wrong'));
       return;
     }
@@ -248,19 +248,30 @@ function* makeSoloPaymentSaga({payload}) {
     if (body.classesSold && body.classesSold > 0) {
       classesSold = body.classesSold;
     } else {
-      classesSold = body.level === 1 || body.level === 2 ? 12 : 24;
+      classesSold = 12; // changed it to 12 as 1 & 2 have 12 classes and combo has 12 class each
     }
 
     delete body.classesSold;
-    console.log('body hre is=');
-    const batch = {
+
+    let level = body?.level === 3 ? 1 : body.level;
+    let batch = {
       ageGroup: body.ageGroup,
       batchType: body.batchType,
       classCount: classesSold,
       courseId: body.courseId,
-      level: body.level,
+      level,
       price: parseInt(body.discountedPrice || body.price),
+      course_type: body.course_type,
     };
+
+    delete body.course_type;
+
+    console.log('leveltext is', body?.levelText);
+    if (body.level === 3) {
+      batch.actualItems = 2;
+    } else {
+      batch.actualItems = 1;
+    }
 
     const offeringBody = generateOffering(batch);
     body.offeringData = offeringBody;
@@ -268,6 +279,9 @@ function* makeSoloPaymentSaga({payload}) {
     // console.log("getting token", token)
 
     console.log('paymentMethod', paymentMethod);
+    yield put(setLoading(false));
+    // console.log('going to send body', body);
+    return;
 
     if (paymentMethod === 'tazapay') {
       console.log('tpBody', body);

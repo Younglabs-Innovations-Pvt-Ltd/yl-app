@@ -67,8 +67,9 @@ export function* fetchDemoDetailsFromPhone({payload}) {
   try {
     const token = yield getCurrentDeviceId();
     const phone = payload?.phone;
-
-    console.log('payload.phone', phone);
+    let callingCode = payload?.callingCode;
+    callingCode = callingCode?.slice(1);
+    delete payload?.callingCode;
 
     if (!phone) {
       yield put(setLoading(false));
@@ -79,15 +80,12 @@ export function* fetchDemoDetailsFromPhone({payload}) {
     const response = yield call(fetchBookingDetailsFromPhone, phone, token);
     let data = yield response.json();
 
-    // let callingCode = yield AsyncStorage.getItem(LOCAL_KEYS.CALLING_CODE);
-
-    // callingCode = callingCode?.replace('+', '') || '91';
-    let callingCode = '91';
-
+    console.log('phone is', callingCode.concat(phone));
     const detailsResponse = yield call(fetchBookingDetils, {
       phone: JSON.parse(callingCode.concat(phone)),
     });
 
+    console.log('detailsResponse', detailsResponse.status)
     let bookingDetails = yield detailsResponse.json();
 
     if (response.status === 400) {
@@ -179,13 +177,14 @@ function* getPhoneFromStorage() {
 function* onSetDemoData({payload: {demoData, bookingDetails}}) {
   try {
     const demoTime = demoData?.demoDate?._seconds * 1000;
+    console.log("demo time is", demoTime)
 
     if (demoTime) {
       const isClassOngoing =
         moment().isAfter(moment(demoTime)) &&
-        moment().isBefore(moment(demoTime).add(10, 'minutes'));
+        moment().isBefore(moment(demoTime).add(50, 'minutes'));
 
-      if (isClassOngoing && demoData.teamUrl) {
+      if (isClassOngoing) {
         yield put(setClassOngoing(true));
       } else {
         yield put(setClassOngoing(false));

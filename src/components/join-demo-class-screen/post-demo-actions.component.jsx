@@ -48,7 +48,7 @@ const PostDemoAction = ({rescheduleClass}) => {
   } = useSelector(joinDemoSelector);
 
   const {courses} = useSelector(welcomeScreenSelector);
-
+  const courseName = bookingDetails?.courseName || '';
   // console.log("demoData is", demoData)
 
   const navigation = useNavigation();
@@ -56,6 +56,7 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   // Check for rating from local storage
   // If rating then show post demos ctas
+  console.log("isNmi ", isNmi)
   useEffect(() => {
     dispatch(checkForRating());
   }, []);
@@ -69,16 +70,6 @@ const PostDemoAction = ({rescheduleClass}) => {
       });
     setCurrentSlideIndex(scrollToX / deviceWidth);
   };
-
-  // useEffect(() => {
-  //   if (isAttended && !isRated) {
-  //     scrollSlider(deviceWidth);
-  //   } else if (isRated && !isNmi) {
-  //     scrollSlider(deviceWidth * 2);
-  //   } else if (isNmi) {
-  //     scrollSlider(deviceWidth * 3);
-  //   }
-  // }, [isAttended, isRated, isNmi]);
 
   useEffect(() => {
     if (isRated && !isNmi) {
@@ -208,39 +199,17 @@ const PostDemoAction = ({rescheduleClass}) => {
         onMomentumScrollEnd={onMomentumScrollEnd}
         scrollEnabled={false}
         pagingEnabled>
-        {/* {!attended && !isRated && ( */}
-        {/* <View style={styles.container}>
-          {ATTENDED_TEXT}
-          <Spacer space={4} />
-          <View style={styles.paButtons}>
-            {IS_ATTENDED}
-            <Pressable
-              style={({pressed}) => [
-                styles.paButton,
-                {
-                  opacity: pressed ? 0.7 : 1,
-                },
-              ]}
-              onPress={rescheduleClass}>
-              <TextWrapper color={'#434a52'} fs={16} ff={FONTS.primaryFont}>
-                Reschedule
-              </TextWrapper>
-            </Pressable>
-          </View>
-        </View> */}
-        {/* )} */}
-        {/* {!isRated && attended && ( */}
-        <View style={styles.container}>
+        <View style={styles.container} className="items-center justify-center">
           <TextWrapper
-            fs={20}
+            fs={18}
             color={COLORS.white}
             fw="600"
             styles={{textAlign: 'center'}}
             ff={FONTS.headingFont}>
-            Congratulations for attending your free class.
+            Congratulations for attending your first free {courseName} class.
           </TextWrapper>
-          <View style={styles.ratingWrapper}>
-            <TextWrapper fs={16} color={COLORS.white} ff={FONTS.headingFont}>
+          <View style={styles.ratingWrapper} className="">
+            <TextWrapper fs={15} color={COLORS.white} ff={FONTS.headingFont}>
               Please rate your class experience
             </TextWrapper>
             <View style={styles.starsContainer}>
@@ -252,68 +221,58 @@ const PostDemoAction = ({rescheduleClass}) => {
             </View>
           </View>
         </View>
-        {/* )} */}
-        {/* {isRated && !isNmi && ( */}
-        <View style={styles.container}>
+        <View
+          style={styles.container}
+          className="items-center justify-center py-1">
           <TextWrapper
-            fs={17.5}
+            fs={16}
             color={COLORS.white}
-            styles={{marginBottom: 8}}>
+            ff={FONTS.primaryFont}
+            styles={{marginBottom: 2, marginTop: 1, textAlign: 'center'}}>
             Would you like to continue with the course and improve your child's
             handwriting?
           </TextWrapper>
-          <View style={styles.ctas}>
+          <View style={styles.ctas} className="w-full mt-1">
             <Pressable
               style={({pressed}) => [
                 styles.ctaButton,
+                {width: '100%'},
                 {opacity: pressed ? 0.8 : 1},
               ]}
               disabled={nmiLoading}
               onPress={markNeedMoreInfo}>
               {/* <MIcon name="whatsapp" size={22} color={COLORS.pgreen} /> */}
-              <TextWrapper>Yes, Need more info</TextWrapper>
+              <TextWrapper
+                style={{
+                  fontSize: 14,
+                  color: COLORS.black,
+                  fontFamily: FONTS.primaryFont,
+                }}>
+                Yes, Need more info
+              </TextWrapper>
               {NMI_LOADING}
             </Pressable>
             <Pressable
               style={({pressed}) => [
                 styles.paButton,
+                {width: '100%'},
                 {
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
               onPress={onOpenNotInterested}>
-              <TextWrapper>No, I don't want</TextWrapper>
+              <TextWrapper
+                style={{
+                  fontSize: 14,
+                  color: COLORS.black,
+                  fontFamily: FONTS.primaryFont,
+                }}>
+                No, I don't want
+              </TextWrapper>
             </Pressable>
           </View>
         </View>
       </ScrollView>
-      <View
-        style={{
-          justifyContent: 'flex-end',
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: 8,
-            gap: 8,
-          }}>
-          {Array.from({length: 2}, (_, i) => {
-            return (
-              <View
-                style={[
-                  styles.dotIndicator,
-                  {
-                    backgroundColor:
-                      currentSlideIndex === i ? COLORS.white : '#434a52',
-                  },
-                ]}
-                key={i}></View>
-            );
-          })}
-        </View>
-      </View>
 
       <ModalComponent
         visible={notInterestedPopup}
@@ -346,11 +305,11 @@ const styles = StyleSheet.create({
   },
   starsContainer: {
     flexDirection: 'row',
-    paddingVertical: 12,
+    paddingVertical: 4,
     gap: 8,
   },
   ctas: {
-    gap: 8,
+    gap: 6,
   },
   ctaButton: {
     paddingVertical: 8,

@@ -73,6 +73,7 @@ const SwiperSlide = ({item, navigation}) => {
                       style={{
                         borderWidth: 1,
                         borderColor: textColors.textYlMain,
+                        backgroundColor: textColors.textYlMain,
                       }}
                       onPress={() =>
                         navigation.navigate('CourseDetailScreen', {
@@ -82,9 +83,10 @@ const SwiperSlide = ({item, navigation}) => {
                       }>
                       {/* <MIcon name="whatsapp" size={30} color="white" /> */}
                       <Text
-                        className={`${swiperBtnTextStyle}`}
+                        className={`${swiperBtnTextStyle} font-semibold`}
                         style={{
-                          color: textColors.textYlMain,
+                          color: "white",
+                          // color: textColors.textYlMain,
                           fontFamily: FONTS.primaryFont,
                         }}>
                         Course Details
@@ -96,6 +98,7 @@ const SwiperSlide = ({item, navigation}) => {
                         style={{
                           borderWidth: 1,
                           borderColor: textColors.textYlMain,
+                          backgroundColor:textColors?.textYlMain
                         }}
                         onPress={() =>
                           navigation.navigate('CourseDetailScreen', {
@@ -105,9 +108,9 @@ const SwiperSlide = ({item, navigation}) => {
                         }>
                         {/* <MIcon name="whatsapp" size={30} color="white" /> */}
                         <Text
-                          className={`${swiperBtnTextStyle}`}
+                          className={`${swiperBtnTextStyle} font-semibold`}
                           style={{
-                            color: textColors.textYlMain,
+                            color: "white",
                             fontFamily: FONTS.primaryFont,
                           }}>
                           Pay and Enroll

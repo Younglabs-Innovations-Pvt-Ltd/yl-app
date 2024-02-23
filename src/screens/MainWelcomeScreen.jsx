@@ -155,14 +155,24 @@ const MainWelcomeScreen = ({navigation}) => {
           dispatch(setIsFirstTimeUser(true));
         }
       } else if (user?.phone) {
-        dispatch(startFetchBookingDetailsFromPhone({phone: user?.phone}));
+        dispatch(
+          startFetchBookingDetailsFromPhone({
+            phone: user?.phone,
+            callingCode: ipData?.calling_code,
+          }),
+        );
       }
     } else if (user?.phone && customer == 'yes') {
       console.log('is customer yes and getting details from phone');
       console.log('user.phone', user.phone);
-      dispatch(startFetchBookingDetailsFromPhone({phone: user?.phone}));
+      dispatch(
+        startFetchBookingDetailsFromPhone({
+          phone: user?.phone,
+          callingCode: ipData?.calling_code,
+        }),
+      );
     }
-  }, [user, currentChild]);
+  }, [user, currentChild, ipData]);
 
   // Demo actions useEffects here
   const getTimeRemaining = bookingDate => {
@@ -194,8 +204,9 @@ const MainWelcomeScreen = ({navigation}) => {
   useEffect(() => {
     if (!bookingTime) return;
     const isDemoOver =
-      new Date(bookingTime).getTime() + 1000 * 60 * 10 <= Date.now();
-    console.log('teamUrl', teamUrl);
+      new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
+
+    console.log(isDemoOver, 'isDemoOver');
 
     if (isDemoOver && isAttended && teamUrl && !isNmi && !appRemark) {
       setShowPostActions(true);

@@ -175,12 +175,10 @@ const BatchFeeDetails = ({navigation, courseData}) => {
   const btnStyle = type => {
     if (selectedCourseTypeToBuy === type) {
       return {
-        borderColor: textColors.textYlMain,
-        backgroundColor: textColors.textYlMain,
+        backgroundColor: bgSecondaryColor,
       };
     } else {
       return {
-        borderColor: textColors.textSecondary,
         backgroundColor: bgColor,
       };
     }
@@ -201,14 +199,26 @@ const BatchFeeDetails = ({navigation, courseData}) => {
   return (
     <>
       <View className="items-center">
-        <View className="flex-row">
+        <View className="flex-row border rounded-md border-gray-200">
           {isGroupCourseAvailable && (
             <Pressable onPress={() => setSelectedCourseTypeToBuy('group')}>
               <View
-                className="border rounded py-2 px-4 items-center"
+                className="rounded py-2 px-4 items-center"
                 style={btnStyle('group')}>
-                <Text className="" style={btnTextStyle('group')}>
-                  Group Course
+                <MIcon
+                  name="account-group"
+                  size={35}
+                  color={textColors.textYlMain}
+                />
+                <Text
+                  className={`text-[18px]`}
+                  style={[
+                    {
+                      color: textColors?.textYlMain,
+                      fontFamily: FONTS.primaryFont,
+                    },
+                  ]}>
+                  Group batch
                 </Text>
               </View>
             </Pressable>
@@ -217,10 +227,22 @@ const BatchFeeDetails = ({navigation, courseData}) => {
           {isOneToOneCourseAvailable && (
             <Pressable onPress={() => setSelectedCourseTypeToBuy('solo')}>
               <View
-                className="border rounded py-2 px-4 items-center ml-2"
+                className="rounded py-2 px-4 items-center"
                 style={btnStyle('solo')}>
-                <Text className="" style={btnTextStyle('solo')}>
-                  Solo Course
+                <MIcon
+                  name="account-supervisor"
+                  size={35}
+                  color={textColors.textYlMain}
+                />
+                <Text
+                  className={`text-[18px]`}
+                  style={[
+                    {
+                      color: textColors.textYlMain,
+                      fontFamily: FONTS.primaryFont,
+                    },
+                  ]}>
+                  One to one batch
                 </Text>
               </View>
             </Pressable>
@@ -229,7 +251,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
       </View>
 
       {selectedCourseTypeToBuy === 'solo' ? (
-        showPriceType === 'solo' || showPriceType === 'both' ? (
+        showPriceType !== 'group' && showPriceType !== 'none' ? (
           <View className="mt-7" style={{backgroundColor: bgColor}}>
             <SoloBatchPayment
               courseData={courseData}
@@ -245,7 +267,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         ) : (
           <ShowPriceFalseView courseData={courseData} />
         )
-      ) : showPriceType === 'group' || showPriceType === 'both' ? (
+      ) : showPriceType !== 'solo'  && showPriceType !== 'none' ? (
         <View style={{flex: 1}}>
           {loading ? (
             <View style={{flex: 1, justifyContent: 'center'}}>
@@ -519,7 +541,7 @@ const AgeSelector = ({
 const ShowPriceFalseView = ({courseData}) => {
   const toast = useToast();
   const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
-  console.log('course Data is', courseData);
+  // console.log('course Data is', courseData);
 
   const reqBatchPrices = async () => {
     try {
@@ -541,7 +563,7 @@ const ShowPriceFalseView = ({courseData}) => {
         <Text
           className="text-2xl font-semibold capitalize text-center"
           style={{color: textColors.textSecondary}}>
-          Contact Us For Prices of This Batch.
+          Contact us for prices of this batch.
         </Text>
         <View className="w-full flex-row justify-center gap-3 mt-4">
           <Pressable
@@ -551,12 +573,6 @@ const ShowPriceFalseView = ({courseData}) => {
             <MIcon name="whatsapp" size={25} color="white" />
             <Text className="text-white ml-1">Contact Us</Text>
           </Pressable>
-          {/* <Pressable
-            className="py-2 w-[45%] rounded-full items-center flex-row justify-center"
-            style={{backgroundColor: textColors?.textYlOrange}}>
-            <MIcon name="phone" size={25} color="white" />
-            <Text className="text-white">Call Us</Text>
-          </Pressable> */}
         </View>
       </View>
     </View>

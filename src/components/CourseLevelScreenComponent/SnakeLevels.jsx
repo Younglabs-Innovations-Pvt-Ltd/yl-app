@@ -414,17 +414,17 @@ const SnakeLevels = ({
                           <View className="h-[60px] w-[150px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                             {upcomingClass?.visibility ? (
                               <View>
-                                <Text className="font-semibold text-[16px]">
+                                <Text className="font-semibold text-[16px] text-white">
                                   {moment(
                                     convertTimeStamp(upcomingClass?.classDate),
                                   ).format('ddd MMM D')}
                                 </Text>
-                                <Text className="font-semibold text-[16px]">
+                                <Text className="font-semibold text-[16px] text-white">
                                   Upcoming
                                 </Text>
                               </View>
                             ) : (
-                              <Text className="font-semibold text-[20px]">
+                              <Text className="font-semibold text-[20px] text-white">
                                 Upcoming
                               </Text>
                             )}

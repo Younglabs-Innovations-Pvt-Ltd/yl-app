@@ -285,9 +285,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
             courseData?.demoTypeAvailable === 'both') && (
             <Pressable
               className={`flex-col items-center justify-center rounded py-1 px-1 ${
-                courseData?.demoTypeAvailable == 'both'
-                  ? 'w-[50%]'
-                  : 'w-full'
+                courseData?.demoTypeAvailable == 'both' ? 'w-[50%]' : 'w-full'
               } 
               `}
               style={
@@ -309,7 +307,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
                     fontFamily: FONTS.primaryFont,
                   },
                 ]}>
-                Group Demo
+                Group Session
               </Text>
               <Text
                 className="text-[13px] text-center"
@@ -317,7 +315,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
                   color: textColors.textSecondary,
                   fontFamily: FONTS.primaryFont,
                 }}>
-                Demo conducted with a group of 5-10 Students
+                Teacher and 4-5 students
               </Text>
             </Pressable>
           )}
@@ -326,9 +324,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
             courseData?.demoTypeAvailable === 'both') && (
             <Pressable
               className={`flex-col items-center justify-center py-1 px-1 rounded  ${
-                courseData?.demoTypeAvailable == 'both'
-                  ? 'w-[50%]'
-                  : 'w-full'
+                courseData?.demoTypeAvailable == 'both' ? 'w-[50%]' : 'w-full'
               } 
               `}
               onPress={() => setSelectedDemoType('solo')}
@@ -352,7 +348,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
                     fontFamily: FONTS.primaryFont,
                   },
                 ]}>
-                Solo Demo
+                One To One Session
               </Text>
               <Text
                 className="text-[13px] text-center"
@@ -360,7 +356,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
                   color: textColors.textSecondary,
                   fontFamily: FONTS.primaryFont,
                 }}>
-                Demo conducted One to One between teacher and student
+                Just the teacher and student
               </Text>
             </Pressable>
           )}

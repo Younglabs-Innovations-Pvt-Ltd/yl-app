@@ -194,7 +194,7 @@ function* fetchAllBookingsWithPhone() {
 // fetching user's all orders
 function* fetchAllOrders({payload}) {
   try {
-    console.log('fetching orders', payload);
+    // console.log('fetching orders', payload);
     const response = yield fetchAllOrdersFromLeadId(payload);
     // console.log('got response', response, ' got status', response.status);
 
@@ -205,7 +205,7 @@ function* fetchAllOrders({payload}) {
     }
 
     const data = yield response.json();
-    console.log('got order data', data);
+    // console.log('got order data', data);
 
     if (data?.orderData) {
       yield put(userOrderFetchingSuccess(data?.orderData));

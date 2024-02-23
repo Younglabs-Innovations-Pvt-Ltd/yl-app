@@ -1,4 +1,6 @@
 export const generateOffering = currentCourse => {
+  console.log(currentCourse, 'currentCourse');
+
   const batch1 = {
     ageGroup: currentCourse.ageGroup,
     batchType: currentCourse.batchType,
@@ -34,14 +36,21 @@ export const generateOffering = currentCourse => {
   } else {
     let batch2;
     let batchArr;
-    if (currentCourse.actualItems === 2) {
-      batch2 = {...batch1, level: currentCourse.level + 1};
-      batchArr = [batch1, batch2];
-    } else {
+    if (currentCourse?.course_type === 'curriculum') {
       batchArr = [batch1];
+    } else {
+      if (currentCourse.actualItems === 2) {
+        batch2 = {...batch1, level: currentCourse.level + 1};
+        batchArr = [batch1, batch2];
+      } else {
+        batchArr = [batch1];
+      }
     }
 
-    let courseLevel = currentCourse.actualItems === 2 ? `level_3` :  `level_${currentCourse.level}`;
+    let courseLevel =
+      currentCourse.actualItems === 2
+        ? `level_3`
+        : `level_${currentCourse.level}`;
     const offeringName = `${currentCourse.courseId} ${currentCourse.ageGroup} ${courseLevel} ${currentCourse.price}`;
     const offeringObj = {
       batchArr,

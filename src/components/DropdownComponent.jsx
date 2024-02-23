@@ -33,7 +33,7 @@ const DropdownComponent = ({
         <Text
           style={[
             styles.label,
-            {borderRadius:8 , paddingHorizontal:4 , paddingVertical:2},
+            {borderRadius:8 , paddingHorizontal:4},
             {color: isFocus ? colorYlMain : textColors.textSecondary},
             {backgroundColor: bgColor, fontFamily: FONTS.primaryFont},
           ]}>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   label: {
     position: 'absolute',
     left: 22,
-    top: 8,
+    top: -2,
     zIndex: 999,
     paddingHorizontal: 8,
     fontSize: 14,
