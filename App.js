@@ -58,6 +58,9 @@ import PaymentSuccess from './src/screens/payment-success';
 import CourseConductScreen from './src/screens/course-conduct-screen';
 import Referral from './src/screens/referral-scree';
 import MyTickets from './src/screens/mytickets-screen';
+import messaging from '@react-native-firebase/messaging';
+import {AndroidStyle, AndroidImportance} from '@notifee/react-native';
+import {displayNotification} from './src/utils/notifications';
 
 initialize('kdg30i0fnc');
 
@@ -76,6 +79,47 @@ function App() {
   );
 
   const notificationRef = useRef({});
+
+  // Foreground notifications
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      try {
+        const data = remoteMessage.data;
+        const notification = {
+          android: {
+            sound: 'default',
+            smallIcon: 'ic_small_icon',
+            importance: AndroidImportance.HIGH,
+            largeIcon: require('./src/assets/images/spinner.png'),
+            pressAction: {
+              id: 'open_app',
+              launchActivity: 'default',
+            },
+          },
+        };
+
+        if (data.title) {
+          notification.title = data.title;
+        }
+        if (data.body) {
+          notification.body = data.body;
+        }
+        if (data.image) {
+          notification.android.style = {
+            type: AndroidStyle.BIGPICTURE,
+            picture: data.image,
+            largeIcon: null,
+          };
+        }
+
+        await displayNotification(notification, 'general', 'general');
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     StatusBar.setBackgroundColor(COLORS.pblue);

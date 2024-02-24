@@ -99,3 +99,36 @@ export const displayRemarketingNotification = async notification => {
     ...notificationData,
   });
 };
+
+const capitalize = text => {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+// Display the notification
+export const displayNotification = async (
+  notification,
+  channelId,
+  channelName,
+) => {
+  const groupId = await notifee.createChannelGroup({
+    id: capitalize(channelId),
+    name: capitalize(channelName),
+  });
+
+  const cId = await notifee.createChannel({
+    id: channelId.toLowerCase(),
+    name: channelName.toLowerCase(),
+    sound: 'default',
+    groupId: groupId,
+    vibration: true,
+  });
+
+  let notificationData = notification;
+  notificationData.android.channelId = cId;
+
+  console.log('notificationData', notificationData);
+
+  await notifee.displayNotification({
+    ...notificationData,
+  });
+};

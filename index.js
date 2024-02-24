@@ -14,6 +14,7 @@ import notifee, {
 } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import {
+  displayNotification,
   displayRemarketingNotification,
   displayReminderNotification,
 } from './src/utils/notifications';
@@ -106,6 +107,9 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
       await displayRemarketingNotification(notification);
     } else if (message?.type === 'reminders') {
       await displayReminderNotification(notification);
+    } else {
+      console.log('notificationBody', notification);
+      displayNotification(notification, 'general', 'general');
     }
   } catch (error) {
     console.log('BACKGROUND_NOTIFICATION_ERROR=', error);
