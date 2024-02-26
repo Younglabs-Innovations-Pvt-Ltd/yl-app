@@ -69,8 +69,7 @@ function* payOnTazapay({body, ipData}) {
     }
 
     const {token} = yield checkOutSessionRes.json();
-    console.log('token is', token);
-    const redirectUrl = `https://younglabsdev1.vercel.app/yl_app/tazapay?token=${token}`;
+    const redirectUrl = `https://younglabs.in/yl_app/tazapay?token=${token}`;
 
     yield put(setLoading(false));
     yield Linking.openURL(redirectUrl);
@@ -95,7 +94,7 @@ function* makePaymentSaga({payload}) {
       credits,
       paymentMethod,
     } = payload;
-    console.log("Level text is", levelText)
+    console.log('Level text is', levelText);
 
     let selectBatch = {...currentSelectedBatch};
 
@@ -154,7 +153,7 @@ function* makePaymentSaga({payload}) {
     const offeringBody = generateOffering(selectBatch);
     body.offeringData = offeringBody;
 
-    console.log("payment method is", paymentMethod)
+    console.log('payment method is', paymentMethod);
     if (paymentMethod === 'tazapay') {
       body.FCY = `QAR ${selectBatch?.price}`;
       yield payOnTazapay({body, ipData});
@@ -162,6 +161,7 @@ function* makePaymentSaga({payload}) {
     }
 
     const token = yield auth().currentUser.getIdToken();
+    console.log(`Token: ${token}`);
     // console.log('body=', body);
     const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
       method: 'POST',
@@ -182,6 +182,8 @@ function* makePaymentSaga({payload}) {
     const data = yield response.json();
 
     console.log('here 2');
+
+    console.log('data.order', data);
 
     const {amount, id: order_id, currency} = data.order;
 
@@ -216,7 +218,7 @@ function* makePaymentSaga({payload}) {
     // };
 
     const options = {
-      key: 'rzp_test_0cYlLVRMEaCUDx',
+      key: RP_KEY,
       currency,
       amount: amount?.toString(),
       order_id,
@@ -229,8 +231,6 @@ function* makePaymentSaga({payload}) {
 
     if (rzRes.status_code === 200) {
       replace(SCREEN_NAMES.PAYMENT_SUCCESS);
-    } else {
-      yield put(makePaymentFailed('Payment failed, Something went wrong.'));
     }
   } catch (error) {
     console.log(error);
@@ -281,7 +281,6 @@ function* makeSoloPaymentSaga({payload}) {
     console.log('paymentMethod', paymentMethod);
     yield put(setLoading(false));
     // console.log('going to send body', body);
-    return;
 
     if (paymentMethod === 'tazapay') {
       console.log('tpBody', body);
@@ -345,7 +344,7 @@ function* makeSoloPaymentSaga({payload}) {
       console.log('i am her 3');
 
       const options = {
-        key: 'rzp_test_0cYlLVRMEaCUDx',
+        key: RP_KEY,
         currency,
         amount: amount?.toString(),
         order_id,

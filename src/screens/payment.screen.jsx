@@ -48,7 +48,7 @@ import {setUser} from '../store/auth/reducer';
 
 GoogleSignin.configure({
   webClientId:
-    '351274768066-ftkfamveov8pb1nkd558fv0mrur546lf.apps.googleusercontent.com',
+    '54129267828-73o9bu1af3djrmh0e9krbk59s1g47rsp.apps.googleusercontent.com',
 });
 
 const {width: deviceWidth} = Dimensions.get('window');
@@ -66,8 +66,6 @@ const Payment = ({navigation, route}) => {
   const [couponMsg, setCouponMsg] = useState('');
   const [visibleCongratulations, setVisibleCongratulations] = useState(false);
   const [authVisible, setAuthVisible] = useState(false);
-  // reducers values
-  const {user} = useSelector(authSelector);
   const [email, setEmail] = useState(user?.email || '');
   // referral and coupon handle
   const [totalCredits, setTotalCredits] = useState(0);
@@ -98,7 +96,7 @@ const Payment = ({navigation, route}) => {
   const confettiRef = useRef();
   const cannonWrapperRef = useRef();
   const {ipData} = useSelector(bookDemoSelector);
-  const {customer} = useSelector(authSelector);
+  const {customer, user} = useSelector(authSelector);
   const dispatch = useDispatch();
   const {children} = useSelector(userSelector);
   const {
@@ -301,6 +299,9 @@ const Payment = ({navigation, route}) => {
     }
 
     // console.log('giving body', body);
+    if (!user?.email && email) {
+      dispatch(setUser({...user, email: email}));
+    }
     dispatch(startMakePayment(body));
     setEmailErr('');
   };
@@ -378,7 +379,7 @@ const Payment = ({navigation, route}) => {
       level: currentLevel,
       classesSold: classesSold || null,
       course_type: courseDetails?.course_type,
-      levelText:levelText,
+      levelText: levelText,
     };
 
     if (selectedCoupon) {
@@ -399,6 +400,9 @@ const Payment = ({navigation, route}) => {
 
     // console.log('body  giving is =', body);
     console.log('i am here');
+    if (!user?.email && email) {
+      dispatch(setUser({...user, email: email}));
+    }
     dispatch(makeSoloPayment({body, ipData, paymentMethod}));
   };
 

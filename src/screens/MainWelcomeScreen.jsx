@@ -206,8 +206,6 @@ const MainWelcomeScreen = ({navigation}) => {
     const isDemoOver =
       new Date(bookingTime).getTime() + 1000 * 60 * 50 <= Date.now();
 
-    console.log(isDemoOver, 'isDemoOver');
-
     if (isDemoOver && isAttended && teamUrl && !isNmi && !appRemark) {
       setShowPostActions(true);
     } else {

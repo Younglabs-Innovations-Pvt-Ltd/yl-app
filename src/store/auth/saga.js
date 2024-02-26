@@ -22,6 +22,7 @@ import {localStorage} from '../../utils/storage/storage-provider';
 import {resetNavigation} from '../../navigationRef';
 import {setIsFirstTimeUser} from '../welcome-screen/reducer';
 import {BASE_URL} from '@env';
+import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 
 function* phoneAuthentication({payload: {phone}}) {
   try {
@@ -101,8 +102,12 @@ function* fetchUserListener() {
   yield takeLatest(fetchUser.type, fetchUserSaga);
 }
 
-function* logoutFunc() {
-  resetNavigation();
+function* logoutFunc({payload}) {
+  if (payload?.route === SCREEN_NAMES.EMAIL_LOGIN) {
+    resetNavigation(SCREEN_NAMES.EMAIL_LOGIN, payload.params || {});
+  } else {
+    resetNavigation();
+  }
   localStorage.clearAll();
 
   const currentUser = auth().currentUser;

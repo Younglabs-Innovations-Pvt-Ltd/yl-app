@@ -9,6 +9,7 @@ import Spacer from '../components/spacer.component';
 import {logout} from '../store/auth/reducer';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Snackbar from 'react-native-snackbar';
+import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
 const INITIAL_COUNT = 10;
 
@@ -36,9 +37,12 @@ const PaymentSuccess = () => {
   useEffect(() => {
     if (count === 0) {
       // logout and navigate to signup screen
-      console.log('logging out');
-
-      dispatch(logout());
+      dispatch(
+        logout({
+          route: SCREEN_NAMES.EMAIL_LOGIN,
+          params: {email: user.email, password: `younglabs${user.leadId}`},
+        }),
+      );
     }
   }, [count]);
 

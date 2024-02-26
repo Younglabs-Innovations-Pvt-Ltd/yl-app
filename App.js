@@ -112,6 +112,13 @@ function App() {
           };
         }
 
+        if (data.largeText) {
+          notification.android.style = {
+            type: AndroidStyle.BIGTEXT,
+            text: data.largeText,
+          };
+        }
+
         await displayNotification(notification, 'general', 'general');
       } catch (error) {
         console.log(error);

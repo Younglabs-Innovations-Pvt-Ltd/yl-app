@@ -22,11 +22,12 @@ import {fetchUserFormLoginDetails} from '../store/auth/reducer';
 import {CommonActions} from '@react-navigation/native';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const EmailLogin = ({navigation}) => {
+const EmailLogin = ({route, navigation}) => {
+  const params = route.params;
   const dispatch = useDispatch();
   const toast = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(params?.email || '');
+  const [password, setPassword] = useState(params?.password || '');
   const [loginLoading, setLoginLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -86,7 +87,14 @@ const EmailLogin = ({navigation}) => {
       <View style={styles.content}>
         <View style={styles.inputWrapper} className="relative">
           <TextInput
-            style={[styles.input, {fontFamily: FONTS.primaryFont}]}
+            style={[
+              styles.input,
+              {
+                fontFamily: FONTS.primaryFont,
+                fontSize: 16,
+                color: COLORS.black,
+              },
+            ]}
             selectionColor={COLORS.black}
             onChangeText={e => setEmail(e)}
             value={email}
@@ -106,13 +114,19 @@ const EmailLogin = ({navigation}) => {
         <View style={styles.inputWrapper} className="relative">
           <View style={[styles.input]} className="relative w-full">
             <TextInput
-              style={[{fontFamily: FONTS.primaryFont, fontSize: 16.5}]}
+              style={[
+                {
+                  fontFamily: FONTS.primaryFont,
+                  fontSize: 16,
+                  color: COLORS.black,
+                },
+              ]}
               selectionColor={COLORS.black}
               onChangeText={e => setPassword(e)}
               value={password}
               inputMode="text"
-              className="w-full rounded-md border-gray-400 border py-3 pl-2 pr-[50px] text-black"
-              secureTextEntry={showPassword}
+              className="w-full rounded-md border-gray-400 border py-3 pl-2 pr-[50px]"
+              secureTextEntry={!showPassword}
               autoCapitalize="none"
             />
             <View className="absolute top-5  right-3 z-50">

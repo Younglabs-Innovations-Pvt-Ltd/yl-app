@@ -126,8 +126,6 @@ export const displayNotification = async (
   let notificationData = notification;
   notificationData.android.channelId = cId;
 
-  console.log('notificationData', notificationData);
-
   await notifee.displayNotification({
     ...notificationData,
   });
