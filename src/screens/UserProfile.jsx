@@ -90,10 +90,10 @@ const UserProfile = ({navigation}) => {
                   fontFamily: FONTS.primaryFont,
                   color: textColors.textSecondary,
                 }}>
-                Dark mode
+                Switch to light mode
               </Text>
               <MIcon
-                name="brightness-4"
+                name="brightness-6"
                 color="white"
                 size={20}
                 onPress={() => changeDarkMode(true)}
@@ -109,10 +109,10 @@ const UserProfile = ({navigation}) => {
                   fontFamily: FONTS.primaryFont,
                   color: textColors.textSecondary,
                 }}>
-                Light mode
+                Switch to dark mode
               </Text>
               <MIcon
-                name="brightness-6"
+                name="brightness-4"
                 color="orange"
                 size={20}
                 onPress={() => changeDarkMode(true)}

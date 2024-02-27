@@ -8,6 +8,7 @@ import {
   TextInput,
   ImageBackground,
   Alert,
+  Text,
 } from 'react-native';
 
 import {FONTS} from '../utils/constants/fonts';
@@ -41,6 +42,7 @@ import Icon from '../components/icon.component';
 import {networkSelector} from '../store/network/selector';
 import Spacer from '../components/spacer.component';
 import Seperator from '../components/seperator.component';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -48,11 +50,11 @@ const {width: deviceWidth} = Dimensions.get('window');
 const DemoClassScreen = ({navigation}) => {
   const toast = useToast();
   const {colorYlMain, textColors} = useSelector(state => state.appTheme);
-
   const {localLang, currentLang} = i18nContext();
-
   const [phone, setPhone] = useState('');
   const [visible, setVisible] = useState(false);
+  const [loginWithWhatsapp, setLoginWithWhatsapp] = useState(true);
+  const [whatsappConsent, setWhatsappConsent] = useState(true);
 
   const dispatch = useDispatch();
 
@@ -327,37 +329,103 @@ const DemoClassScreen = ({navigation}) => {
                 <Icon name="chevron-down" size={20} color={COLORS.black} />
               </Pressable>
               <TextInput
-                placeholder="Enter WhatsApp number"
+                placeholder={
+                  loginWithWhatsapp
+                    ? 'Enter WhatsApp number'
+                    : 'Enter your mobile number'
+                }
                 style={styles.input}
                 selectionColor={COLORS.black}
                 value={phone}
                 onChangeText={handlePhone}
                 inputMode="numeric"
                 placeholderTextColor={'gray'}
+                placeholderStyle={{fontWeight:600}}
                 maxLength={15}
               />
             </View>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={btnContinueStyle}
-              disabled={loading}
-              onPress={handleBookingStatus}
-              className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}>
-              <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
-                Log In
-              </TextWrapper>
-            </TouchableOpacity>
-            <View style={{alignItems: 'flex-end', paddingRight: 4}}>
+
+            {loginWithWhatsapp && (
               <Pressable
-                style={{paddingTop: 8}}
-                onPress={() => navigation.navigate(SCREEN_NAMES.PHONELOGIN)}>
-                <TextWrapper
-                  fs={16}
-                  ff={FONTS.primaryFont}
-                  color={textColors.textSecondary}>
-                  Don't have WhatsApp?
-                </TextWrapper>
+                className="flex flex-row items-center mt-2 mb-2 justify-start px-3"
+                onPress={() => setWhatsappConsent(!whatsappConsent)}>
+                <View
+                  className={`h-[25px] w-[25px] justify-center items-center rounded border  ${
+                    whatsappConsent
+                      ? 'border-[#76C8F2] bg-[#76C8F2]'
+                      : 'border-gray-400 bg-white'
+                  }`}>
+                  {whatsappConsent && (
+                    <MIcon name="check" color="white" size={20} />
+                  )}
+                </View>
+                <Text
+                  className="ml-2 text-[15px]"
+                  style={{fontFamily: FONTS.primaryFont}}>
+                  I agree to recieve updates on{' '}
+                  <MIcon name="whatsapp" color="green" size={20} /> WhatsApp
+                </Text>
               </Pressable>
+            )}
+            {loginWithWhatsapp ? (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={btnContinueStyle}
+                disabled={loading}
+                onPress={() => whatsappConsent && handleBookingStatus()}
+                className={`w-full items-center justify-center mt-3 rounded-full py-3 ${
+                  whatsappConsent ? `bg-[${colorYlMain}]` : 'bg-blue-200'
+                }`}>
+                <TextWrapper
+                  fs={18}
+                  ff={FONTS.headingFont}
+                  color={COLORS.white}>
+                  Log In
+                </TextWrapper>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={btnContinueStyle}
+                disabled={loading}
+                onPress={handleBookingStatus}
+                className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}>
+                <TextWrapper
+                  fs={18}
+                  ff={FONTS.headingFont}
+                  color={COLORS.white}>
+                  Log In
+                </TextWrapper>
+              </TouchableOpacity>
+            )}
+            <View style={{alignItems: 'flex-end', paddingRight: 4}}>
+              {loginWithWhatsapp ? (
+                <Pressable
+                  style={{paddingTop: 8}}
+                  onPress={() => setLoginWithWhatsapp(false)}>
+                  {/* onPress={() => navigation.navigate(SCREEN_NAMES.PHONELOGIN)}> */}
+                  <TextWrapper
+                    fs={16}
+                    ff={FONTS.primaryFont}
+                    color={textColors.textSecondary}
+                    style={{fontWeight:400 , fontFamily:FONTS.primaryFont}}
+                    >
+                    Don't have WhatsApp?
+                  </TextWrapper>
+                </Pressable>
+              ) : (
+                <Pressable
+                  style={{paddingTop: 8}}
+                  onPress={() => setLoginWithWhatsapp(true)}>
+                  {/* onPress={() => navigation.navigate(SCREEN_NAMES.PHONELOGIN)}> */}
+                  <TextWrapper
+                    fs={16}
+                    ff={FONTS.primaryFont}
+                    color={textColors.textSecondary}>
+                    Have WhatsApp number?
+                  </TextWrapper>
+                </Pressable>
+              )}
             </View>
             <Spacer />
             <Seperator text={'OR'} />
@@ -368,7 +436,7 @@ const DemoClassScreen = ({navigation}) => {
               onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}
               className={`w-full items-center justify-center mt-2 rounded-full py-3 bg-[${colorYlMain}]`}>
               <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
-                Existing customer Log In
+                Customer Log In
               </TextWrapper>
             </TouchableOpacity>
 

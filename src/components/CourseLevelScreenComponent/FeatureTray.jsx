@@ -113,13 +113,13 @@ const FeatureTray = ({
                   style={[styles?.icon, {width: 120, height: 100}]}
                   source={item?.item?.icon}
                 />
-                <View className="flex flex-col justify-center items-center">
+                <View className="flex flex-col justify-end items-end h-[48px]">
                   <Text
                     style={{
                       fontFamily: FONTS.signika_medium,
                       color: darkMode ? 'white' : 'black',
                     }}
-                    className="px-4 text-[16px] w-[100%] text-center">
+                    className="px-4 text-[16px] leading-[18px] w-[100%] text-center">
                     {item.item?.featureName.split('/')[0]}
                   </Text>
                   <Text
@@ -127,7 +127,7 @@ const FeatureTray = ({
                       fontFamily: FONTS.signika_medium,
                       color: darkMode ? 'white' : 'black',
                     }}
-                    className="px-4 text-[16px] w-[100%] text-center">
+                    className="px-4 text-[16px] leading-[18px] w-[100%] text-center">
                     {item.item?.featureName.split('/')[1]}
                   </Text>
                 </View>

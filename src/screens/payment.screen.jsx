@@ -1127,59 +1127,6 @@ const Payment = ({navigation, route}) => {
           />
         </View>
       </ModalComponent>
-
-      {/* <ModalComponent visible={visibleCongratulations} animationType="fade">
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            backgroundColor: 'rgba(0,0,0,0.25)',
-          }}>
-          <TextWrapper
-            fs={36}
-            ff={FONTS.signika_semiBold}
-            color={COLORS.white}
-            styles={{textAlign: 'center'}}>
-            Congratulations
-          </TextWrapper>
-        </View>
-      </ModalComponent> */}
-
-      {/* <ModalComponent
-        visible={visible}
-        onRequestClose={onClose}
-        animationType="fade">
-        <View style={styles.modalContainer}>
-          <Pressable style={styles.modalOverlay}></Pressable>
-          <View style={styles.modalContent}>
-            <Pressable style={styles.btnClose} onPress={onClose}>
-              <Icon name="close-outline" size={28} color={COLORS.black} />
-            </Pressable>
-            <MIcon
-              name="check-circle"
-              size={78}
-              color={COLORS.pgreen}
-              style={{alignSelf: 'center'}}
-            />
-            <Spacer space={4} />
-            <TextWrapper fs={20} fw="700" styles={{textAlign: 'center'}}>
-              Payment Successful
-            </TextWrapper>
-            <Spacer space={12} />
-            <Pressable
-              style={({pressed}) => [
-                styles.btnCheckout,
-                {opacity: pressed ? 0.8 : 1, backgroundColor: COLORS.pblue},
-              ]}
-              onPress={goToHome}>
-              <TextWrapper fs={18} color={COLORS.white}>
-                Continue
-              </TextWrapper>
-            </Pressable>
-          </View>
-          <Pressable style={styles.modalOverlay}></Pressable>
-        </View>
-      </ModalComponent> */}
       <ModalComponent visible={authVisible}>
         <View
           style={{

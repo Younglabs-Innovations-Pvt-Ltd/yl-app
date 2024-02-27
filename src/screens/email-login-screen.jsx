@@ -164,12 +164,12 @@ const EmailLogin = ({route, navigation}) => {
         </Pressable>
       </View>
 
-      <View style={{alignItems: 'center', marginTop: 28}} className="mb-5">
+      <View style={{alignItems: 'center', marginTop: 0}} className="mt-3 py-3">
         <Pressable
           style={{paddingVertical: 4}}
           onPress={() => navigation.navigate(SCREEN_NAMES.WELCOME)}>
           <TextWrapper fs={16} ff={FONTS.primaryFont} className="text-gray-600">
-            Not a user? Sign in with Whatsapp
+            Not a customer? Log in with Whatsapp.
           </TextWrapper>
         </Pressable>
       </View>
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    flex: 1,
+    // flex: 1,
     paddingTop: 38,
     paddingHorizontal: 16,
     alignItems: 'center',

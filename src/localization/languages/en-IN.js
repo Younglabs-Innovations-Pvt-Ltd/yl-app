@@ -1,5 +1,5 @@
 export const enIN = {
-  tagline: 'Helping parents raise capable, skillful & happy children',
+  tagline: 'Helping parents raise capable, skilful & happy children',
   rescheduleText: 'Looks like you missed the class, please reschedule one',
   timerText:
     'Once this timer ends Click on ENTER CLASS button (shown after timer ends)',

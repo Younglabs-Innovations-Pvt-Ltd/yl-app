@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View, TextInput} from 'react-native';
 import {FONTS} from '../utils/constants/fonts';
+import { COLORS } from '../utils/constants/colors';
 
 const PhoneLogin = () => {
   return (
