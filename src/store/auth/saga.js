@@ -64,7 +64,7 @@ function* fetchUserSaga({payload}) {
     const res = yield getCustomers(payload);
     console.log('res status', res.status);
     const data = yield res.json();
-    console.log('got user data', data);
+    // console.log('got user data', data);
     if (data?.data?.customer === 'yes') {
       console.log('sttin customer');
       yield put(setIsCustomer(true));

@@ -21,6 +21,7 @@ import Input from './CustomInputComponent';
 import DropdownComponent from './DropdownComponent';
 import {COLORS} from '../utils/constants/colors';
 import Snackbar from 'react-native-snackbar';
+import BottomSheetInput from './BottomSheetInput';
 
 const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
   const handleShowDrawer = () => navigation.openDrawer();
@@ -370,7 +371,7 @@ const EditChildView = ({child, close, setChildToEdit}) => {
   const {user} = useSelector(authSelector);
   const [childName, setChildName] = useState('');
   const [childAge, setChildAge] = useState(null);
-  const {editChildLoading} = useSelector(userSelector);
+  const {childAddLoading} = useSelector(userSelector);
 
   useEffect(() => {
     setChildName(child?.name);
@@ -390,27 +391,41 @@ const EditChildView = ({child, close, setChildToEdit}) => {
     {label: '14', value: 14},
   ];
 
+  const onClose = () => {
+    close();
+    setChildToEdit(null);
+  };
+
   const onSaveChild = () => {
+    console.log("clicked")
     let body = {
       toAdd: childName,
       toRemove: child?.name,
       childAge,
       leadId: user?.leadId,
-      close,
+      close: onClose,
     };
-    console.log('body is', body);
     dispatch(startEditChild(body));
-    setChildToEdit(null);
   };
 
   return (
     <View className="w-full items-center mt-4">
       <View className="w-[80%]">
-        <Input
+        {/* <Input
           placeHolder="Enter Child Name"
           setValue={setChildName}
           value={childName}
+        /> */}
+
+        {/* <View className="py-1"></View> */}
+
+        <BottomSheetInput
+          setValue={setChildName}
+          value={childName}
+          placeHolder={'Enter child name'}
         />
+
+        <View className="py-1"></View>
 
         <DropdownComponent
           data={arr}
@@ -423,9 +438,9 @@ const EditChildView = ({child, close, setChildToEdit}) => {
           className="w-full py-2 rounded-full justify-center flex-row"
           style={{backgroundColor: COLORS.pblue}}
           onPress={onSaveChild}
-          disabled={editChildLoading}>
+          disabled={childAddLoading}>
           <Text className="text-white text-base font-semibold">Save</Text>
-          {editChildLoading && (
+          {childAddLoading && (
             <ActivityIndicator
               size={'small'}
               color={'white'}

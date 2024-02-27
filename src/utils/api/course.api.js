@@ -15,7 +15,7 @@ export const getClasses = async ({leadId, serviceRequestId, token}) => {
     leadId,
     serviceRequestId,
   };
-  console.log('body:', body, token);
+  // console.log('body:', body, token);
   return fetch(`${BASE_URL}/app/mycourses/serviceRequestClasses`, {
     method: 'POST',
     headers: {

@@ -14,11 +14,11 @@ const HomeScreenStackNavigator = () => {
       initialRouteName="MainWelcomeScreen"
       screenOptions={{
         headerStyle: {
-          backgroundColor: bgColor,
+          backgroundColor: textColors.textYlMain,
           borderColor: textColors.textSecondary,
           elevation: 1.12,
         },
-        headerTintColor: textColors.textSecondary,
+        headerTintColor: "white",
         headerTitleStyle: {
           fontWeight: '500',
           fontSize: 18,

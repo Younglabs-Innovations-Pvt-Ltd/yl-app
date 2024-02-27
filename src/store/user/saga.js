@@ -70,6 +70,7 @@ export function* userSaga() {
       const data = yield response.json();
 
       if (data?.data?.children) {
+        console.log('got data in return', data?.data?.children);
         yield put(setChildren(data?.data?.children));
       }
       Snackbar.show({
@@ -78,10 +79,10 @@ export function* userSaga() {
         duration: Snackbar.LENGTH_LONG,
       });
       close && close();
+      yield put(setChildAddSuccess(true));
     } catch (error) {
-      console.log("edit child error", error);
-      
-      setChildAddSuccess(false);
+      console.log('edit child error', error);
+      yield put(setChildAddSuccess(false));
     }
   }
 
