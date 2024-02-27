@@ -80,7 +80,7 @@ const EmailLogin = ({route, navigation}) => {
         <Text
           className="text-center w-[95%] py-1"
           style={[FONTS.heading, {color: COLORS.white}]}>
-          Enter your Younglabs Login Credentials To Continue
+          Enter your Younglabs login credentials to continue
         </Text>
       </View>
 

@@ -143,10 +143,10 @@ const ReviewsAndTestimonials = () => {
       <View className="w-full mt-5">
         <View>
           <Text style={[FONTS.heading, {color: textColors.textPrimary}]}>
-            What Our Customer Speak
+            What our customers say
           </Text>
         </View>
-        <View className="w-[100%] mt-1">
+        <View className="w-[100%] mt-2">
           <FlatList
             data={reviews}
             keyExtractor={item => item.id}

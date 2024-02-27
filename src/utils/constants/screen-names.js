@@ -16,4 +16,5 @@ export const SCREEN_NAMES = {
   PAYMENT_SUCCESS: 'paymentSuccess',
   REFERRAL: 'referral',
   MYTICKETS: 'myTicket',
+  PHONELOGIN: 'phonelogin',
 };

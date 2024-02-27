@@ -61,6 +61,7 @@ import MyTickets from './src/screens/mytickets-screen';
 import messaging from '@react-native-firebase/messaging';
 import {AndroidStyle, AndroidImportance} from '@notifee/react-native';
 import {displayNotification} from './src/utils/notifications';
+import PhoneLogin from './src/screens/phone-login.screen';
 
 initialize('kdg30i0fnc');
 
@@ -262,19 +263,6 @@ function App() {
       </View>
     );
 
-  const CustomBackButton = ({navigation, color}) => {
-    return (
-      <Icon
-        name="arrow-back-outline"
-        size={24}
-        color={color}
-        Conti
-        style={{marginLeft: 4}}
-        onPress={() => navigation.goBack()}
-      />
-    );
-  };
-
   return (
     // Provider for language
     <I18NProvider>
@@ -317,6 +305,16 @@ function App() {
                 <Stack.Screen
                   name={SCREEN_NAMES.EMAIL_LOGIN}
                   component={EmailLogin}
+                  options={{
+                    headerTitle: 'Log in',
+                    headerStyle: {backgroundColor: COLORS.pblue},
+                    headerTitleStyle: {color: COLORS.white},
+                    headerTintColor: COLORS.white,
+                  }}
+                />
+                <Stack.Screen
+                  name={SCREEN_NAMES.PHONELOGIN}
+                  component={PhoneLogin}
                   options={{
                     headerTitle: 'Log in',
                     headerStyle: {backgroundColor: COLORS.pblue},

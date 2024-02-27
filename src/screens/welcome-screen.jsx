@@ -39,13 +39,15 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import Icon from '../components/icon.component';
 import {networkSelector} from '../store/network/selector';
+import Spacer from '../components/spacer.component';
+import Seperator from '../components/seperator.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
 // Main Component
 const DemoClassScreen = ({navigation}) => {
   const toast = useToast();
-  const {colorYlMain} = useSelector(state => state.appTheme);
+  const {colorYlMain, textColors} = useSelector(state => state.appTheme);
 
   const {localLang, currentLang} = i18nContext();
 
@@ -308,8 +310,12 @@ const DemoClassScreen = ({navigation}) => {
             },
           ]}>
           <View
-            style={{elevation: 10}}
-            className="py-6 bg-white px-3 rounded-2xl relative">
+            style={{
+              elevation: 10,
+              borderTopRightRadius: 16,
+              borderTopLeftRadius: 16,
+            }}
+            className="py-6 bg-white px-3 relative">
             {/* <View className="absolute p-[2px] rounded-full bg-gray-400 top-1 left-[48%] w-[15%]"></View> */}
 
             {/* <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
@@ -321,7 +327,7 @@ const DemoClassScreen = ({navigation}) => {
                 <Icon name="chevron-down" size={20} color={COLORS.black} />
               </Pressable>
               <TextInput
-                placeholder="Enter Whatsapp number"
+                placeholder="Enter WhatsApp number"
                 style={styles.input}
                 selectionColor={COLORS.black}
                 value={phone}
@@ -338,22 +344,53 @@ const DemoClassScreen = ({navigation}) => {
               onPress={handleBookingStatus}
               className={`w-full items-center justify-center mt-3 rounded-full py-3 bg-[${colorYlMain}]`}>
               <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
-                Log in
+                Log In
               </TextWrapper>
             </TouchableOpacity>
-
-            <View style={{alignItems: 'center', marginTop: 28}}>
+            <View style={{alignItems: 'flex-end', paddingRight: 4}}>
               <Pressable
-                style={{paddingVertical: 4}}
-                onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
+                style={{paddingTop: 8}}
+                onPress={() => navigation.navigate(SCREEN_NAMES.PHONELOGIN)}>
                 <TextWrapper
                   fs={16}
                   ff={FONTS.primaryFont}
-                  className="text-gray-600">
-                  Existing user? Login with Email
+                  color={textColors.textSecondary}>
+                  Don't have WhatsApp?
                 </TextWrapper>
               </Pressable>
             </View>
+            <Spacer />
+            <Seperator text={'OR'} />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={btnContinueStyle}
+              disabled={loading}
+              onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}
+              className={`w-full items-center justify-center mt-2 rounded-full py-3 bg-[${colorYlMain}]`}>
+              <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
+                Existing customer Log In
+              </TextWrapper>
+            </TouchableOpacity>
+
+            {/* <View style={{alignItems: 'center', marginTop: 12}}>
+              <Pressable
+                style={({pressed}) => [
+                  {
+                    width: '100%',
+                    paddingVertical: 8,
+                    alignItems: 'center',
+                    backgroundColor: pressed ? '#eaeaea' : 'transparent',
+                  },
+                ]}
+                onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
+                <TextWrapper
+                  fs={18}
+                  ff={FONTS.primaryFont}
+                  color={textColors.textSecondary}>
+                  Existing customer login
+                </TextWrapper>
+              </Pressable>
+            </View> */}
           </View>
         </Animated.View>
         <ModalComponent visible={loading}>
