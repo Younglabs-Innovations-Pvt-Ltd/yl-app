@@ -17,6 +17,7 @@ import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {FONTS} from '../../utils/constants/fonts';
 import {ScrollView} from 'react-native-gesture-handler';
+
 import {
   resetCourseDetails,
   setCurrentAgeGroup,
@@ -195,11 +196,11 @@ const SoloBatchPayment = ({
     setPaynowLoading(false);
   };
 
-  useEffect(()=>{
-    if(paynowLoading){
-      console.log("become true")
+  useEffect(() => {
+    if (paynowLoading) {
+      console.log('become true');
     }
-  },[paynowLoading])
+  }, [paynowLoading]);
 
   const handleBatchSelect = (level, price, strikeThroughPrice) => {
     let levelText = getLevelName(level);
@@ -229,9 +230,9 @@ const SoloBatchPayment = ({
         <View className="flex-1">
           <View className="px-2">
             <Text
-              className="text-xl font-semibold"
+              className="text-xl font-semibold text-center"
               style={[FONTS.heading, {color: textColors.textYlMain}]}>
-              Interact Directly with teacher One to One In our new Solo Bathes
+              Dedicated attention to your child in our one-to-one batches
             </Text>
             <Text
               className="text-base mt-2 text-center"
@@ -239,8 +240,8 @@ const SoloBatchPayment = ({
                 color: textColors.textSecondary,
                 fontFamily: FONTS.primaryFont,
               }}>
-              Solo Batch Offer flexible Timing, Better Learning, And Instant
-              Doubt Solving
+              Select timings according to your schedule and avoid missing any
+              classes
             </Text>
           </View>
 
@@ -256,12 +257,12 @@ const SoloBatchPayment = ({
                   fontFamily: FONTS.headingFont,
                   color: textColors.textSecondary,
                 }}>
-                Select A batch For you
+                Select a batch
               </Text>
 
               <View className="w-full my-2 flex-row px-2 items-center justify-center">
                 <Text style={{color: textColors.textSecondary}}>
-                  Select Age Group:
+                  Select age group:
                 </Text>
                 <View className="flex-row px-3">
                   {ageGroups?.map((group, i) => {
@@ -381,7 +382,7 @@ const SoloBatchPayment = ({
                   color: textColors.textSecondary,
                   fontFamily: FONTS.primaryFont,
                 }}>
-                Choose Your Preffered Time and Date to Start Your Classes
+                Please select the date you would like to start
               </Text>
             </View>
           </View>
@@ -397,7 +398,9 @@ const SoloBatchPayment = ({
                 Buy Now
               </Text>
 
-              {paynowLoading && <ActivityIndicator size={20} className="ml-3" color={'white'} />}
+              {paynowLoading && (
+                <ActivityIndicator size={20} className="ml-3" color={'white'} />
+              )}
             </Pressable>
           </View>
         </View>

@@ -340,7 +340,7 @@ const DemoClassScreen = ({navigation}) => {
                 onChangeText={handlePhone}
                 inputMode="numeric"
                 placeholderTextColor={'gray'}
-                placeholderStyle={{fontWeight:600}}
+                placeholderStyle={{fontWeight: 600}}
                 maxLength={15}
               />
             </View>
@@ -360,7 +360,7 @@ const DemoClassScreen = ({navigation}) => {
                   )}
                 </View>
                 <Text
-                  className="ml-2 text-[15px]"
+                  className="ml-2 text-[15px] text-gray-800"
                   style={{fontFamily: FONTS.primaryFont}}>
                   I agree to recieve updates on{' '}
                   <MIcon name="whatsapp" color="green" size={20} /> WhatsApp
@@ -408,8 +408,7 @@ const DemoClassScreen = ({navigation}) => {
                     fs={16}
                     ff={FONTS.primaryFont}
                     color={textColors.textSecondary}
-                    style={{fontWeight:400 , fontFamily:FONTS.primaryFont}}
-                    >
+                    style={{fontWeight: 400, fontFamily: FONTS.primaryFont}}>
                     Don't have WhatsApp?
                   </TextWrapper>
                 </Pressable>
