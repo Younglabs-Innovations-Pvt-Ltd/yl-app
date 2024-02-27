@@ -161,7 +161,6 @@ function* makePaymentSaga({payload}) {
     }
 
     const token = yield auth().currentUser.getIdToken();
-    console.log(`Token: ${token}`);
     // console.log('body=', body);
     const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
       method: 'POST',
@@ -288,8 +287,7 @@ function* makeSoloPaymentSaga({payload}) {
       yield payOnTazapay({body, ipData});
     } else {
       const token = yield auth().currentUser.getIdToken();
-      const url =
-        'https://f55b-2401-4900-1c5c-3da3-1964-c1bc-473e-5467.ngrok-free.app';
+
       const response = yield fetch(
         `${BASE_URL}/shop/orderhandler/makepayment`,
         {
@@ -357,13 +355,11 @@ function* makeSoloPaymentSaga({payload}) {
       yield put(setLoading(false));
       if (rzRes.status_code === 200) {
         replace(SCREEN_NAMES.PAYMENT_SUCCESS);
-      } else {
-        yield put(makePaymentFailed('Payment failed, Something went wrong.'));
       }
     }
   } catch (error) {
     console.log('getting err', error);
-    yield put(setLoading(false));
+    yield put(makePaymentFailed('Payment failed, try again later.'));
   }
 }
 

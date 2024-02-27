@@ -1,7 +1,8 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {COLORS} from '../utils/constants/colors';
 
-const Seperator = ({text, color}) => {
+const Seperator = ({text, color = COLORS.black}) => {
   return (
     <View style={styles.wrapper}>
       <View style={[styles.seperatorLine, {backgroundColor: color}]} />

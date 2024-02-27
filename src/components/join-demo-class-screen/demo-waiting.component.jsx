@@ -18,7 +18,7 @@ const zeroPrefix = time => (time > 9 ? time : `0${time}`);
 const DemoWaiting = ({timeLeft}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [visibleEmail, setVisibleEmail] = useState(false);
-  const {demoData} = useSelector(state => state.joinDemo);
+  const {demoData, bookingDetails} = useSelector(state => state.joinDemo);
 
   const onVisibleEmail = () => {
     setVisibleEmail(true);
@@ -47,6 +47,7 @@ const DemoWaiting = ({timeLeft}) => {
           demoData={demoData}
           onVisibleEmail={onVisibleEmail}
           setIsCollapsed={setIsCollapsed}
+          courseName={bookingDetails?.courseName}
         />
       )}
 
@@ -85,7 +86,7 @@ const DemoWaiting = ({timeLeft}) => {
 
 export default DemoWaiting;
 
-const LongTape = ({timeLeft, demoData, onVisibleEmail, setIsCollapsed}) => {
+const LongTape = ({timeLeft, courseName, onVisibleEmail, setIsCollapsed}) => {
   const gmailIcon = require('../../assets/icons/gmailIcon.png');
 
   const marginBottom = useSharedValue(-30);
@@ -106,7 +107,9 @@ const LongTape = ({timeLeft, demoData, onVisibleEmail, setIsCollapsed}) => {
       }}>
       <View className="flex-row items-center justify-between py-1 px-1">
         <View className="flex-col">
-          <Text className="text-xs text-white">Your free class starts in</Text>
+          <Text className="text-xs text-white">{`Your free ${
+            courseName || ''
+          } class starts in`}</Text>
           <View className="flex-row mt-1">
             <CountDownTimer timeLeft={timeLeft} />
           </View>
