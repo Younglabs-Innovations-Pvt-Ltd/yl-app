@@ -26,7 +26,7 @@ const Testimonial = ({data}) => {
     <View
       className="h-[200px] rounded-md items-center border-gray-100 overflow-hidden"
       style={{
-        width: width - 130,
+        width: width - 110,
         backgroundColor: darkMode ? bgSecondaryColor : bgColor,
         borderWidth: darkMode ? 0 : 1,
       }}>

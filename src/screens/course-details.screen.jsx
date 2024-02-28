@@ -203,7 +203,7 @@ const CourseDetails = ({navigation, courseData}) => {
         {loading ? (
           <ActivityIndicator
             size={'large'}
-            color={COLORS.black}
+            color={textColors.textSecondary}
             style={{alignSelf: 'center'}}
           />
         ) : (
@@ -328,7 +328,6 @@ const CourseContent = ({content}) => {
             <View
               style={{paddingHorizontal: 18, width: '100%'}}
               className="mt-1">
-
               {item?.points.map((point, index) => {
                 return (
                   <View
@@ -343,7 +342,10 @@ const CourseContent = ({content}) => {
                     </View>
                     <Text
                       className="break-words w-[90%]"
-                      style={[FONTS.primary , {color:textColors.textSecondary}]}>
+                      style={[
+                        FONTS.primary,
+                        {color: textColors.textSecondary},
+                      ]}>
                       {point?.trim()}
                     </Text>
                   </View>

@@ -205,7 +205,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
               onPress={() => setSelectedCourseTypeToBuy('group')}
               className={`${isOneToOneCourseAvailable ? 'w-[50%]' : 'w-full'}`}>
               <View
-                className="rounded py-1 px-4 items-center "
+                className="rounded py-1 px-2 items-center "
                 style={btnStyle('group')}>
                 <MIcon
                   name="account-group"
@@ -213,7 +213,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                   color={textColors.textYlMain}
                 />
                 <Text
-                  className={`text-[18px] leading-[20px]`}
+                  className={`text-[17px] leading-[20px]`}
                   style={[
                     {
                       color: textColors?.textYlMain,
@@ -231,7 +231,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
               onPress={() => setSelectedCourseTypeToBuy('solo')}
               className={`${isGroupCourseAvailable ? 'w-[50%]' : 'w-full'}`}>
               <View
-                className="rounded py-1 px-4 items-center"
+                className="rounded py-1 px-2 items-center"
                 style={btnStyle('solo')}>
                 <MIcon
                   name="account-supervisor"
@@ -239,7 +239,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                   color={textColors.textYlMain}
                 />
                 <Text
-                  className={`text-[18px] leading-[20px]`}
+                  className={`text-[17px] leading-[20px]`}
                   style={[
                     {
                       color: textColors.textYlMain,

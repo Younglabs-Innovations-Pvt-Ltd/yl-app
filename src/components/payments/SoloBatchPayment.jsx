@@ -295,11 +295,7 @@ const SoloBatchPayment = ({
             </Text>
           </View>
 
-          <View
-            className="py-4 rounded mt-5"
-            style={{
-              backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
-            }}>
+          <View className="py-4 rounded mt-5" style={{paddingBottom: 16}}>
             <View className="">
               {/* <Text
                 className="text-center w-full font-semibold text-xl"
@@ -309,9 +305,14 @@ const SoloBatchPayment = ({
                 }}>
                 Select a batch
               </Text> */}
-
               {/* Select age group */}
-              <View style={{paddingHorizontal: 6}}>
+              <View
+                style={{
+                  paddingHorizontal: 8,
+                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                  paddingVertical: 12,
+                  borderRadius: 4,
+                }}>
                 <Pressable
                   style={{
                     flexDirection: 'row',
@@ -381,7 +382,13 @@ const SoloBatchPayment = ({
               <Spacer space={4} />
 
               {/* Select batch */}
-              <View style={{paddingHorizontal: 6}}>
+              <View
+                style={{
+                  paddingHorizontal: 8,
+                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                  paddingVertical: 12,
+                  borderRadius: 4,
+                }}>
                 <Pressable
                   style={{
                     flexDirection: 'row',
@@ -492,7 +499,13 @@ const SoloBatchPayment = ({
               <Spacer space={4} />
 
               {/* Select time and date */}
-              <View style={{paddingHorizontal: 6}}>
+              <View
+                style={{
+                  paddingHorizontal: 8,
+                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                  paddingVertical: 12,
+                  borderRadius: 4,
+                }}>
                 <Pressable
                   style={{
                     flexDirection: 'row',
@@ -553,7 +566,13 @@ const SoloBatchPayment = ({
               <Spacer space={4} />
 
               {/* Pay now */}
-              <View style={{paddingHorizontal: 6}}>
+              <View
+                style={{
+                  paddingHorizontal: 8,
+                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                  paddingVertical: 12,
+                  borderRadius: 4,
+                }}>
                 <Pressable
                   onPress={() =>
                     setCollapsed(p => ({...p, payment: !p.payment}))
@@ -586,116 +605,7 @@ const SoloBatchPayment = ({
                 </Collapsible>
               </View>
             </View>
-
-            {/* <View className="flex-row justify-around w-full mt-3">
-                      {Object.entries(filteredBatches).map(([key, obj]) => {
-                        return (
-                          <Pressable
-                            className="py-2 rounded px-3 max-w-[32%] items-center"
-                            style={{
-                              backgroundColor:
-                                selectedLevelToBuy?.level == obj.level
-                                  ? textColors.textYlMain
-                                  : bgSecondaryColor,
-                            }}
-                            onPress={() => {
-                              handleBatchSelect(
-                                obj.level,
-                                obj?.offer,
-                                obj?.price,
-                              ),
-                                setSelectedLevelToBuy({
-                                  level: obj.level,
-                                  price: obj?.offer,
-                                });
-                            }}
-                            key={Math.random()}>
-                            <View className="items-center justify-center flex-1">
-                              <Text
-                                className="font-semibold text-[16px] leading-[18px] text-center"
-                                style={{
-                                  fontFamily: FONTS.headingFont,
-                                  color:
-                                    selectedLevelToBuy?.level == obj.level
-                                      ? 'white'
-                                      : textColors.textYlMain,
-                                }}>
-                                {getLevelName(obj.level)}
-                              </Text>
-
-                              <View className="flex-row">
-                                <Text
-                                  className=""
-                                  style={{color: textColors.textSecondary}}>
-                                  {ipData?.currency?.symbol} {obj?.offer}
-                                </Text>
-                                <Text
-                                  className="line-through ml-1"
-                                  style={{color: textColors.textSecondary}}>
-                                  {obj?.price}
-                                </Text>
-                              </View>
-                            </View>
-                          </Pressable>
-                        );
-                      })}
-                    </View> */}
-
-            {/* <View className="mt-2 w-full">
-              <View className="w-full items-center mt-8">
-                <Pressable
-                  className="w-[90%] border-[.4px] rounded overflow-hidden"
-                  style={{borderColor: textColors.textSecondary}}
-                  onPress={visibleDatePicker}>
-                  <View className="w-full flex-row">
-                    <View className="w-[75%] justify-center px-3">
-                      {date && date !== '' ? (
-                        <Text
-                          className=""
-                          style={{color: textColors.textPrimary}}>
-                          {moment(date).format('YYYY-MM-DD HH:mm')}
-                        </Text>
-                      ) : (
-                        <Text className="w-full text-gray-400">
-                          Click to select date
-                        </Text>
-                      )}
-                    </View>
-                    <View
-                      className="p-2 w-[25%] items-center"
-                      style={{backgroundColor: textColors.textYlMain}}>
-                      <Text className="text-white">Select</Text>
-                    </View>
-                  </View>
-                </Pressable>
-              </View>
-              <Text
-                className="mt-3 text-center w-full"
-                style={{
-                  color: textColors.textSecondary,
-                  fontFamily: FONTS.primaryFont,
-                }}>
-                Please select the date you would like to start
-              </Text>
-            </View> */}
           </View>
-
-          {/* <View className="my-5 items-center">
-            <Pressable
-              className="w-[95%] rounded py-2 items-center flex-row justify-center"
-              style={{backgroundColor: textColors.textYlMain}}
-              onPress={payNow}>
-              <Text
-                className="text-white font-semibold text-base"
-                style={{fontFamily: FONTS.primaryFont}}>
-                Buy Now
-              </Text>
-
-              {paynowLoading && (
-                <ActivityIndicator size={20} className="ml-3" color={'white'} />
-              )}
-            </Pressable>
-          </View> */}
         </View>
 
         <DateTimePickerModal

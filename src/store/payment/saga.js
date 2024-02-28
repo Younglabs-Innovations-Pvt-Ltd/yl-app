@@ -63,15 +63,12 @@ function* payOnTazapay({body, ipData}) {
     );
 
     if (checkOutSessionRes.status !== 200) {
-      console.log('can not generate checkOutSession token');
       yield put(makePaymentFailed('Something went wrong'));
       return;
     }
 
     const {token} = yield checkOutSessionRes.json();
-    console.log('token', token);
-    // const redirectUrl = `https://younglabs.in/yl_app/tazapay?token=${token}`;
-    const redirectUrl = `https://younglabs.in/payments/tazapay?token=${token}`;
+    const redirectUrl = `https://younglabs.in/yl_app/tazapay?token=${token}`;
 
     yield put(setLoading(false));
     yield Linking.openURL(redirectUrl);
