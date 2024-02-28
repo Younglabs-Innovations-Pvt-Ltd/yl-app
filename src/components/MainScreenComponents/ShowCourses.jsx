@@ -44,7 +44,9 @@ const ShowCourses = ({navigation}) => {
 
   useEffect(() => {
     if (ipData) {
-      dispatch(getCoursesForWelcomeScreen({country: ipData?.country_name}));
+      dispatch(
+        getCoursesForWelcomeScreen({country: ipData?.country_name || 'India'}),
+      );
     }
   }, [ipData, refreshCourses]);
 

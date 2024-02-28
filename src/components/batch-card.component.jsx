@@ -127,17 +127,16 @@ const BatchCard = ({
             <TextWrapper
               fs={23}
               className="font-semibold text-[28px]"
-              style={{color: textColors.textPrimary}}
-              color={
-                textColors.primary
-              }>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
+              style={{
+                color: textColors.textPrimary,
+              }}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
             <TextWrapper
               styles={{textDecorationLine: 'line-through'}}
               fs={17}
               className="mr-3 line-through"
-              color={
-                textColors.textSecondary
-              }>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
+              style={{
+                color: textColors.textSecondary,
+              }}>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
           </View>
         </View>
         <Spacer />

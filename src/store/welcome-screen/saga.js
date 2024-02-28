@@ -49,12 +49,12 @@ function* handleBookingStatus({payload: {phone, ipData}}) {
   try {
     // Check for length of a phone number according to country
     // Return true or false
-    const isValidPhone = isValidNumber(phone, ipData.country_code2);
+    // const isValidPhone = isValidNumber(phone, country.country_code2);
 
-    if (!isValidPhone) {
-      yield put(setErrorMessage('Please enter a valid number'));
-      return;
-    }
+    // if (!isValidPhone) {
+    //   yield put(setErrorMessage('Please enter a valid number'));
+    //   return;
+    // }
 
     const deviceId = yield getCurrentDeviceId();
     const deviceUID = yield DeviceInfo.getAndroidId();
@@ -72,12 +72,8 @@ function* handleBookingStatus({payload: {phone, ipData}}) {
       timezone: ipData.time_zone.offset_with_dst,
     };
 
-    console.log('leadBody', leadBody);
-
     const leadRes = yield createLead(leadBody);
     const leadData = yield leadRes.json();
-
-    console.log('leadData', leadData);
 
     if (leadData.customer === 'yes') {
       yield put(setCustomer('yes'));
@@ -199,7 +195,7 @@ function* fetchAllOrders({payload}) {
     // console.log('got response', response, ' got status', response.status);
 
     if (response.status !== 200) {
-      console.log("did not get response", response.status)
+      console.log('did not get response', response.status);
       yield put(userOrdersLoadingFailed('Something went Wrong'));
       return;
     }

@@ -56,7 +56,6 @@ const PostDemoAction = ({rescheduleClass}) => {
 
   // Check for rating from local storage
   // If rating then show post demos ctas
-  console.log("isNmi ", isNmi)
   useEffect(() => {
     dispatch(checkForRating());
   }, []);

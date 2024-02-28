@@ -69,7 +69,9 @@ function* payOnTazapay({body, ipData}) {
     }
 
     const {token} = yield checkOutSessionRes.json();
-    const redirectUrl = `https://younglabs.in/yl_app/tazapay?token=${token}`;
+    console.log('token', token);
+    // const redirectUrl = `https://younglabs.in/yl_app/tazapay?token=${token}`;
+    const redirectUrl = `https://younglabs.in/payments/tazapay?token=${token}`;
 
     yield put(setLoading(false));
     yield Linking.openURL(redirectUrl);
@@ -352,7 +354,6 @@ function* makeSoloPaymentSaga({payload}) {
 
       const rzRes = yield RazorpayCheckout.open(options);
       console.log('rzRes=', rzRes);
-      yield put(setLoading(false));
       if (rzRes.status_code === 200) {
         replace(SCREEN_NAMES.PAYMENT_SUCCESS);
       }
