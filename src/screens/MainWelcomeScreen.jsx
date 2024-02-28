@@ -78,7 +78,7 @@ const MainWelcomeScreen = ({navigation}) => {
     appRemark,
   } = useSelector(joinDemoSelector);
 
-  const {ipData} = useSelector(bookDemoSelector);
+  const {ipData, loading: loadings} = useSelector(bookDemoSelector);
   const {
     networkState: {isConnected},
   } = useSelector(networkSelector);
@@ -329,7 +329,7 @@ const MainWelcomeScreen = ({navigation}) => {
             </View>
           </ModalComponent>
         )}
-        {coursesLoading ? (
+        {coursesLoading || loadings?.ipDataLoading ? (
           <View className="rounded-md p-2 items-center">
             <ShimmerPlaceholder
               // shimmerWidthPercent={0.4}

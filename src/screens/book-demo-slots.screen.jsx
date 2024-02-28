@@ -306,11 +306,13 @@ const BookDemoSlots = ({
   ) : bookingSlots && bookingSlots.length > 0 ? (
     <>
       {/* {console.log("i am here")} */}
-      <View className=" w-full px-2 mt-5">
+      <View className=" w-full px-2 mt-2">
         <View className="p-1 bg-gray-300 rounded-md my-3">
-          <Text className="text-gray-700 ml-3 ">
-            Booking Free class for{' '}
-            <Text className="font-semibold">{childData?.childName}</Text>
+          <Text className="text-gray-700 ml-1 ">
+            Booking free class for{' '}
+            <Text className="font-semibold capitalize">
+              {childData?.childName}
+            </Text>
           </Text>
         </View>
         <View style={styles.slotsWrapper}>

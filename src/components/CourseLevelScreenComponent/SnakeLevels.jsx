@@ -92,7 +92,7 @@ const SnakeLevels = ({
     });
     console.log('currentOngoingClass?.classId', currentOngoingClass?.classId);
     const token = await auth().currentUser.getIdToken();
-    console.log('token', token);
+    // console.log('token', token);
     try {
       const API_URL = `${BASE_URL}/app/mycourse/classattendance`;
       const response = await fetch(API_URL, {

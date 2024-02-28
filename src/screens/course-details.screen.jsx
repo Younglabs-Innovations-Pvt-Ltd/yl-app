@@ -200,12 +200,6 @@ const CourseDetails = ({navigation, courseData}) => {
           style={[FONTS.heading, {color: textColors.textSecondary}]}>
           More About Course
         </Text>
-        <Spacer />
-        {/* <VideoPlayer
-          uri={courseVideos?.videoUri}
-          // poster={courseVideos?.coursePoster}
-        /> */}
-        <Spacer />
         {loading ? (
           <ActivityIndicator
             size={'large'}
@@ -214,7 +208,7 @@ const CourseDetails = ({navigation, courseData}) => {
           />
         ) : (
           <>
-            <View>
+            <View className="mt-2">
               <Text
                 className="text-center font-semibold"
                 style={[FONTS.subHeading, {color: textColors.textYlMain}]}>
@@ -294,7 +288,7 @@ const CourseDetails = ({navigation, courseData}) => {
             </View>
 
             {/* <Spacer /> */}
-            <View>
+            <View className="">
               {/* {console.log('selected level ', selectedLevelItemToShow)} */}
               {selectedLevelItemToShow && (
                 <CourseContent content={selectedLevelItemToShow?.content} />
@@ -310,10 +304,10 @@ const CourseDetails = ({navigation, courseData}) => {
 const CourseContent = ({content}) => {
   const {textColors} = useSelector(state => state.appTheme);
   return (
-    <View>
+    <View className="w-full overflow-hidden">
       {content?.map((item, index) => {
         return (
-          <View style={{paddingVertical: 1}} key={index}>
+          <View style={{paddingVertical: 1, marginTop: 12}} key={index}>
             <View
               style={{
                 flexDirection: 'row',
@@ -332,17 +326,30 @@ const CourseContent = ({content}) => {
               </Text>
             </View>
             <View
-              style={{paddingHorizontal: 8, width: '100%'}}
+              style={{paddingHorizontal: 18, width: '100%'}}
               className="mt-1">
-              {item?.points.map((point, index) => (
-                <View key={index.toString()}>
-                  <Text
-                    className="font-semibold"
-                    style={[FONTS.primary, {color: textColors.textSecondary}]}>
-                    {point}
-                  </Text>
-                </View>
-              ))}
+              {console.log('point', item?.points)}
+
+              {item?.points.map((point, index) => {
+                return (
+                  <View
+                    key={index}
+                    className="flex-row items-center my-[4px] justify-between">
+                    <View className="w-[10%]">
+                      <MIcon
+                        name="check"
+                        size={22}
+                        color={textColors.textYlMain}
+                      />
+                    </View>
+                    <Text
+                      className="break-words w-[90%]"
+                      style={[FONTS.primary]}>
+                      {point?.trim()}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
         );
@@ -356,8 +363,6 @@ export default CourseDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
   },
   ageGroup: {
     paddingVertical: 12,

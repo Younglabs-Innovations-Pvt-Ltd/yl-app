@@ -12,6 +12,7 @@ import {
   setNewOneToOneBookingStart,
   setOneToOneBookingSuccess,
   setOneToOneBookingFailed,
+  fetchIpDataFailed,
 } from './book-demo.reducer';
 
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
@@ -36,6 +37,7 @@ function* fetchIpData() {
     // console.log("got ip data", data)
     yield put(fetchIpDataSuccess(data));
   } catch (error) {
+    yield put(fetchIpDataFailed());
     console.log('Timezone error', error);
   }
 }

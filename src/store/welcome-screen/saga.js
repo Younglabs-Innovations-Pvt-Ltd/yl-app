@@ -109,6 +109,7 @@ function* startBookingStatus() {
 
 function* startFetchingCoursesForLandingPage({payload}) {
   try {
+    console.log("payload", payload);
     const country = payload.country?.toLowerCase();
     console.log('country: ', country);
 

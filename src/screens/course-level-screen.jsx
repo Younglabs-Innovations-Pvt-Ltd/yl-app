@@ -22,7 +22,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {Showtoast} from '../utils/toast';
 
 const CourseLevelScreen = ({navigation, route}) => {
-  const {serviceRequestId} = route.params;
+  const {serviceRequestId, courseName} = route.params;
   const [allClasses, setAllClasses] = useState([]);
   const [enabledFeatures, setEnabledFeatures] = useState([]);
   const [features, setFeatures] = useState([]);
@@ -41,6 +41,16 @@ const CourseLevelScreen = ({navigation, route}) => {
     const leadId = user?.leadId;
     dispatch(startFetchServiceRequestClasses({leadId, serviceRequestId}));
   };
+
+  useEffect(() => {
+    console.log('here', courseName);
+    if (courseName) {
+      console.log('settting course name');
+      navigation.setOptions({
+        title: courseName || 'Course Data',
+      });
+    }
+  }, [courseName]);
 
   useEffect(() => {
     console.log('homeworksubmittedsuccessfully', homeworksubmittedsuccessfully);

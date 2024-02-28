@@ -71,12 +71,12 @@ const CourseDetailsScreen = ({navigation, route}) => {
       scrollViewRef.current.scrollToEnd({animated: true});
   };
 
-  useEffect(() => {
-    console.log('selected tab is', selectedTab);
-    if (selectedTab !== 'courseDetails') {
-      scrollToBottom();
-    }
-  }, [selectedTab]);
+  // useEffect(() => {
+  //   console.log('selected tab is', selectedTab);
+  //   if (selectedTab !== 'courseDetails') {
+  //     scrollToBottom();
+  //   }
+  // }, [selectedTab]);
 
   if (!courseDetails) {
     return (

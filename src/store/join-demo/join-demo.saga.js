@@ -85,7 +85,7 @@ export function* fetchDemoDetailsFromPhone({payload}) {
       phone: JSON.parse(callingCode.concat(phone)),
     });
 
-    console.log('detailsResponse', detailsResponse.status)
+    console.log('detailsResponse', detailsResponse.status);
     let bookingDetails = yield detailsResponse.json();
 
     if (response.status === 400) {
@@ -106,6 +106,7 @@ export function* fetchDemoDetailsFromPhone({payload}) {
     yield put(setContentData({improvements, reviews, tips, content}));
   } catch (error) {
     console.log('fetchDemoDetailsFromPhoneError', payload, error);
+    yield put(setLoading(false));
     // yield put(setBookingDetailsFailed("Something went wrong, try again"))
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setLoading(false));
@@ -177,7 +178,7 @@ function* getPhoneFromStorage() {
 function* onSetDemoData({payload: {demoData, bookingDetails}}) {
   try {
     const demoTime = demoData?.demoDate?._seconds * 1000;
-    console.log("demo time is", demoTime)
+    console.log('demo time is', demoTime);
 
     if (demoTime) {
       const isClassOngoing =

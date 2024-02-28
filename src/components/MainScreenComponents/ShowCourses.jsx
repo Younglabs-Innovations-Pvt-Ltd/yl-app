@@ -19,10 +19,10 @@ const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 const {height, width} = Dimensions.get('window');
 const ShowCourses = ({navigation}) => {
   const coursesNameByCategory = {
-    handwriting: 'Handwriting Improvement Courses',
+    handwriting: 'Handwriting  Courses',
     learning: 'English Learning',
     mathematics: 'Mathematics Courses',
-    others: 'Other Academic Courses',
+    others: 'Academic Courses',
   };
 
   const dispatch = useDispatch();

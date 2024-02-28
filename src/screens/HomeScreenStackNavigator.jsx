@@ -15,10 +15,9 @@ const HomeScreenStackNavigator = () => {
       screenOptions={{
         headerStyle: {
           backgroundColor: textColors.textYlMain,
-          borderColor: textColors.textSecondary,
           elevation: 1.12,
         },
-        headerTintColor: "white",
+        headerTintColor: 'white',
         headerTitleStyle: {
           fontWeight: '500',
           fontSize: 18,

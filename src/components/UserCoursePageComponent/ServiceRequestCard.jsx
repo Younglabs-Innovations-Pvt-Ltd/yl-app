@@ -43,6 +43,7 @@ const ServiceRequestCard = ({
               // console.log('navigate to course page', course?.serviceRequestId);
               navigation.navigate(SCREEN_NAMES.COURSE_LEVEL_PAGE, {
                 serviceRequestId: course?.serviceRequestId,
+                courseName: alternativeNameOnApp,
               });
             }}
             className="w-[92vw] h-[160px] rounded-lg shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px] flex flex-row justify-between items-center mt-2 pl-3">

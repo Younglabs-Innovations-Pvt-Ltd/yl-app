@@ -282,7 +282,7 @@ const DemoClassScreen = ({navigation}) => {
         source={require('../assets/images/background2.jpeg')}
         resizeMode="cover">
         {/* <LanguageSelection /> */}
-        <View style={{flex: 1}}>
+        <View style={{}} className="py-4">
           <View style={[styles.container]}>
             <View style={{position: 'relative'}}>
               <Animated.Image
@@ -304,7 +304,7 @@ const DemoClassScreen = ({navigation}) => {
         </View>
         {/* Footer */}
         <Animated.View
-          className=""
+          className="flex-1"
           style={[
             styles.footer,
             {
@@ -408,7 +408,11 @@ const DemoClassScreen = ({navigation}) => {
                     fs={16}
                     ff={FONTS.primaryFont}
                     color={textColors.textSecondary}
-                    style={{fontWeight: 400, fontFamily: FONTS.primaryFont}}>
+                    style={{
+                      fontWeight: 400,
+                      fontFamily: FONTS.primaryFont,
+                      color: textColors.textSecondary,
+                    }}>
                     Don't have WhatsApp?
                   </TextWrapper>
                 </Pressable>
@@ -420,20 +424,24 @@ const DemoClassScreen = ({navigation}) => {
                   <TextWrapper
                     fs={16}
                     ff={FONTS.primaryFont}
-                    color={textColors.textSecondary}>
+                    color={textColors.textSecondary}
+                    style={{
+                      fontWeight: 400,
+                      fontFamily: FONTS.primaryFont,
+                      color: textColors.textSecondary,
+                    }}>
                     Have WhatsApp number?
                   </TextWrapper>
                 </Pressable>
               )}
             </View>
-            <Spacer />
             <Seperator text={'OR'} />
             <TouchableOpacity
               activeOpacity={0.8}
               style={btnContinueStyle}
               disabled={loading}
               onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}
-              className={`w-full items-center justify-center mt-2 rounded-full py-3 bg-[${colorYlMain}]`}>
+              className={`w-full items-center justify-center mt-1 rounded-full py-3 bg-[${colorYlMain}]`}>
               <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
                 Customer Log In
               </TextWrapper>
@@ -479,10 +487,8 @@ export default DemoClassScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 16,
     position: 'relative',
-    marginTop: deviceWidth * 0.2,
   },
   wrapper: {
     flex: 1,
@@ -560,7 +566,6 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
   },
   footer: {
-    flex: 1,
     justifyContent: 'flex-end',
   },
   footerContent: {

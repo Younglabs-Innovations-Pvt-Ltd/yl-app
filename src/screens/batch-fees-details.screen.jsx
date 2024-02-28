@@ -201,9 +201,11 @@ const BatchFeeDetails = ({navigation, courseData}) => {
       <View className="items-center">
         <View className="flex-row border rounded-md border-gray-200">
           {isGroupCourseAvailable && (
-            <Pressable onPress={() => setSelectedCourseTypeToBuy('group')}>
+            <Pressable
+              onPress={() => setSelectedCourseTypeToBuy('group')}
+              className={`${isOneToOneCourseAvailable ? 'w-[50%]' : 'w-full'}`}>
               <View
-                className="rounded py-2 px-4 items-center"
+                className="rounded py-2 px-4 items-center "
                 style={btnStyle('group')}>
                 <MIcon
                   name="account-group"
@@ -225,7 +227,9 @@ const BatchFeeDetails = ({navigation, courseData}) => {
           )}
 
           {isOneToOneCourseAvailable && (
-            <Pressable onPress={() => setSelectedCourseTypeToBuy('solo')}>
+            <Pressable
+              onPress={() => setSelectedCourseTypeToBuy('solo')}
+              className={`${isGroupCourseAvailable ? 'w-[50%]' : 'w-full'}`}>
               <View
                 className="rounded py-2 px-4 items-center"
                 style={btnStyle('solo')}>

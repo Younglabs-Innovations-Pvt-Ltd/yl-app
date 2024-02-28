@@ -3,6 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const INITIAL_STATE = {
   timezone: '',
   ipData: null,
+  ipDataLoading: false,
   country: {callingCode: ''},
   bookingSlots: [],
   errorMessage: '',
@@ -32,7 +33,10 @@ const reducer = {
   fetchIpDataSuccess(state, action) {
     state.loading.ipDataLoading = false;
     state.ipData = action.payload;
-    state.timezone = action.payload.time_zone.offset_with_dst;
+    state.timezone = action?.payload?.time_zone?.offset_with_dst;
+  },
+  fetchIpDataFailed(state){
+    state.loading.ipDataLoading = false
   },
   startFetchingBookingSlots(state) {
     state.loading.bookingSlotsLoading = true;
@@ -118,6 +122,7 @@ export const {
   setTimezone,
   startFetchingIpData,
   fetchIpDataSuccess,
+  fetchIpDataFailed,
   startFetchingBookingSlots,
   fetchBookingSlotsSuccess,
   setIpDataLoadingState,

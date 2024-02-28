@@ -273,14 +273,9 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
   const {width, height} = Dimensions.get('window');
 
   return (
-    <View
-      className="flex-1 items-center justify-center w-full h-full"
-      style={{height: place ? height - 190 : height - 130}}>
-      <View className="w-full flex-1 rounded-lg items-center overflow-hidden pb-[70px]">
-        <View
-          className=" my-2 w-full justify-between items-center flex-row rounded-md border border-gray-200"
-          // style={{backgroundColor: bgSecondaryColor}}
-        >
+    <View className="flex-1 items-center justify-center w-full">
+      <View className="w-full flex-1 rounded-lg items-center overflow-hidden">
+        <View className="my-1 w-full justify-between items-center flex-row rounded-md border border-gray-200">
           {(courseData?.demoTypeAvailable === 'group' ||
             courseData?.demoTypeAvailable === 'both') && (
             <Pressable
@@ -296,11 +291,11 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
               onPress={() => setSelectedDemoType('group')}>
               <MIcon
                 name="account-group"
-                size={35}
+                size={30}
                 color={textColors.textYlMain}
               />
               <Text
-                className={`text-[18px]`}
+                className={`text-[18px] leading-[20px]`}
                 style={[
                   {
                     color: textColors.textYlMain,
@@ -310,7 +305,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
                 Group Session
               </Text>
               <Text
-                className="text-[13px] text-center"
+                className="text-[13px] text-center leading-[15px]"
                 style={{
                   color: textColors.textSecondary,
                   fontFamily: FONTS.primaryFont,
@@ -337,11 +332,11 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
             >
               <MIcon
                 name="account-supervisor"
-                size={35}
+                size={30}
                 color={textColors.textYlMain}
               />
               <Text
-                className={`text-[18px]`}
+                className={`text-[18px] leading-[20px]`}
                 style={[
                   {
                     color: textColors.textYlMain,
@@ -351,7 +346,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
                 One To One Session
               </Text>
               <Text
-                className="text-[13px] text-center"
+                className="text-[13px] text-center leading-[15px]"
                 style={{
                   color: textColors.textSecondary,
                   fontFamily: FONTS.primaryFont,
@@ -368,7 +363,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
             style={[FONTS.subHeading, {color: textColors.textSecondary}]}>
             Steps To Book
           </Text>
-          <View className="flex-row py-2  w-[100%] justify-between ">
+          <View className="flex-row pt-2  w-[100%] justify-between ">
             {bookingSteps?.map((step, i) => {
               return (
                 <Pressable
@@ -448,7 +443,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
         </View>
 
         {currentStep !== 3 && (
-          <View className="flex-row justify-around p-1 absolute bottom-0 w-full items-center h-[70px]">
+          <View className="flex-row justify-around p-1 w-full items-center mt-4">
             <Pressable
               className="rounded-full w-[45%] items-center border"
               style={{borderColor: textColors.textYlMain}}
