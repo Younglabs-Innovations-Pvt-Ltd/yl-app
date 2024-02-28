@@ -19,7 +19,6 @@ const CourseCard = ({
     darkMode,
     addMoreCourseCardbgColor,
   } = useSelector(state => state.appTheme);
-  console.log('thumbnailUrl', thumbnailUrl);
   return (
     <View
       key={course?.level}
@@ -44,7 +43,7 @@ const CourseCard = ({
             course={data}
             userName={userName}
             alternativeNameOnApp={alternativeNameOnApp}
-            thumbnailUrl={thumbnailUrl}
+            thumbnailUrl={thumbnailUrl || ""}
             navigation={navigation}
           />
         );

@@ -278,7 +278,7 @@ function* makeSoloPaymentSaga({payload}) {
     // console.log("getting token", token)
 
     console.log('paymentMethod', paymentMethod);
-    yield put(setLoading(false));
+    // yield put(setLoading(false));
     // console.log('going to send body', body);
 
     if (paymentMethod === 'tazapay') {

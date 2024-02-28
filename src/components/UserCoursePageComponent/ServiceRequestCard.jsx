@@ -34,7 +34,7 @@ const ServiceRequestCard = ({
 
   return (
     <View className="overflow-hidden rounded-xl relative mt-[6px] border border-solid border-gray-200">
-      <ImageBackground source={{uri: `${thumbnailUrl}`}}>
+      <ImageBackground source={{uri: `${thumbnailUrl || " "}`}}>
         <LinearGradient
           start={{x: 0.5, y: -0.3}}
           colors={['#e9dcdc78', '#161414a2']}>

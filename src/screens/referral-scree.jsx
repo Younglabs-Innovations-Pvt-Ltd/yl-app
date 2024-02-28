@@ -39,7 +39,7 @@ const Referral = ({route}) => {
   };
 
   const shareOnWhatsApp = async () => {
-    let text = `I really liked Younglabs courses for my child.\n\nAdding you as a referral. You will get 20% off on Younglabs courses when you buy on their app Or website using the code: ${referralCode}\n\nWebsite: www.younglabs.in`;
+    let text = `I really liked Younglabs courses for my child.\n\nAdding you as a referral. You will get 15% off on Younglabs courses when you buy on their app Or website using the code: ${referralCode}\n\nWebsite: www.younglabs.in`;
     let whatsAppUrl = '';
 
     text = encodeURIComponent(text);

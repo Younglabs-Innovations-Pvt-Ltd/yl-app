@@ -99,6 +99,7 @@ const Payment = ({navigation, route}) => {
   const {customer, user} = useSelector(authSelector);
   const dispatch = useDispatch();
   const {children} = useSelector(userSelector);
+  console.log("loading is0", loading)
   const {
     currentAgeGroup,
     currentSelectedBatch,
@@ -160,7 +161,8 @@ const Payment = ({navigation, route}) => {
   useEffect(() => {
     if (currentSelectedBatch) {
       if (currentSelectedBatch?.type === 'solo') {
-        const dateAndTime = moment(date).format('MMMM Do [at] h:mm A');
+        const dateAndTime = moment(currentSelectedBatch?.startDate).format('MMMM Do [at] h:mm A');
+        // console.log("date was", currentSelectedBatch?.)
         setDateTime(dateAndTime);
         return;
       }

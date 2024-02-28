@@ -193,7 +193,7 @@ const BookDemoSlots = ({
           {console.log('showdate is', slot.showDate)}
           <TextWrapper
             color={
-              currentSlotDate === slot.showDate ? COLORS.white : COLORS.black
+              currentSlotDate === slot.showDate ? COLORS.white : textColors.textSecondary
             }>
             {slot.showDate}
           </TextWrapper>
@@ -221,7 +221,7 @@ const BookDemoSlots = ({
             color={
               currentSlotTime.showTimings === slotTime.showTimings
                 ? COLORS.white
-                : COLORS.black
+                : textColors.textSecondary
             }>
             {slotTime.showTimings}
           </TextWrapper>

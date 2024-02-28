@@ -60,13 +60,13 @@ function* fetchUserSaga({payload}) {
     if (!payload) {
       return;
     }
-    console.log('getting response', payload);
+    // console.log('getting response', payload);
     const res = yield getCustomers(payload);
-    console.log('res status', res.status);
+    // console.log('res status', res.status);
     const data = yield res.json();
     // console.log('got user data', data);
     if (data?.data?.customer === 'yes') {
-      console.log('sttin customer');
+      // console.log('sttin customer');
       yield put(setIsCustomer(true));
     }
 
@@ -76,11 +76,11 @@ function* fetchUserSaga({payload}) {
       let objWithoutBooking = arr.filter(item => !item.bookingId);
       let sortedList = objWithBooking.sort((a, b) => b.bookingId - a.bookingId);
       let finalArray = [...sortedList, ...objWithoutBooking];
-      console.log(
-        'setting current Child',
-        finalArray[0]?.name,
-        finalArray[0].bookingId,
-      );
+      // console.log(
+      //   'setting current Child',
+      //   finalArray[0]?.name,
+      //   finalArray[0].bookingId,
+      // );
       yield put(setCurrentChild(finalArray[0]));
       yield put(setChildren(finalArray));
     } else {

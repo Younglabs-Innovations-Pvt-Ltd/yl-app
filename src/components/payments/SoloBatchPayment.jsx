@@ -112,35 +112,78 @@ const SoloBatchPayment = ({
   const visibleDatePicker = () => setVisible(true);
   const hideDatePicker = () => setVisible(false);
 
-  const setSelectedDate = date => {
-    const dateSelectd = moment(date);
-    const dateToStartBatch = moment().add(1, 'days');
+  const verifyDate = date => {
+    if (!date || date === '') {
+      Showtoast({text: 'Please Select a date', toast, type: 'danger'});
+      return;
+    }
 
-    if (dateSelectd.isBefore(dateToStartBatch)) {
-      console.log('select date from today onwards');
+    const dateSelectd = moment(date);
+    const today = moment().startOf('day');
+    const tomorrow = today.clone().add(1, 'day');
+    const dateToStartBatch = tomorrow.clone().add(1, 'day');
+
+    if (dateSelectd.isBefore(tomorrow)) {
       Showtoast({
         text: 'Select date from Tomorrow onwards',
         toast,
         type: 'danger',
       });
-      hideDatePicker();
-      return;
+      return false;
     }
 
     const differenceInDays = dateSelectd.diff(dateToStartBatch, 'days');
+    console.log('difference in days is', differenceInDays);
+
     if (differenceInDays > 15) {
       Showtoast({
         text: 'Choose Demo date between 15 days span',
         toast,
         type: 'danger',
       });
-      hideDatePicker();
+      return false;
+    }
+    return true;
+  };
+
+  const setSelectedDate = date => {
+    if (!verifyDate(date)) {
+      hideDatePicker()
       return;
     }
-
+    console.log("setting date is", date);
     setDate(date);
     dispatch(setCurrentSelectedBatch({startDate: date, type: 'solo'}));
     hideDatePicker();
+
+    // const dateSelectd = moment(date);
+    // const dateToStartBatch = moment().add(1, 'days');
+
+    // if (dateSelectd.isBefore(dateToStartBatch)) {
+    //   console.log('select date from today onwards');
+    //   Showtoast({
+    //     text: 'Select date from Tomorrow onwards',
+    //     toast,
+    //     type: 'danger',
+    //   });
+    //   hideDatePicker();
+    //   return;
+    // }
+
+    // const differenceInDays = dateSelectd.diff(dateToStartBatch, 'days')  ;
+    // if (differenceInDays > 15) {
+    //   Showtoast({
+    //     text: 'Choose Demo date between 15 days span',
+    //     toast,
+    //     type: 'danger',
+    //   });
+    //   hideDatePicker();
+    //   return;
+    // }
+
+    // setDate(date);
+    // dispatch(setCurrentSelectedBatch({startDate: date, type: 'solo'}));
+    // hideDatePicker();
   };
 
   const {currentAgeGroup} = useSelector(courseSelector);

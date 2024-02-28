@@ -16,7 +16,7 @@ const Input = ({noBorder, ...props}) => {
       fontSize: 18,
       letterSpacing: 1.15,
       fontFamily: FONTS.roboto,
-      color: textColors.textSecondary,
+      color: 'gray',
     },
   });
 
@@ -24,7 +24,10 @@ const Input = ({noBorder, ...props}) => {
     <TextInput
       {...props}
       selectionColor={COLORS.black}
-      style={[styles.input, {borderBottomWidth: noBorder ? 0 : 1}]}
+      style={[
+        styles.input,
+        {borderBottomWidth: noBorder ? 0 : 1},
+      ]}
       placeholderTextColor={'gray'}
     />
   );

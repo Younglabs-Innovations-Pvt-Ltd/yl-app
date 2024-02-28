@@ -12,14 +12,20 @@ import {authSelector} from '../store/auth/selector';
 import BottomSheetComponent from './BottomSheetComponent';
 import CustomerSupportFeature from './CourseLevelScreenComponent/features/customer-support-feature';
 
-const shareApp = async () => {
-  const message =
-    'I really liked Younglabs handwriting improvement App. You can try it as well.';
+const shareApp = async (customer, referralCode) => {
+  console.log('in tababr comp', referralCode, customer);
+
+  let message;
+  if (customer === 'yes') {
+    message = `I really liked Younglabs courses for my child.\n\nAdding you as a referral. You will get 15% off on Younglabs courses when you buy on their app Or website using the code: ${referralCode}\n\nWebsite: www.younglabs.in`;
+  } else {
+    message = `I really liked Younglabs handwriting improvement App. You can try it as well.`;
+  }
   const url = 'https://play.google.com/store/apps/details?id=com.younglabs';
   try {
     await Share.open({
       title: 'Younglabs',
-      message: `${message} \n Download app now: ${url}`,
+      message: `${message} \nDownload app now: ${url}`,
     });
   } catch (error) {
     console.log(error);
@@ -34,7 +40,7 @@ function Tabbar({state, descriptors, navigation}) {
     state => state.appTheme,
   );
 
-  const {customer} = useSelector(authSelector);
+  const {user, customer} = useSelector(authSelector);
 
   const Icons = (name, focused) => {
     switch (name) {
@@ -164,7 +170,7 @@ function Tabbar({state, descriptors, navigation}) {
                 accessibilityState={isFocused ? {selected: true} : {}}
                 accessibilityLabel={options.tabBarAccessibilityLabel}
                 testID={options.tabBarTestID}
-                onPress={shareApp}
+                onPress={() => shareApp(customer, user?.referralCode)}
                 style={{flex: 1, alignItems: 'center'}}>
                 <Icon
                   key={route.key}

@@ -19,17 +19,17 @@ function* fetchAllClasses({payload}) {
     });
     if (response.status != 200) {
       console.log('leadId1: ', payload.leadId);
-    console.log('ServiceRequest1: ', payload.serviceRequestId);
-    // console.log('token1: ', token);
-    console.log('response Status1: ', response.status);
+      console.log('ServiceRequest1: ', payload.serviceRequestId);
+      // console.log('token1: ', token);
+      console.log('response Status1: ', response.status);
       console.log('Failed to fetch1', response);
       return;
     }
     const data = yield response.json();
-    console.log('leadId: ', payload.leadId);
-    console.log('ServiceRequest: ', payload.serviceRequestId);
-    console.log('token: ', token);
-    console.log('response Status: ', response.status);
+    // console.log('leadId: ', payload.leadId);
+    // console.log('ServiceRequest: ', payload.serviceRequestId);
+    // console.log('token: ', token);
+    // console.log('response Status: ', response.status);
     // console.log('getClassesData', data);
     yield put(fetchServiceRequestClassesSuccess(data));
   } catch (error) {

@@ -40,7 +40,7 @@ const ShowCourses = ({navigation}) => {
     }
   }, [ipData]);
 
-  // console.log("ip data is", ipData?.country_name)
+  // console.log("ip data is", ipData)
 
   useEffect(() => {
     if (ipData) {

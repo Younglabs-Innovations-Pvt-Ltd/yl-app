@@ -199,21 +199,21 @@ const BatchFeeDetails = ({navigation, courseData}) => {
   return (
     <>
       <View className="items-center">
-        <View className="flex-row border rounded-md border-gray-200">
+        <View className="flex-row border rounded-md border-gray-200 max-w-[90%]">
           {isGroupCourseAvailable && (
             <Pressable
               onPress={() => setSelectedCourseTypeToBuy('group')}
               className={`${isOneToOneCourseAvailable ? 'w-[50%]' : 'w-full'}`}>
               <View
-                className="rounded py-2 px-4 items-center "
+                className="rounded py-1 px-4 items-center "
                 style={btnStyle('group')}>
                 <MIcon
                   name="account-group"
-                  size={35}
+                  size={30}
                   color={textColors.textYlMain}
                 />
                 <Text
-                  className={`text-[18px]`}
+                  className={`text-[18px] leading-[20px]`}
                   style={[
                     {
                       color: textColors?.textYlMain,
@@ -231,15 +231,15 @@ const BatchFeeDetails = ({navigation, courseData}) => {
               onPress={() => setSelectedCourseTypeToBuy('solo')}
               className={`${isGroupCourseAvailable ? 'w-[50%]' : 'w-full'}`}>
               <View
-                className="rounded py-2 px-4 items-center"
+                className="rounded py-1 px-4 items-center"
                 style={btnStyle('solo')}>
                 <MIcon
                   name="account-supervisor"
-                  size={35}
+                  size={30}
                   color={textColors.textYlMain}
                 />
                 <Text
-                  className={`text-[18px]`}
+                  className={`text-[18px] leading-[20px]`}
                   style={[
                     {
                       color: textColors.textYlMain,
@@ -256,7 +256,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
 
       {selectedCourseTypeToBuy === 'solo' ? (
         showPriceType !== 'group' && showPriceType !== 'none' ? (
-          <View className="mt-7" style={{backgroundColor: bgColor}}>
+          <View className="mt-2" style={{backgroundColor: bgColor}}>
             <SoloBatchPayment
               courseData={courseData}
               ipData={ipData}
@@ -287,7 +287,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
             <ScrollView
               showsVerticalScrollIndicator={false}
               style={{flex: 1}}
-              contentContainerStyle={{padding: 16}}>
+              contentContainerStyle={{padding: 2}}>
               {/* {console.log('courseData.thumbnailUrl', courseData.thumbnailUrl)} */}
               <View style={{paddingVertical: 16}} className="flex-1">
                 <Image

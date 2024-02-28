@@ -328,7 +328,6 @@ const CourseContent = ({content}) => {
             <View
               style={{paddingHorizontal: 18, width: '100%'}}
               className="mt-1">
-              {console.log('point', item?.points)}
 
               {item?.points.map((point, index) => {
                 return (
@@ -344,7 +343,7 @@ const CourseContent = ({content}) => {
                     </View>
                     <Text
                       className="break-words w-[90%]"
-                      style={[FONTS.primary]}>
+                      style={[FONTS.primary , {color:textColors.textSecondary}]}>
                       {point?.trim()}
                     </Text>
                   </View>

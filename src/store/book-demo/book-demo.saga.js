@@ -14,11 +14,13 @@ import {
   setOneToOneBookingFailed,
   fetchIpDataFailed,
 } from './book-demo.reducer';
+import {localStorage} from '../../utils/storage/storage-provider';
 
 import {GEO_LOCATION_API, BASE_URL, GET_SLOTS_API} from '@env';
 import {makeNewBooking, addNewSoloBooking} from '../../utils/api/yl.api';
 import {fetchUserFormLoginDetails} from '../auth/reducer';
 import Snackbar from 'react-native-snackbar';
+import {US_ipData} from '../../assets/data/US_ipData';
 
 /**
  * @author Shobhit
@@ -29,11 +31,37 @@ import Snackbar from 'react-native-snackbar';
  */
 function* fetchIpData() {
   try {
+    // Setp1 : getting the saved ip data from local storage and retrun it if exists
+    const dataInLs = localStorage.getString('ipDataInLs');
+    console.log('checking data in local storage');
+    if (dataInLs) {
+      const parsedData = JSON.parse(dataInLs);
+      if (parsedData?.country_name) {
+        console.log('setting data in ip Data and returning from local storage');
+        yield put(fetchIpDataSuccess(parsedData));
+        return;
+      }
+    }
+
+    console.log('going for step 2');
+    // step2: if ipdata is not in ls then get from api
     const response = yield fetch(GEO_LOCATION_API, {
       method: 'GET',
     });
 
+    console.log('going for step 3');
+    if (response.status !== 200) {
+      // step3: if did not get the data from api then alert for api calls limit exceeded
+      console.log('api limit exceeded');
+      // step4: set Default US ipData when api calls limit exceeded
+      console.log('setting default data of Us', US_ipData);
+      yield put(fetchIpDataSuccess(US_ipData));
+      return;
+    }
+
     const data = yield response.json();
+    console.log('setting data in localStorage');
+    localStorage.set('ipDataInLs', JSON.stringify(data));
     // console.log("got ip data", data)
     yield put(fetchIpDataSuccess(data));
   } catch (error) {

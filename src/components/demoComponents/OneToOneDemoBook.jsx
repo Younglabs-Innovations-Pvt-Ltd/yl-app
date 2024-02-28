@@ -69,21 +69,36 @@ const OneToOneDemoBook = ({}) => {
   };
 
   const dateCheckPassed = date => {
+    if (!date || date === '') {
+      Showtoast({text: 'Please Select a date', toast, type: 'danger'});
+      return;
+    }
+
     const dateSelectd = moment(date);
-    const dateToStartBooking = moment().add(1 , "days");
+    const today = moment().startOf('day');
+    const tomorrow = today.clone().add(1, 'day');
+    const dateToStartBatch = tomorrow.clone().add(1, 'day');
 
-    if (dateSelectd.isBefore(dateToStartBooking)) {
-      console.log('select date from today onwards');
-      Showtoast({text: 'Select date from Tomorrow onwards', toast});
+    if (dateSelectd.isBefore(tomorrow)) {
+      Showtoast({
+        text: 'Select date from Tomorrow onwards',
+        toast,
+        type: 'danger',
+      });
       return false;
     }
 
-    const differenceInDays = dateSelectd.diff(dateToStartBooking, 'days');
-    if (differenceInDays > 7) {
-      Showtoast({text: 'Choose Demo date between 7 days span', toast});
+    const differenceInDays = dateSelectd.diff(dateToStartBatch, 'days');
+    console.log('difference in days is', differenceInDays);
+
+    if (differenceInDays > 15) {
+      Showtoast({
+        text: 'Choose Demo date between 15 days span',
+        toast,
+        type: 'danger',
+      });
       return false;
     }
-
     return true;
   };
 
