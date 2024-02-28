@@ -20,7 +20,6 @@ import auth from '@react-native-firebase/auth';
 import {BASE_URL} from '@env';
 import Icon from '../icon.component';
 import {userSelector} from '../../store/user/selector';
-import smile from '../../assets/images/512.gif';
 import FastImage from 'react-native-fast-image';
 
 const SnakeLevels = ({
