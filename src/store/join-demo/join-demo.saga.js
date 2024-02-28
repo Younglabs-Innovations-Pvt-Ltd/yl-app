@@ -331,7 +331,7 @@ function* saveUserRating({payload: {bookingId, rating}}) {
     const response = yield call(saveFreeClassRating, {bookingId, rating});
 
     if (response.status === 200) {
-      localStorage.set(LOCAL_KEYS.IS_RATED, 'true');
+      localStorage.set(LOCAL_KEYS.IS_RATED, true);
       yield put(setIsRated(true));
     }
   } catch (error) {
@@ -342,8 +342,9 @@ function* saveUserRating({payload: {bookingId, rating}}) {
 // Check rating from local storage
 function* checkRatingFromLocalStorage() {
   try {
-    const rating = localStorage.getString(LOCAL_KEYS.IS_RATED);
-    if (rating === 'true') {
+    const rating = localStorage.getBoolean(LOCAL_KEYS.IS_RATED);
+    console.log('rating', rating);
+    if (rating) {
       yield put(setIsRated(true));
     }
     yield put(setRatingLoading(false));
@@ -374,16 +375,20 @@ function* markAttendaceSaga({payload: {bookingId}}) {
  * @description Mark need more info
  */
 function* handleNMI({payload: {bookingId, courseId, courses}}) {
-  console.log(bookingId, courseId);
-
   try {
     const response = yield saveNeedMoreInfo({bookingId});
     if (response.status === 200) {
       yield put(markNMISuccess());
-      yield call(redirectToCourse, {navigate, courses, courseId});
+      yield call(redirectToCourse, {
+        navigate,
+        courses,
+        courseId,
+        subScreen: 'payAndEnroll',
+      });
     }
   } catch (error) {
     console.log('saveNMIError', error.message);
+    yield put(markNMISuccess());
     // if (error.message === ERROR_MESSAGES.NETWORK_STATE_ERROR) {
     //   yield put(setCurrentNetworkState(markNMI({bookingId})));
     // } else {

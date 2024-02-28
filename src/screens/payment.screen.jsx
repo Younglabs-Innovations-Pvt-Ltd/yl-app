@@ -183,11 +183,11 @@ const Payment = ({navigation, route}) => {
     setAmount(finalPrice);
   }, [couponDiscount, creditsValueApplied, price, referralDiscount]);
 
-  useEffect(() => {
-    if (payment === MESSAGES.PAYMENT_SUCCESS) {
-      setVisible(true);
-    }
-  }, [payment]);
+  // useEffect(() => {
+  //   if (payment === MESSAGES.PAYMENT_SUCCESS) {
+  //     setVisible(true);
+  //   }
+  // }, [payment]);
 
   const saveParentName = async () => {
     try {
