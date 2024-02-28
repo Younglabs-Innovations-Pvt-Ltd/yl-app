@@ -7,12 +7,17 @@ const ClassWiseHomeWorkFeature = ({serviceReqClassesData}) => {
   const [classWiseHomeWork, setClassWiseHomeWork] = useState([]);
   useEffect(() => {
     if (serviceReqClassesData) {
-      let classWiseHomeWorkList;
+      let classWiseHomeWorkList = [];
+      console.log(
+        'serviceReqClassesData?.classes',
+        serviceReqClassesData?.classes,
+      );
       serviceReqClassesData?.classes?.map(studentClass => {
-        classWiseHomeWork.push({
-          classNumber: studentClass?.classNumer,
+        const homeworkData = {
+          classNumber: studentClass?.classNumber,
           homeWork: studentClass?.homework,
-        });
+        };
+        classWiseHomeWorkList.push(homeworkData);
       });
       setClassWiseHomeWork(classWiseHomeWorkList);
     }
@@ -33,7 +38,7 @@ const ClassWiseHomeWorkFeature = ({serviceReqClassesData}) => {
                 </Text>
                 <Text
                   style={{color: textColors?.textSecondary}}
-                  className="text-[15px]">
+                  className="text-[15px] ">
                   {homeWork}
                 </Text>
               </View>

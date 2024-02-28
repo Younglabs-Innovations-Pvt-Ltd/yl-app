@@ -1,4 +1,11 @@
-import {View, ScrollView, Dimensions, Pressable} from 'react-native';
+import {
+  View,
+  ScrollView,
+  Dimensions,
+  Pressable,
+  ImageBackground,
+  StyleSheet,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import AppBar from '../components/UserCoursePageComponent/AppBar';
@@ -12,6 +19,8 @@ import BottomSheetComponent from '../components/BottomSheetComponent';
 import {ChangeAddedChild} from '../components/HeaderComponent';
 import PopularCourses from '../components/UserCoursePageComponent/PopularCourses';
 import auth from '@react-native-firebase/auth';
+import courseLevelScreenImageLightMode from '../assets/images/courseLevelScreenImageLightMode.jpg';
+import courseLevelScreenImageDarkMode from '../assets/images/courseLevelScreenImageDarkMode.jpg';
 
 // Shimmer effect
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
@@ -19,6 +28,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {authSelector} from '../store/auth/selector';
 import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
 import {navigate} from '../navigationRef';
+import {opacity} from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width} = Dimensions.get('window');
@@ -40,6 +50,7 @@ const UserCoursesPage = ({navigation}) => {
 
   useEffect(() => {
     if (userOrders?.length > 0 && currentChild) {
+      console.log('user?.children[0]?.courses', user?.children[0]?.courses);
       const filteredOrders = userOrders?.filter(
         item => item.childName === currentChild?.name,
       );
@@ -78,6 +89,25 @@ const UserCoursesPage = ({navigation}) => {
       getOrders();
     }
   };
+
+  const styles = StyleSheet.create({
+    backgroundImage: {
+      height: '100%',
+      width: '100%',
+      resizeMode: 'cover',
+      justifyContent: 'start',
+      opacity: 0.8,
+    },
+    myView: {
+      // backgroundColor: darkMode ? bgSecondaryColor : 'white',
+      padding: 10,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 0.5,
+      shadowRadius: 5,
+      elevation: 10,
+    },
+  });
 
   return (
     <View className="flex-1" style={{backgroundColor: bgColor}}>
@@ -118,7 +148,7 @@ const UserCoursesPage = ({navigation}) => {
             <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
               <ScrollView className="" showsVerticalScrollIndicator={false}>
                 {userCourseData?.map((course, index) => {
-                  console.log('check courseCard', course?.serviceRequests);
+                  // console.log('check courseCard', course?.serviceRequests);
                   return (
                     <CourseCard
                       key={index}
@@ -139,14 +169,18 @@ const UserCoursesPage = ({navigation}) => {
               </ScrollView>
             </View>
           ) : (
-            <View className="mt-2 flex flex-col justify-center items-center h-[70%] w-[100vw]">
-              <Text className="text-2xl font-semibold text-gray-400 px-3 text-center mt-4">
-                {currentChild?.name || 'You'} don't have any course
-              </Text>
+            <View className="flex flex-col justify-center items-center h-[100%] w-[100vw]">
+              <ImageBackground
+                style={styles.backgroundImage}
+                source={
+                  darkMode
+                    ? courseLevelScreenImageDarkMode
+                    : courseLevelScreenImageLightMode
+                }></ImageBackground>
             </View>
           )}
 
-          <View className="h-[25%] w-full items-center flex-1">
+          <View className="h-[25%] w-full items-center flex-1 absolute bottom-0">
             <AddMoreCourse
               addMoreCourseCardbgColor={addMoreCourseCardbgColor}
               darkMode={darkMode}

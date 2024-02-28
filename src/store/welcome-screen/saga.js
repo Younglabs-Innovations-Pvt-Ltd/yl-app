@@ -194,12 +194,12 @@ function* fetchAllBookingsWithPhone() {
 // fetching user's all orders
 function* fetchAllOrders({payload}) {
   try {
-    // console.log('fetching orders', payload);
+    console.log('fetching orders', payload);
     const response = yield fetchAllOrdersFromLeadId(payload);
-    // console.log('got response', response, ' got status', response.status);
+    console.log('got response', response, ' got status', response.status);
 
     if (response.status !== 200) {
-      console.log("did not get response", response.status)
+      console.log('did not get response', response.status);
       yield put(userOrdersLoadingFailed('Something went Wrong'));
       return;
     }

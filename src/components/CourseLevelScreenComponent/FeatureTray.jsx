@@ -59,12 +59,12 @@ const FeatureTray = ({
       feature: 'download_worksheets',
       index: 3,
     },
-    {
-      featureName: 'Download/Certificate',
-      icon: DownloadCertificate,
-      feature: 'course_certificate',
-      index: 4,
-    },
+    // {
+    //   featureName: 'Download/Certificate',
+    //   icon: DownloadCertificate,
+    //   feature: 'course_certificate',
+    //   index: 4,
+    // },
     {
       featureName: 'Class Wise/HomeWork',
       icon: ClassViewHomeWork,
