@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {Text, View} from 'react-native-animatable';
+import {Image, Text, View} from 'react-native-animatable';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 import RoadMapBG from '../../assets/images/roadMapBackground.jpeg';
 import RoadMapBGDark from '../../assets/images/roadMapBackgroundDark.jpeg';
@@ -19,7 +19,9 @@ import {useSelector} from 'react-redux';
 import auth from '@react-native-firebase/auth';
 import {BASE_URL} from '@env';
 import Icon from '../icon.component';
-import { userSelector } from '../../store/user/selector';
+import {userSelector} from '../../store/user/selector';
+import smile from '../../assets/images/512.gif';
+import FastImage from 'react-native-fast-image';
 
 const SnakeLevels = ({
   navigation,
@@ -277,6 +279,16 @@ const SnakeLevels = ({
             ))}
           {allClasses &&
             allClasses?.map((level, index) => {
+              const statusEmoji =
+                level?.classStatus === 'Attended'
+                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d/512.gif'
+                  : level?.classStatus === 'Missed'
+                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f614/512.gif'
+                  : level?.classStatus === 'Upcoming'
+                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f600/512.gif'
+                  : level?.classStatus === 'Ongoing'
+                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1fae3/512.gif'
+                  : '';
               count = count >= marginleftcustom.length - 1 ? 0 : count + 1;
               return (
                 <View key={index} className="w-[100%] my-3 bg-transparent">
@@ -386,10 +398,18 @@ const SnakeLevels = ({
                               </Text>
                             </View>
                           ) : (
-                            <View className="h-[60px] w-[160px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
+                            <View className="h-[60px] w-[180px] flex flex-col justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                               <Text className="font-semibold text-[20px]">
                                 Upcoming
                               </Text>
+                              <FastImage
+                                style={[styles?.icon, {width: 23, height: 23}]}
+                                source={{
+                                  uri: statusEmoji,
+                                  priority: FastImage.priority.normal,
+                                }}
+                                resizeMode={FastImage.resizeMode.contain}
+                              />
                             </View>
                           )}
                         </View>
@@ -411,7 +431,7 @@ const SnakeLevels = ({
                                 ? '-left-0'
                                 : 'top-6'
                             } border-2 border-gray-300 border-solid `}></View>
-                          <View className="h-[60px] w-[150px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
+                          <View className="h-[60px] w-[170px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                             {upcomingClass?.visibility ? (
                               <View>
                                 <Text className="font-semibold text-[16px] text-white">
@@ -428,6 +448,14 @@ const SnakeLevels = ({
                                 Upcoming
                               </Text>
                             )}
+                            <FastImage
+                              style={[styles?.icon, {width: 23, height: 23}]}
+                              source={{
+                                uri: statusEmoji,
+                                priority: FastImage.priority.normal,
+                              }}
+                              resizeMode={FastImage.resizeMode.contain}
+                            />
                           </View>
                         </View>
                       )}
@@ -452,10 +480,18 @@ const SnakeLevels = ({
                           }}
                           className="absolute -top-9 flex justify-center items-center">
                           <View className="h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute top-3 border-2 border-gray-300 border-solid "></View>
-                          <View className="h-[50px] w-[100px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
+                          <View className="h-[50px] w-[120px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                             <Text className="font-semibold text-[16px]">
                               Join now
                             </Text>
+                            <FastImage
+                              style={[styles?.icon, {width: 23, height: 23}]}
+                              source={{
+                                uri: statusEmoji,
+                                priority: FastImage.priority.normal,
+                              }}
+                              resizeMode={FastImage.resizeMode.contain}
+                            />
                           </View>
                         </Pressable>
                       )}
@@ -480,7 +516,7 @@ const SnakeLevels = ({
                               : null
                           } rounded-[5px] absolute top-3 border-2 border-gray-300 border-solid `}></View>
                         <View
-                          className={`h-[50px] w-[100px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  ${
+                          className={`h-[50px] w-[120px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  ${
                             level?.classStatus === 'Upcoming'
                               ? 'bg-[#AEAEAE]'
                               : level?.classStatus === 'Missed'
@@ -495,9 +531,17 @@ const SnakeLevels = ({
                               ? 'bg-[#76C8F2]'
                               : null
                           } `}>
-                          <Text className="font-semibold text-[16px] text-white">
+                          <Text className="font-semibold text-[16px] mr-1 text-white">
                             {level?.classStatus}
                           </Text>
+                          <FastImage
+                            style={[styles?.icon, {width: 23, height: 23}]}
+                            source={{
+                              uri: statusEmoji,
+                              priority: FastImage.priority.normal,
+                            }}
+                            resizeMode={FastImage.resizeMode.contain}
+                          />
                         </View>
                       </Pressable>
                     )}

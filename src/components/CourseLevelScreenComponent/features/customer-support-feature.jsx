@@ -25,6 +25,7 @@ const CustomerSupportFeature = ({
   serviceReqClassesData,
   setSheetOpen,
   source,
+  course,
 }) => {
   const [issueType, setIssueType] = useState([
     {label: 'Batch Issues', value: 'Batch Issues'},
@@ -60,6 +61,7 @@ const CustomerSupportFeature = ({
   }, [serviceReqClassesData]);
 
   const onFormSubmit = async data => {
+    console.log('coursecoursecourse', course);
     const token = await auth().currentUser.getIdToken();
     console.log(selectClassNumber, selectedIssueType, message);
     if (selectedIssueType == null || selectedIssueType == '') {
@@ -79,7 +81,7 @@ const CustomerSupportFeature = ({
         details: message,
         customerName: user.fullName,
         creatorEmail: user.email,
-        courseId: user?.courseType,
+        courseId: course?.courseId,
         classInfo: {
           classNumber: selectClassNumber,
           classDate:

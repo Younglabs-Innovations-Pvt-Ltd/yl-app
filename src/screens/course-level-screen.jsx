@@ -22,7 +22,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {Showtoast} from '../utils/toast';
 
 const CourseLevelScreen = ({navigation, route}) => {
-  const {serviceRequestId, courseName} = route.params;
+  const {serviceRequestId, course, courseName} = route.params;
   const [allClasses, setAllClasses] = useState([]);
   const [enabledFeatures, setEnabledFeatures] = useState([]);
   const [features, setFeatures] = useState([]);
@@ -203,6 +203,7 @@ const CourseLevelScreen = ({navigation, route}) => {
               <CustomerSupportFeature
                 setSheetOpen={setSheetOpen}
                 serviceReqClassesData={serviceReqClassesData}
+                course={course}
               />
             }
             onClose={() => setSheetOpen(false)}
