@@ -154,7 +154,6 @@ function* makePaymentSaga({payload}) {
 
     console.log('payment method is', paymentMethod);
     if (paymentMethod === 'tazapay') {
-      body.FCY = `QAR ${selectBatch?.price}`;
       yield payOnTazapay({body, ipData});
       return;
     }

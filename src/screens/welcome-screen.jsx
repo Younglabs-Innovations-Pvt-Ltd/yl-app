@@ -71,7 +71,7 @@ const DemoClassScreen = ({navigation}) => {
   useEffect(() => {
     if (customer === 'yes') {
       Showtoast({
-        text: 'Login with right credentials (email, password)',
+        text: 'You are an existing customer click on Customer LogIn',
         toast,
         type: 'danger',
       });
@@ -380,7 +380,7 @@ const DemoClassScreen = ({navigation}) => {
                   fs={18}
                   ff={FONTS.headingFont}
                   color={COLORS.white}>
-                  Log In
+                  LogIn
                 </TextWrapper>
               </TouchableOpacity>
             ) : (
@@ -394,7 +394,7 @@ const DemoClassScreen = ({navigation}) => {
                   fs={18}
                   ff={FONTS.headingFont}
                   color={COLORS.white}>
-                  Log In
+                  LogIn
                 </TextWrapper>
               </TouchableOpacity>
             )}

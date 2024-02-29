@@ -37,14 +37,14 @@ const AddMoreCourse = ({
           style={[
             styles.borderStyle,
             styles.innerBorder,
-            {backgroundColor: 'b6b6bc4f'},
+            {backgroundColor: '#ffffff7c'},
           ]}
-          className="w-[95vw] h-full rounded-lg  mt-3 flex justify-center items-center">
+          className="w-[95vw]  h-full rounded-lg  mt-3 flex justify-center items-center">
           <MIcon name="plus-circle" size={30} color="gray" />
           <Text
-            className="text-gray-600 font-semibold text-base"
+            className="text-gray-600 font-semibold text-base text-[19px]"
             style={{color: textColors.textSecondary}}>
-            Add More Courses
+            Add a Course
           </Text>
         </Pressable>
       </View>
