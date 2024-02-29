@@ -17,7 +17,7 @@ export function* userSaga() {
   function* addChildSaga({payload}) {
     try {
       const onClose = payload.onClose;
-      const children = payload.children;
+      const children = payload.children || [];
 
       delete payload.onClose;
       delete payload.children;
@@ -59,6 +59,7 @@ export function* userSaga() {
       }
 
       delete payload?.leadId;
+
       let newChildrenData = [
         ...children,
         {name: payload?.childName, age: payload?.childAge},

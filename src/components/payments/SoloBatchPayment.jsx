@@ -17,6 +17,8 @@ import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {FONTS} from '../../utils/constants/fonts';
 import {ScrollView} from 'react-native-gesture-handler';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 import {
   resetCourseDetails,
@@ -34,6 +36,9 @@ import TextWrapper from '../text-wrapper.component';
 import Collapsible from 'react-native-collapsible';
 import Spacer from '../spacer.component';
 import Icon from '../icon.component';
+import {ShowPriceFalseView} from '../../screens/batch-fees-details.screen';
+import BottomSheetComponent from '../BottomSheetComponent';
+import ModalComponent from '../modal.component';
 
 // const ageGroups = ['5-7', '8-10', '11-14'];
 
@@ -63,6 +68,9 @@ const SoloBatchPayment = ({
   const [classCount, setClassCount] = useState(0);
   const {courseDetails} = useSelector(courseSelector);
   const [paynowLoading, setPaynowLoading] = useState(false);
+  const [showPrice, setShowPrice] = useState(false);
+  const [showContactOnWhatsAppSheet, setShowContactOnWhatsAppSheet] =
+    useState(false);
 
   const [collapsed, setCollapsed] = useState({
     ageGroup: false,
@@ -70,6 +78,20 @@ const SoloBatchPayment = ({
     payment: true,
     time: true,
   });
+
+  useEffect(() => {
+    if (courseData) {
+      // console.log("courseData?.showPrice", courseData?.showPriceType)
+      if (
+        courseData?.showPriceType === 'solo' ||
+        courseData?.showPriceType === 'both'
+      ) {
+        // console.log("i am hereeee,");
+
+        setShowPrice(true);
+      }
+    }
+  }, [courseData]);
 
   useEffect(() => {
     if (prices?.solo) {
@@ -208,6 +230,17 @@ const SoloBatchPayment = ({
   const payNow = () => {
     // const ageGroup = makeAgeGroup(selectedChild.childAge);
     // const startDateTime = moment(date).format('YYYY-MM-DD HH:mm');
+
+    if (!showPrice) {
+      setShowContactOnWhatsAppSheet(true);
+      Showtoast({
+        text: 'Contact us for prices of this batch',
+        toast,
+        type: 'danger',
+      });
+      return;
+    }
+
     setPaynowLoading(true);
     if (!currentAgeGroup || currentAgeGroup === '') {
       Showtoast({text: 'Please Select Age Group', toast, type: 'danger'});
@@ -275,29 +308,30 @@ const SoloBatchPayment = ({
   };
 
   return (
-    <ScrollView style={{flex: 1}} className="flex-1">
-      <View className="flex-1">
+    <>
+      <ScrollView style={{flex: 1}} className="flex-1">
         <View className="flex-1">
-          <View className="px-2">
-            <Text
-              className="text-xl font-semibold text-center"
-              style={[FONTS.heading, {color: textColors.textYlMain}]}>
-              Dedicated attention to your child in our one-to-one batches
-            </Text>
-            <Text
-              className="text-base mt-2 text-center"
-              style={{
-                color: textColors.textSecondary,
-                fontFamily: FONTS.primaryFont,
-              }}>
-              Select timings according to your schedule and avoid missing any
-              classes
-            </Text>
-          </View>
+          <View className="flex-1">
+            <View className="px-2">
+              <Text
+                className="text-xl font-semibold text-center"
+                style={[FONTS.heading, {color: textColors.textYlMain}]}>
+                Dedicated attention to your child in our one-to-one batches
+              </Text>
+              <Text
+                className="text-base mt-2 text-center"
+                style={{
+                  color: textColors.textSecondary,
+                  fontFamily: FONTS.primaryFont,
+                }}>
+                Select timings according to your schedule and avoid missing any
+                classes
+              </Text>
+            </View>
 
-          <View className="py-4 rounded mt-5" style={{paddingBottom: 16}}>
-            <View className="">
-              {/* <Text
+            <View className="py-4 rounded mt-5" style={{paddingBottom: 16}}>
+              <View className="">
+                {/* <Text
                 className="text-center w-full font-semibold text-xl"
                 style={{
                   fontFamily: FONTS.headingFont,
@@ -305,317 +339,363 @@ const SoloBatchPayment = ({
                 }}>
                 Select a batch
               </Text> */}
-              {/* Select age group */}
-              <View
-                style={{
-                  paddingHorizontal: 8,
-                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
-                  paddingVertical: 12,
-                  borderRadius: 4,
-                }}>
-                <Pressable
+                {/* Select age group */}
+                <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                  onPress={() =>
-                    setCollapsed(p => ({...p, ageGroup: !p.ageGroup}))
-                  }>
-                  <TextWrapper fs={20} fw="700" color={textColors.textPrimary}>
-                    1. Select age group
-                  </TextWrapper>
-                  {!currentAgeGroup ? (
-                    <Icon
-                      name={`chevron-${
-                        !collapsed.ageGroup ? 'up' : 'down'
-                      }-outline`}
-                      size={24}
-                      color={textColors.textSecondary}
-                    />
-                  ) : (
-                    <Icon
-                      name="checkmark-circle"
-                      size={32}
-                      color={COLORS.pblue}
-                    />
-                  )}
-                </Pressable>
-                <Collapsible duration={450} collapsed={collapsed.ageGroup}>
-                  <View style={{marginVertical: 8}}>
-                    <View className="flex-row px-3">
-                      {ageGroups?.map((group, i) => {
-                        return (
-                          <Pressable
-                            key={i}
-                            className="flex-1 py-1 px-3 items-center justify-center mr-2 border rounded-full"
-                            style={
-                              currentAgeGroup === group.ageGroup
-                                ? {
-                                    borderColor: textColors.textYlMain,
-                                    backgroundColor: textColors.textYlMain,
-                                  }
-                                : {
-                                    borderColor: textColors.textSecondary,
-                                    backgroundColor: bgSecondaryColor,
-                                  }
-                            }
-                            onPress={() => handleAgeGroup(group?.ageGroup)}>
-                            <Text
-                              style={{
-                                color:
-                                  currentAgeGroup === group.ageGroup
-                                    ? 'white'
-                                    : textColors.textSecondary,
-                                fontSize: 16,
-                              }}>
-                              {group?.ageGroup}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                  </View>
-                </Collapsible>
-              </View>
-
-              <Spacer space={4} />
-
-              {/* Select batch */}
-              <View
-                style={{
-                  paddingHorizontal: 8,
-                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
-                  paddingVertical: 12,
-                  borderRadius: 4,
-                }}>
-                <Pressable
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                  onPress={() => setCollapsed(p => ({...p, batch: !p.batch}))}>
-                  <TextWrapper fs={20} fw="700" color={textColors.textPrimary}>
-                    2. Select batch
-                  </TextWrapper>
-                  {!selectedLevelToBuy?.level ? (
-                    <Icon
-                      name={`chevron-${
-                        !collapsed.batch ? 'up' : 'down'
-                      }-outline`}
-                      size={24}
-                      color={textColors.textSecondary}
-                    />
-                  ) : (
-                    <Icon
-                      name="checkmark-circle"
-                      size={32}
-                      color={COLORS.pblue}
-                    />
-                  )}
-                </Pressable>
-                <Collapsible duration={450} collapsed={collapsed.batch}>
-                  <View
+                    paddingHorizontal: 8,
+                    backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                    paddingVertical: 12,
+                    borderRadius: 4,
+                  }}>
+                  <Pressable
                     style={{
-                      padding: 8,
-                    }}>
-                    {Object.values(filteredBatches).map(batch => (
-                      <Pressable
-                        key={batch.level}
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-end',
-                          gap: 4,
-                          paddingHorizontal: 12,
-                          paddingVertical: 8,
-                          backgroundColor:
-                            selectedLevelToBuy?.level === batch.level
-                              ? textColors.textYlMain
-                              : bgSecondaryColor,
-                          borderRadius: 8,
-                          borderColor: textColors.textSecondary,
-                          borderWidth: 1,
-                          marginTop: 8,
-                        }}
-                        onPress={() =>
-                          handleBatchSelect(
-                            batch.level,
-                            batch?.offer,
-                            batch?.price,
-                          )
-                        }>
-                        <View>
-                          <Text
-                            style={{
-                              color: textColors.textPrimary,
-                              fontSize: 19,
-                              fontWeight: 'bold',
-                            }}>
-                            {getLevelName(batch.level)}
-                          </Text>
-                          {getClasses(batch.level) && (
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                    onPress={() =>
+                      setCollapsed(p => ({...p, ageGroup: !p.ageGroup}))
+                    }>
+                    <TextWrapper
+                      fs={20}
+                      fw="700"
+                      color={textColors.textPrimary}>
+                      1. Select age group
+                    </TextWrapper>
+                    {!currentAgeGroup ? (
+                      <Icon
+                        name={`chevron-${
+                          !collapsed.ageGroup ? 'up' : 'down'
+                        }-outline`}
+                        size={24}
+                        color={textColors.textSecondary}
+                      />
+                    ) : (
+                      <Icon
+                        name="checkmark-circle"
+                        size={32}
+                        color={COLORS.pblue}
+                      />
+                    )}
+                  </Pressable>
+                  <Collapsible duration={450} collapsed={collapsed.ageGroup}>
+                    <View style={{marginVertical: 8}}>
+                      <View className="flex-row px-3">
+                        {ageGroups?.map((group, i) => {
+                          return (
+                            <Pressable
+                              key={i}
+                              className="flex-1 py-1 px-3 items-center justify-center mr-2 border rounded-full"
+                              style={
+                                currentAgeGroup === group.ageGroup
+                                  ? {
+                                      borderColor: textColors.textYlMain,
+                                      backgroundColor: textColors.textYlMain,
+                                    }
+                                  : {
+                                      borderColor: textColors.textSecondary,
+                                      backgroundColor: bgSecondaryColor,
+                                    }
+                              }
+                              onPress={() => handleAgeGroup(group?.ageGroup)}>
+                              <Text
+                                style={{
+                                  color:
+                                    currentAgeGroup === group.ageGroup
+                                      ? 'white'
+                                      : textColors.textSecondary,
+                                  fontSize: 16,
+                                }}>
+                                {group?.ageGroup}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+                      </View>
+                    </View>
+                  </Collapsible>
+                </View>
+
+                <Spacer space={4} />
+
+                {/* Select batch */}
+                <View
+                  style={{
+                    paddingHorizontal: 8,
+                    backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                    paddingVertical: 12,
+                    borderRadius: 4,
+                  }}>
+                  <Pressable
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                    onPress={() =>
+                      setCollapsed(p => ({...p, batch: !p.batch}))
+                    }>
+                    <TextWrapper
+                      fs={20}
+                      fw="700"
+                      color={textColors.textPrimary}>
+                      2. Select batch
+                    </TextWrapper>
+                    {!selectedLevelToBuy?.level ? (
+                      <Icon
+                        name={`chevron-${
+                          !collapsed.batch ? 'up' : 'down'
+                        }-outline`}
+                        size={24}
+                        color={textColors.textSecondary}
+                      />
+                    ) : (
+                      <Icon
+                        name="checkmark-circle"
+                        size={32}
+                        color={COLORS.pblue}
+                      />
+                    )}
+                  </Pressable>
+                  <Collapsible duration={450} collapsed={collapsed.batch}>
+                    <View
+                      style={{
+                        padding: 8,
+                      }}>
+                      <View className="">
+                        <Text
+                          className="text-[14px]"
+                          style={{
+                            fontFamily: FONTS.primaryFont,
+                            color: textColors.textSecondary,
+                          }}>
+                          Contact us for prices of this batch
+                        </Text>
+                      </View>
+                      {Object.values(filteredBatches).map(batch => (
+                        <Pressable
+                          key={batch.level}
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-end',
+                            gap: 4,
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            backgroundColor:
+                              selectedLevelToBuy?.level === batch.level
+                                ? textColors.textYlMain
+                                : bgSecondaryColor,
+                            borderRadius: 8,
+                            borderColor: textColors.textSecondary,
+                            borderWidth: 1,
+                            marginTop: 8,
+                          }}
+                          onPress={() =>
+                            handleBatchSelect(
+                              batch.level,
+                              batch?.offer,
+                              batch?.price,
+                            )
+                          }>
+                          <View>
                             <Text
                               style={{
                                 color: textColors.textPrimary,
-                                fontSize: 15,
+                                fontSize: 19,
+                                fontWeight: 'bold',
                               }}>
-                              {`${getClasses(batch.level)} classes`}
+                              {getLevelName(batch.level)}
                             </Text>
+                            {getClasses(batch.level) && (
+                              <Text
+                                style={{
+                                  color: textColors.textPrimary,
+                                  fontSize: 15,
+                                }}>
+                                {`${getClasses(batch.level)} classes`}
+                              </Text>
+                            )}
+                          </View>
+                          {showPrice && (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'flex-end',
+                                gap: 4,
+                              }}>
+                              <Text
+                                style={{
+                                  color: textColors.textPrimary,
+                                  fontSize: 18,
+                                  fontWeight: 'bold',
+                                }}>
+                                {ipData?.currency?.symbol}
+                                {batch?.offer}
+                              </Text>
+                              <Text
+                                style={{
+                                  color: textColors.textSecondary,
+                                }}
+                                className="line-through">
+                                {ipData?.currency?.symbol}
+                                {batch?.price}
+                              </Text>
+                            </View>
                           )}
-                        </View>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'flex-end',
-                            gap: 4,
-                          }}>
-                          <Text
-                            style={{
-                              color: textColors.textPrimary,
-                              fontSize: 18,
-                              fontWeight: 'bold',
-                            }}>
-                            {ipData?.currency?.symbol}
-                            {batch?.offer}
-                          </Text>
-                          <Text
-                            style={{
-                              color: textColors.textSecondary,
-                            }}
-                            className="line-through">
-                            {ipData?.currency?.symbol}
-                            {batch?.price}
-                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </Collapsible>
+                </View>
+
+                <Spacer space={4} />
+
+                {/* Select time and date */}
+                <View
+                  style={{
+                    paddingHorizontal: 8,
+                    backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                    paddingVertical: 12,
+                    borderRadius: 4,
+                  }}>
+                  <Pressable
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                    onPress={() => setCollapsed(p => ({...p, time: !p.time}))}
+                    disabled={!showPrice}>
+                    <TextWrapper
+                      fs={20}
+                      fw="700"
+                      color={textColors.textPrimary}>
+                      3. Select time
+                    </TextWrapper>
+                    {!date ? (
+                      <Icon
+                        name={`chevron-${
+                          !collapsed.time ? 'up' : 'down'
+                        }-outline`}
+                        size={24}
+                        color={textColors.textSecondary}
+                      />
+                    ) : (
+                      <Icon
+                        name="checkmark-circle"
+                        size={32}
+                        color={COLORS.pblue}
+                      />
+                    )}
+                  </Pressable>
+                  <Collapsible duration={450} collapsed={collapsed.time}>
+                    <View style={{paddingTop: 8, alignItems: 'center'}}>
+                      <Pressable
+                        className="w-[90%] border-[.4px] rounded overflow-hidden"
+                        style={{borderColor: textColors.textSecondary}}
+                        onPress={visibleDatePicker}>
+                        <View className="w-full flex-row">
+                          <View className="w-[75%] justify-center px-3">
+                            {date && date !== '' ? (
+                              <Text
+                                className=""
+                                style={{color: textColors.textPrimary}}>
+                                {moment(date).format('YYYY-MM-DD HH:mm')}
+                              </Text>
+                            ) : (
+                              <Text className="w-full text-gray-400">
+                                Click to select date
+                              </Text>
+                            )}
+                          </View>
+                          <View
+                            className="p-2 w-[25%] items-center"
+                            style={{backgroundColor: textColors.textYlMain}}>
+                            <Text className="text-white">Select</Text>
+                          </View>
                         </View>
                       </Pressable>
-                    ))}
-                  </View>
-                </Collapsible>
-              </View>
+                    </View>
+                  </Collapsible>
+                </View>
 
-              <Spacer space={4} />
+                <Spacer space={4} />
 
-              {/* Select time and date */}
-              <View
-                style={{
-                  paddingHorizontal: 8,
-                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
-                  paddingVertical: 12,
-                  borderRadius: 4,
-                }}>
-                <Pressable
+                {/* Pay now */}
+                <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                  onPress={() => setCollapsed(p => ({...p, time: !p.time}))}>
-                  <TextWrapper fs={20} fw="700" color={textColors.textPrimary}>
-                    3. Select time
-                  </TextWrapper>
-                  {!date ? (
-                    <Icon
-                      name={`chevron-${
-                        !collapsed.time ? 'up' : 'down'
-                      }-outline`}
-                      size={24}
-                      color={textColors.textSecondary}
-                    />
-                  ) : (
-                    <Icon
-                      name="checkmark-circle"
-                      size={32}
-                      color={COLORS.pblue}
-                    />
-                  )}
-                </Pressable>
-                <Collapsible duration={450} collapsed={collapsed.time}>
-                  <View style={{paddingTop: 8, alignItems: 'center'}}>
-                    <Pressable
-                      className="w-[90%] border-[.4px] rounded overflow-hidden"
-                      style={{borderColor: textColors.textSecondary}}
-                      onPress={visibleDatePicker}>
-                      <View className="w-full flex-row">
-                        <View className="w-[75%] justify-center px-3">
-                          {date && date !== '' ? (
-                            <Text
-                              className=""
-                              style={{color: textColors.textPrimary}}>
-                              {moment(date).format('YYYY-MM-DD HH:mm')}
-                            </Text>
-                          ) : (
-                            <Text className="w-full text-gray-400">
-                              Click to select date
-                            </Text>
-                          )}
-                        </View>
-                        <View
-                          className="p-2 w-[25%] items-center"
-                          style={{backgroundColor: textColors.textYlMain}}>
-                          <Text className="text-white">Select</Text>
-                        </View>
-                      </View>
-                    </Pressable>
-                  </View>
-                </Collapsible>
-              </View>
+                    paddingHorizontal: 8,
+                    backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
+                    paddingVertical: 12,
+                    borderRadius: 4,
+                  }}>
+                  <Pressable
+                    onPress={() =>
+                      setCollapsed(p => ({...p, payment: !p.payment}))
+                    }>
+                    <TextWrapper
+                      fs={20}
+                      fw="700"
+                      color={textColors.textPrimary}>
+                      4. Buy Now
+                    </TextWrapper>
+                  </Pressable>
+                  <Collapsible duration={450} collapsed={collapsed.payment}>
+                    <View style={{paddingTop: 8, alignItems: 'center'}}>
+                      <Pressable
+                        className="w-[95%] rounded py-2 items-center flex-row justify-center"
+                        style={{backgroundColor: textColors.textYlMain}}
+                        onPress={payNow}>
+                        <Text
+                          className="text-white font-semibold text-base"
+                          style={{fontFamily: FONTS.primaryFont}}>
+                          Buy Now
+                        </Text>
 
-              <Spacer space={4} />
-
-              {/* Pay now */}
-              <View
-                style={{
-                  paddingHorizontal: 8,
-                  backgroundColor: darkMode ? bgSecondaryColor : '#80808017',
-                  paddingVertical: 12,
-                  borderRadius: 4,
-                }}>
-                <Pressable
-                  onPress={() =>
-                    setCollapsed(p => ({...p, payment: !p.payment}))
-                  }>
-                  <TextWrapper fs={20} fw="700" color={textColors.textPrimary}>
-                    4. Buy Now
-                  </TextWrapper>
-                </Pressable>
-                <Collapsible duration={450} collapsed={collapsed.payment}>
-                  <View style={{paddingTop: 8, alignItems: 'center'}}>
-                    <Pressable
-                      className="w-[95%] rounded py-2 items-center flex-row justify-center"
-                      style={{backgroundColor: textColors.textYlMain}}
-                      onPress={payNow}>
-                      <Text
-                        className="text-white font-semibold text-base"
-                        style={{fontFamily: FONTS.primaryFont}}>
-                        Buy Now
-                      </Text>
-
-                      {paynowLoading && (
-                        <ActivityIndicator
-                          size={20}
-                          className="ml-3"
-                          color={'white'}
-                        />
-                      )}
-                    </Pressable>
-                  </View>
-                </Collapsible>
+                        {paynowLoading && (
+                          <ActivityIndicator
+                            size={20}
+                            className="ml-3"
+                            color={'white'}
+                          />
+                        )}
+                      </Pressable>
+                    </View>
+                  </Collapsible>
+                </View>
               </View>
             </View>
           </View>
-        </View>
 
-        <DateTimePickerModal
-          isVisible={visible}
-          mode="datetime"
-          onConfirm={setSelectedDate}
-          onCancel={hideDatePicker}
-        />
-      </View>
-    </ScrollView>
+          <DateTimePickerModal
+            isVisible={visible}
+            mode="datetime"
+            onConfirm={setSelectedDate}
+            onCancel={hideDatePicker}
+          />
+        </View>
+      </ScrollView>
+      <ModalComponent
+        visible={showContactOnWhatsAppSheet}
+        onRequestClose={() => setShowContactOnWhatsAppSheet(false)}
+        animationType="fade-in">
+        <View className="h-[100vh] w-[100vw] flex justify-center items-center bg-[#423a3a4f]">
+          <View className="bg-white w-[85%] p-2 justify-center min-h-[50%] rounded-md shadow-md shadow-gray-700 relative">
+            <View className="absolute right-0 top-0">
+              <MIcon
+                name="close"
+                size={35}
+                color="gray"
+                onPress={() => setShowContactOnWhatsAppSheet(false)}
+              />
+            </View>
+            <ShowPriceFalseView courseData={courseData} />
+          </View>
+        </View>
+      </ModalComponent>
+    </>
   );
 };
 

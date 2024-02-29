@@ -19,6 +19,7 @@ const BatchCard = ({
   levelText,
   course_type,
   levelNames,
+  showPrice,
 }) => {
   const {currentLevel} = useSelector(courseSelector);
   const [price, setPrice] = useState(0);
@@ -116,28 +117,30 @@ const BatchCard = ({
               </TextWrapper>
             )}
           </View>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              gap: 4,
-            }}>
-            <TextWrapper
-              fs={23}
-              className="font-semibold text-[28px]"
+          {showPrice && (
+            <View
               style={{
-                color: textColors.textPrimary,
-              }}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
-            <TextWrapper
-              styles={{textDecorationLine: 'line-through'}}
-              fs={17}
-              className="mr-3 line-through"
-              style={{
-                color: textColors.textSecondary,
-              }}>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
-          </View>
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: 4,
+              }}>
+              <TextWrapper
+                fs={23}
+                className="font-semibold text-[28px]"
+                style={{
+                  color: textColors.textPrimary,
+                }}>{`${ipData?.currency.symbol}${price}`}</TextWrapper>
+              <TextWrapper
+                styles={{textDecorationLine: 'line-through'}}
+                fs={17}
+                className="mr-3 line-through"
+                style={{
+                  color: textColors.textSecondary,
+                }}>{`${ipData?.currency.symbol}${strikeThroughPrice}`}</TextWrapper>
+            </View>
+          )}
         </View>
         <Spacer />
         {/* <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
