@@ -216,6 +216,17 @@ const SnakeLevels = ({
     },
   });
 
+  useEffect(() => {
+    console.log(
+      'todaysClasstodaysClass',
+      todaysClass?.conductOnWebsiteTemasSDK,
+    );
+    console.log(
+      'currentOngoingClasscurrentOngoingClass',
+      currentOngoingClass?.conductOnWebsiteTemasSDK,
+    );
+  }, [todaysClass, currentOngoingClass]);
+
   let count = -1;
   return (
     <View className="h-[100%] w-[100%] bg-white rounded-t-xl overflow-hidden">
@@ -231,62 +242,60 @@ const SnakeLevels = ({
           // resizeMode="cover"
           style={styles.backgroundImage}
           source={darkMode ? RoadMapBGDark : RoadMapBG}>
-          {currentOngoingClass?.conductOnWebsiteTemasSDK ||
-            (todaysClass?.conductOnWebsiteTemasSDK && (
-              <View className="w-full bg-white flex flex-col justify-center items-start px-2 py-2 gap-y-1">
-                <View className="flex flex-row justify-start items-start w-full gap-x-2">
-                  <Icon
-                    name="checkmark-done-outline"
-                    size={20}
-                    color={textColors.textYlGreen}
-                  />
+          {(currentOngoingClass?.conductOnWebsiteTemasSDK == false ||
+            todaysClass?.conductOnWebsiteTemasSDK == false) && (
+            <View className="w-full bg-white flex flex-col justify-center items-start px-2 py-2 gap-y-1">
+              <View className="flex flex-row justify-start items-start w-full gap-x-2">
+                <Icon
+                  name="checkmark-done-outline"
+                  size={20}
+                  color={textColors.textYlGreen}
+                />
+                <Text
+                  className="font-semibold text-[13px]"
+                  style={{color: textColors?.textYlMain}}>
+                  This Batch will be conducted on Microsoft Teams App
+                </Text>
+              </View>
+              <View className="flex flex-row justify-start items-start w-full gap-x-2">
+                <Icon
+                  name="checkmark-done-outline"
+                  size={20}
+                  color={textColors.textYlGreen}
+                />
+                <View className="flex flex-row justify-start items-center ">
                   <Text
                     className="font-semibold text-[13px]"
                     style={{color: textColors?.textYlMain}}>
-                    This Batch will be conducted on Microsoft Teams App
+                    Click here to download
                   </Text>
-                </View>
-                <View className="flex flex-row justify-start items-start w-full gap-x-2">
-                  <Icon
-                    name="checkmark-done-outline"
-                    size={20}
-                    color={textColors.textYlGreen}
-                  />
-                  <View className="flex flex-row justify-start items-center ">
-                    <Text
-                      className="font-semibold text-[13px]"
-                      style={{color: textColors?.textYlMain}}>
-                      Click here to download
+                  <Pressable
+                    onPress={() => {
+                      Linking.openURL(
+                        'https://play.google.com/store/apps/details?id=com.microsoft.teams',
+                      ).catch(err => console.error('An error occurred: ', err));
+                    }}
+                    className="px-2 py-1 rounded-md ml-2"
+                    style={{backgroundColor: textColors?.textYlMain}}>
+                    <Text className="text-[13px] font-semibold text-white">
+                      Microsoft Teams
                     </Text>
-                    <Pressable
-                      onPress={() => {
-                        Linking.openURL(
-                          'https://play.google.com/store/apps/details?id=com.microsoft.teams',
-                        ).catch(err =>
-                          console.error('An error occurred: ', err),
-                        );
-                      }}
-                      className="px-2 py-1 rounded-md ml-2"
-                      style={{backgroundColor: textColors?.textYlMain}}>
-                      <Text className="text-[13px] font-semibold text-white">
-                        Microsoft Teams
-                      </Text>
-                    </Pressable>
-                  </View>
+                  </Pressable>
                 </View>
               </View>
-            ))}
+            </View>
+          )}
           {allClasses &&
             allClasses?.map((level, index) => {
               const statusEmoji =
-                level?.classStatus === 'Attended'
+                level?.classStatus === 'Attended' && todaysClass?.classNumber != level?.classNumber
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d/512.gif'
                   : level?.classStatus === 'Missed'
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f614/512.gif'
                   : level?.classStatus === 'Upcoming'
-                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f600/512.gif'
+                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f603/512.gif'
                   : level?.classStatus === 'Ongoing'
-                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1fae3/512.gif'
+                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f913/512.gif'
                   : '';
               count = count >= marginleftcustom.length - 1 ? 0 : count + 1;
               return (
@@ -430,9 +439,9 @@ const SnakeLevels = ({
                                 ? '-left-0'
                                 : 'top-6'
                             } border-2 border-gray-300 border-solid `}></View>
-                          <View className="h-[60px] w-[170px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
+                          <View className="h-[60px] w-[150px] flex flex-row justify-end items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
                             {upcomingClass?.visibility ? (
-                              <View>
+                              <View className="w-fit flex flex-col justify-center items-center mr-2">
                                 <Text className="font-semibold text-[16px] text-white">
                                   {moment(
                                     convertTimeStamp(upcomingClass?.classDate),
@@ -448,7 +457,8 @@ const SnakeLevels = ({
                               </Text>
                             )}
                             <FastImage
-                              style={[styles?.icon, {width: 23, height: 23}]}
+                              className="mr-1"
+                              style={[styles?.icon, {width: 30, height: 30}]}
                               source={{
                                 uri: statusEmoji,
                                 priority: FastImage.priority.normal,
@@ -480,7 +490,7 @@ const SnakeLevels = ({
                           className="absolute -top-9 flex justify-center items-center">
                           <View className="h-[40px] w-[40px] rotate-[45deg] bg-[#76C8F2] rounded-[5px] absolute top-3 border-2 border-gray-300 border-solid "></View>
                           <View className="h-[50px] w-[120px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  bg-[#76C8F2]">
-                            <Text className="font-semibold text-[16px]">
+                            <Text className="font-semibold text-[16px] mr-2">
                               Join now
                             </Text>
                             <FastImage
