@@ -25,7 +25,7 @@ const ReviewsAndTestimonials = () => {
     <View className="w-full">
       {/* Video slider */}
       <View
-        style={{paddingVertical: 8}}
+        style={{}}
         // onLayout={event => handleSectionLayout('reviews', event)}>
         onLayout={event => {
           console.log('event is');
@@ -40,6 +40,7 @@ const ReviewsAndTestimonials = () => {
               fontFamily: FONTS.dancing_script,
               lineHeight: 18,
               fontSize: 18,
+              marginTop: 4,
             },
           ]}>
           {contentData?.content?.reviews?.subheading}
@@ -71,7 +72,7 @@ const ReviewsAndTestimonials = () => {
       {/* Tips and tricks */}
       {/* Video slider */}
       <View
-        style={{paddingVertical: 8}}
+        className="mt-4"
         onLayout={event => {
           console.log('event: ');
         }}>
@@ -91,6 +92,7 @@ const ReviewsAndTestimonials = () => {
               fontFamily: FONTS.dancing_script,
               lineHeight: 18,
               fontSize: 18,
+              marginTop: 4,
             },
           ]}>
           {contentData?.content?.tips?.subheading}
@@ -115,7 +117,7 @@ const ReviewsAndTestimonials = () => {
       </View>
 
       {contentData?.content?.rating && (
-        <View style={{marginTop: 16}}>
+        <View className="mt-4">
           <Text
             style={[
               FONTS.heading,
@@ -132,6 +134,7 @@ const ReviewsAndTestimonials = () => {
                 fontFamily: FONTS.dancing_script,
                 lineHeight: 18,
                 fontSize: 18,
+                marginTop: 4,
               },
             ]}>
             {contentData?.content?.rating?.subheading}
@@ -140,7 +143,7 @@ const ReviewsAndTestimonials = () => {
       )}
 
       {/* Testimonials */}
-      <View className="w-full mt-5">
+      <View className="w-full mt-4">
         <View>
           <Text style={[FONTS.heading, {color: textColors.textPrimary}]}>
             What our customers say

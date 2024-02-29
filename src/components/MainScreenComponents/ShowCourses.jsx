@@ -19,10 +19,10 @@ const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 const {height, width} = Dimensions.get('window');
 const ShowCourses = ({navigation}) => {
   const coursesNameByCategory = {
-    handwriting: 'Handwriting  Courses',
+    handwriting: 'Handwriting Improvement Courses',
     learning: 'English Learning',
     mathematics: 'Mathematics Courses',
-    others: 'Academic Courses',
+    others: 'Other Academic Courses',
   };
 
   const dispatch = useDispatch();
@@ -79,10 +79,10 @@ const ShowCourses = ({navigation}) => {
       ) : (
         Object.keys(courses)?.map(key => {
           return courses[key]?.length > 0 ? (
-            <View className="py-1 w-[100%]" key={key}>
+            <View className="mt-4 w-[100%]" key={key}>
               <View className="gap-1 pl-2 pr-3 flex-row justify-between items-end">
                 <Text
-                  className={`w-[100%] p-0`}
+                  className={`w-[100%] p-0 mb-1`}
                   style={[FONTS.heading, {color: textColors?.textPrimary}]}>
                   {coursesNameByCategory[key]}
                 </Text>
