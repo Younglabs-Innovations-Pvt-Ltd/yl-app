@@ -35,12 +35,15 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getWhatsappRedirectUrl} from '../utils/redirect-whatsapp';
 import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
+import BottomSheetComponent from '../components/BottomSheetComponent';
+import ModalComponent from '../components/modal.component';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
 const ITEM_WIDTH = deviceWidth * 0.75;
 
 const BatchFeeDetails = ({navigation, courseData}) => {
+  const toast = useToast();
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [collapsedButton, setCollapsedButton] = useState(true);
   const [steps, setSteps] = useState({
@@ -72,7 +75,9 @@ const BatchFeeDetails = ({navigation, courseData}) => {
   const [isOneToOneCourseAvailable, setIsOneToOneCourseAvailable] =
     useState(false);
   const [isGroupCourseAvailable, setIsGroupCourseAvailable] = useState(false);
-  const [showPriceType, setShowPriceType] = useState('');
+  const [showPrice, setShowPrice] = useState(false);
+  const [showContactOnWhatsAppSheet, setShowContactOnWhatsAppSheet] =
+    useState(false);
 
   useEffect(() => {
     if (!courseDetails || courseDetails?.courseId !== courseData.id) {
@@ -102,8 +107,11 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         setSelectedCourseTypeToBuy('group');
       }
     }
-    if (courseData?.showPriceType) {
-      setShowPriceType(courseData.showPriceType);
+    if (
+      courseData?.showPriceType === 'group' ||
+      courseData?.showPriceType === 'both'
+    ) {
+      setShowPrice(true);
     }
   }, [courseData]);
 
@@ -164,6 +172,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         item => item.ageGroup === currentAgeGroup,
       );
 
+      console.log("filterred batches here are", filteredBatches.length)
       setFilteredBatches(filteredBatches);
     }
   }, [currentAgeGroup, batches]);
@@ -194,6 +203,23 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         color: textColors.textSecondary,
       };
     }
+  };
+
+  const payNow = () => {
+    if (!showPrice) {
+      Showtoast({
+        text: 'Contact us for prices of this batch',
+        toast,
+        type: 'warning',
+      });
+      setShowContactOnWhatsAppSheet(true);
+      return;
+    }
+
+    navigation.navigate(SCREEN_NAMES.PAYMENT, {
+      paymentBatchType: 'group',
+      paymentMethod: courseData?.paymentMethod || 'tazapay',
+    });
   };
 
   return (
@@ -255,23 +281,19 @@ const BatchFeeDetails = ({navigation, courseData}) => {
       </View>
 
       {selectedCourseTypeToBuy === 'solo' ? (
-        showPriceType !== 'group' && showPriceType !== 'none' ? (
-          <View className="mt-2" style={{backgroundColor: bgColor}}>
-            <SoloBatchPayment
-              courseData={courseData}
-              ipData={ipData}
-              timezone={timezone}
-              prices={prices?.prices}
-              navigation={navigation}
-              ageGroups={ageGroups}
-              levelNames={courseDetails?.levelNames}
-              course_type={courseDetails?.course_type}
-            />
-          </View>
-        ) : (
-          <ShowPriceFalseView courseData={courseData} />
-        )
-      ) : showPriceType !== 'solo' && showPriceType !== 'none' ? (
+        <View className="mt-2" style={{backgroundColor: bgColor}}>
+          <SoloBatchPayment
+            courseData={courseData}
+            ipData={ipData}
+            timezone={timezone}
+            prices={prices?.prices}
+            navigation={navigation}
+            ageGroups={ageGroups}
+            levelNames={courseDetails?.levelNames}
+            course_type={courseDetails?.course_type}
+          />
+        </View>
+      ) : (
         <View style={{flex: 1}}>
           {loading ? (
             <View style={{flex: 1, justifyContent: 'center'}}>
@@ -390,6 +412,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         levelText={levelText}
                         course_type={courseDetails?.course_type}
                         levelNames={courseDetails?.levelNames}
+                        showPrice={showPrice}
                       />
 
                       <Spacer space={4} />
@@ -407,6 +430,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         levelText={levelText}
                         course_type={courseDetails?.course_type}
                         levelNames={courseDetails?.levelNames}
+                        showPrice={showPrice}
                       />
                       <Spacer space={4} />
                       <BatchCard
@@ -423,6 +447,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         levelText={levelText}
                         course_type={courseDetails?.course_type}
                         levelNames={courseDetails?.levelNames}
+                        showPrice={showPrice}
                       />
                     </Collapsible>
                   </View>
@@ -471,12 +496,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                         marginTop: 20,
                       },
                     ]}
-                    onPress={() =>
-                      navigation.navigate(SCREEN_NAMES.PAYMENT, {
-                        paymentBatchType: 'group',
-                        paymentMethod: courseData?.paymentMethod || 'tazapay',
-                      })
-                    }>
+                    onPress={payNow}>
                     <TextWrapper fs={18} fw="700" color={COLORS.white}>
                       Pay and Enroll
                     </TextWrapper>
@@ -488,9 +508,26 @@ const BatchFeeDetails = ({navigation, courseData}) => {
             <NoBatchesModule courseData={courseData} />
           )}
         </View>
-      ) : (
-        <ShowPriceFalseView courseData={courseData} />
       )}
+
+      <ModalComponent
+        visible={showContactOnWhatsAppSheet}
+        onRequestClose={() => setShowContactOnWhatsAppSheet(false)}
+        animationType="fade-in">
+        <View className="h-[100vh] w-[100vw] flex justify-center items-center bg-[#423a3a4f]">
+          <View className="bg-white w-[85%] p-2 justify-center min-h-[50%] rounded-md shadow-md shadow-gray-700 relative">
+            <View className="absolute right-0 top-0">
+              <MIcon
+                name="close"
+                size={35}
+                color="gray"
+                onPress={() => setShowContactOnWhatsAppSheet(false)}
+              />
+            </View>
+            <ShowPriceFalseView courseData={courseData} />
+          </View>
+        </View>
+      </ModalComponent>
     </>
   );
 };
@@ -542,7 +579,7 @@ const AgeSelector = ({
   );
 };
 
-const ShowPriceFalseView = ({courseData}) => {
+export const ShowPriceFalseView = ({courseData}) => {
   const toast = useToast();
   const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
   // console.log('course Data is', courseData);
