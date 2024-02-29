@@ -37,7 +37,20 @@ export function* userSaga() {
         return;
       }
 
-      yield put(setChildren(data?.data?.children));
+      if (data?.message === 'child already exists') {
+        Snackbar.show({
+          text: 'Child already exists',
+          textColor: 'white',
+          duration: Snackbar.LENGTH_LONG,
+        });
+        onClose();
+        yield put(childAdded(false));
+        return;
+      }
+
+      if (data?.data?.children) {
+        yield put(setChildren(data?.data?.children));
+      }
       yield put(childAdded(true));
       Snackbar.show({
         text: 'Child Added Successfully',
@@ -45,7 +58,6 @@ export function* userSaga() {
         duration: Snackbar.LENGTH_LONG,
       });
       onClose();
-      console.log('Child added successfully', data);
     } catch (error) {
       console.log('error in adding Child', error.message);
     }
