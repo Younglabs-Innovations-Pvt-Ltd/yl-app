@@ -288,8 +288,7 @@ const SnakeLevels = ({
           {allClasses &&
             allClasses?.map((level, index) => {
               const statusEmoji =
-                level?.classStatus === 'Attended' &&
-                todaysClass?.classNumber != level?.classNumber
+                level?.classStatus === 'Attended'
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d/512.gif'
                   : level?.classStatus === 'Missed'
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f614/512.gif'
