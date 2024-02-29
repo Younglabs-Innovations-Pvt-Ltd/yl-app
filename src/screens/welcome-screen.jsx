@@ -362,7 +362,7 @@ const DemoClassScreen = ({navigation}) => {
                 <Text
                   className="ml-2 text-[15px] text-gray-800"
                   style={{fontFamily: FONTS.primaryFont}}>
-                  I agree to recieve updates on{' '}
+                  I agree to receive updates on{' '}
                   <MIcon name="whatsapp" color="green" size={20} /> WhatsApp
                 </Text>
               </Pressable>

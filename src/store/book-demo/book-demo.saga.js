@@ -43,29 +43,43 @@ function* fetchIpData() {
       }
     }
 
-    console.log('going for step 2');
     // step2: if ipdata is not in ls then get from api
     const response = yield fetch(GEO_LOCATION_API, {
       method: 'GET',
     });
 
-    console.log('going for step 3');
+    const data = yield response.json();
+
     if (response.status !== 200) {
       // step3: if did not get the data from api then alert for api calls limit exceeded
-      console.log('api limit exceeded');
       // step4: set Default US ipData when api calls limit exceeded
       console.log('setting default data of Us', US_ipData);
       yield put(fetchIpDataSuccess(US_ipData));
+      // Send error notification
+      yield fetch(`${BASE_URL}/admin/app/sendIpErrorNotification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({phone: '', error: data.message}),
+      });
       return;
     }
 
-    const data = yield response.json();
     console.log('setting data in localStorage');
     localStorage.set('ipDataInLs', JSON.stringify(data));
     // console.log("got ip data", data)
     yield put(fetchIpDataSuccess(data));
   } catch (error) {
     yield put(fetchIpDataFailed());
+    // Send error notification
+    yield fetch(`${BASE_URL}/admin/app/sendIpErrorNotification`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({phone: '', error: error.message}),
+    });
     console.log('Timezone error', error);
   }
 }

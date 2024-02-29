@@ -994,7 +994,7 @@ const Payment = ({navigation, route}) => {
               <View className="mt-2 border-t-[.4px] border-gray-400 ">
                 <View className="w-[85%] flex-row justify-between items-center">
                   <Text className="text-black text-[16px] font-semibold">
-                    Nett Total
+                    Net Total
                   </Text>
 
                   <Text className="text-black text-[16px] font-semibold">{`${ipData?.currency.symbol}${amount}`}</Text>
