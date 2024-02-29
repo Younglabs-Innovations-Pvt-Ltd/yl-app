@@ -23,6 +23,10 @@ import {COLORS} from '../utils/constants/colors';
 import Snackbar from 'react-native-snackbar';
 import BottomSheetInput from './BottomSheetInput';
 
+const capitalize = text => {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
 const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
   const handleShowDrawer = () => navigation.openDrawer();
   const [customerName, setCustomerName] = useState('To Younglabs');
@@ -152,8 +156,8 @@ const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
                       className={`font-semibold`}>
                       Welcome{' '}
                       {customerName && customerName?.length > 8
-                        ? customerName.slice(0, 8) + '...'
-                        : customerName || 'to Younglabs'}
+                        ? capitalize(customerName.slice(0, 8)) + '...'
+                        : capitalize(customerName) || 'to Younglabs'}
                     </Text>
 
                     {user?.credits > 0 && (
@@ -162,6 +166,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
                           color: darkMode
                             ? textColors.textSecondary
                             : '#448BD6',
+                          fontSize: 12,
                         }}
                         className={`text-[10px] font-semibold `}>
                         {user?.credits} credits
@@ -397,7 +402,7 @@ const EditChildView = ({child, close, setChildToEdit}) => {
   };
 
   const onSaveChild = () => {
-    console.log("clicked")
+    console.log('clicked');
     let body = {
       toAdd: childName,
       toRemove: child?.name,

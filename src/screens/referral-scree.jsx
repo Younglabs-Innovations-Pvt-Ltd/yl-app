@@ -29,17 +29,19 @@ const Referral = ({route}) => {
     state => state.appTheme,
   );
 
+  const code = referralCode ? referralCode.toUpperCase() : '';
+
   const copyReferralCode = () => {
-    Clipboard.setString(referralCode);
+    Clipboard.setString(code);
     Snackbar.show({
-      text: `Referral code ${referralCode} copied`,
+      text: `Referral code ${code} copied`,
       textColor: textColors.textSecondary,
       duration: Snackbar.LENGTH_SHORT,
     });
   };
 
   const shareOnWhatsApp = async () => {
-    let text = `I really liked Younglabs courses for my child.\n\nAdding you as a referral. You will get 15% off on Younglabs courses when you buy on their app Or website using the code: ${referralCode}\n\nWebsite: www.younglabs.in`;
+    let text = `I really liked Younglabs courses for my child.\n\nAdding you as a referral. You will get 15% off on Younglabs courses when you buy on their app Or website using the code: *${code}*\n\nWebsite: www.younglabs.in`;
     let whatsAppUrl = '';
 
     text = encodeURIComponent(text);
@@ -100,7 +102,7 @@ const Referral = ({route}) => {
                   fs={14}
                   color={textColors.textSecondary}
                   ff={FONTS.primaryFont}>
-                  {referralCode}
+                  {code}
                 </TextWrapper>
               </Pressable>
             </View>

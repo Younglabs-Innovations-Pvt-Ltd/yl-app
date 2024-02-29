@@ -13,11 +13,10 @@ import BottomSheetComponent from './BottomSheetComponent';
 import CustomerSupportFeature from './CourseLevelScreenComponent/features/customer-support-feature';
 
 const shareApp = async (customer, referralCode) => {
-  console.log('in tababr comp', referralCode, customer);
-
+  const code = referralCode ? referralCode.toUpperCase() : '';
   let message;
   if (customer === 'yes') {
-    message = `I really liked Younglabs courses for my child.\n\nAdding you as a referral. You will get 15% off on Younglabs courses when you buy on their app Or website using the code: ${referralCode}\n\nWebsite: www.younglabs.in`;
+    message = `I really liked Younglabs courses for my child.\n\nAdding you as a referral. You will get 15% off on Younglabs courses when you buy on their app Or website using the code: *${code}*\n\nWebsite: www.younglabs.in`;
   } else {
     message = `I really liked Younglabs handwriting improvement App. You can try it as well.`;
   }

@@ -164,6 +164,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
         item => item.ageGroup === currentAgeGroup,
       );
 
+      console.log('filteredBatchesLength', filteredBatches.length);
       setFilteredBatches(filteredBatches);
     }
   }, [currentAgeGroup, batches]);
