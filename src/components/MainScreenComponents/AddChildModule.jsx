@@ -1,17 +1,15 @@
 import {View, Text, Pressable, ActivityIndicator} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Input from '../CustomInputComponent';
 import DropdownComponent from '../DropdownComponent';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import BookDemoScreen from '../../screens/book-demo-form.screen';
 import {authSelector} from '../../store/auth/selector';
 import {FONTS} from '../../utils/constants/fonts';
 import {startAddingChild} from '../../store/user/reducer';
 import {userSelector} from '../../store/user/selector';
 import {Showtoast} from '../../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
-import {COLORS} from '../../utils/constants/colors';
+import BottomSheetInput from '../BottomSheetInput';
 
 export const AddChildModule = ({onClose}) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
@@ -74,11 +72,10 @@ export const AddChildModule = ({onClose}) => {
         </Text>
 
         <View className="w-[95%] mt-4">
-          <Input
+          <BottomSheetInput
             setValue={setChildName}
             placeHolder="Enter Child Name"
             value={childName}
-            isDisabled={false}
           />
 
           <View className="w-full mt-1">
