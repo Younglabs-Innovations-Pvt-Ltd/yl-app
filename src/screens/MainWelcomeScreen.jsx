@@ -259,10 +259,9 @@ const MainWelcomeScreen = ({navigation}) => {
           />
         )}
 
-        <Spacer space={8} />
         <ShowCourses navigation={navigation} />
         {/* Reviews And Testimonials Here */}
-        <Spacer space={12} />
+        <Spacer space={8} />
         <ReviewsAndTestimonials />
 
         <Spacer space={16} />
