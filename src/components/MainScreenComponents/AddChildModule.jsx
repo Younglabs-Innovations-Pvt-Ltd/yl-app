@@ -19,6 +19,7 @@ export const AddChildModule = ({onClose}) => {
   const [isFieldsFilled, setIsFieldsFilled] = useState(false);
   const {customer, user} = useSelector(authSelector);
   const {childAddLoading} = useSelector(userSelector);
+  const {children} = useSelector(userSelector);
 
   const dispatch = useDispatch();
   const toast = useToast();
@@ -51,13 +52,12 @@ export const AddChildModule = ({onClose}) => {
       childAge,
       leadId: user?.leadId,
       onClose,
+      children,
     };
 
     console.log('adding child');
     dispatch(startAddingChild(body));
     setChildName('');
-    // console.log('isFiled filled', isFieldsFilled);
-    // console.log('body is', body);
   };
 
   return (

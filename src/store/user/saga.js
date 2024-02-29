@@ -17,7 +17,12 @@ export function* userSaga() {
   function* addChildSaga({payload}) {
     try {
       const onClose = payload.onClose;
+      const children = payload.children;
+
       delete payload.onClose;
+      delete payload.children;
+      console.log('payload giving is', payload, children);
+
       const res = yield fetch(`${BASE_URL}/admin/app/addChildName`, {
         method: 'POST',
         headers: {
@@ -34,6 +39,11 @@ export function* userSaga() {
       const data = yield res.json();
       if (data.message === 'child limit exceeded') {
         yield put(childAdded(false));
+        Snackbar.show({
+          text: 'Child limit exceeded',
+          textColor: 'white',
+          duration: Snackbar.LENGTH_LONG,
+        });
         return;
       }
 
@@ -48,16 +58,23 @@ export function* userSaga() {
         return;
       }
 
-      if (data?.data?.children) {
-        yield put(setChildren(data?.data?.children));
-      }
-      yield put(childAdded(true));
+      delete payload?.leadId;
+      let newChildrenData = [
+        ...children,
+        {name: payload?.childName, age: payload?.childAge},
+      ];
+      console.log('new list of child is', newChildrenData);
+      yield put(setChildren(newChildrenData));
+
+      // if (data?.data?.children) {
+      // }
       Snackbar.show({
         text: 'Child Added Successfully',
         textColor: 'white',
         duration: Snackbar.LENGTH_LONG,
       });
       onClose();
+      yield put(childAdded(true));
     } catch (error) {
       console.log('error in adding Child', error.message);
     }
@@ -84,6 +101,8 @@ export function* userSaga() {
       if (data?.data?.children) {
         console.log('got data in return', data?.data?.children);
         yield put(setChildren(data?.data?.children));
+      } else {
+        console.log('got data', data);
       }
       Snackbar.show({
         text: 'Child Edited Successfully',
