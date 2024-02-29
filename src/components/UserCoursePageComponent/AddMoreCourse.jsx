@@ -10,6 +10,7 @@ const AddMoreCourse = ({
   bgSecondaryColor,
   openCoursesSheet,
   textColors,
+  setBottomSheetSource,
 }) => {
   const styles = StyleSheet.create({
     borderStyle: {
@@ -29,7 +30,10 @@ const AddMoreCourse = ({
     <>
       <View className="h-[90%] ">
         <Pressable
-          onPress={openCoursesSheet}
+          onPress={() => {
+            setBottomSheetSource(null);
+            openCoursesSheet();
+          }}
           style={[
             styles.borderStyle,
             styles.innerBorder,

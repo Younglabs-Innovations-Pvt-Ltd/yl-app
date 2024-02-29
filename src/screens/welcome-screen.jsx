@@ -320,9 +320,9 @@ const DemoClassScreen = ({navigation}) => {
             className="py-6 bg-white px-3 relative">
             {/* <View className="absolute p-[2px] rounded-full bg-gray-400 top-1 left-[48%] w-[15%]"></View> */}
 
-            {/* <TextWrapper fs={18} styles={{marginLeft: 8, marginBottom: 8}}>
+            <TextWrapper fs={17} styles={{marginLeft: 8, marginBottom: 6}}>
               Book Free Handwriting Class
-            </TextWrapper> */}
+            </TextWrapper>
             <View style={styles.row}>
               <Pressable style={styles.btnCountryCode} onPress={onModalOpen}>
                 <TextWrapper>{country?.callingCode}</TextWrapper>
@@ -350,13 +350,13 @@ const DemoClassScreen = ({navigation}) => {
                 className="flex flex-row items-center mt-2 mb-2 justify-start px-3"
                 onPress={() => setWhatsappConsent(!whatsappConsent)}>
                 <View
-                  className={`h-[25px] w-[25px] justify-center items-center rounded border  ${
+                  className={`h-[18px] w-[18px] justify-center items-center rounded border  ${
                     whatsappConsent
                       ? 'border-[#76C8F2] bg-[#76C8F2]'
                       : 'border-gray-400 bg-white'
                   }`}>
                   {whatsappConsent && (
-                    <MIcon name="check" color="white" size={20} />
+                    <MIcon name="check" color="white" size={16} />
                   )}
                 </View>
                 <Text

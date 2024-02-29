@@ -2,10 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet} from 'react-native';
 import {Image, Text, View} from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
+import {useSelector} from 'react-redux';
+import {FONTS} from '../../utils/constants/fonts';
 
-const PopularCourses = ({courses, navigation}) => {
+const PopularCourses = ({courses, navigation, bottomSheetSource}) => {
   const [allCourses, setAllCourses] = useState(courses);
   const [allCoursesKey, setAllCoursesKey] = useState(Object.keys(courses));
+  const {textColors} = useSelector(state => state.appTheme);
 
   useEffect(() => {
     // console.log(allCoursesKey, 'regiheorihgerihgoeirngo');
@@ -29,6 +32,18 @@ const PopularCourses = ({courses, navigation}) => {
   });
   return (
     <View>
+      {bottomSheetSource === 'noCourse' && (
+        <View className="w-full flex flex-row justify-center items-center">
+          <Text
+            style={{
+              fontFamily: FONTS.headingFont,
+              color: textColors?.textPrimary,
+            }}
+            className="text-[19px] font-semibold">
+            Register for a course to access
+          </Text>
+        </View>
+      )}
       <ScrollView className="w-[96vw] mx-auto">
         {allCoursesKey &&
           allCourses &&

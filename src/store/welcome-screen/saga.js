@@ -49,12 +49,12 @@ function* handleBookingStatus({payload: {phone, ipData}}) {
   try {
     // Check for length of a phone number according to country
     // Return true or false
-    // const isValidPhone = isValidNumber(phone, country.country_code2);
+    const isValidPhone = isValidNumber(phone, ipData.country_code2);
 
-    // if (!isValidPhone) {
-    //   yield put(setErrorMessage('Please enter a valid number'));
-    //   return;
-    // }
+    if (!isValidPhone) {
+      yield put(setErrorMessage('Please enter a valid number'));
+      return;
+    }
 
     const deviceId = yield getCurrentDeviceId();
     const deviceUID = yield DeviceInfo.getAndroidId();
@@ -105,7 +105,7 @@ function* startBookingStatus() {
 
 function* startFetchingCoursesForLandingPage({payload}) {
   try {
-    console.log("payload", payload);
+    console.log('payload', payload);
     const country = payload.country?.toLowerCase();
     console.log('country: ', country);
 

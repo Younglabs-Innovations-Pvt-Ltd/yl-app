@@ -29,6 +29,7 @@ import {authSelector} from '../store/auth/selector';
 import {startFetchingUserOrders} from '../store/welcome-screen/reducer';
 import {navigate} from '../navigationRef';
 import {opacity} from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
+import CourseLevelScreenDummy from '../components/CourseLevelScreenDummy';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width} = Dimensions.get('window');
@@ -42,6 +43,7 @@ const UserCoursesPage = ({navigation}) => {
   const {currentChild} = useSelector(userSelector);
   const [changeChildSheet, setChangeChildSheeet] = useState(false);
   const [coursesSheetOpen, setCoursesSheetOpen] = useState(false);
+  const [bottomSheetSource, setBottomSheetSource] = useState(null);
   const {user, customer} = useSelector(authSelector);
 
   useEffect(() => {
@@ -169,17 +171,22 @@ const UserCoursesPage = ({navigation}) => {
               </ScrollView>
             </View>
           ) : (
-            <View className="flex flex-col justify-center items-center h-[100%] w-[100vw]">
-              <ImageBackground
+            <View
+              style={styles.SnakeLevelOpacity}
+              className="flex flex-col justify-center items-center h-[100%] w-[100vw]">
+              <CourseLevelScreenDummy
+                setCoursesSheetOpen={setCoursesSheetOpen}
+                setBottomSheetSource={setBottomSheetSource}
+              />
+            </View>
+          )}
+          {/* <ImageBackground
                 style={styles.backgroundImage}
                 source={
                   darkMode
                     ? courseLevelScreenImageDarkMode
                     : courseLevelScreenImageLightMode
-                }></ImageBackground>
-            </View>
-          )}
-
+                }></ImageBackground> */}
           <View className="h-[25%] w-full items-center flex-1 absolute bottom-0">
             <AddMoreCourse
               addMoreCourseCardbgColor={addMoreCourseCardbgColor}
@@ -190,6 +197,7 @@ const UserCoursesPage = ({navigation}) => {
               openCoursesSheet={() => {
                 setCoursesSheetOpen(true);
               }}
+              setBottomSheetSource={setBottomSheetSource}
               textColors={textColors}
             />
           </View>
@@ -204,10 +212,14 @@ const UserCoursesPage = ({navigation}) => {
           <BottomSheetComponent
             isOpen={coursesSheetOpen}
             Children={
-              <PopularCourses courses={courses} navigation={navigation} />
+              <PopularCourses
+                courses={courses}
+                navigation={navigation}
+                bottomSheetSource={bottomSheetSource}
+              />
             }
             onClose={() => setCoursesSheetOpen(false)}
-            snapPoint={['50%', '75%']}
+            snapPoint={['63%', '63%']}
           />
         </View>
       )}
