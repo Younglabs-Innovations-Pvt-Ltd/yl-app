@@ -32,7 +32,7 @@ const PopularCourses = ({courses, navigation, bottomSheetSource}) => {
   });
   return (
     <View>
-      {bottomSheetSource === 'noCourse' && (
+      {bottomSheetSource === 'noCourse' ? (
         <View className="w-full flex flex-row justify-center items-center">
           <Text
             style={{
@@ -41,6 +41,17 @@ const PopularCourses = ({courses, navigation, bottomSheetSource}) => {
             }}
             className="text-[19px] font-semibold">
             Register for a course to access
+          </Text>
+        </View>
+      ) : (
+        <View className="w-full flex flex-row justify-center items-center">
+          <Text
+            style={{
+              fontFamily: FONTS.headingFont,
+              color: textColors?.textPrimary,
+            }}
+            className="text-[19px] font-semibold">
+            Buy a course now
           </Text>
         </View>
       )}
