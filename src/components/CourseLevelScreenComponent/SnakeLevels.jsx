@@ -288,7 +288,8 @@ const SnakeLevels = ({
           {allClasses &&
             allClasses?.map((level, index) => {
               const statusEmoji =
-                level?.classStatus === 'Attended' && todaysClass?.classNumber != level?.classNumber
+                level?.classStatus === 'Attended' &&
+                todaysClass?.classNumber != level?.classNumber
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d/512.gif'
                   : level?.classStatus === 'Missed'
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f614/512.gif'
@@ -296,7 +297,7 @@ const SnakeLevels = ({
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f603/512.gif'
                   : level?.classStatus === 'Ongoing'
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f913/512.gif'
-                  : '';
+                  : 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f614/512.gif';
               count = count >= marginleftcustom.length - 1 ? 0 : count + 1;
               return (
                 <View key={index} className="w-[100%] my-3 bg-transparent">
