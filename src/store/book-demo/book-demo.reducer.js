@@ -35,8 +35,12 @@ const reducer = {
     state.ipData = action.payload;
     state.timezone = action?.payload?.time_zone?.offset_with_dst;
   },
-  fetchIpDataFailed(state){
-    state.loading.ipDataLoading = false
+  setIpData(state, action) {
+    state.ipData = action.payload;
+    state.timezone = action?.payload?.time_zone?.offset_with_dst;
+  },
+  fetchIpDataFailed(state) {
+    state.loading.ipDataLoading = false;
   },
   startFetchingBookingSlots(state) {
     state.loading.bookingSlotsLoading = true;
@@ -140,6 +144,7 @@ export const {
   setOneToOneBookingSuccess,
   setOneToOneBookingFailed,
   setOneToOneBookingFailed2,
+  setIpData,
 } = bookDemoSlice.actions;
 
 // reducer

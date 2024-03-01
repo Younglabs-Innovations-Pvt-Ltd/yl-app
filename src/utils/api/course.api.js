@@ -1,6 +1,6 @@
 import {BASE_URL} from '@env';
 
-export const getCourseDetails = async ({courseId, courseType, country}) => {
+export const getCourseDetails = async ({courseId, country}) => {
   return fetch(`${BASE_URL}/admin/courses/getCourseDetailsNew`, {
     method: 'POST',
     headers: {

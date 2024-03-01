@@ -165,7 +165,7 @@ const HeaderComponent = ({navigation, setShowAddChildView, open, ipData}) => {
                         style={{
                           color: darkMode
                             ? textColors.textSecondary
-                            : '#448BD6',
+                            : COLORS.white,
                           fontSize: 12,
                         }}
                         className={`text-[10px] font-semibold `}>

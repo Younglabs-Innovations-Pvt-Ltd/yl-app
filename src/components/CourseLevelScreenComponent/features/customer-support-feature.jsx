@@ -195,8 +195,8 @@ const CustomerSupportFeature = ({
               setSelectedValue={setSelectClassNumber}
             />
           )}
-          <TextInput
-            style={{color: textColors?.textPrimary}}
+          <BottomSheetTextInput
+            style={[styles.bottomSheetInput, {color: textColors?.textPrimary}]}
             className="w-[100%] border border-solid border-[#adabab] text-[16px] rounded-xl px-2 mt-3"
             multiline
             numberOfLines={6}
@@ -205,6 +205,7 @@ const CustomerSupportFeature = ({
             placeholder="Describe the issue in detail"
             placeholderTextColor={'#858080'}
             textAlignVertical="top"
+            selectionColor={textColors.textPrimary}
           />
           <Pressable
             onPress={onFormSubmit}
@@ -224,7 +225,7 @@ const CustomerSupportFeature = ({
 export default CustomerSupportFeature;
 
 const styles = StyleSheet.create({
-  input: {
+  bottomSheetInput: {
     width: '100%',
     borderWidth: 1,
     borderColor: '#adabab',

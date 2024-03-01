@@ -21,6 +21,7 @@ import {makeNewBooking, addNewSoloBooking} from '../../utils/api/yl.api';
 import {fetchUserFormLoginDetails} from '../auth/reducer';
 import Snackbar from 'react-native-snackbar';
 import {US_ipData} from '../../assets/data/US_ipData';
+import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 
 /**
  * @author Shobhit
@@ -32,7 +33,7 @@ import {US_ipData} from '../../assets/data/US_ipData';
 function* fetchIpData() {
   try {
     // Setp1 : getting the saved ip data from local storage and retrun it if exists
-    const dataInLs = localStorage.getString('ipDataInLs');
+    const dataInLs = localStorage.getString(LOCAL_KEYS.IP_DATA);
     console.log('checking data in local storage');
     if (dataInLs) {
       const parsedData = JSON.parse(dataInLs);
@@ -67,7 +68,7 @@ function* fetchIpData() {
     }
 
     console.log('setting data in localStorage');
-    localStorage.set('ipDataInLs', JSON.stringify(data));
+    localStorage.set(LOCAL_KEYS.IP_DATA, JSON.stringify(data));
     // console.log("got ip data", data)
     yield put(fetchIpDataSuccess(data));
   } catch (error) {

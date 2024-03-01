@@ -53,13 +53,9 @@ const CourseDetails = ({navigation, courseData}) => {
   const [filteredLevels, setFilteredLevels] = useState([]);
   const [selectedLevelItemToShow, setSelectedLevelItemToShow] = useState(null);
 
-  // console.log("CourseID here in this page", courseId)
-
   const {courseDetails, ageGroups, courseVideos, loading} =
     useSelector(courseSelector);
   const {ipData} = useSelector(bookDemoSelector);
-
-  // console.log("About course array is", aboutCourseArr[0].objArray[0].content)
 
   useEffect(() => {
     if (!courseDetails || courseDetails?.courseId !== courseData.id) {
@@ -208,6 +204,9 @@ const CourseDetails = ({navigation, courseData}) => {
           />
         ) : (
           <>
+            {courseDetails?.courseId === 'Eng_Hw' && courseVideos && (
+              <VideoPlayer uri={courseVideos.postDemoVideo} />
+            )}
             <View className="mt-2">
               <Text
                 className="text-center font-semibold"

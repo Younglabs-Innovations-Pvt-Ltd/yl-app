@@ -15,6 +15,7 @@ const localKeys = {
   JOIN_CLASS: 'joinClass',
   DEMO_TIME: 'demoTime',
   LOGINDETAILS: 'loginDetails',
+  IP_DATA: 'ipDataInLs',
 };
 
 export const LOCAL_KEYS = Object.freeze(localKeys);

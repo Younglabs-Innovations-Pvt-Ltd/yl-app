@@ -215,7 +215,7 @@ const UserProfile = ({navigation}) => {
                   borderRadius: 8,
                   backgroundColor: bgSecondaryColor,
                 }}>
-                <View style={{flex: 1, flexDirection: 'row'}}>
+                <View style={{flex: 1, flexDirection: 'row', gap: 8}}>
                   <View style={{flex: 1}}>
                     <TextWrapper
                       fs={20}
@@ -231,23 +231,49 @@ const UserProfile = ({navigation}) => {
                       Invite your friends to join Younglabs courses and earn
                       credits
                     </TextWrapper>
+                    <Spacer space={4} />
+                    <Pressable
+                      style={({pressed}) => [
+                        styles.btnRefer,
+                        {opacity: pressed ? 0.8 : 1},
+                      ]}
+                      onPress={goToReferral}>
+                      <TextWrapper color={COLORS.white} ff={FONTS.primaryFont}>
+                        Refer
+                      </TextWrapper>
+                    </Pressable>
                   </View>
                   <View
-                    style={{paddingHorizontal: 4, justifyContent: 'center'}}>
+                    style={{
+                      paddingHorizontal: 4,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
                     <Image source={GiftBoxIcon} style={styles.giftBoxIcon} />
+                    {user?.credits && (
+                      <React.Fragment>
+                        <Text
+                          style={{
+                            color: textColors.textSecondary,
+                            marginTop: 4,
+                            fontSize: 12.5,
+                          }}
+                          className={`text-[10px] font-semibold `}>
+                          Earned credits
+                        </Text>
+                        <Text
+                          style={{
+                            color: COLORS.pblue,
+                            fontWeight: 'bold',
+                            fontSize: 20,
+                          }}
+                          className={`text-[10px] font-semibold `}>
+                          {user?.credits}
+                        </Text>
+                      </React.Fragment>
+                    )}
                   </View>
                 </View>
-                <Spacer space={4} />
-                <Pressable
-                  style={({pressed}) => [
-                    styles.btnRefer,
-                    {opacity: pressed ? 0.8 : 1},
-                  ]}
-                  onPress={goToReferral}>
-                  <TextWrapper color={COLORS.white} ff={FONTS.primaryFont}>
-                    Refer
-                  </TextWrapper>
-                </Pressable>
               </View>
             </View>
 

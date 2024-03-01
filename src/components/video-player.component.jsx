@@ -15,7 +15,7 @@ const isFileExists = async uri => {
 
 const VideoMediaPlayer = ({uri, ...otherProps}) => {
   const [videoLoading, setVideoLoading] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(true);
   const [localUri, setLocalUri] = useState('');
   const videoRef = useRef(null);
 
@@ -91,8 +91,6 @@ const VideoMediaPlayer = ({uri, ...otherProps}) => {
           ref={videoRef}
           source={{uri: localUri}}
           style={styles.video}
-          paused={paused}
-          muted={true}
           // posterResizeMode="cover"
           resizeMode="cover"
           onLoadStart={onLoadStart}

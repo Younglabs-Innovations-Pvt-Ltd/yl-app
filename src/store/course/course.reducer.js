@@ -18,7 +18,7 @@ const INITIAL_STATE = {
 };
 
 const reducer = {
-  fetchCourseStart(state , action) {
+  fetchCourseStart(state, action) {
     state.loading = true;
   },
   fetchCourseSuccess(state, action) {
@@ -32,6 +32,7 @@ const reducer = {
   },
   fetchCourseFailed(state, action) {
     state.message = action.payload.message;
+    state.loading = false;
   },
   setPrice(state, action) {
     state.price = action.payload;

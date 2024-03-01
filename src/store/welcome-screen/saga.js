@@ -3,7 +3,6 @@ import {
   fetchBookingStatusStart,
   fetchBookingStatusFailed,
   fetchBookingStatusSuccess,
-  setErrorMessage,
   getCoursesForWelcomeScreen,
   getCoursesForWelcomeScreenFailed,
   getCoursesForWelcomeScreenSuccess,
@@ -34,6 +33,8 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import {getCurrentDeviceId} from '../../utils/deviceId';
 import DeviceInfo from 'react-native-device-info';
 import {fetchUserFormLoginDetails} from '../auth/reducer';
+import {US_ipData} from '../../assets/data/US_ipData';
+import {setIpData} from '../book-demo/book-demo.reducer';
 
 /**
  * @author Shobhit
@@ -105,13 +106,22 @@ function* startBookingStatus() {
 
 function* startFetchingCoursesForLandingPage({payload}) {
   try {
-    console.log('payload', payload);
     const country = payload.country?.toLowerCase();
-    console.log('country: ', country);
 
     const res = yield fetchCoursesForWelcomeScreen(country);
-    const data = yield res.json();
-    // console.log("got data",data)
+    let data = yield res.json();
+
+    if (res.status === 404) {
+      const courseRes = yield fetchCoursesForWelcomeScreen(
+        US_ipData.country_name,
+      );
+      data = yield courseRes.json();
+      let localIpData = localStorage.getString(LOCAL_KEYS.IP_DATA);
+      localIpData = JSON.parse(localIpData);
+      const newIpData = {...US_ipData, country_flag: localIpData.country_flag};
+      localStorage.set(LOCAL_KEYS.IP_DATA, JSON.stringify(newIpData));
+      yield put(setIpData(newIpData));
+    }
 
     if (data) {
       const formattedCourses = {
