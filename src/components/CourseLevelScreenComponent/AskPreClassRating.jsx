@@ -131,7 +131,7 @@ const AskPreClassRating = ({previousClassData, setAskForRating}) => {
     <View className="h-[100%] w-[100%] absolute z-20 flex justify-center items-center">
       <View
         className={`flex flex-col justify-start items-center ${
-          feedBack !== 'Other' ? 'h-[50%]' : 'h-[70%]'
+          feedBack !== 'Other' ? 'h-[50%]' : 'h-[75%]'
         } w-[90%] bg-white px-3 py-3 rounded-md`}>
         <View className="flex flex-col justify-center items-center w-full">
           <Text className="text-black text-[23px] font-semibold mb-3">
