@@ -275,11 +275,12 @@ const SnakeLevels = ({
                         'https://play.google.com/store/apps/details?id=com.microsoft.teams',
                       ).catch(err => console.error('An error occurred: ', err));
                     }}
-                    className="px-2 py-1 rounded-md ml-2"
+                    className="px-2 py-1 rounded-md ml-2 flex-row"
                     style={{backgroundColor: textColors?.textYlMain}}>
-                    <Text className="text-[13px] font-semibold text-white">
+                    <Text className="text-[13px] mr-1 font-semibold text-white">
                       Microsoft Teams
                     </Text>
+                    <MIcon name="microsoft-teams" size={20} color={'white'} />
                   </Pressable>
                 </View>
               </View>
