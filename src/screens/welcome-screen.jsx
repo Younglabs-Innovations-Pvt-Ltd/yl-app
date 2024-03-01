@@ -380,7 +380,7 @@ const DemoClassScreen = ({navigation}) => {
                   fs={18}
                   ff={FONTS.headingFont}
                   color={COLORS.white}>
-                  LogIn
+                  Book Free Class
                 </TextWrapper>
               </TouchableOpacity>
             ) : (
@@ -394,7 +394,7 @@ const DemoClassScreen = ({navigation}) => {
                   fs={18}
                   ff={FONTS.headingFont}
                   color={COLORS.white}>
-                  LogIn
+                  Book Free Class
                 </TextWrapper>
               </TouchableOpacity>
             )}

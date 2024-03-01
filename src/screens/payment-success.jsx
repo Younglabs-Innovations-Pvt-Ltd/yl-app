@@ -11,7 +11,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import Snackbar from 'react-native-snackbar';
 import {SCREEN_NAMES} from '../utils/constants/screen-names';
 
-const INITIAL_COUNT = 10;
+const INITIAL_COUNT = 5;
 
 const PaymentSuccess = () => {
   const {user} = useSelector(authSelector);

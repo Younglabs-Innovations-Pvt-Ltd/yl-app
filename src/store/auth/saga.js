@@ -23,6 +23,7 @@ import {resetNavigation} from '../../navigationRef';
 import {setIsFirstTimeUser} from '../welcome-screen/reducer';
 import {BASE_URL} from '@env';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
+import {removeRegisterNotificationTimer} from '../../natiive-modules/timer-notification';
 
 function* phoneAuthentication({payload: {phone}}) {
   try {
@@ -109,6 +110,8 @@ function* logoutFunc({payload}) {
     resetNavigation();
   }
   localStorage.clearAll();
+
+  removeRegisterNotificationTimer();
 
   const currentUser = auth().currentUser;
   if (currentUser) {

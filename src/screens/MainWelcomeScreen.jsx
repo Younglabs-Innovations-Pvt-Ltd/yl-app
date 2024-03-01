@@ -38,6 +38,8 @@ import {FONTS} from '../utils/constants/fonts';
 import {networkSelector} from '../store/network/selector';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import DemoComp from '../components/DemoComp';
+import {joinDemoSelector} from '../store/join-demo/join-demo.selector';
+import {registerNotificationTimer} from '../natiive-modules/timer-notification';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
@@ -63,6 +65,19 @@ const MainWelcomeScreen = ({navigation}) => {
   const {
     networkState: {isConnected},
   } = useSelector(networkSelector);
+
+  const {bookingTime} = useSelector(joinDemoSelector);
+
+  // Show timer
+  useEffect(() => {
+    if (bookingTime) {
+      const currentTime = Date.now();
+
+      if (bookingTime > currentTime) {
+        registerNotificationTimer(bookingTime);
+      }
+    }
+  }, [bookingTime]);
 
   // fetch IpData
   useEffect(() => {

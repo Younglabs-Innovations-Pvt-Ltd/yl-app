@@ -1,13 +1,12 @@
 import {View, Text, ImageBackground, Pressable} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import Level2 from '../../assets/images/redRank.png';
-import Level1 from '../../assets/images/blueRank.png';
 import Custom from '../../assets/images/chevron_cleanup.png';
 import {SCREEN_NAMES} from '../../utils/constants/screen-names';
 import moment from 'moment';
 import LinearGradient from 'react-native-linear-gradient';
 import {Image} from 'react-native-animatable';
 import {FONTS} from '../../utils/constants/fonts';
+import {COLORS} from '../../utils/constants/colors';
 
 const ServiceRequestCard = ({
   course,
@@ -32,24 +31,41 @@ const ServiceRequestCard = ({
     }
   }, [course]);
 
+  const navigateToLevel = () => {
+    if (course?.batchId !== 'unallocated') {
+      navigation.navigate(SCREEN_NAMES.COURSE_LEVEL_PAGE, {
+        serviceRequestId: course?.serviceRequestId,
+        course: course,
+        courseName: alternativeNameOnApp,
+      });
+    }
+  };
+
   return (
     <View className="overflow-hidden rounded-xl relative mt-[6px] border border-solid border-gray-200">
       <ImageBackground source={{uri: `${thumbnailUrl || ' '}`}}>
         <LinearGradient
           start={{x: 0.5, y: -0.3}}
           colors={['#e9dcdc78', '#161414a2']}>
+          {/* flex flex-row justify-between items-center */}
           <Pressable
-            onPress={() => {
-              // console.log('navigate to course page', course?.serviceRequestId);
-              navigation.navigate(SCREEN_NAMES.COURSE_LEVEL_PAGE, {
-                serviceRequestId: course?.serviceRequestId,
-                course: course,
-                courseName: alternativeNameOnApp,
-              });
-            }}
-            className="w-[92vw] h-[160px] rounded-lg shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px] flex flex-row justify-between items-center mt-2 pl-3">
+            onPress={navigateToLevel}
+            className="w-[92vw] h-[160px] rounded-lg shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px] mt-2 pl-3">
             <View className="flex flex-row justify-between items-center w-[100%]">
-              <View className="py-2 h-[160px] max-w-[63%] flex flex-col justify-end items-start">
+              <View
+                className={`py-2 h-[160px] max-w-[63%] justify-${
+                  course?.batchId === 'unallocated' ? 'between' : 'end'
+                } items-start`}>
+                {course?.batchId === 'unallocated' && (
+                  <View style={{padding: 4}}>
+                    <Text
+                      style={{fontFamily: FONTS.primaryFont}}
+                      className="text-[16px] text-white font-semibold">
+                      Advanced level will start after completion of Foundation
+                      level
+                    </Text>
+                  </View>
+                )}
                 <View className="flex flex-col justify-center items-start">
                   {course?.course_type !== 'curriculum' ? (
                     <Text

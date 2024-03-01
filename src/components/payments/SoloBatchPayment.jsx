@@ -19,7 +19,6 @@ import {FONTS} from '../../utils/constants/fonts';
 import {ScrollView} from 'react-native-gesture-handler';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
 import {
   resetCourseDetails,
   setCurrentAgeGroup,
@@ -566,8 +565,7 @@ const SoloBatchPayment = ({
                       alignItems: 'center',
                       justifyContent: 'space-between',
                     }}
-                    onPress={() => setCollapsed(p => ({...p, time: !p.time}))}
-                    disabled={!showPrice}>
+                    onPress={() => setCollapsed(p => ({...p, time: !p.time}))}>
                     <TextWrapper
                       fs={20}
                       fw="700"
@@ -634,7 +632,8 @@ const SoloBatchPayment = ({
                   <Pressable
                     onPress={() =>
                       setCollapsed(p => ({...p, payment: !p.payment}))
-                    }>
+                    }
+                    disabled={!date}>
                     <TextWrapper
                       fs={20}
                       fw="700"
@@ -691,7 +690,11 @@ const SoloBatchPayment = ({
                 onPress={() => setShowContactOnWhatsAppSheet(false)}
               />
             </View>
-            <ShowPriceFalseView courseData={courseData} />
+            <ShowPriceFalseView
+              courseData={courseData}
+              date={date}
+              selectedLevelToBuy={selectedLevelToBuy}
+            />
           </View>
         </View>
       </ModalComponent>

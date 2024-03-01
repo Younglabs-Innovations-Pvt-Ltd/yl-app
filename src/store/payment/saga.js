@@ -13,7 +13,7 @@ import {LOCAL_KEYS} from '../../utils/constants/local-keys';
 import RazorpayCheckout from 'react-native-razorpay';
 import {MESSAGES} from '../../utils/constants/messages';
 import {setEmail} from '../auth/reducer';
-import {BASE_URL, RP_KEY} from '@env';
+import {BASE_URL, RP_KEY, RP_TEST_KEY} from '@env';
 import {localStorage} from '../../utils/storage/storage-provider';
 import auth from '@react-native-firebase/auth';
 import {Linking} from 'react-native';
@@ -155,78 +155,77 @@ function* makePaymentSaga({payload}) {
     console.log('payment method is', paymentMethod);
     if (paymentMethod === 'tazapay') {
       yield payOnTazapay({body, ipData});
-      return;
-    }
+    } else {
+      const token = yield auth().currentUser.getIdToken();
+      // console.log('body=', body);
+      const response = yield fetch(
+        `${BASE_URL}/shop/orderhandler/makepayment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        },
+      );
 
-    const token = yield auth().currentUser.getIdToken();
-    // console.log('body=', body);
-    const response = yield fetch(`${BASE_URL}/shop/orderhandler/makepayment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+      if (data?.order?.status === 'failed') {
+        yield put(makePaymentFailed('Something went wrong'));
+        return;
+      }
 
-    if (data?.order?.status === 'failed') {
-      yield put(makePaymentFailed('Something went wrong'));
-      return;
-    }
+      console.log('here 1', response.status);
 
-    console.log('here 1', response.status);
+      const data = yield response.json();
 
-    const data = yield response.json();
+      console.log('here 2');
 
-    console.log('here 2');
+      console.log('data.order', data);
 
-    console.log('data.order', data);
+      const {amount, id: order_id, currency} = data.order;
 
-    const {amount, id: order_id, currency} = data.order;
+      yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bagDetails: {...body, rpOrderId: order_id, type: 'order'},
+          leadId: body?.leadId,
+        }),
+      });
 
-    yield fetch(`${BASE_URL}/shop/orderhandler/addToBag`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        bagDetails: {...body, rpOrderId: order_id, type: 'order'},
-        leadId: body?.leadId,
-      }),
-    });
+      // let config = {
+      //   display: {
+      //     blocks: {
+      //       banks: {
+      //         name: 'Pay via UPI',
+      //         instruments: [
+      //           {
+      //             method: 'upi',
+      //           },
+      //         ],
+      //       },
+      //     },
+      //     sequence: ['block.banks'],
+      //     preferences: {
+      //       show_default_blocks: false,
+      //     },
+      //   },
+      // };
 
-    // let config = {
-    //   display: {
-    //     blocks: {
-    //       banks: {
-    //         name: 'Pay via UPI',
-    //         instruments: [
-    //           {
-    //             method: 'upi',
-    //           },
-    //         ],
-    //       },
-    //     },
-    //     sequence: ['block.banks'],
-    //     preferences: {
-    //       show_default_blocks: false,
-    //     },
-    //   },
-    // };
+      const options = {
+        key: RP_KEY,
+        currency,
+        amount: amount?.toString(),
+        order_id,
+        name: 'Younglabs',
+        description: 'Younglabs Innovations',
+      };
 
-    const options = {
-      key: RP_KEY,
-      currency,
-      amount: amount?.toString(),
-      order_id,
-      name: 'Younglabs',
-      description: 'Younglabs Innovations',
-    };
-
-    const rzRes = yield RazorpayCheckout.open(options);
-    console.log('rzRes=', rzRes);
-
-    if (rzRes.status_code === 200) {
+      yield RazorpayCheckout.open(options);
+      yield put(setLoading(false));
       replace(SCREEN_NAMES.PAYMENT_SUCCESS);
     }
   } catch (error) {
@@ -348,11 +347,9 @@ function* makeSoloPaymentSaga({payload}) {
         description: 'Younglabs Innovations',
       };
 
-      const rzRes = yield RazorpayCheckout.open(options);
-      console.log('rzRes=', rzRes);
-      if (rzRes.status_code === 200) {
-        replace(SCREEN_NAMES.PAYMENT_SUCCESS);
-      }
+      yield RazorpayCheckout.open(options);
+      yield put(setLoading(false));
+      replace(SCREEN_NAMES.PAYMENT_SUCCESS);
     }
   } catch (error) {
     console.log('getting err', error);

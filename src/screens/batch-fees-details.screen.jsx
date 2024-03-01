@@ -37,6 +37,7 @@ import {Showtoast} from '../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import ModalComponent from '../components/modal.component';
+import moment from 'moment';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -498,7 +499,7 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                     ]}
                     onPress={payNow}>
                     <TextWrapper fs={18} fw="700" color={COLORS.white}>
-                      Pay and Enroll
+                      Pay and enroll
                     </TextWrapper>
                   </Pressable>
                 </Collapsible>
@@ -524,7 +525,11 @@ const BatchFeeDetails = ({navigation, courseData}) => {
                 onPress={() => setShowContactOnWhatsAppSheet(false)}
               />
             </View>
-            <ShowPriceFalseView courseData={courseData} />
+            <ShowPriceFalseView
+              courseData={courseData}
+              date={new Date(currentSelectedBatch?.startDate?._seconds * 1000)}
+              selectedLevelToBuy={{level: currentSelectedBatch?.level}}
+            />
           </View>
         </View>
       </ModalComponent>
@@ -579,15 +584,18 @@ const AgeSelector = ({
   );
 };
 
-export const ShowPriceFalseView = ({courseData}) => {
+export const ShowPriceFalseView = ({courseData, selectedLevelToBuy, date}) => {
   const toast = useToast();
   const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
   // console.log('course Data is', courseData);
 
   const reqBatchPrices = async () => {
     try {
-      console.log('hit');
-      message = `Hi! i need to know the Prices of your ${courseData?.alternativeNameOnApp} Course.`;
+      const currentDate = new Date(date).toDateString();
+      console.log('currentDate is', currentDate);
+      const level = selectedLevelToBuy.level === 1 ? 'Foundation' : 'Advanced';
+
+      message = `Hi! I need to know the prices of your ${level} ${courseData?.alternativeNameOnApp} course for date ${currentDate}`;
       const link = getWhatsappRedirectUrl(message);
       await Linking.openURL(link);
     } catch (error) {
@@ -612,7 +620,7 @@ export const ShowPriceFalseView = ({courseData}) => {
         />
         <Text
           className="text-2xl font-semibold text-center"
-          style={{color: textColors.textSecondary}}>
+          style={{color: COLORS.black}}>
           Contact us for prices of this batch.
         </Text>
         <View className="w-full flex-row justify-center gap-3 mt-4">
