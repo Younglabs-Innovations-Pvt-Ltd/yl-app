@@ -296,6 +296,8 @@ const SnakeLevels = ({
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f603/512.gif'
                   : level?.classStatus === 'Ongoing'
                   ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f913/512.gif'
+                  : level?.classStatus === 'Rescheduled'
+                  ? 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f60c/512.gif'
                   : 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f913/512.gif';
               count = count >= marginleftcustom.length - 1 ? 0 : count + 1;
               return (
@@ -525,7 +527,7 @@ const SnakeLevels = ({
                               : null
                           } rounded-[5px] absolute top-3 border-2 border-gray-300 border-solid `}></View>
                         <View
-                          className={`h-[50px] w-[120px] flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  ${
+                          className={`h-[50px] min-w-[120px] px-2 flex flex-row justify-center items-center rounded-xl border-2 border-gray-300 border-solid  ${
                             level?.classStatus === 'Upcoming'
                               ? 'bg-[#AEAEAE]'
                               : level?.classStatus === 'Missed'
