@@ -34,6 +34,10 @@ import {Button} from 'react-native-share';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
 import {userSelector} from '../store/user/selector';
 import {useNavigation} from '@react-navigation/native';
+import BottomSheetComponent from '../components/BottomSheetComponent';
+import {startAddingChild} from '../store/user/reducer';
+import {BOOKING_URL, BASE_URL} from '@env';
+import moment from 'moment';
 
 const ageList = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -58,6 +62,7 @@ const bookingSteps = [
 ];
 
 const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
+  const dispatch = useDispatch();
   const toast = useToast();
   const [gutter, setGutter] = useState(0);
   const [open, setOpen] = useState(false);
@@ -67,7 +72,12 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
   const [isCurrentStepDataFilled, setIsCurrentStepDataFilled] = useState(false);
   const [selectedDemoType, setSelectedDemoType] = useState('');
   const [showAddChildView, setShowAddChildView] = useState(false);
-  const {textColors, bgSecondaryColor} = useSelector(state => state.appTheme);
+  const {textColors, bgSecondaryColor, bgColor} = useSelector(
+    state => state.appTheme,
+  );
+  const [selectedChildBookingId, setSelectedChildBookingId] = useState(false);
+  const {children, currentChild} = useSelector(userSelector);
+  console.log('selectedChildBookingId', selectedChildBookingId);
 
   const navigation = useNavigation();
   const {
@@ -82,7 +92,6 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
   const {user} = useSelector(authSelector);
 
   const phone = user?.phone;
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (courseData?.demoAvailable) {
@@ -208,11 +217,70 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
     dispatch(setNewOneToOneBookingStart(body));
   };
 
-  const handleNextBtnClick = () => {
+  const checkIfDemoExists = async () => {
+    try {
+      console.log('calling checkIfDemoExists');
+      if (selectedChildBookingId) {
+        console.log('selected chid booking id is', selectedChildBookingId);
+        const demoDetailsResponse = await fetch(`${BASE_URL}${BOOKING_URL}`, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({bId: selectedChildBookingId, source: 'app'}),
+        });
+
+        const demoDetails = await demoDetailsResponse.json();
+        if (demoDetails && demoDetails.demoDate) {
+          const {_seconds, _nanoseconds} = demoDetails?.demoDate;
+          const milliseconds = _seconds * 1000 + Math.floor(_nanoseconds / 1e6);
+
+          if (moment(milliseconds).isAfter(moment())) {
+            Showtoast({
+              text: `You already have a demo on ${moment(milliseconds).format(
+                'DD/MM/YY HH:mm A',
+              )}`,
+              toast,
+              type: 'danger',
+            });
+            return true;
+          }
+          return false;
+        }
+        return false;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log('demo exists check error: ', error);
+      Showtoast({
+        text: `Something went wrong ${error.message}`,
+        toast,
+        type: 'danger',
+      });
+      return true;
+    }
+  };
+
+  const handleNextBtnClick = async () => {
     if (currentStep === 1) {
       if (!checkFirstStepData()) {
         return;
       }
+
+      if (children?.length == 0 || !children) {
+        console.log('dont have any children');
+        let body = {
+          childName: fields.childName,
+          childAge,
+          leadId: user?.leadId,
+          onClose: () => {},
+          children: [],
+        };
+        console.log('giving body to add child...', body);
+        dispatch(startAddingChild(body));
+      }
+
       setCurrentStep(currentStep + 1);
       dispatch(
         setChildData({
@@ -221,17 +289,15 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
           childAge,
         }),
       );
-
-      console.log('child data is', {
-        childName: fields.childName,
-        parentName: fields.parentName,
-        childAge,
-      });
     } else if (currentStep === 2) {
       if (!checkSecondStepData()) {
         return;
       }
-      console.log('fields in 2nd step: ', fields);
+
+      const demoExists = await checkIfDemoExists();
+      if (demoExists) {
+        return;
+      }
       if (selectedDemoType === 'solo') {
         handleBookOneToOneDemo();
         return;
@@ -412,6 +478,7 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
               handleChildAge={handleChildAge}
               setFields={setFields}
               setShowAddChildView={setShowAddChildView}
+              setSelectedChildBookingId={setSelectedChildBookingId}
             />
           ) : currentStep === 2 ? (
             selectedDemoType === 'solo' ? (
@@ -488,8 +555,10 @@ const BookDemoScreen = ({courseId, setSelectedTab, place, courseData}) => {
         <View
           className="bg-[#1312125c] relative z-50"
           style={{height: height + 15, width}}>
-          <View className="flex-1 absolute bottom-0 pb-10 w-full bg-white p-3 rounded h-[450px]">
-            <AddChildModule onClose={onRequestClose} />
+          <View
+            className="flex-1 absolute bottom-0 pb-10 w-full p-3 rounded h-[450px] border-t border-gray-300"
+            style={{backgroundColor: bgColor}}>
+            <AddChildModule onClose={onRequestClose} isModal={true} />
           </View>
         </View>
       </ModalComponent>
@@ -506,6 +575,7 @@ const FirstStepDetails = ({
   handleChildAge,
   setFields,
   setShowAddChildView,
+  setSelectedChildBookingId,
 }) => {
   const {textColors, bgColor} = useSelector(state => state.appTheme);
   const {children, currentChild} = useSelector(userSelector);
@@ -513,15 +583,31 @@ const FirstStepDetails = ({
   const [childList, setChildList] = useState([]);
   const [defaultChild, setDefaultChild] = useState([]);
 
+  const ageArray = [
+    {label: '5', value: 5},
+    {label: '6', value: 6},
+    {label: '7', value: 7},
+    {label: '8', value: 8},
+    {label: '9', value: 9},
+    {label: '10', value: 10},
+    {label: '11', value: 11},
+    {label: '12', value: 12},
+    {label: '13', value: 13},
+    {label: '14', value: 14},
+  ];
+
   useEffect(() => {
     if (children?.length > 0) {
       let arr = [];
       children.forEach(element => {
-        arr.push({label: element.name, value: element});
+        arr.push({
+          label: element.name,
+          value: element,
+        });
       });
       setChildList(arr);
     } else {
-      setChildList([{label: 'No Child added. Add One', value: 'addChild'}]);
+      setChildList([]);
     }
   }, [children]);
 
@@ -529,9 +615,11 @@ const FirstStepDetails = ({
     if (currentChild) {
       const elem = [{label: currentChild.name, value: currentChild}];
       const {name, age} = currentChild;
+      let bookingId = currentChild?.bookingId;
       setFields(pre => ({...pre, childName: name}));
       handleChildAge(age);
       setDefaultChild(name);
+      setSelectedChildBookingId(bookingId);
     }
   }, [currentChild]);
 
@@ -543,7 +631,12 @@ const FirstStepDetails = ({
       setShowAddChildView(true);
       return;
     }
+    console.log('selected child is', child);
+
     const {name, age} = child;
+    let bookId = child?.bookingId || null;
+    setSelectedChildBookingId(bookId);
+
     console.log(name, age);
 
     setFields(pre => ({...pre, childName: name}));
@@ -569,13 +662,44 @@ const FirstStepDetails = ({
       </View>
 
       <View className="my-1"></View>
-      {childList && (
-        <DropdownComponent
-          data={childList}
-          placeHolder="Select Child"
-          setSelectedValue={handleSelectChild}
-          defaultValue={defaultChild}
-        />
+      {childList?.length > 0 ? (
+        <>
+          {/* <Text
+            className="text-[15px] font-bold w-full mb-1"
+            style={{
+              color: textColors.textPrimary,
+              fontFamily: FONTS.primaryFont,
+            }}>
+            Booking for
+          </Text> */}
+          <DropdownComponent
+            data={childList}
+            placeHolder="Booking for"
+            setSelectedValue={handleSelectChild}
+            defaultValue={defaultChild}
+          />
+        </>
+      ) : (
+        <>
+          <Input
+            placeHolder="Enter Child Name"
+            setValue={e => handleChangeValue({name: 'childName', value: e})}
+            value={fields.childName}
+          />
+          <DropdownComponent
+            data={ageArray}
+            placeHolder="Select Child Age"
+            setSelectedValue={handleChildAge}
+          />
+        </>
+      )}
+
+      {childList?.length > 0 && (
+        <View className="w-full items-end">
+          <Pressable onPress={() => setShowAddChildView(true)}>
+            <Text style={{color: textColors.textYlMain}}>Add child</Text>
+          </Pressable>
+        </View>
       )}
 
       <Input

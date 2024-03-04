@@ -11,7 +11,7 @@ import {Showtoast} from '../../utils/toast';
 import {useToast} from 'react-native-toast-notifications';
 import BottomSheetInput from '../BottomSheetInput';
 
-export const AddChildModule = ({onClose}) => {
+export const AddChildModule = ({onClose, isModal}) => {
   const {darkMode, bgColor, textColors, bgSecondaryColor, colorYlMain} =
     useSelector(state => state.appTheme);
   const [childName, setChildName] = useState(null);
@@ -23,8 +23,7 @@ export const AddChildModule = ({onClose}) => {
 
   const dispatch = useDispatch();
   const toast = useToast();
-
-  const ageArray = [
+ const ageArray = [
     {label: '5', value: 5},
     {label: '6', value: 6},
     {label: '7', value: 7},
@@ -36,6 +35,7 @@ export const AddChildModule = ({onClose}) => {
     {label: '13', value: 13},
     {label: '14', value: 14},
   ];
+ 
 
   const addChild = () => {
     if (childName == null || childName?.length < 2) {
@@ -54,8 +54,6 @@ export const AddChildModule = ({onClose}) => {
       onClose,
       children,
     };
-
-    console.log('adding child');
     dispatch(startAddingChild(body));
     setChildName('');
   };
@@ -72,11 +70,19 @@ export const AddChildModule = ({onClose}) => {
         </Text>
 
         <View className="w-[95%] mt-4">
-          <BottomSheetInput
-            setValue={setChildName}
-            placeHolder="Enter Child Name"
-            value={childName}
-          />
+          {isModal ? (
+            <Input
+              setValue={setChildName}
+              placeHolder="Enter Child Name"
+              value={childName}
+            />
+          ) : (
+            <BottomSheetInput
+              setValue={setChildName}
+              placeHolder="Enter Child Name"
+              value={childName}
+            />
+          )}
 
           <View className="w-full mt-1">
             <DropdownComponent

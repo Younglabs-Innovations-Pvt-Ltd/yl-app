@@ -411,7 +411,6 @@ const DemoClassScreen = ({navigation}) => {
                     style={{
                       fontWeight: 400,
                       fontFamily: FONTS.primaryFont,
-                      color: textColors.textSecondary,
                     }}>
                     Don't have WhatsApp?
                   </TextWrapper>
@@ -436,7 +435,33 @@ const DemoClassScreen = ({navigation}) => {
               )}
             </View>
             <Seperator text={'OR'} />
-            <TouchableOpacity
+
+            <View className="w-full flex-row justify-center items-center">
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontFamily: FONTS.primaryFont,
+                  color: COLORS.black,
+                }}>
+                Already a customer ?
+              </Text>
+              <Pressable
+                className="ml-2"
+                onPress={() => navigation.navigate(SCREEN_NAMES.EMAIL_LOGIN)}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontFamily: FONTS.primaryFont,
+                    borderBottomWidth: 1,
+                    borderColor: 'gray',
+                    color: COLORS.pblue,
+                  }}>
+                  Log in
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* <TouchableOpacity
               activeOpacity={0.8}
               style={btnContinueStyle}
               disabled={loading}
@@ -445,7 +470,7 @@ const DemoClassScreen = ({navigation}) => {
               <TextWrapper fs={18} ff={FONTS.headingFont} color={COLORS.white}>
                 Customer Log In
               </TextWrapper>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* <View style={{alignItems: 'center', marginTop: 12}}>
               <Pressable

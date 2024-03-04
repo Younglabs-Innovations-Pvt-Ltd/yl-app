@@ -81,16 +81,14 @@ const BookDemoSlots = ({
   useEffect(() => {
     if (!timezone) return;
     const body = {
-      courseId: courseId || 'Eng_Hw',
+      courseId: courseId,
       childAge: childAge,
       timeZone: timezone.toString(),
       type: 'website',
     };
 
-    if (bookingSlots.length < 1) {
-      dispatch(startFetchingBookingSlots(body));
-    }
-  }, [timezone]);
+    dispatch(startFetchingBookingSlots(body));
+  }, [timezone, courseId]);
 
   // set booking slot date and time
   useEffect(() => {
@@ -193,7 +191,9 @@ const BookDemoSlots = ({
           {console.log('showdate is', slot.showDate)}
           <TextWrapper
             color={
-              currentSlotDate === slot.showDate ? COLORS.white : textColors.textSecondary
+              currentSlotDate === slot.showDate
+                ? COLORS.white
+                : textColors.textSecondary
             }>
             {slot.showDate}
           </TextWrapper>

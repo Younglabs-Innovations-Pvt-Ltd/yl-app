@@ -11,7 +11,7 @@ const INITIAL_STATE = {
   isBookingLimitExceeded: false,
   loading: {
     ipDataLoading: false,
-    bookingSlotsLoading: false,
+    bookingSlotsLoading: true,
     bookingLoading: false,
   },
   selectedSlot: null,
@@ -48,6 +48,9 @@ const reducer = {
   fetchBookingSlotsSuccess(state, action) {
     state.loading.bookingSlotsLoading = false;
     state.bookingSlots = action.payload;
+  },
+  fetchBookingSlotsFailed(state) {
+    state.loading.bookingSlotsLoading = false;
   },
   setIpDataLoadingState(state, action) {
     state.ipDataLoading = action.payload;
@@ -129,6 +132,7 @@ export const {
   fetchIpDataFailed,
   startFetchingBookingSlots,
   fetchBookingSlotsSuccess,
+  fetchBookingSlotsFailed,
   setIpDataLoadingState,
   setNewBookingStart,
   setNewBookingFailed,

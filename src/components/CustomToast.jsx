@@ -29,7 +29,7 @@ const CustomToast = ({toast}) => {
         <MIcon name={icon} size={25} color={pColor} />
       )}
       <Text
-        className={`flex-wrap font-semibold text-base text-center ml-2`}
+        className={`flex-wrap font-semibold text-base  ml-2`}
         style={{color: pColor}}>
         {toast.message}
       </Text>

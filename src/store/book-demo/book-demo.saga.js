@@ -13,6 +13,7 @@ import {
   setOneToOneBookingSuccess,
   setOneToOneBookingFailed,
   fetchIpDataFailed,
+  fetchBookingSlotsFailed,
 } from './book-demo.reducer';
 import {localStorage} from '../../utils/storage/storage-provider';
 
@@ -107,6 +108,7 @@ function* fetchBookingSlots({payload}) {
     console.log('data is', slotsData);
     yield put(fetchBookingSlotsSuccess(slotsData));
   } catch (error) {
+    yield put(fetchBookingSlotsFailed());
     console.log('Slots error', error);
   }
 }
@@ -181,10 +183,12 @@ function* handleNewOneToOneBooking({payload}) {
         textColor: 'white',
         duration: Snackbar.LENGTH_LONG,
       });
+      return;
     }
+    yield put(setOneToOneBookingFailed('Something went wrong'));
   } catch (error) {
     console.log('eror', error.message);
-    yield put(setOneToOneBookingFailed('Somethis went wrong'));
+    yield put(setOneToOneBookingFailed('Something went wrong'));
   }
 }
 
