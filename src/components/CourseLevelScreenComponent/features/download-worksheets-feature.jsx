@@ -1,5 +1,6 @@
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {Showtoast} from '../../../utils/toast';
+import FileViewer from 'react-native-file-viewer';
 
 export const downloadWorksheet = async ({serviceReqClassesData}) => {
   const workSheetLink = serviceReqClassesData?.classes[0]?.worksheetLink
@@ -17,6 +18,7 @@ export const downloadWorksheet = async ({serviceReqClassesData}) => {
         mime: 'application/pdf',
       },
     }).fetch('GET', workSheetLink);
+    await FileViewer.open(response.path());
   } catch (error) {
     Showtoast({
       text: 'Worksheet not available',
