@@ -59,7 +59,10 @@ function* handleBookingStatus({payload: {phone, ipData}}) {
 
     const deviceId = yield getCurrentDeviceId();
     const deviceUID = yield DeviceInfo.getAndroidId();
-    const countryCode = 91;
+    let countryCode = ipData?.calling_code;
+    if (countryCode.charAt(0) === '+') {
+      countryCode.substring(1);
+    }
     const courseId = 'Eng_Hw';
 
     const leadBody = {
