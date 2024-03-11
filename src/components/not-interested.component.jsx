@@ -79,6 +79,7 @@ const NotInterested = ({onClose, bookingDetails}) => {
       }
       setLoading(false);
       dispatch(setAppRemark(remark));
+      onClose();
     } catch (error) {
       console.log('MARK NOT INTERESTED', error.message);
     }

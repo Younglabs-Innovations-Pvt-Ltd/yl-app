@@ -10,6 +10,7 @@ import {
   startFetchBookingDetailsFromPhone,
   startFetchBookingDetailsFromId,
   setToInitialState,
+  setNotInterestedPopup,
 } from '../store/join-demo/join-demo.reducer';
 import BottomSheetComponent from '../components/BottomSheetComponent';
 import {AddChildModule} from '../components/MainScreenComponents/AddChildModule';
@@ -43,6 +44,11 @@ import {
   registerNotificationTimer,
   removeRegisterNotificationTimer,
 } from '../natiive-modules/timer-notification';
+import moment from 'moment';
+import {LOCAL_KEYS} from '../utils/constants/local-keys';
+import RatingPopup from '../components/popups/rating';
+import NotInterested from '../components/not-interested.component';
+
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const {width, height} = Dimensions.get('window');
@@ -51,11 +57,12 @@ const MainWelcomeScreen = ({navigation}) => {
   const [showAddChildView, setShowAddChildView] = useState(false);
   const [showChangeChildView, setShowChangeChildView] = useState(false);
   const [showBookFreeClassSheet, setShowBookFreeClassSheet] = useState(false);
+  const [ratingModal, setRatingModal] = useState(false);
   const [showRescheduleClassSheet, setShowRescheduleClassSheet] =
     useState(false);
-  const dispatch = useDispatch();
   const [swiperData, setSwiperData] = useState([]);
 
+  const dispatch = useDispatch();
   const {customer, user, userFetchLoading} = useSelector(authSelector);
   const {bgColor, textColors, colorYlMain} = useSelector(
     state => state.appTheme,
@@ -69,7 +76,14 @@ const MainWelcomeScreen = ({navigation}) => {
     networkState: {isConnected},
   } = useSelector(networkSelector);
 
-  const {bookingTime} = useSelector(joinDemoSelector);
+  const {
+    bookingTime,
+    demoData,
+    bookingDetails,
+    notInterestedPopup,
+    isNmi,
+    appRemark,
+  } = useSelector(joinDemoSelector);
 
   // Show timer
   useEffect(() => {
@@ -82,6 +96,30 @@ const MainWelcomeScreen = ({navigation}) => {
       }
     }
   }, [bookingTime, currentChild]);
+
+  // Rating after 45 minutes of class
+  useEffect(() => {
+    if (bookingTime) {
+      const isClassOver = moment().isAfter(
+        moment(bookingTime).add(45, 'minutes'),
+      );
+
+      console.log('isClassOver', isClassOver);
+
+      const isJoined = localStorage.getString(LOCAL_KEYS.JOIN_CLASS);
+      console.log('isJoined', isJoined);
+
+      if (isJoined && isClassOver) {
+        setRatingModal(true);
+      }
+
+      if (!isNmi && !appRemark) {
+        console.log('isNmi', isNmi);
+        console.log('appRemark', appRemark);
+        setRatingModal(true);
+      }
+    }
+  }, [bookingTime, isNmi, appRemark]);
 
   // fetch IpData
   useEffect(() => {
@@ -185,6 +223,11 @@ const MainWelcomeScreen = ({navigation}) => {
   };
   const onChangeChildSheetClose = () => {
     setShowChangeChildView(false);
+  };
+
+  const onCloseNotInterested = () => {
+    dispatch(setNotInterestedPopup(false));
+    ratingModal && setRatingModal(false);
   };
 
   // ---------Referesh
@@ -330,6 +373,24 @@ const MainWelcomeScreen = ({navigation}) => {
         }
         snapPoint={['50%', '90%']}
       />
+      <RatingPopup
+        visible={ratingModal}
+        onClose={() => setRatingModal(false)}
+        bookingId={demoData?.bookingId}
+        courses={courses}
+        bookingDetails={bookingDetails}
+      />
+      <ModalComponent
+        visible={notInterestedPopup}
+        animationType="slide"
+        onRequestClose={onCloseNotInterested}>
+        {bookingDetails && (
+          <NotInterested
+            onClose={onCloseNotInterested}
+            bookingDetails={bookingDetails}
+          />
+        )}
+      </ModalComponent>
     </View>
   );
 };

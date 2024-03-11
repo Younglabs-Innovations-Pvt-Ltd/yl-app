@@ -243,15 +243,20 @@ function* saveAcsTokenInLocalStorage({data}) {
 function* handleJoinClass({payload: {bookingDetails, childName, demoData}}) {
   if (!childName) {
     yield put(setErrorMessage('Please enter child name'));
+    yield put(setJoinClassLoading(false));
+    return;
+  } else if (childName.toLowerCase().includes('@childname')) {
+    yield put(setErrorMessage('Please enter child name'));
+    yield put(setJoinClassLoading(false));
     return;
   }
 
   try {
     yield put(setJoinClassLoading(true));
-    const notChildName = bookingDetails.childName
-      .toLowerCase()
-      .includes('your child');
-    if (notChildName) {
+    const bChildName = bookingDetails.childName;
+    if (bChildName && bChildName.toLowerCase().includes('your child')) {
+      yield call(updateChildName, {bookingDetails, childName});
+    } else if (bChildName && bChildName.toLowerCase().includes('@childname')) {
       yield call(updateChildName, {bookingDetails, childName});
     }
 

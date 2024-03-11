@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useRef} from 'react';
+import React, {useState, useMemo, useRef, useEffect} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -24,18 +24,32 @@ import {joinDemoSelector} from '../../store/join-demo/join-demo.selector';
 
 const CARD_WIDTH = 296;
 
-const RatingPopup = ({visible, onClose, bookingId}) => {
+const RatingPopup = ({
+  visible,
+  onClose,
+  bookingId,
+  courses,
+  bookingDetails,
+}) => {
   const [rating, setRating] = useState(0);
 
   const scrollViewRef = useRef();
 
   const dispatch = useDispatch();
 
-  const {nmiLoading} = useSelector(joinDemoSelector);
+  const {nmiLoading, isRated} = useSelector(joinDemoSelector);
+
+  useEffect(() => {
+    if (isRated) {
+      console.log('isRated is set to ' + isRated);
+      scrollViewRef.current &&
+        scrollViewRef.current.scrollTo({x: CARD_WIDTH, animated: true});
+    }
+  }, [isRated]);
 
   // Marked need more info
   const markNeedMoreInfo = async () => {
-    dispatch(markNMI({bookingId}));
+    dispatch(markNMI({bookingId, courseId: bookingDetails?.courseId, courses}));
     setTimeout(() => {
       onClose();
     }, 300);
@@ -115,7 +129,7 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
               </View>
               <View style={{width: CARD_WIDTH}}>
                 <TextWrapper
-                  fs={22}
+                  fs={20}
                   ff={FONTS.signika_medium}
                   styles={{textAlign: 'center', marginBottom: 16}}>
                   Would you like to continue with the complete course and
@@ -128,7 +142,7 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
                   ]}
                   disabled={nmiLoading}
                   onPress={markNeedMoreInfo}>
-                  <TextWrapper fs={18} color={COLORS.white}>
+                  <TextWrapper fs={16} color={COLORS.white}>
                     Yes, Need more info
                   </TextWrapper>
                   {NMI_LOADING}
@@ -136,11 +150,17 @@ const RatingPopup = ({visible, onClose, bookingId}) => {
                 <Pressable
                   style={({pressed}) => [
                     styles.ctaButton,
-                    {opacity: pressed ? 0.8 : 1, marginTop: 8},
+                    {
+                      opacity: pressed ? 0.8 : 1,
+                      marginTop: 8,
+                      backgroundColor: 'transparent',
+                      borderWidth: 1,
+                      borderColor: COLORS.pblue,
+                    },
                   ]}
                   disabled={nmiLoading}
                   onPress={onOpenNotInterested}>
-                  <TextWrapper fs={18} color={COLORS.white}>
+                  <TextWrapper fs={16} color={COLORS.pblue}>
                     No, I don't want
                   </TextWrapper>
                 </Pressable>
@@ -174,12 +194,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ctaButton: {
-    height: 48,
+    height: 46,
     paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: 50,
     gap: 8,
     backgroundColor: COLORS.pblue,
   },
