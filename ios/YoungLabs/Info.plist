@@ -61,5 +61,21 @@
 		<string>Signika Negative Medium.ttf</string>
 		<string>Signika Negative SemiBold.ttf</string>
 	</array>
+
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+  <key>CFBundleURLSchemes</key>
+  <array>
+    <string>365530592091832</string>
+  </array>
+  </dict>
+</array>
+<key>FacebookAppID</key>
+<string>365530592091832</string>
+<key>FacebookClientToken</key>
+<string>1fc8df8a117d945c114149c2740b3f37</string>
+<key>FacebookDisplayName</key>
+<string>Younglabs</string>
 </dict>
 </plist>
