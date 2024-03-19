@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Linking, Alert, ActivityIndicator, View, StatusBar} from 'react-native';
+import {Linking, Alert, ActivityIndicator, View, StatusBar, Platform} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -62,6 +62,7 @@ import messaging from '@react-native-firebase/messaging';
 import {AndroidStyle, AndroidImportance} from '@notifee/react-native';
 import {displayNotification} from './src/utils/notifications';
 import PhoneLogin from './src/screens/phone-login.screen';
+import { requestAPNSPermissions } from './src/utils/requestPermissions';
 
 initialize('kdg30i0fnc');
 
@@ -141,13 +142,21 @@ function App() {
 
   // Check for app update
   useEffect(() => {
-    checkForUpdate();
+    if (Platform.OS === "android") {
+      checkForUpdate();
+    }
   }, []);
 
   useEffect(() => {
     const storeDeviceId = async () => {
       try {
-        const uid = await DeviceInfo.getAndroidId();
+        let uid = "";
+        if (Platform.OS === "android") {
+          uid = await DeviceInfo.getAndroidId()
+        }else if (Platform.OS === "ios") {
+          uid = await DeviceInfo.getUniqueId();
+        }
+        console.log("uid", uid)
         await saveDeviceId({phone: '', deviceUID: uid});
       } catch (error) {
         console.log('storeDeviceIdError', error.message);
@@ -158,7 +167,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    requestPermissions();
+    if (Platform.OS === "android") {
+      requestPermissions();
+    }else if (Platform.OS === "ios") {
+      requestAPNS()
+    }
     let storedUser = localStorage.getString(LOCAL_KEYS.LOGINDETAILS);
     if (!storedUser) {
       setLoading(false);
@@ -195,6 +208,14 @@ function App() {
       setLoading(false);
     }
   }, []);
+
+  const requestAPNS = async() => {
+    try {
+      await requestAPNSPermissions();
+    } catch (error) {
+      console.log("apnsError", error)
+    }
+  }
 
   const handlePaymentDeepLink = ({url}) => {
     const route = url.replace(/.*?:\/\//g, '');

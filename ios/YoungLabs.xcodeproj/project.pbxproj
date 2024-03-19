@@ -40,6 +40,7 @@
 		00E356F21AD99517003FC87E /* YoungLabsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YoungLabsTests.m; sourceTree = "<group>"; };
 		019D94A555B94A2A957C16FF /* Roboto Condensed.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto Condensed.ttf"; path = "../src/assets/fonts/Roboto Condensed.ttf"; sourceTree = "<group>"; };
 		0D3233ED2BA82B94001C87FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0DF068F92BA9834600411EA5 /* YoungLabs.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = YoungLabs.entitlements; path = YoungLabs/YoungLabs.entitlements; sourceTree = "<group>"; };
 		122D52EC81BCA33A75DED54E /* Pods_YoungLabs_YoungLabsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_YoungLabs_YoungLabsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* YoungLabs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YoungLabs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = YoungLabs/AppDelegate.h; sourceTree = "<group>"; };
@@ -116,6 +117,7 @@
 		13B07FAE1A68108700A75B9A /* YoungLabs */ = {
 			isa = PBXGroup;
 			children = (
+				0DF068F92BA9834600411EA5 /* YoungLabs.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -554,6 +556,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = YoungLabs/YoungLabs.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = YoungLabs/Info.plist;
@@ -581,6 +584,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = YoungLabs/YoungLabs.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = YoungLabs/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

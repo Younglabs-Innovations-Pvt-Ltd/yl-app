@@ -20,8 +20,23 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>365530592091832</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FacebookAppID</key>
+	<string>365530592091832</string>
+	<key>FacebookClientToken</key>
+	<string>1fc8df8a117d945c114149c2740b3f37</string>
+	<key>FacebookDisplayName</key>
+	<string>Younglabs</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -36,7 +51,22 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Roboto Condensed.ttf</string>
+		<string>Big Shoulders Display SemiBold.ttf</string>
+		<string>Gelasio-SemiBold.ttf</string>
+		<string>Roboto.ttf</string>
+		<string>Dancing Script.ttf</string>
+		<string>Signika Negative Medium.ttf</string>
+		<string>Signika Negative SemiBold.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -51,31 +81,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Roboto Condensed.ttf</string>
-		<string>Big Shoulders Display SemiBold.ttf</string>
-		<string>Gelasio-SemiBold.ttf</string>
-		<string>Roboto.ttf</string>
-		<string>Dancing Script.ttf</string>
-		<string>Signika Negative Medium.ttf</string>
-		<string>Signika Negative SemiBold.ttf</string>
-	</array>
-
-<key>CFBundleURLTypes</key>
-<array>
-  <dict>
-  <key>CFBundleURLSchemes</key>
-  <array>
-    <string>365530592091832</string>
-  </array>
-  </dict>
-</array>
-<key>FacebookAppID</key>
-<string>365530592091832</string>
-<key>FacebookClientToken</key>
-<string>1fc8df8a117d945c114149c2740b3f37</string>
-<key>FacebookDisplayName</key>
-<string>Younglabs</string>
 </dict>
 </plist>
