@@ -63,6 +63,7 @@ import {AndroidStyle, AndroidImportance} from '@notifee/react-native';
 import {displayNotification} from './src/utils/notifications';
 import PhoneLogin from './src/screens/phone-login.screen';
 import { requestAPNSPermissions } from './src/utils/requestPermissions';
+import { increment } from './src/natiive-modules/app-version';
 
 initialize('kdg30i0fnc');
 
@@ -81,6 +82,11 @@ function App() {
   );
 
   const notificationRef = useRef({});
+
+  useEffect(() => {
+    console.log("calling increment")
+    increment();
+  }, [])
 
   // Foreground notifications
   useEffect(() => {

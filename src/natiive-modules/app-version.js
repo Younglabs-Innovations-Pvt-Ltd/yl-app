@@ -1,6 +1,6 @@
 import {NativeModules} from 'react-native';
 
-const {AppVersionModule} = NativeModules;
+const {AppVersionModule, Counter} = NativeModules;
 
 /**
  * @author Shobhit
@@ -10,3 +10,7 @@ const {AppVersionModule} = NativeModules;
  */
 export const getCurrentAppVersion = callback =>
   AppVersionModule.getCurrentVersion(callback);
+
+export const increment = () => {
+  Counter.increment()
+}

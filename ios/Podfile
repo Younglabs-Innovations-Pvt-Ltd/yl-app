@@ -33,6 +33,7 @@ target 'YoungLabs' do
   flags = get_default_flags()
   # use_frameworks!
   use_frameworks! :linkage => :static
+  # pod 'AzureCommunicationUICalling', '1.6.0'
   use_react_native!(
     :path => config[:reactNativePath],
     # Hermes is now enabled by default. Disable by setting this flag to false.

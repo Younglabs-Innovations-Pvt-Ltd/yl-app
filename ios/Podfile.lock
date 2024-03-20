@@ -643,8 +643,6 @@ PODS:
     - React-Core
   - RNSVG (14.1.0):
     - React-Core
-  - RNVectorIcons (10.0.0):
-    - React-Core
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
@@ -734,7 +732,6 @@ DEPENDENCIES:
   - RNShare (from `../node_modules/react-native-share`)
   - RNSnackbar (from `../node_modules/react-native-snackbar`)
   - RNSVG (from `../node_modules/react-native-svg`)
-  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -921,8 +918,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-snackbar"
   RNSVG:
     :path: "../node_modules/react-native-svg"
-  RNVectorIcons:
-    :path: "../node_modules/react-native-vector-icons"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1027,7 +1022,6 @@ SPEC CHECKSUMS:
   RNShare: da6d90b6dc332f51f86498041d6e34211f96b630
   RNSnackbar: 3727b42bf6c4314a53c18185b5203e915a4ab020
   RNSVG: ba3e7232f45e34b7b47e74472386cf4e1a676d0a
-  RNVectorIcons: 8b5bb0fa61d54cd2020af4f24a51841ce365c7e9
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   Sentry: 71cd4427146ac56eab6e70401ac7a24384c3d3b5
@@ -1035,6 +1029,6 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 65286bb6a07edce5e4fe8c90774da977ae8fc009
 
-PODFILE CHECKSUM: 5c0c458333d7d68d5995655d8811d2d3d6608c6c
+PODFILE CHECKSUM: 7cf858114c9c11f0ef989cc61e9f8f0cc758f919
 
 COCOAPODS: 1.15.2
