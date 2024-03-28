@@ -8,6 +8,7 @@ import {
   Dimensions,
   ActivityIndicator,
   Text,
+  Platform,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {COLORS} from '../utils/constants/colors';
@@ -45,6 +46,7 @@ import {AddChildModule} from '../components/MainScreenComponents/AddChildModule'
 import Snackbar from 'react-native-snackbar';
 import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
 import {setUser} from '../store/auth/reducer';
+import { appleSignIn } from '../utils/signins';
 
 GoogleSignin.configure({
   webClientId:
@@ -576,6 +578,23 @@ const Payment = ({navigation, route}) => {
       }
     } catch (error) {
       console.log('GoogleAuthenticationError', error.message);
+    }
+  }
+
+  const onAppleButtonPressed = async() => {
+    try {
+      await appleSignIn();
+      setAuthVisible(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const onLogin = () => {
+    if (Platform.OS === "android") {
+      onGoogleButtonPress()
+    }else {
+      onAppleButtonPressed();
     }
   }
 
@@ -1170,14 +1189,14 @@ const Payment = ({navigation, route}) => {
                 Please login to continue
               </TextWrapper>
               <Spacer space={10} />
-              <Pressable style={styles.btnLogin} onPress={onGoogleButtonPress}>
-                <Icon name="logo-google" size={24} color="#434a52" />
+              <Pressable style={styles.btnLogin} onPress={onLogin}>
+                <Icon name={`logo-${Platform.OS === "android" ? "google" : "apple"}`} size={24} color="#434a52" />
                 <TextWrapper
                   ff={FONTS.signika_semiBold}
                   fs={18}
                   color="#434a52"
                   styles={{marginLeft: 4}}>
-                  Login with Google
+                  {`Login with ${Platform.OS === "android" ? "Google" : "Apple"}`}
                 </TextWrapper>
               </Pressable>
             </View>
