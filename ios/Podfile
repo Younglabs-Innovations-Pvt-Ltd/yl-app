@@ -6,7 +6,7 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, min_ios_version_supported
+platform :ios, "14.0"
 prepare_react_native_project!
 
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
@@ -33,7 +33,6 @@ target 'YoungLabs' do
   flags = get_default_flags()
   # use_frameworks!
   use_frameworks! :linkage => :static
-  # pod 'AzureCommunicationUICalling', '1.6.0'
   use_react_native!(
     :path => config[:reactNativePath],
     # Hermes is now enabled by default. Disable by setting this flag to false.
@@ -47,6 +46,9 @@ target 'YoungLabs' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+   # Add AzureCommunicationUICalling pod here
+  #  pod 'AzureCommunicationUICalling', '1.6.0'
 
   target 'YoungLabsTests' do
     inherit! :complete
