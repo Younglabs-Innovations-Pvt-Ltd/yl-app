@@ -19,7 +19,6 @@ import {LOCAL_KEYS} from './src/utils/constants/local-keys';
 import {request, PERMISSIONS} from 'react-native-permissions';
 
 // Native mmodules
-import {checkForUpdate} from './src/natiive-modules/inapp-update';
 import {localStorage} from './src/utils/storage/storage-provider';
 import {FONTS} from './src/utils/constants/fonts';
 import {SCREEN_NAMES} from './src/utils/constants/screen-names';
@@ -46,7 +45,6 @@ import {NetworkProvider} from './src/context/network.state';
 
 import auth from '@react-native-firebase/auth';
 
-import Icon from './src/components/icon.component';
 import CourseDetailsScreen from './src/screens/CourseDetailScreen';
 import CustomToast from './src/components/CustomToast';
 import DeviceInfo from 'react-native-device-info';
@@ -146,12 +144,13 @@ function App() {
     SplashScreen.hide();
   }, []);
 
-  // Check for app update
-  useEffect(() => {
-    if (Platform.OS === "android") {
-      checkForUpdate();
+  const requestAPNS = async() => {
+    try {
+      await requestAPNSPermissions();
+    } catch (error) {
+      console.log("apnsError", error)
     }
-  }, []);
+  }
 
   useEffect(() => {
     const storeDeviceId = async () => {
@@ -214,14 +213,6 @@ function App() {
       setLoading(false);
     }
   }, []);
-
-  const requestAPNS = async() => {
-    try {
-      await requestAPNSPermissions();
-    } catch (error) {
-      console.log("apnsError", error)
-    }
-  }
 
   const handlePaymentDeepLink = ({url}) => {
     const route = url.replace(/.*?:\/\//g, '');

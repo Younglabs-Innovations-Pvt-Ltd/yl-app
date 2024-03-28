@@ -11,6 +11,8 @@ import {
   Text,
 } from 'react-native';
 
+import {BASE_URL} from '@env';
+
 import {FONTS} from '../utils/constants/fonts';
 import {COLORS} from '../utils/constants/colors';
 import {IMAGES} from '../utils/constants/images';
@@ -40,9 +42,11 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {startFetchingIpData} from '../store/book-demo/book-demo.reducer';
 import Icon from '../components/icon.component';
 import {networkSelector} from '../store/network/selector';
-import Spacer from '../components/spacer.component';
 import Seperator from '../components/seperator.component';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {checkForUpdate} from '../natiive-modules/inapp-update';
+import VersionNumber from 'react-native-version-number';
+import Update from '../components/popups/update';
 
 const {width: deviceWidth} = Dimensions.get('window');
 
@@ -55,6 +59,8 @@ const DemoClassScreen = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [loginWithWhatsapp, setLoginWithWhatsapp] = useState(true);
   const [whatsappConsent, setWhatsappConsent] = useState(true);
+  const [checkUpdateVisible, setCheckUpdateVisible] = useState(false);
+  const [identifier, setIdentifier] = useState('');
 
   const dispatch = useDispatch();
 
@@ -66,6 +72,35 @@ const DemoClassScreen = ({navigation}) => {
   const {
     networkState: {isConnected},
   } = useSelector(networkSelector);
+
+  const checkForIOSUpdate = async currentVersion => {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/app/checkForUpdate`);
+      const data = await response.json();
+      console.log('data', data);
+      const {appVersion, updateAvailable, bundleIdentifier} = data;
+      if (updateAvailable) {
+        if (appVersion > currentVersion) {
+          console.log('show update modal');
+          setCheckUpdateVisible(true);
+          setIdentifier(bundleIdentifier);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Check for app update
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      checkForUpdate();
+    } else {
+      const currentVersion = VersionNumber.appVersion;
+      console.log('appVersion', currentVersion);
+      checkForIOSUpdate(currentVersion);
+    }
+  }, []);
 
   // show message to customer to login with right credentials (email and password)
   useEffect(() => {
@@ -503,6 +538,7 @@ const DemoClassScreen = ({navigation}) => {
           onClose={onModalClose}
           onSelect={handleSelectCountry}
         />
+        <Update visible={checkUpdateVisible} identifier={identifier} />
       </ImageBackground>
     </View>
   );

@@ -10,7 +10,7 @@
 		00E356F31AD99517003FC87E /* YoungLabsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* YoungLabsTests.m */; };
 		0D0E83B52BAAC0AB00F31FE7 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0D0E83B32BAAC0AB00F31FE7 /* Ionicons.ttf */; };
 		0D0E83B62BAAC0AB00F31FE7 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0D0E83B42BAAC0AB00F31FE7 /* MaterialCommunityIcons.ttf */; };
-		0D3233EE2BA82B94001C87FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0D3233ED2BA82B94001C87FB /* GoogleService-Info.plist */; };
+		0DBDD2D02BB58E360073208B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DBDD2CF2BB58E350073208B /* GoogleService-Info.plist */; };
 		0DF069012BA9A03900411EA5 /* Counter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF069002BA9A03900411EA5 /* Counter.swift */; };
 		0DF069032BA9A1D000411EA5 /* Counter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DF069022BA9A1D000411EA5 /* Counter.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
@@ -44,7 +44,7 @@
 		019D94A555B94A2A957C16FF /* Roboto Condensed.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto Condensed.ttf"; path = "../src/assets/fonts/Roboto Condensed.ttf"; sourceTree = "<group>"; };
 		0D0E83B32BAAC0AB00F31FE7 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		0D0E83B42BAAC0AB00F31FE7 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
-		0D3233ED2BA82B94001C87FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0DBDD2CF2BB58E350073208B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0DF068F92BA9834600411EA5 /* YoungLabs.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = YoungLabs.entitlements; path = YoungLabs/YoungLabs.entitlements; sourceTree = "<group>"; };
 		0DF068FF2BA9A03900411EA5 /* YoungLabs-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "YoungLabs-Bridging-Header.h"; sourceTree = "<group>"; };
 		0DF069002BA9A03900411EA5 /* Counter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Counter.swift; sourceTree = "<group>"; };
@@ -169,7 +169,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				0D3233ED2BA82B94001C87FB /* GoogleService-Info.plist */,
+				0DBDD2CF2BB58E350073208B /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* YoungLabs */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* YoungLabsTests */,
@@ -307,7 +307,7 @@
 				1B82EDD02CF941E58FF4890C /* Gelasio-SemiBold.ttf in Resources */,
 				ACAEAC005A7B45048A78A75F /* Roboto.ttf in Resources */,
 				F90F8CF7423E4743B3239FD5 /* Dancing Script.ttf in Resources */,
-				0D3233EE2BA82B94001C87FB /* GoogleService-Info.plist in Resources */,
+				0DBDD2D02BB58E360073208B /* GoogleService-Info.plist in Resources */,
 				949DE7D6AA624B1CBB208B29 /* Signika Negative Medium.ttf in Resources */,
 				2C42A34EC6F6431DAE7C0453 /* Signika Negative SemiBold.ttf in Resources */,
 			);
